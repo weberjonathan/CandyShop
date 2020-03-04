@@ -75,10 +75,6 @@ namespace ChocoAutostart
                 return;
             }
 
-            /* TODO 
-             * research how pinned affects output summary
-             * (Chocolatey has determined 0 package(s) are outdated.)
-             * */
             string summaryPattern = @"Chocolatey has determined [0-9]* package\(s\) are outdated\.";
             Match summaryMatch = Regex.Match(output, summaryPattern);
             if (!summaryMatch.Success)
@@ -102,7 +98,7 @@ namespace ChocoAutostart
                     upgradeProcInfo.UseShellExecute = true;
                     try
                     {
-                        Process.Start(upgradeProcInfo);
+                        Process p = Process.Start(upgradeProcInfo);
                     }
                     catch (System.ComponentModel.Win32Exception)
                     {
