@@ -3,7 +3,7 @@ _ChocoAutostart_ checks for outdated choco updates and prompts once to upgrade a
 
 Use `ChocoAutostart.exe -d` to display debug information.
 
-Requires .NET Core 3.1. Written for Chocolatey v0.10.15.
+Targets .NET Core 3.1. Written for Chocolatey v0.10.15.
 
 ## Help
 * `%appdata%\Microsoft\Windows\Start Menu\Programs\Startup`
