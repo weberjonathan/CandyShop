@@ -4,6 +4,7 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+    <StartupObject>ChocoUpgrade.Program</StartupObject>
   </PropertyGroup>
 
 </Project>

@@ -89,12 +89,14 @@ namespace ChocoAutostart
             // execute upgrades
             if (outdatedCount > 0 && File.Exists(upgradeTool))
             {
+                Warning("Do not change or rename shortcuts on your desktop while the installation is ongoing!");
                 Console.Write("Do you wish to update all outdated packages? [y] ");
                 if (Console.ReadLine().ToLower().Equals("y"))
                 {
                     // launch upgrade tool and exit
                     Console.WriteLine("Launching upgrade process...");
                     ProcessStartInfo upgradeProcInfo = new ProcessStartInfo(upgradeTool);
+                    upgradeProcInfo.Arguments = "--cleanup";
                     upgradeProcInfo.UseShellExecute = true;
                     try
                     {
