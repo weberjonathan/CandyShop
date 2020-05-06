@@ -1,19 +1,12 @@
 # chocoHelpers
-_ChocoAutostart_ checks for outdated choco updates and prompts once to upgrade all (using integrated upgrade tool with elevated privileges).
+_ChocoAutostart_ checks for outdated choco updates and prompts once to upgrade all. Packages _ChocoUpgrade_ and launches it on demand (and with elevated privileges).
 
 Use `ChocoAutostart.exe -d` to display debug information.
+Use `ChocoUpgrade.exe -c` or `--cleanup` to automatically remove newly created shortcuts on the desktop. The default release package uses this option.
 
 Targets .NET Core 3.1. Written for Chocolatey v0.10.15.
 
-## ChocoAutostart Versions
-### 1.1.0
-* Automatically removes shortcuts created during package upgrade.
-
-## ChocoUpgrade Versions
-### 1.1.0
-* Use `ChocoUpgrade.exe -c` or `--cleanup` to remove shortcuts created during the installation of upgrades.
-
-## Help
+## Other
 * `%appdata%\Microsoft\Windows\Start Menu\Programs\Startup`
 * `shell:startup`
 
