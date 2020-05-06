@@ -6,24 +6,7 @@ Use `ChocoUpgrade.exe -c` or `--cleanup` to automatically remove newly created s
 
 Targets .NET Core 3.1. Written for Chocolatey v0.10.15.
 
-<<<<<<< HEAD
 ## Other
-=======
-## Versions
-### ChocoAutostart
-#### 1.1.0.1 (TODO)
-* Packages Choco Upgrade v1.1.0.1.
-#### 1.1.0
-* Packages Choco Upgrade v1.1.0. (Automatically removes shortcuts created during package upgrade.)
-
-### ChocoUpgrade
-#### 1.1.0.1
-* Improved shortcut removal.
-#### 1.1.0
-* Use `ChocoUpgrade.exe -c` or `--cleanup` to remove shortcuts created during the installation of upgrades.
-
-## Help
->>>>>>> 6aeb54a6911de3392b053545abd5e73c40272b26
 * `%appdata%\Microsoft\Windows\Start Menu\Programs\Startup`
 * `shell:startup`
 
