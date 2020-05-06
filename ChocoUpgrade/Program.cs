@@ -8,6 +8,7 @@ namespace ChocoUpgrade
     class Program
     {
         private static string chocoError = "";
+        private static Queue<string> newShortcuts = new Queue<string>();
         
         private static void OutputDataReceived(object sender, DataReceivedEventArgs e)
         {
@@ -24,18 +25,19 @@ namespace ChocoUpgrade
             chocoError += e.Data + "\n";
         }
 
+        private static void Watcher_Created(object sender, FileSystemEventArgs e)
+        {
+            newShortcuts.Enqueue(e.FullPath);
+        }
+
         static int Main(string[] args)
         {
+
             // get desktop shortcuts
             bool FLAG_CLEANUP;
-            List<string> desktopShortcuts = null;
             if (args.Length > 0 && (args[0].Equals("-c") || args[0].Equals("--cleanup")))
             {
                 FLAG_CLEANUP = true;
-                desktopShortcuts = new List<string>(Directory.GetFiles(
-                    Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
-                    "*.lnk",
-                    SearchOption.TopDirectoryOnly));
             }
             else
             {
@@ -53,31 +55,42 @@ namespace ChocoUpgrade
             p.ErrorDataReceived += ErrorDataReceived;
             p.Start();
 
-            p.BeginOutputReadLine();
-            p.BeginErrorReadLine();
-            p.WaitForExit();
-
-            if (p.ExitCode != 0)
+            using (FileSystemWatcher watcher = new FileSystemWatcher())
             {
-                Console.WriteLine($"choco did not exit cleanly ({p.ExitCode}).\n");
-                Console.WriteLine(chocoError);
+                watcher.Path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+                watcher.Filter = "*.lnk";
+                watcher.IncludeSubdirectories = false;
+                watcher.NotifyFilter = NotifyFilters.FileName;
+                watcher.Created += Watcher_Created;
+                watcher.EnableRaisingEvents = true;
+
+                Console.ReadKey();
+
+                p.BeginOutputReadLine();
+                p.BeginErrorReadLine();
+                p.WaitForExit();
+
+                if (p.ExitCode != 0)
+                {
+                    Console.WriteLine($"choco did not exit cleanly ({p.ExitCode}).\n");
+                    Console.WriteLine(chocoError);
+                }
             }
 
             // remove new shortcuts
             if (FLAG_CLEANUP)
             {
-                Queue<string> newShortcuts = new Queue<string>(Directory.GetFiles(
-                    Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
-                    "*.lnk",
-                    SearchOption.TopDirectoryOnly));
-
-                while (desktopShortcuts != null && newShortcuts.Count > 0)
+                while (newShortcuts.Count > 0)
                 {
-                    string newS = newShortcuts.Dequeue();
-                    if (!desktopShortcuts.Contains(newS))
+                    string shortcut = newShortcuts.Dequeue();
+                    Console.WriteLine($"Deleting shortcut {shortcut}");
+                    try
                     {
-                        Console.WriteLine($"Deleting shortcut {newS}");
-                        File.Delete(newS);
+                        File.Delete(shortcut);
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine($"ERROR: Could not delete shortcut. (${e.Message})");
                     }
                 }
             }
