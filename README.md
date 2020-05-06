@@ -5,12 +5,17 @@ Use `ChocoAutostart.exe -d` to display debug information.
 
 Targets .NET Core 3.1. Written for Chocolatey v0.10.15.
 
-## ChocoAutostart Versions
-### 1.1.0
-* Automatically removes shortcuts created during package upgrade.
+## Versions
+### ChocoAutostart
+#### 1.1.0.1 (TODO)
+* Packages Choco Upgrade v1.1.0.1.
+#### 1.1.0
+* Packages Choco Upgrade v1.1.0. (Automatically removes shortcuts created during package upgrade.)
 
-## ChocoUpgrade Versions
-### 1.1.0
+### ChocoUpgrade
+#### 1.1.0.1
+* Improved shortcut removal.
+#### 1.1.0
 * Use `ChocoUpgrade.exe -c` or `--cleanup` to remove shortcuts created during the installation of upgrades.
 
 ## Help
