@@ -1,5 +1,4 @@
 ﻿using ChocoAutoUpdate.Properties;
-using ChocoHelpers;
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
@@ -53,7 +52,7 @@ namespace ChocoAutoUpdate
                 // TODO
                 throw;
             }
-            catch (ChocoHelpersException)
+            catch (ChocoAutoUpdateException)
             {
                 // TODO
                 throw;
