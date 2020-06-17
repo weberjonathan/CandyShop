@@ -6,7 +6,7 @@
     <UseWindowsForms>true</UseWindowsForms>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <PackageId>Choco AutoUpdate</PackageId>
-    <Version>1.0</Version>
+    <Version>1.1.0</Version>
     <Authors>Jonathan Weber</Authors>
     <Product>Choco AutoUpdate</Product>
     <AssemblyName>ChocoAutoUpdate</AssemblyName>

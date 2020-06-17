@@ -24,12 +24,23 @@ namespace ChocoAutoUpdate
         
         public ApplicationContext()
         {
+            // create context menu
+            ToolStripItem item = new ToolStripMenuItem
+            {
+                Text = "Exit",
+            };
+            item.Click += TrayIcon_Rightclick;
+
+            ContextMenuStrip contextMenu = new ContextMenuStrip();
+            contextMenu.Items.Add(item);
+
             // Initialize Tray Icon
             _TrayIcon = new NotifyIcon()
             {
                 // Icon = Resources.AppIcon,
                 Icon = Resources.Icon,
-                Visible = true
+                Visible = true,
+                ContextMenuStrip = contextMenu
             };
 
             // check outdated
@@ -54,7 +65,7 @@ namespace ChocoAutoUpdate
             if (count > 0)
             {
                 _TrayIcon.BalloonTipClicked += TrayIcon_BalloonTipClicked;
-                _TrayIcon.Click += TrayIcon_Click;
+                _TrayIcon.MouseClick += TrayIcon_Click;
                 _TrayIcon.BalloonTipIcon = ToolTipIcon.Info;
                 _TrayIcon.Text = Application.ProductName;
 
@@ -68,9 +79,14 @@ namespace ChocoAutoUpdate
             }
         }
 
-        private void TrayIcon_Click(object sender, EventArgs e)
+        private void TrayIcon_Rightclick(object sender, EventArgs e)
         {
-            Upgrade();
+            Exit();
+        }
+
+        private void TrayIcon_Click(object sender, MouseEventArgs e)
+        {
+            if (e.Button.Equals(MouseButtons.Left)) Upgrade();
         }
 
         private void TrayIcon_BalloonTipClicked(object sender, EventArgs e)
