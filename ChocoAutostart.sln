@@ -3,15 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29728.190
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChocoAutostart", "ChocoAutostart\ChocoAutostart.csproj", "{BD3D2315-36E6-4464-B598-ECF4765C9456}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChocoUpgrade", "ChocoUpgrade\ChocoUpgrade.csproj", "{3E73F455-7537-4F97-8C70-2BCC09FC0FC5}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChocoHelpers", "ChocoHelpers\ChocoHelpers.csproj", "{9936E065-24B6-4BC4-A713-AD6390FAAF4B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChocoAutoUpdate", "ChocoAutoUpdate\ChocoAutoUpdate.csproj", "{528E9739-E029-4391-9E69-5A8A881B2711}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "archive", "archive", "{69A82F2B-FB5D-41A9-BC33-95E0E748EEF7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChocoAutostart", "archive\ChocoAutostart\ChocoAutostart.csproj", "{4B566F24-32A3-4DBB-9031-EAD588EEC92B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "archive", "archive", "{B92DFF69-B374-4933-841A-1FC2EF5A9E65}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChocoUpgrade", "archive\ChocoUpgrade\ChocoUpgrade.csproj", "{41249701-239E-489A-9FA2-56638CECEEFC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -19,14 +19,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{BD3D2315-36E6-4464-B598-ECF4765C9456}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BD3D2315-36E6-4464-B598-ECF4765C9456}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BD3D2315-36E6-4464-B598-ECF4765C9456}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BD3D2315-36E6-4464-B598-ECF4765C9456}.Release|Any CPU.Build.0 = Release|Any CPU
-		{3E73F455-7537-4F97-8C70-2BCC09FC0FC5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3E73F455-7537-4F97-8C70-2BCC09FC0FC5}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3E73F455-7537-4F97-8C70-2BCC09FC0FC5}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3E73F455-7537-4F97-8C70-2BCC09FC0FC5}.Release|Any CPU.Build.0 = Release|Any CPU
 		{9936E065-24B6-4BC4-A713-AD6390FAAF4B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{9936E065-24B6-4BC4-A713-AD6390FAAF4B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9936E065-24B6-4BC4-A713-AD6390FAAF4B}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -35,13 +27,21 @@ Global
 		{528E9739-E029-4391-9E69-5A8A881B2711}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{528E9739-E029-4391-9E69-5A8A881B2711}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{528E9739-E029-4391-9E69-5A8A881B2711}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4B566F24-32A3-4DBB-9031-EAD588EEC92B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4B566F24-32A3-4DBB-9031-EAD588EEC92B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4B566F24-32A3-4DBB-9031-EAD588EEC92B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4B566F24-32A3-4DBB-9031-EAD588EEC92B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{41249701-239E-489A-9FA2-56638CECEEFC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{41249701-239E-489A-9FA2-56638CECEEFC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{41249701-239E-489A-9FA2-56638CECEEFC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{41249701-239E-489A-9FA2-56638CECEEFC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{BD3D2315-36E6-4464-B598-ECF4765C9456} = {69A82F2B-FB5D-41A9-BC33-95E0E748EEF7}
-		{3E73F455-7537-4F97-8C70-2BCC09FC0FC5} = {69A82F2B-FB5D-41A9-BC33-95E0E748EEF7}
+		{4B566F24-32A3-4DBB-9031-EAD588EEC92B} = {B92DFF69-B374-4933-841A-1FC2EF5A9E65}
+		{41249701-239E-489A-9FA2-56638CECEEFC} = {B92DFF69-B374-4933-841A-1FC2EF5A9E65}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4D2E260D-1AAE-44AC-BAC0-0322AE266B90}

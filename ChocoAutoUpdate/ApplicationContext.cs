@@ -1,5 +1,7 @@
-﻿using ChocoHelpers;
+﻿using ChocoAutoUpdate.Properties;
+using ChocoHelpers;
 using System;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
@@ -14,27 +16,31 @@ namespace ChocoAutoUpdate
         private NotifyIcon _TrayIcon;
         private Choco _Choco;
 
+        public bool HideAdminWarn { get; set; } // TODO implement
+
+        // TODO exit button
+        
         public ApplicationContext()
         {
             // Initialize Tray Icon
             _TrayIcon = new NotifyIcon()
             {
                 // Icon = Resources.AppIcon,
-                Icon = new System.Drawing.Icon(@"C:\Users\Jonathan\Desktop\Untitled.ico"),
+                Icon = Resources.Icon,
                 Visible = true
             };
-
-            _TrayIcon.BalloonTipClicked += TrayIcon_BalloonTipClicked;
-            _TrayIcon.Click += TrayIcon_Click;
-            _TrayIcon.BalloonTipIcon = ToolTipIcon.Info;
-            _TrayIcon.Text = "Chocolatey Auto-Updater";
 
             // check outdated
             try
             {
                 _Choco = new Choco();
             }
-            catch (Exception)
+            catch (ChocolateyException)
+            {
+                // TODO
+                throw;
+            }
+            catch (ChocoHelpersException)
             {
                 // TODO
                 throw;
@@ -42,9 +48,14 @@ namespace ChocoAutoUpdate
 
             int count = _Choco.OutdatedCount;
 
-            // prepare Balloon
+            // prepare balloon and click handlers
             if (count > 0)
             {
+                _TrayIcon.BalloonTipClicked += TrayIcon_BalloonTipClicked;
+                _TrayIcon.Click += TrayIcon_Click;
+                _TrayIcon.BalloonTipIcon = ToolTipIcon.Info;
+                _TrayIcon.Text = Application.ProductName;
+
                 _TrayIcon.BalloonTipTitle = $"{count} package{(count == 1 ? " is" : "s are")} outdated.";
                 _TrayIcon.BalloonTipText = $"To upgrade click here or the tray icon later.";
                 _TrayIcon.ShowBalloonTip(2000);
@@ -83,10 +94,28 @@ namespace ChocoAutoUpdate
 
             if (result.Equals(DialogResult.Yes))
             {
+                // check if admin
+                // TODO actually check privileges
+                if (!HideAdminWarn)
+                {
+                    result = MessageBox.Show(
+                        $"{Application.ProductName} does not have administrator privileges. Do you wish to continue?",
+                        Application.ProductName,
+                        MessageBoxButtons.YesNo,
+                        MessageBoxIcon.Question,
+                        MessageBoxDefaultButton.Button1
+                    );
+
+                    if (result.Equals(DialogResult.No))
+                    {
+                        Exit();
+                    }
+                }
+
+                // upgrade
                 AllocConsole();
                 Console.WriteLine("> choco upgrade all -y");
 
-                _Choco.Out = Console.Out;
                 try
                 {
                     _Choco.Upgrade();
@@ -96,8 +125,30 @@ namespace ChocoAutoUpdate
                     // TODO
                     throw;
                 }
-                _Choco.RemoveShortcuts();
 
+                // remove shortcuts
+                Console.WriteLine($"Created {_Choco.NewShortcuts.Length} new desktop shortcut(s) during the upgrade process:");
+                foreach (string shortcut in _Choco.NewShortcuts)
+                {
+                    Console.WriteLine($"- {Path.GetFileNameWithoutExtension(shortcut)}");
+                }
+                Console.Write("Do you wish to delete them all? [y] ");
+                
+                if (Console.ReadLine().ToLower().Equals("y"))
+                {
+                    _Choco.RemoveShortcuts();
+                    if (_Choco.NewShortcuts.Length > 0)
+                    {
+                        Console.WriteLine("Could not delete one or more shortcuts:");
+                        foreach (string shortcut in _Choco.NewShortcuts)
+                        {
+                            Console.WriteLine($"- {Path.GetFileNameWithoutExtension(shortcut)}");
+                        }
+                    }
+                }
+
+                // exit
+                Console.CursorVisible = false;
                 Console.Write("Press any key to terminate... ");
                 Console.ReadKey();
                 Exit();

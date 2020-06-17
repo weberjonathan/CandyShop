@@ -8,7 +8,6 @@ namespace ChocoHelpers
 {
     public class Choco
     {
-        public TextWriter Out { get; set; }
         public int OutdatedCount { get; private set; }
         public string OutdatedDetails { get; private set; }
 
@@ -90,14 +89,12 @@ namespace ChocoHelpers
             while (_NewShortcuts.Count > 0)
             {
                 string shortcut = _NewShortcuts.Dequeue();
-                Out?.WriteLine($"Deleting shortcut {shortcut}");
                 try
                 {
                     File.Delete(shortcut);
                 }
-                catch (Exception e)
+                catch (IOException)
                 {
-                    Out?.WriteLine($"ERROR: Could not delete shortcut. (${e.Message})");
                 }
             }
         }
