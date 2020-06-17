@@ -13,6 +13,8 @@
     <RootNamespace>ChocoAutoUpdate</RootNamespace>
     <StartupObject>ChocoAutoUpdate.Program</StartupObject>
     <ApplicationIcon>Resources\Icon.ico</ApplicationIcon>
+    <AssemblyVersion>1.1.0.1</AssemblyVersion>
+    <FileVersion>1.1.0.1</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
