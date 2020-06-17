@@ -18,6 +18,8 @@ namespace ChocoAutoUpdate
 
         public bool HideAdminWarn { get; set; } // TODO implement
 
+        public bool IsElevated { get; set; }
+
         // TODO exit button
         
         public ApplicationContext()
@@ -79,7 +81,7 @@ namespace ChocoAutoUpdate
         private void Exit()
         {
             _TrayIcon.Visible = false;
-            Application.Exit();
+            Environment.Exit(0);
         }
 
         private void Upgrade()
@@ -95,14 +97,13 @@ namespace ChocoAutoUpdate
             if (result.Equals(DialogResult.Yes))
             {
                 // check if admin
-                // TODO actually check privileges
-                if (!HideAdminWarn)
+                if (!IsElevated && !HideAdminWarn)
                 {
                     result = MessageBox.Show(
-                        $"{Application.ProductName} does not have administrator privileges. Do you wish to continue?",
+                        $"{Application.ProductName} does not have administrator privileges. Do you wish to continue?\n\nNote that this prompt can be disabled by using the --hide-admin-warn option.",
                         Application.ProductName,
                         MessageBoxButtons.YesNo,
-                        MessageBoxIcon.Question,
+                        MessageBoxIcon.Warning,
                         MessageBoxDefaultButton.Button1
                     );
 
