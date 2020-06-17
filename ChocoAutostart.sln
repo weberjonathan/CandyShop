@@ -7,9 +7,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChocoAutostart", "ChocoAuto
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChocoUpgrade", "ChocoUpgrade\ChocoUpgrade.csproj", "{3E73F455-7537-4F97-8C70-2BCC09FC0FC5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChocoHelpers", "ChocoHelpers\ChocoHelpers.csproj", "{9936E065-24B6-4BC4-A713-AD6390FAAF4B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChocoHelpers", "ChocoHelpers\ChocoHelpers.csproj", "{9936E065-24B6-4BC4-A713-AD6390FAAF4B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChocoAutoUpdate", "ChocoAutoUpdate\ChocoAutoUpdate.csproj", "{528E9739-E029-4391-9E69-5A8A881B2711}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChocoAutoUpdate", "ChocoAutoUpdate\ChocoAutoUpdate.csproj", "{528E9739-E029-4391-9E69-5A8A881B2711}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "archive", "archive", "{69A82F2B-FB5D-41A9-BC33-95E0E748EEF7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -36,6 +38,10 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{BD3D2315-36E6-4464-B598-ECF4765C9456} = {69A82F2B-FB5D-41A9-BC33-95E0E748EEF7}
+		{3E73F455-7537-4F97-8C70-2BCC09FC0FC5} = {69A82F2B-FB5D-41A9-BC33-95E0E748EEF7}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4D2E260D-1AAE-44AC-BAC0-0322AE266B90}
