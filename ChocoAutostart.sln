@@ -7,6 +7,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChocoAutostart", "ChocoAuto
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChocoUpgrade", "ChocoUpgrade\ChocoUpgrade.csproj", "{3E73F455-7537-4F97-8C70-2BCC09FC0FC5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChocoHelpers", "ChocoHelpers\ChocoHelpers.csproj", "{9936E065-24B6-4BC4-A713-AD6390FAAF4B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChocoAutoUpdate", "ChocoAutoUpdate\ChocoAutoUpdate.csproj", "{528E9739-E029-4391-9E69-5A8A881B2711}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +25,14 @@ Global
 		{3E73F455-7537-4F97-8C70-2BCC09FC0FC5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3E73F455-7537-4F97-8C70-2BCC09FC0FC5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3E73F455-7537-4F97-8C70-2BCC09FC0FC5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9936E065-24B6-4BC4-A713-AD6390FAAF4B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9936E065-24B6-4BC4-A713-AD6390FAAF4B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9936E065-24B6-4BC4-A713-AD6390FAAF4B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9936E065-24B6-4BC4-A713-AD6390FAAF4B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{528E9739-E029-4391-9E69-5A8A881B2711}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{528E9739-E029-4391-9E69-5A8A881B2711}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{528E9739-E029-4391-9E69-5A8A881B2711}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{528E9739-E029-4391-9E69-5A8A881B2711}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

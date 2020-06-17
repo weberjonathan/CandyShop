@@ -2,13 +2,16 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Runtime.CompilerServices;
 
 namespace ChocoUpgrade
 {
+    // TODO eval UseShellExecute = false; makes child process share current window ?!? https://stackoverflow.com/a/5094208
+
     class Program
     {
+        private static readonly Queue<string> newShortcuts = new Queue<string>();
         private static string chocoError = "";
-        private static Queue<string> newShortcuts = new Queue<string>();
         
         private static void OutputDataReceived(object sender, DataReceivedEventArgs e)
         {
@@ -53,6 +56,8 @@ namespace ChocoUpgrade
             Process p = new Process() { StartInfo = procInfo };
             p.OutputDataReceived += OutputDataReceived;
             p.ErrorDataReceived += ErrorDataReceived;
+
+            Console.CursorVisible = false;
             p.Start();
 
             using (FileSystemWatcher watcher = new FileSystemWatcher())
@@ -64,11 +69,10 @@ namespace ChocoUpgrade
                 watcher.Created += Watcher_Created;
                 watcher.EnableRaisingEvents = true;
 
-                Console.ReadKey();
-
                 p.BeginOutputReadLine();
                 p.BeginErrorReadLine();
                 p.WaitForExit();
+                Console.CursorVisible = true;
 
                 if (p.ExitCode != 0)
                 {

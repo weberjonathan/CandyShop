@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <PackageId>Choco AutoUpdate</PackageId>
+    <Version>1.0</Version>
+    <Authors>Jonathan Weber</Authors>
+    <Product>Choco AutoUpdate</Product>
+    <AssemblyName>ChocoAutoUpdate</AssemblyName>
+    <RootNamespace>ChocoAutoUpdate</RootNamespace>
+    <StartupObject>ChocoAutoUpdate.Program</StartupObject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\chocoHelpers\chocoHelpers.csproj" />
+  </ItemGroup>
+
+</Project>
