@@ -15,12 +15,10 @@ namespace ChocoAutoUpdate
         private NotifyIcon _TrayIcon;
         private Choco _Choco;
 
-        public bool HideAdminWarn { get; set; } // TODO implement
+        public bool HideAdminWarn { get; set; }
 
         public bool IsElevated { get; set; }
 
-        // TODO exit button
-        
         public ApplicationContext()
         {
             // create context menu
@@ -47,15 +45,25 @@ namespace ChocoAutoUpdate
             {
                 _Choco = new Choco();
             }
-            catch (ChocolateyException)
+            catch (ChocolateyException e)
             {
-                // TODO
-                throw;
+                MessageBox.Show(
+                    $"An error occurred while executing Chocolatey: {e.Message}",
+                    $"{Application.ProductName} Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error
+                );
+                Exit();
             }
             catch (ChocoAutoUpdateException)
             {
-                // TODO
-                throw;
+                MessageBox.Show(
+                    e.Message,
+                    $"{Application.ProductName} Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error
+                );
+                Exit();
             }
 
             int count = _Choco.OutdatedCount;
@@ -136,10 +144,15 @@ namespace ChocoAutoUpdate
                 {
                     _Choco.Upgrade();
                 }
-                catch (ChocolateyException)
+                catch (ChocolateyException e)
                 {
-                    // TODO
-                    throw;
+                    MessageBox.Show(
+                        $"An error occurred while executing Chocolatey: {e.Message}",
+                        $"{Application.ProductName} Error",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Error
+                    );
+                    Exit();
                 }
 
                 // remove shortcuts
