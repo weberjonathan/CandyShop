@@ -48,14 +48,14 @@ namespace ChocoAutoUpdate
             catch (ChocolateyException e)
             {
                 MessageBox.Show(
-                    $"An error occurred while executing Chocolatey: {e.Message}",
+                    $"An error occurred while executing Chocolatey: \"{e.Message}\"",
                     $"{Application.ProductName} Error",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Error
                 );
                 Exit();
             }
-            catch (ChocoAutoUpdateException)
+            catch (ChocoAutoUpdateException e)
             {
                 MessageBox.Show(
                     e.Message,
@@ -147,7 +147,7 @@ namespace ChocoAutoUpdate
                 catch (ChocolateyException e)
                 {
                     MessageBox.Show(
-                        $"An error occurred while executing Chocolatey: {e.Message}",
+                        $"An error occurred while executing Chocolatey: \"{e.Message}\"",
                         $"{Application.ProductName} Error",
                         MessageBoxButtons.OK,
                         MessageBoxIcon.Error
@@ -156,29 +156,32 @@ namespace ChocoAutoUpdate
                 }
 
                 // remove shortcuts
-                Console.WriteLine($"Created {_Choco.NewShortcuts.Length} new desktop shortcut(s) during the upgrade process:");
-                foreach (string shortcut in _Choco.NewShortcuts)
+                if (_Choco.NewShortcuts.Length > 0)
                 {
-                    Console.WriteLine($"- {Path.GetFileNameWithoutExtension(shortcut)}");
-                }
-                Console.Write("Do you wish to delete them all? [y] ");
-                
-                if (Console.ReadLine().ToLower().Equals("y"))
-                {
-                    _Choco.RemoveShortcuts();
-                    if (_Choco.NewShortcuts.Length > 0)
+                    Console.WriteLine($"\n\nCreated {_Choco.NewShortcuts.Length} new desktop shortcut(s) during the upgrade process:");
+                    foreach (string shortcut in _Choco.NewShortcuts)
                     {
-                        Console.WriteLine("Could not delete one or more shortcuts:");
-                        foreach (string shortcut in _Choco.NewShortcuts)
+                        Console.WriteLine($"- {Path.GetFileNameWithoutExtension(shortcut)}");
+                    }
+                    Console.Write("Do you wish to delete them all? [y] ");
+
+                    if (Console.ReadLine().ToLower().Equals("y"))
+                    {
+                        _Choco.RemoveShortcuts();
+                        if (_Choco.NewShortcuts.Length > 0)
                         {
-                            Console.WriteLine($"- {Path.GetFileNameWithoutExtension(shortcut)}");
+                            Console.WriteLine("Could not delete one or more shortcuts:");
+                            foreach (string shortcut in _Choco.NewShortcuts)
+                            {
+                                Console.WriteLine($"- {Path.GetFileNameWithoutExtension(shortcut)}");
+                            }
                         }
                     }
                 }
 
                 // exit
                 Console.CursorVisible = false;
-                Console.Write("Press any key to terminate... ");
+                Console.Write("\nPress any key to terminate... ");
                 Console.ReadKey();
                 Exit();
             }
