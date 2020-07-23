@@ -27,8 +27,6 @@ namespace ChocoAutoUpdate
                 }
             }
 
-            
-
             // launch application
             Application.SetHighDpiMode(HighDpiMode.SystemAware);
             Application.EnableVisualStyles();
@@ -39,6 +37,7 @@ namespace ChocoAutoUpdate
                 HideAdminWarn = hideAdminWarn,
                 IsElevated = isElevated
             };
+
             Application.Run(appContext);
         }
     }
