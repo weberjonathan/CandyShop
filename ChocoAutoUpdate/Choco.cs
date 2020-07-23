@@ -8,8 +8,11 @@ namespace ChocoAutoUpdate
 {
     public class Choco
     {
-        public int OutdatedCount { get; private set; }
-        public string OutdatedDetails { get; private set; }
+        private const string EX_PARSE_ERR = "Could not parse chocolatey output.";
+
+        public List<string> Outdated { get; private set; }
+
+        public string OutdatedOutput { get; private set; }
 
         private readonly Queue<string> _NewShortcuts = new Queue<string>();
         public string[] NewShortcuts => _NewShortcuts.ToArray();
@@ -25,6 +28,10 @@ namespace ChocoAutoUpdate
         /// <exception cref="ChocoAutoUpdateException"></exception>
         public void CheckOutdated()
         {
+            OutdatedOutput = "";
+            Outdated = new List<string>();
+            
+            // launch process
             ProcessStartInfo procInfo = new ProcessStartInfo("choco", "outdated")
             {
                 RedirectStandardOutput = true,
@@ -38,27 +45,50 @@ namespace ChocoAutoUpdate
             {
                 throw new ChocolateyException($"choco did not exit cleanly. Returned {proc.ExitCode}. ");
             }
+            OutdatedOutput = output;
 
+            // parse head
+            Queue<string> outputLines = new Queue<string>(output.Split("\r\n"));
+            
+            if (!outputLines.Dequeue().StartsWith("Chocolatey v"))
+            {
+                // TOOD version checks? "Chocolatey v0.10.15"
+            }
+
+            if (!outputLines.Dequeue().Equals("Outdated Packages") ||
+                !outputLines.Dequeue().Equals(" Output is package name | current version | available version | pinned?"))
+            {
+                throw new ChocoAutoUpdateException(EX_PARSE_ERR);
+            }
+
+            // parse outdated packages
+            while (outputLines.Count > 0)
+            {
+                string line = outputLines.Dequeue();
+                // TODO test; choco outdated prints two empty lines if no packages are outdated
+                if (line.Equals(""))
+                {
+                    if (outputLines.Count > 0 && outputLines.Dequeue().Equals(""))
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        throw new ChocoAutoUpdateException(EX_PARSE_ERR);
+                    }
+                }
+                
+                // TODO parse
+                Outdated.Add(line);
+            }
+            
+            // parse summary
             string summaryPattern = @"Chocolatey has determined [0-9]* package\(s\) are outdated\.";
-            Match summaryMatch = Regex.Match(output, summaryPattern);
+            Match summaryMatch = Regex.Match(outputLines.Dequeue(), summaryPattern);
             if (!summaryMatch.Success)
             {
-                throw new ChocoAutoUpdateException("Could not parse chocolatey output.");
+                throw new ChocoAutoUpdateException(EX_PARSE_ERR);
             }
-
-            try
-            {
-                OutdatedCount = Convert.ToInt32(Regex.Replace(summaryMatch.Value, "[^0-9]", ""));
-            }
-            catch (FormatException)
-            {
-                throw new ChocoAutoUpdateException("Could not parse chocolatey output.");
-            }
-            catch (OverflowException)
-            {
-                throw new ChocoAutoUpdateException("Could not parse chocolatey output.");
-            }
-            OutdatedDetails = output;
         }
 
         private void Watcher_Created(object sender, FileSystemEventArgs e)
@@ -90,21 +120,6 @@ namespace ChocoAutoUpdate
                 if (proc.ExitCode != 0)
                 {
                     throw new ChocolateyException($"choco did not exit cleanly. Returned {proc.ExitCode}. ");
-                }
-            }
-        }
-
-        public void RemoveShortcuts()
-        {
-            while (_NewShortcuts.Count > 0)
-            {
-                string shortcut = _NewShortcuts.Dequeue();
-                try
-                {
-                    File.Delete(shortcut);
-                }
-                catch (IOException)
-                {
                 }
             }
         }
