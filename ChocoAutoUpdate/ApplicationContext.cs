@@ -111,43 +111,13 @@ namespace ChocoAutoUpdate
 
         private void Upgrade()
         {
-            _Choco.CheckOutdated(); // TODO test for side effects; all data structures work if this is called a second time ?
-
-            StringBuilder sb = new StringBuilder("The following packages are outdated:\n\n");
-            for (int i = 0; i < _Choco.Outdated.Count; i++)
+            ChocoAutoUpdateForm form = new ChocoAutoUpdateForm(_Choco)
             {
-                sb.Append($"({i}) {_Choco.Outdated[i]}\n");
-            }
-
-            sb.Append("\nDo you wish to upgrade all outdated packages?");
+                IsElevated = this.IsElevated
+            };
             
-            DialogResult result = MessageBox.Show(
-                sb.ToString(),
-                Application.ProductName,
-                MessageBoxButtons.YesNoCancel,
-                MessageBoxIcon.Question,
-                MessageBoxDefaultButton.Button1
-            );
-
-            if (result.Equals(DialogResult.Yes))
+            if (form.ShowDialog().Equals(DialogResult.OK))
             {
-                // check if admin
-                if (!IsElevated && !HideAdminWarn)
-                {
-                    result = MessageBox.Show(
-                        $"{Application.ProductName} does not have administrator privileges. Do you wish to continue?\n\nNote that this prompt can be disabled by using the --hide-admin-warn option.",
-                        Application.ProductName,
-                        MessageBoxButtons.YesNo,
-                        MessageBoxIcon.Warning,
-                        MessageBoxDefaultButton.Button1
-                    );
-
-                    if (result.Equals(DialogResult.No))
-                    {
-                        Exit();
-                    }
-                }
-
                 // upgrade
                 AllocConsole();
                 Console.WriteLine("> choco upgrade all -y");
@@ -212,7 +182,7 @@ namespace ChocoAutoUpdate
                 Console.ReadKey();
                 Exit();
             }
-            else if (result.Equals(DialogResult.No))
+            else
             {
                 Exit();
             }

@@ -10,7 +10,7 @@ namespace ChocoAutoUpdate
     {
         private const string EX_PARSE_ERR = "Could not parse chocolatey output.";
 
-        public List<string> Outdated { get; private set; }
+        public List<ChocoPackage> Outdated { get; private set; }
 
         public string OutdatedOutput { get; private set; }
 
@@ -29,7 +29,7 @@ namespace ChocoAutoUpdate
         public void CheckOutdated()
         {
             OutdatedOutput = "";
-            Outdated = new List<string>();
+            Outdated = new List<ChocoPackage>();
             
             // launch process
             ProcessStartInfo procInfo = new ProcessStartInfo("choco", "outdated")
@@ -56,7 +56,8 @@ namespace ChocoAutoUpdate
             }
 
             if (!outputLines.Dequeue().Equals("Outdated Packages") ||
-                !outputLines.Dequeue().Equals(" Output is package name | current version | available version | pinned?"))
+                !outputLines.Dequeue().Equals(" Output is package name | current version | available version | pinned?") ||
+                !outputLines.Dequeue().Equals(""))
             {
                 throw new ChocoAutoUpdateException(EX_PARSE_ERR);
             }
@@ -65,21 +66,17 @@ namespace ChocoAutoUpdate
             while (outputLines.Count > 0)
             {
                 string line = outputLines.Dequeue();
-                // TODO test; choco outdated prints two empty lines if no packages are outdated
-                if (line.Equals(""))
-                {
-                    if (outputLines.Count > 0 && outputLines.Dequeue().Equals(""))
-                    {
-                        break;
-                    }
-                    else
-                    {
-                        throw new ChocoAutoUpdateException(EX_PARSE_ERR);
-                    }
-                }
+                if (line.Equals("")) break;
                 
-                // TODO parse
-                Outdated.Add(line);
+                // retrieve package
+                ChocoPackage pckg = new ChocoPackage();
+                string[] entry = line.Split('|');
+                pckg.Name = entry[0];
+                pckg.CurrVer= entry[1];
+                pckg.AvailVer = entry[2];
+                pckg.Pinned =  entry[3].Equals("true");
+                pckg.Outdated = true;
+                Outdated.Add(pckg);
             }
             
             // parse summary
