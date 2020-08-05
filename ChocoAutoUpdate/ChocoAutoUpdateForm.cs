@@ -54,7 +54,13 @@ namespace ChocoAutoUpdate
             }
             else
             {
-                TxtLoading.Text = "Error"; // TODO
+                MessageBox.Show(
+                    "An unknown error occurred. Please upgrade using the terminal.",
+                    Application.ProductName,
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+                this.DialogResult = DialogResult.Cancel;
+                this.Close();
             }
         }
 
