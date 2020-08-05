@@ -40,8 +40,8 @@
             this.ColAvail = new System.Windows.Forms.ColumnHeader();
             this.ColPinned = new System.Windows.Forms.ColumnHeader();
             this.TopPanel = new System.Windows.Forms.Panel();
-            this.columnHeader1 = new System.Windows.Forms.ColumnHeader();
             this.label1 = new System.Windows.Forms.Label();
+            this.columnHeader1 = new System.Windows.Forms.ColumnHeader();
             this.BottomPanel.SuspendLayout();
             this.MainPanel.SuspendLayout();
             this.TopPanel.SuspendLayout();
@@ -63,10 +63,10 @@
             this.LinkGithub.AutoSize = true;
             this.LinkGithub.Location = new System.Drawing.Point(12, 19);
             this.LinkGithub.Name = "LinkGithub";
-            this.LinkGithub.Size = new System.Drawing.Size(62, 15);
+            this.LinkGithub.Size = new System.Drawing.Size(45, 15);
             this.LinkGithub.TabIndex = 2;
             this.LinkGithub.TabStop = true;
-            this.LinkGithub.Text = "on GitHub";
+            this.LinkGithub.Text = "GitHub";
             this.LinkGithub.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.LinkGithub_LinkClicked);
             // 
             // BtnUpgrade

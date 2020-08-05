@@ -70,6 +70,10 @@ namespace ChocoAutoUpdate
 
             int count = _Choco.Outdated.Count;
 
+#if DEBUG
+            count = 3;
+#endif
+
             // prepare balloon and click handlers
             if (count > 0)
             {
@@ -140,17 +144,24 @@ namespace ChocoAutoUpdate
                 // remove shortcuts
                 if (_Choco.NewShortcuts.Length > 0)
                 {
-                    Console.WriteLine($"\n\nCreated {_Choco.NewShortcuts.Length} new desktop shortcut(s) during the upgrade process:");
+                    StringBuilder msg = new StringBuilder();
+                    msg.Append($"\n\nCreated {_Choco.NewShortcuts.Length} new desktop shortcut(s) during the upgrade process:\n");
                     foreach (string shortcut in _Choco.NewShortcuts)
                     {
-                        Console.WriteLine($"- {Path.GetFileNameWithoutExtension(shortcut)}");
+                        msg.Append($"- {Path.GetFileNameWithoutExtension(shortcut)}");
                     }
-                    Console.Write("Do you wish to delete them all? [y] ");
+                    msg.Append("Do you wish to delete them all?");
 
-                    if (Console.ReadLine().ToLower().Equals("y"))
+                    DialogResult result = MessageBox.Show(
+                        msg.ToString(),
+                        Application.ProductName,
+                        MessageBoxButtons.YesNo,
+                        MessageBoxIcon.Question,
+                        MessageBoxDefaultButton.Button1);
+
+                    if (result.Equals(DialogResult.Yes))
                     {
                         Queue<string> shortcuts = new Queue<string>(_Choco.NewShortcuts);
-                        
                         while (shortcuts.Count > 0)
                         {
                             string shortcut = shortcuts.Dequeue();
@@ -163,16 +174,6 @@ namespace ChocoAutoUpdate
                                 // TODO
                             }
                         }
-
-                        // TODO
-                        /*if (...)
-                        {
-                            Console.WriteLine("Could not delete one or more shortcuts:");
-                            foreach (string shortcut in _Choco.NewShortcuts)
-                            {
-                                Console.WriteLine($"- {Path.GetFileNameWithoutExtension(shortcut)}");
-                            }
-                        }*/
                     }
                 }
 

@@ -10,7 +10,7 @@ namespace ChocoAutoUpdate
         private readonly Choco _Choco;
         private readonly BackgroundWorker _BackgroundWorker;
 
-        public bool IsElevated { get; set; } = false; // TODO test
+        public bool IsElevated { get; set; } = false;
 
         public ChocoAutoUpdateForm(Choco choco)
         {
