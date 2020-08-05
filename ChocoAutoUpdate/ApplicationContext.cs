@@ -17,8 +17,6 @@ namespace ChocoAutoUpdate
         private NotifyIcon _TrayIcon;
         private Choco _Choco;
 
-        public bool HideAdminWarn { get; set; }
-
         public bool IsElevated { get; set; }
 
         public ApplicationContext()

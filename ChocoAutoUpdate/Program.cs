@@ -17,16 +17,6 @@ namespace ChocoAutoUpdate
                 isElevated = principal.IsInRole(WindowsBuiltInRole.Administrator);
             }
 
-            // check admin option
-            bool hideAdminWarn = false;
-            foreach (string arg in args)
-            {
-                if (arg.Equals("--hide-admin-warn"))
-                {
-                    hideAdminWarn = true;
-                }
-            }
-
             // launch application
             Application.SetHighDpiMode(HighDpiMode.SystemAware);
             Application.EnableVisualStyles();
@@ -34,7 +24,6 @@ namespace ChocoAutoUpdate
 
             ApplicationContext appContext = new ApplicationContext
             {
-                HideAdminWarn = hideAdminWarn,
                 IsElevated = isElevated
             };
 
