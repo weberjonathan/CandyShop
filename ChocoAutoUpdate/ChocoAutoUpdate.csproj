@@ -6,15 +6,15 @@
     <UseWindowsForms>true</UseWindowsForms>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <PackageId>Choco AutoUpdate</PackageId>
-    <Version>1.1.0</Version>
+    <Version>2.0.0</Version>
     <Authors>Jonathan Weber</Authors>
     <Product>Choco AutoUpdate</Product>
     <AssemblyName>ChocoAutoUpdate</AssemblyName>
     <RootNamespace>ChocoAutoUpdate</RootNamespace>
     <StartupObject>ChocoAutoUpdate.Program</StartupObject>
     <ApplicationIcon>Resources\Icon.ico</ApplicationIcon>
-    <AssemblyVersion>1.1.0.1</AssemblyVersion>
-    <FileVersion>1.1.0.1</FileVersion>
+    <AssemblyVersion>2.0.0.0</AssemblyVersion>
+    <FileVersion>2.0.0.0</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
