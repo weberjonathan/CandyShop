@@ -124,6 +124,7 @@
             this.LstPackages.Location = new System.Drawing.Point(0, 0);
             this.LstPackages.MultiSelect = false;
             this.LstPackages.Name = "LstPackages";
+            this.LstPackages.ShowItemToolTips = true;
             this.LstPackages.Size = new System.Drawing.Size(435, 270);
             this.LstPackages.TabIndex = 0;
             this.LstPackages.UseCompatibleStateImageBehavior = false;
@@ -133,17 +134,19 @@
             // 
             this.ColName.Name = "ColName";
             this.ColName.Text = "Name";
-            this.ColName.Width = 250;
+            this.ColName.Width = 130;
             // 
             // ColCurr
             // 
             this.ColCurr.Name = "ColCurr";
             this.ColCurr.Text = "Current";
+            this.ColCurr.Width = 120;
             // 
             // ColAvail
             // 
             this.ColAvail.Name = "ColAvail";
             this.ColAvail.Text = "Available";
+            this.ColAvail.Width = 120;
             // 
             // ColPinned
             // 
