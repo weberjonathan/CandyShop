@@ -181,10 +181,6 @@ namespace ChocoAutoUpdate
                 Console.ReadKey();
                 Exit();
             }
-            else
-            {
-                Exit();
-            }
         }
     }
 }
