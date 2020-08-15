@@ -29,7 +29,16 @@ namespace ChocoAutoUpdate
         {
             _BackgroundWorker.RunWorkerAsync();
             TopPanel.Visible = !IsElevated;
-            this.Text = $"{Application.ProductName} v{Application.ProductVersion}";
+            if (IsElevated)
+            {
+                this.Text = $"{Application.ProductName} v{Application.ProductVersion}";
+            }
+            else
+            {
+                this.Text = $"{Application.ProductName} v{Application.ProductVersion} (no administrator privileges)";
+            }
+
+            this.Activate();
         }
 
         private void _BackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
@@ -43,13 +52,14 @@ namespace ChocoAutoUpdate
             {
                 TxtLoading.Visible = false;
                 BtnCancel.Enabled = true;
-                BtnUpgrade.Text = $"{BtnUpgrade.Text} ({_Choco.Outdated.Count})";
-                BtnUpgrade.Enabled = true;
-                foreach (ChocoPackage pckg in _Choco.Outdated)
+                BtnUpgradeChecked.Enabled = true;
+                BtnUpgradeAll.Enabled = true;
+                foreach (ChocoPackage pckg in _Choco.Outdated.Values)
                 {
-                    LstPackages.Items.Add(new ListViewItem(
-                        new string[] { pckg.Name, pckg.CurrVer, pckg.AvailVer, pckg.Pinned.ToString() })
-                    );
+                    ListViewItem item = new ListViewItem(
+                        new string[] { pckg.Name, pckg.CurrVer, pckg.AvailVer, pckg.Pinned.ToString()});
+                    item.Checked = true;
+                    LstPackages.Items.Add(item);
                 }
             }
             else
@@ -71,8 +81,27 @@ namespace ChocoAutoUpdate
             Process.Start(new ProcessStartInfo("cmd", $"/c start {url}"));
         }
 
-        private void BtnUpgrade_Click(object sender, EventArgs e)
+        private void BtnUpgradeAll_Click(object sender, EventArgs e)
         {
+            foreach (ListViewItem item in LstPackages.Items)
+            {
+                _Choco.Outdated[item.Text].MarkedForUpdate = true;
+            }
+            this.DialogResult = DialogResult.OK;
+            this.Close();
+        }
+
+        private void LstPackages_ItemChecked(object sender, ItemCheckedEventArgs e)
+        {
+            BtnUpgradeChecked.Text = $"Upgrade ({LstPackages.CheckedItems.Count})";
+        }
+
+        private void BtnUpgradeChecked_Click(object sender, EventArgs e)
+        {
+            foreach (ListViewItem item in LstPackages.CheckedItems)
+            {
+                _Choco.Outdated[item.Text].MarkedForUpdate = true;
+            }
             this.DialogResult = DialogResult.OK;
             this.Close();
         }

@@ -11,5 +11,6 @@ namespace ChocoAutoUpdate
         public string AvailVer { get; set; }
         public bool Pinned { get; set; }
         public bool Outdated { get; set; }
+        public bool MarkedForUpdate { get; set; } = false;
     }
 }

@@ -35,7 +35,7 @@ namespace ChocoAutoUpdate
             _TrayIcon = new NotifyIcon()
             {
                 // Icon = Resources.AppIcon,
-                Icon = Resources.Icon,
+                Icon = Resources.IconNew,
                 Visible = true,
                 ContextMenuStrip = contextMenu
             };
@@ -69,7 +69,7 @@ namespace ChocoAutoUpdate
             int count = _Choco.Outdated.Count;
 
 #if DEBUG
-            count = 3;
+            // count = 3;
 #endif
 
             // prepare balloon and click handlers
@@ -122,7 +122,7 @@ namespace ChocoAutoUpdate
             {
                 // upgrade
                 AllocConsole();
-                Console.WriteLine("> choco upgrade all -y");
+                Console.WriteLine($"> choco upgrade {_Choco.Outdated.MarkedPackages.GetPackagesAsString()} -y");
 
                 try
                 {

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace ChocoAutoUpdate
@@ -10,7 +11,7 @@ namespace ChocoAutoUpdate
     {
         private const string EX_PARSE_ERR = "Could not parse chocolatey output.";
 
-        public List<ChocoPackage> Outdated { get; private set; }
+        public ChocoPackageCollection Outdated { get; private set; }
 
         public string OutdatedOutput { get; private set; }
 
@@ -29,7 +30,7 @@ namespace ChocoAutoUpdate
         public void CheckOutdated()
         {
             OutdatedOutput = "";
-            Outdated = new List<ChocoPackage>();
+            Outdated = new ChocoPackageCollection();
             
             // launch process
             ProcessStartInfo procInfo = new ProcessStartInfo("choco", "outdated")
@@ -76,7 +77,7 @@ namespace ChocoAutoUpdate
                 pckg.AvailVer = entry[2];
                 pckg.Pinned =  entry[3].Equals("true");
                 pckg.Outdated = true;
-                Outdated.Add(pckg);
+                Outdated.Add(pckg.Name, pckg);
             }
             
             // parse summary
@@ -93,12 +94,14 @@ namespace ChocoAutoUpdate
             _NewShortcuts.Enqueue(e.FullPath);
         }
 
+        
+
         /// <exception cref="ChocolateyException"></exception>
         public void Upgrade()
         {
             _NewShortcuts.Clear();
             
-            ProcessStartInfo procInfo = new ProcessStartInfo("choco", "upgrade all -y")
+            ProcessStartInfo procInfo = new ProcessStartInfo("choco", $"upgrade {Outdated.MarkedPackages.GetPackagesAsString()} -y")
             {
                 UseShellExecute = false
             };
