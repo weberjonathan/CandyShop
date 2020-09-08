@@ -129,6 +129,7 @@ namespace ChocoAutoUpdate
             {
                 // upgrade
                 AllocConsole();
+                Console.CursorVisible = false;
                 Console.WriteLine($"> choco upgrade {_Choco.Outdated.MarkedPackages.GetPackagesAsString()} -y");
 
                 try
