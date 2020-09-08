@@ -14,8 +14,15 @@ namespace ChocoAutoUpdate
         [return: MarshalAs(UnmanagedType.Bool)]
         static extern bool AllocConsole();
 
+        [DllImport("kernel32.dll", ExactSpelling = true)]
+        public static extern IntPtr GetConsoleWindow();
+
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool SetForegroundWindow(IntPtr hWnd);
+
         private NotifyIcon _TrayIcon;
-        private Choco _Choco;
+        private ChocoWrapper _Choco;
 
         public bool IsElevated { get; set; }
 
@@ -43,7 +50,7 @@ namespace ChocoAutoUpdate
             // check outdated
             try
             {
-                _Choco = new Choco();
+                _Choco = new ChocoWrapper();
             }
             catch (ChocolateyException e)
             {
@@ -143,12 +150,12 @@ namespace ChocoAutoUpdate
                 if (_Choco.NewShortcuts.Length > 0)
                 {
                     StringBuilder msg = new StringBuilder();
-                    msg.Append($"\n\nCreated {_Choco.NewShortcuts.Length} new desktop shortcut(s) during the upgrade process:\n");
+                    msg.Append($"During the upgrade process {_Choco.NewShortcuts.Length} new desktop shortcut(s) were created:\n\n");
                     foreach (string shortcut in _Choco.NewShortcuts)
                     {
-                        msg.Append($"- {Path.GetFileNameWithoutExtension(shortcut)}");
+                        msg.Append($"- {Path.GetFileNameWithoutExtension(shortcut)}\n");
                     }
-                    msg.Append("Do you wish to delete them all?");
+                    msg.Append($"\nDo you want to delete all {_Choco.NewShortcuts.Length} shortcut(s)?");
 
                     DialogResult result = MessageBox.Show(
                         msg.ToString(),
@@ -176,6 +183,11 @@ namespace ChocoAutoUpdate
                 }
 
                 // exit
+                IntPtr handle = GetConsoleWindow();
+                if (!IntPtr.Zero.Equals(handle))
+                {
+                    SetForegroundWindow(handle); // TODO test
+                }
                 Console.CursorVisible = false;
                 Console.Write("\nPress any key to terminate... ");
                 Console.ReadKey();

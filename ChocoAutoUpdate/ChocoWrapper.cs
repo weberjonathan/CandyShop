@@ -7,11 +7,13 @@ using System.Text.RegularExpressions;
 
 namespace ChocoAutoUpdate
 {
-    public class Choco
+    public class ChocoWrapper
     {
         private const string EX_PARSE_ERR = "Could not parse chocolatey output.";
 
         public ChocoPackageCollection Outdated { get; private set; }
+
+        public List<string> UpgradeOutput = new List<string>();
 
         public string OutdatedOutput { get; private set; }
 
@@ -20,7 +22,7 @@ namespace ChocoAutoUpdate
 
         /// <exception cref="ChocolateyException"></exception>
         /// <exception cref="ChocoAutoUpdateException"></exception>
-        public Choco()
+        public ChocoWrapper()
         {
             CheckOutdated();
         }
@@ -94,19 +96,33 @@ namespace ChocoAutoUpdate
             _NewShortcuts.Enqueue(e.FullPath);
         }
 
-        
-
         /// <exception cref="ChocolateyException"></exception>
         public void Upgrade()
         {
             _NewShortcuts.Clear();
-            
+            UpgradeOutput.Clear();
+
             ProcessStartInfo procInfo = new ProcessStartInfo("choco", $"upgrade {Outdated.MarkedPackages.GetPackagesAsString()} -y")
             {
-                UseShellExecute = false
+                UseShellExecute = false,
+
+                // set true to redirect output; will prevent stuff from being printed in allocated console (see ApplicationContext)
+                // RedirectStandardOutput = true
             };
 
-            Process proc = Process.Start(procInfo);
+            Process proc = new Process()
+            {
+                StartInfo = procInfo
+            };
+
+            // redirect output handler
+            //proc.OutputDataReceived += new DataReceivedEventHandler((sender, e) =>
+            //{
+            //    UpgradeOutput.Add(e.Data);
+            //});
+
+            proc.Start();
+            // proc.BeginOutputReadLine(); // needed to redirect output
             using (FileSystemWatcher watcher = new FileSystemWatcher())
             {
                 watcher.Path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);

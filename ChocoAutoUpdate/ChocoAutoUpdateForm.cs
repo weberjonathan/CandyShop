@@ -7,12 +7,12 @@ namespace ChocoAutoUpdate
 {
     public partial class ChocoAutoUpdateForm : Form
     {
-        private readonly Choco _Choco;
+        private readonly ChocoWrapper _Choco;
         private readonly BackgroundWorker _BackgroundWorker;
 
         public bool IsElevated { get; set; } = false;
 
-        public ChocoAutoUpdateForm(Choco choco)
+        public ChocoAutoUpdateForm(ChocoWrapper choco)
         {
             _Choco = choco ?? throw new ArgumentNullException("choco");
             _BackgroundWorker = new BackgroundWorker()
