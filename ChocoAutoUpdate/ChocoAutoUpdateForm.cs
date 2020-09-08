@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows.Forms;
@@ -7,14 +8,16 @@ namespace ChocoAutoUpdate
 {
     public partial class ChocoAutoUpdateForm : Form
     {
-        private readonly ChocoWrapper _Choco;
         private readonly BackgroundWorker _BackgroundWorker;
+
+        private List<ChocolateyPackage> _OutdatedPackages;
+
+        public List<string> PackageNamesForUpgrading { get; private set; } = new List<string>();
 
         public bool IsElevated { get; set; } = false;
 
-        public ChocoAutoUpdateForm(ChocoWrapper choco)
+        public ChocoAutoUpdateForm()
         {
-            _Choco = choco ?? throw new ArgumentNullException("choco");
             _BackgroundWorker = new BackgroundWorker()
             {
                 WorkerReportsProgress = true
@@ -43,18 +46,26 @@ namespace ChocoAutoUpdate
 
         private void _BackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
         {
-            _Choco.CheckOutdated();
+            e.Result = ChocolateyWrapper.CheckOutdated();
         }
 
+        /// <exception cref="InvalidOperationException"></exception>
         private void _BackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
+            if (e.Result.GetType() != typeof(List<ChocolateyPackage>))
+            {
+                throw new InvalidOperationException($"Expected result of type 'List<ChocolateyPackage>'.");
+            }
+
+            _OutdatedPackages = (List<ChocolateyPackage>) e.Result;
+            
             if (!e.Cancelled && e.Error == null)
             {
                 TxtLoading.Visible = false;
                 BtnCancel.Enabled = true;
                 BtnUpgradeChecked.Enabled = true;
                 BtnUpgradeAll.Enabled = true;
-                foreach (ChocoPackage pckg in _Choco.Outdated.Values)
+                foreach (ChocolateyPackage pckg in _OutdatedPackages)
                 {
                     ListViewItem item = new ListViewItem(
                         new string[] { pckg.Name, pckg.CurrVer, pckg.AvailVer, pckg.Pinned.ToString()});
@@ -85,7 +96,7 @@ namespace ChocoAutoUpdate
         {
             foreach (ListViewItem item in LstPackages.Items)
             {
-                _Choco.Outdated[item.Text].MarkedForUpdate = true;
+                PackageNamesForUpgrading.Add(item.Text);
             }
             this.DialogResult = DialogResult.OK;
             this.Close();
@@ -100,7 +111,7 @@ namespace ChocoAutoUpdate
         {
             foreach (ListViewItem item in LstPackages.CheckedItems)
             {
-                _Choco.Outdated[item.Text].MarkedForUpdate = true;
+                PackageNamesForUpgrading.Add(item.Text);
             }
             this.DialogResult = DialogResult.OK;
             this.Close();

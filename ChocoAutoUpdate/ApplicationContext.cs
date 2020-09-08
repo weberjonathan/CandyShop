@@ -22,7 +22,6 @@ namespace ChocoAutoUpdate
         public static extern bool SetForegroundWindow(IntPtr hWnd);
 
         private NotifyIcon _TrayIcon;
-        private ChocoWrapper _Choco;
 
         public bool IsElevated { get; set; }
 
@@ -48,9 +47,10 @@ namespace ChocoAutoUpdate
             };
 
             // check outdated
+            List<ChocolateyPackage> outdatedPckgs = new List<ChocolateyPackage>();
             try
             {
-                _Choco = new ChocoWrapper();
+                 outdatedPckgs = ChocolateyWrapper.CheckOutdated();
             }
             catch (ChocolateyException e)
             {
@@ -73,7 +73,8 @@ namespace ChocoAutoUpdate
                 Exit();
             }
 
-            int count = _Choco.Outdated.Count;
+            // TODO null check
+            int count = outdatedPckgs.Count;
 
 #if DEBUG
             // count = 3;
@@ -120,43 +121,58 @@ namespace ChocoAutoUpdate
 
         private void Upgrade()
         {
-            ChocoAutoUpdateForm form = new ChocoAutoUpdateForm(_Choco)
+            ChocoAutoUpdateForm form = new ChocoAutoUpdateForm()
             {
                 IsElevated = this.IsElevated
             };
             
             if (form.ShowDialog().Equals(DialogResult.OK))
             {
-                // upgrade
-                AllocConsole();
-                Console.CursorVisible = false;
-                Console.WriteLine($"> choco upgrade {_Choco.Outdated.MarkedPackages.GetPackagesAsString()} -y");
+                // setup watcher for desktop shortcuts
+                Queue<string> shortcuts = new Queue<string>();
+                using (FileSystemWatcher watcher = new FileSystemWatcher())
+                {
+                    watcher.Path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+                    watcher.Filter = "*.lnk";
+                    watcher.IncludeSubdirectories = false;
+                    watcher.NotifyFilter = NotifyFilters.FileName;
+                    watcher.Created += new FileSystemEventHandler((sender, e) =>
+                    {
+                        shortcuts.Enqueue(e.FullPath);
+                    });
+                    watcher.EnableRaisingEvents = true;
 
-                try
-                {
-                    _Choco.Upgrade();
-                }
-                catch (ChocolateyException e)
-                {
-                    MessageBox.Show(
-                        $"An error occurred while executing Chocolatey: \"{e.Message}\"",
-                        $"{Application.ProductName} Error",
-                        MessageBoxButtons.OK,
-                        MessageBoxIcon.Error
-                    );
-                    Exit();
+                    // upgrade
+                    AllocConsole();
+                    Console.CursorVisible = false;
+                    // Console.WriteLine($"> choco upgrade {_Choco.Outdated.MarkedPackages.GetPackagesAsString()} -y"); // TODO
+
+                    try
+                    {
+                        ChocolateyWrapper.Upgrade(form.PackageNamesForUpgrading);
+                    }
+                    catch (ChocolateyException e)
+                    {
+                        MessageBox.Show(
+                            $"An error occurred while executing Chocolatey: \"{e.Message}\"",
+                            $"{Application.ProductName} Error",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Error
+                        );
+                        Exit();
+                    }
                 }
 
                 // remove shortcuts
-                if (_Choco.NewShortcuts.Length > 0)
+                if (shortcuts.Count > 0)
                 {
                     StringBuilder msg = new StringBuilder();
-                    msg.Append($"During the upgrade process {_Choco.NewShortcuts.Length} new desktop shortcut(s) were created:\n\n");
-                    foreach (string shortcut in _Choco.NewShortcuts)
+                    msg.Append($"During the upgrade process {shortcuts.Count} new desktop shortcut(s) were created:\n\n");
+                    foreach (string shortcut in shortcuts)
                     {
                         msg.Append($"- {Path.GetFileNameWithoutExtension(shortcut)}\n");
                     }
-                    msg.Append($"\nDo you want to delete all {_Choco.NewShortcuts.Length} shortcut(s)?");
+                    msg.Append($"\nDo you want to delete all {shortcuts.Count} shortcut(s)?");
 
                     DialogResult result = MessageBox.Show(
                         msg.ToString(),
@@ -167,7 +183,6 @@ namespace ChocoAutoUpdate
 
                     if (result.Equals(DialogResult.Yes))
                     {
-                        Queue<string> shortcuts = new Queue<string>(_Choco.NewShortcuts);
                         while (shortcuts.Count > 0)
                         {
                             string shortcut = shortcuts.Dequeue();
