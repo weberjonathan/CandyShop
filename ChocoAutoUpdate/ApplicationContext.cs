@@ -28,14 +28,14 @@ namespace ChocoAutoUpdate
         public ApplicationContext()
         {
             // create context menu
-            ToolStripItem item = new ToolStripMenuItem
+            ToolStripItem exitItem = new ToolStripMenuItem
             {
                 Text = "Exit",
             };
-            item.Click += TrayIcon_Rightclick;
+            exitItem.Click += new EventHandler((sender, e) => { Exit(); });
 
             ContextMenuStrip contextMenu = new ContextMenuStrip();
-            contextMenu.Items.Add(item);
+            contextMenu.Items.Add(exitItem);
 
             // Initialize Tray Icon
             _TrayIcon = new NotifyIcon()
@@ -47,10 +47,39 @@ namespace ChocoAutoUpdate
             };
 
             // check outdated
+            int count = GetOutdatedCount();
+
+            #if DEBUG
+            count = 3;
+            #endif
+
+            // prepare balloon and click handlers
+            if (count > 0)
+            {
+                _TrayIcon.BalloonTipClicked += new EventHandler((sender, e) => { InitiateUpgrade(); });
+                _TrayIcon.MouseClick += new MouseEventHandler((sender, e) =>
+                {
+                    if (e.Button.Equals(MouseButtons.Left)) InitiateUpgrade();
+                });
+                
+                _TrayIcon.BalloonTipIcon = ToolTipIcon.Info;
+                _TrayIcon.Text = Application.ProductName;
+                _TrayIcon.BalloonTipTitle = $"{count} package{(count == 1 ? " is" : "s are")} outdated.";
+                _TrayIcon.BalloonTipText = $"To upgrade click here or the tray icon later.";
+                _TrayIcon.ShowBalloonTip(2000);
+            }
+            else
+            {
+                Exit();
+            }
+        }
+
+        private int GetOutdatedCount()
+        {
             List<ChocolateyPackage> outdatedPckgs = new List<ChocolateyPackage>();
             try
             {
-                 outdatedPckgs = ChocolateyWrapper.CheckOutdated();
+                outdatedPckgs = ChocolateyWrapper.CheckOutdated();
             }
             catch (ChocolateyException e)
             {
@@ -73,53 +102,11 @@ namespace ChocoAutoUpdate
                 Exit();
             }
 
-            // TODO null check
-            int count = outdatedPckgs.Count;
-
-#if DEBUG
-            // count = 3;
-#endif
-
-            // prepare balloon and click handlers
-            if (count > 0)
-            {
-                _TrayIcon.BalloonTipClicked += TrayIcon_BalloonTipClicked;
-                _TrayIcon.MouseClick += TrayIcon_Click;
-                _TrayIcon.BalloonTipIcon = ToolTipIcon.Info;
-                _TrayIcon.Text = Application.ProductName;
-
-                _TrayIcon.BalloonTipTitle = $"{count} package{(count == 1 ? " is" : "s are")} outdated.";
-                _TrayIcon.BalloonTipText = $"To upgrade click here or the tray icon later.";
-                _TrayIcon.ShowBalloonTip(2000);
-            }
-            else
-            {
-                Exit();
-            }
+            return outdatedPckgs.Count;
         }
+        
 
-        private void TrayIcon_Rightclick(object sender, EventArgs e)
-        {
-            Exit();
-        }
-
-        private void TrayIcon_Click(object sender, MouseEventArgs e)
-        {
-            if (e.Button.Equals(MouseButtons.Left)) Upgrade();
-        }
-
-        private void TrayIcon_BalloonTipClicked(object sender, EventArgs e)
-        {
-            Upgrade();
-        }
-
-        private void Exit()
-        {
-            _TrayIcon.Visible = false;
-            Environment.Exit(0);
-        }
-
-        private void Upgrade()
+        private void InitiateUpgrade()
         {
             ChocoAutoUpdateForm form = new ChocoAutoUpdateForm()
             {
@@ -209,6 +196,12 @@ namespace ChocoAutoUpdate
                 Console.ReadKey();
                 Exit();
             }
+        }
+
+        private void Exit()
+        {
+            _TrayIcon.Visible = false;
+            Environment.Exit(0);
         }
     }
 }
