@@ -35,18 +35,18 @@
             this.BtnUpgradeAll = new System.Windows.Forms.Button();
             this.BtnCancel = new System.Windows.Forms.Button();
             this.MainPanel = new System.Windows.Forms.Panel();
-            this.TxtLoading = new System.Windows.Forms.Label();
-            this.LstPackages = new System.Windows.Forms.ListView();
-            this.ColName = new System.Windows.Forms.ColumnHeader();
-            this.ColCurr = new System.Windows.Forms.ColumnHeader();
-            this.ColAvail = new System.Windows.Forms.ColumnHeader();
-            this.ColPinned = new System.Windows.Forms.ColumnHeader();
+            this.UpgradePage = new ChocoAutoUpdate.UpgradePage();
             this.TopPanel = new System.Windows.Forms.Panel();
             this.label1 = new System.Windows.Forms.Label();
             this.columnHeader1 = new System.Windows.Forms.ColumnHeader();
+            this.tabControl1 = new System.Windows.Forms.TabControl();
+            this.TabUpgrade = new System.Windows.Forms.TabPage();
+            this.TabInstalled = new System.Windows.Forms.TabPage();
             this.BottomPanel.SuspendLayout();
             this.MainPanel.SuspendLayout();
             this.TopPanel.SuspendLayout();
+            this.tabControl1.SuspendLayout();
+            this.TabUpgrade.SuspendLayout();
             this.SuspendLayout();
             // 
             // BottomPanel
@@ -55,7 +55,6 @@
             this.BottomPanel.Controls.Add(this.LinkGithub);
             this.BottomPanel.Controls.Add(this.BtnUpgradeAll);
             this.BottomPanel.Controls.Add(this.BtnCancel);
-            this.BottomPanel.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.BottomPanel.Location = new System.Drawing.Point(0, 356);
             this.BottomPanel.Name = "BottomPanel";
             this.BottomPanel.Size = new System.Drawing.Size(604, 55);
@@ -70,7 +69,7 @@
             this.BtnUpgradeChecked.TabIndex = 3;
             this.BtnUpgradeChecked.Text = "&Upgrade";
             this.BtnUpgradeChecked.UseVisualStyleBackColor = true;
-            this.BtnUpgradeChecked.Click += new System.EventHandler(this.BtnUpgradeChecked_Click);
+            this.BtnUpgradeChecked.Click += new System.EventHandler(this.UpgradePage_UpgradeSelectedClick);
             // 
             // LinkGithub
             // 
@@ -81,7 +80,6 @@
             this.LinkGithub.TabIndex = 1;
             this.LinkGithub.TabStop = true;
             this.LinkGithub.Text = "GitHub";
-            this.LinkGithub.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.LinkGithub_LinkClicked);
             // 
             // BtnUpgradeAll
             // 
@@ -92,7 +90,7 @@
             this.BtnUpgradeAll.TabIndex = 2;
             this.BtnUpgradeAll.Text = "Upgrade &All";
             this.BtnUpgradeAll.UseVisualStyleBackColor = true;
-            this.BtnUpgradeAll.Click += new System.EventHandler(this.BtnUpgradeAll_Click);
+            this.BtnUpgradeAll.Click += new System.EventHandler(this.UpgradePage_UpgradeAllClick);
             // 
             // BtnCancel
             // 
@@ -107,74 +105,25 @@
             // MainPanel
             // 
             this.MainPanel.BackColor = System.Drawing.SystemColors.Window;
-            this.MainPanel.Controls.Add(this.TxtLoading);
-            this.MainPanel.Controls.Add(this.LstPackages);
+            this.MainPanel.Controls.Add(this.tabControl1);
             this.MainPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.MainPanel.Location = new System.Drawing.Point(0, 47);
+            this.MainPanel.Location = new System.Drawing.Point(0, 0);
             this.MainPanel.Name = "MainPanel";
-            this.MainPanel.Size = new System.Drawing.Size(604, 309);
+            this.MainPanel.Size = new System.Drawing.Size(730, 534);
             this.MainPanel.TabIndex = 1;
             // 
-            // TxtLoading
+            // UpgradePage
             // 
-            this.TxtLoading.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.TxtLoading.Location = new System.Drawing.Point(250, 117);
-            this.TxtLoading.Name = "TxtLoading";
-            this.TxtLoading.Size = new System.Drawing.Size(100, 15);
-            this.TxtLoading.TabIndex = 1;
-            this.TxtLoading.Text = "Loading...";
-            this.TxtLoading.TextAlign = System.Drawing.ContentAlignment.TopCenter;
-            // 
-            // LstPackages
-            // 
-            this.LstPackages.CheckBoxes = true;
-            this.LstPackages.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.ColName,
-            this.ColCurr,
-            this.ColAvail,
-            this.ColPinned});
-            this.LstPackages.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.LstPackages.FullRowSelect = true;
-            this.LstPackages.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
-            this.LstPackages.HideSelection = false;
-            this.LstPackages.Location = new System.Drawing.Point(0, 0);
-            this.LstPackages.MultiSelect = false;
-            this.LstPackages.Name = "LstPackages";
-            this.LstPackages.ShowItemToolTips = true;
-            this.LstPackages.Size = new System.Drawing.Size(604, 309);
-            this.LstPackages.TabIndex = 0;
-            this.LstPackages.UseCompatibleStateImageBehavior = false;
-            this.LstPackages.View = System.Windows.Forms.View.Details;
-            this.LstPackages.ItemChecked += new System.Windows.Forms.ItemCheckedEventHandler(this.LstPackages_ItemChecked);
-            // 
-            // ColName
-            // 
-            this.ColName.Name = "ColName";
-            this.ColName.Text = "Name";
-            this.ColName.Width = 200;
-            // 
-            // ColCurr
-            // 
-            this.ColCurr.Name = "ColCurr";
-            this.ColCurr.Text = "Current";
-            this.ColCurr.Width = 170;
-            // 
-            // ColAvail
-            // 
-            this.ColAvail.Name = "ColAvail";
-            this.ColAvail.Text = "Available";
-            this.ColAvail.Width = 170;
-            // 
-            // ColPinned
-            // 
-            this.ColPinned.Name = "ColPinned";
-            this.ColPinned.Text = "Pinned";
+            this.UpgradePage.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.UpgradePage.Location = new System.Drawing.Point(3, 3);
+            this.UpgradePage.Name = "UpgradePage";
+            this.UpgradePage.Size = new System.Drawing.Size(716, 500);
+            this.UpgradePage.TabIndex = 2;
             // 
             // TopPanel
             // 
             this.TopPanel.BackColor = System.Drawing.SystemColors.Window;
             this.TopPanel.Controls.Add(this.label1);
-            this.TopPanel.Dock = System.Windows.Forms.DockStyle.Top;
             this.TopPanel.Location = new System.Drawing.Point(0, 0);
             this.TopPanel.Name = "TopPanel";
             this.TopPanel.Size = new System.Drawing.Size(604, 47);
@@ -190,13 +139,45 @@
             this.label1.Text = "!!! ChocoAuto Update does not have administrator privileges. Proceed with caution" +
     "!";
             // 
+            // tabControl1
+            // 
+            this.tabControl1.Controls.Add(this.TabUpgrade);
+            this.tabControl1.Controls.Add(this.TabInstalled);
+            this.tabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tabControl1.Location = new System.Drawing.Point(0, 0);
+            this.tabControl1.Name = "tabControl1";
+            this.tabControl1.SelectedIndex = 0;
+            this.tabControl1.Size = new System.Drawing.Size(730, 534);
+            this.tabControl1.TabIndex = 3;
+            // 
+            // TabUpgrade
+            // 
+            this.TabUpgrade.Controls.Add(this.UpgradePage);
+            this.TabUpgrade.Location = new System.Drawing.Point(4, 24);
+            this.TabUpgrade.Name = "TabUpgrade";
+            this.TabUpgrade.Padding = new System.Windows.Forms.Padding(3);
+            this.TabUpgrade.Size = new System.Drawing.Size(722, 506);
+            this.TabUpgrade.TabIndex = 0;
+            this.TabUpgrade.Text = "Upgrade";
+            this.TabUpgrade.UseVisualStyleBackColor = true;
+            // 
+            // TabInstalled
+            // 
+            this.TabInstalled.Location = new System.Drawing.Point(4, 24);
+            this.TabInstalled.Name = "TabInstalled";
+            this.TabInstalled.Padding = new System.Windows.Forms.Padding(3);
+            this.TabInstalled.Size = new System.Drawing.Size(192, 72);
+            this.TabInstalled.TabIndex = 1;
+            this.TabInstalled.Text = "Installed";
+            this.TabInstalled.UseVisualStyleBackColor = true;
+            // 
             // ChocoAutoUpdateForm
             // 
             this.AcceptButton = this.BtnUpgradeChecked;
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.BtnCancel;
-            this.ClientSize = new System.Drawing.Size(604, 411);
+            this.ClientSize = new System.Drawing.Size(730, 534);
             this.Controls.Add(this.MainPanel);
             this.Controls.Add(this.BottomPanel);
             this.Controls.Add(this.TopPanel);
@@ -211,6 +192,8 @@
             this.MainPanel.ResumeLayout(false);
             this.TopPanel.ResumeLayout(false);
             this.TopPanel.PerformLayout();
+            this.tabControl1.ResumeLayout(false);
+            this.TabUpgrade.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -222,15 +205,13 @@
         private System.Windows.Forms.Button BtnUpgradeAll;
         private System.Windows.Forms.Button BtnCancel;
         private System.Windows.Forms.LinkLabel LinkGithub;
-        private System.Windows.Forms.ListView LstPackages;
-        private System.Windows.Forms.ColumnHeader ColName;
-        private System.Windows.Forms.ColumnHeader ColCurr;
-        private System.Windows.Forms.ColumnHeader ColAvail;
-        private System.Windows.Forms.ColumnHeader ColPinned;
         private System.Windows.Forms.ColumnHeader columnHeader1;
-        private System.Windows.Forms.Label TxtLoading;
         private System.Windows.Forms.Panel TopPanel;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button BtnUpgradeChecked;
+        private UpgradePage UpgradePage;
+        private System.Windows.Forms.TabControl tabControl1;
+        private System.Windows.Forms.TabPage TabUpgrade;
+        private System.Windows.Forms.TabPage TabInstalled;
     }
 }

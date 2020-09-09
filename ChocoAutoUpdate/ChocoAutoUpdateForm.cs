@@ -10,14 +10,14 @@ namespace ChocoAutoUpdate
     {
         private readonly BackgroundWorker _BackgroundWorker;
 
-        private List<ChocolateyPackage> _OutdatedPackages;
-
-        public List<string> PackageNamesForUpgrading { get; private set; } = new List<string>();
+        public List<ChocolateyPackage> SelectedPackages { get; set; }
 
         public bool IsElevated { get; set; } = false;
 
         public ChocoAutoUpdateForm()
         {
+            InitializeComponent();
+
             _BackgroundWorker = new BackgroundWorker()
             {
                 WorkerReportsProgress = true
@@ -25,7 +25,9 @@ namespace ChocoAutoUpdate
             _BackgroundWorker.DoWork += _BackgroundWorker_DoWork;
             _BackgroundWorker.RunWorkerCompleted += _BackgroundWorker_RunWorkerCompleted;
 
-            InitializeComponent();
+            UpgradePage.UpgradeAllClick += UpgradePage_UpgradeAllClick;
+            UpgradePage.UpgradeSelectedClick += UpgradePage_UpgradeSelectedClick;
+            UpgradePage.CancelClick += UpgradePage_CancelClick;
         }
 
         private void ChocoAutoUpdateForm_Load(object sender, EventArgs e)
@@ -57,21 +59,10 @@ namespace ChocoAutoUpdate
                 throw new InvalidOperationException($"Expected result of type 'List<ChocolateyPackage>'.");
             }
 
-            _OutdatedPackages = (List<ChocolateyPackage>) e.Result;
-            
+            List<ChocolateyPackage> packages = (List<ChocolateyPackage>) e.Result;
             if (!e.Cancelled && e.Error == null)
             {
-                TxtLoading.Visible = false;
-                BtnCancel.Enabled = true;
-                BtnUpgradeChecked.Enabled = true;
-                BtnUpgradeAll.Enabled = true;
-                foreach (ChocolateyPackage pckg in _OutdatedPackages)
-                {
-                    ListViewItem item = new ListViewItem(
-                        new string[] { pckg.Name, pckg.CurrVer, pckg.AvailVer, pckg.Pinned.ToString()});
-                    item.Checked = true;
-                    LstPackages.Items.Add(item);
-                }
+                UpgradePage.OutdatedPackages = packages;
             }
             else
             {
@@ -85,35 +76,23 @@ namespace ChocoAutoUpdate
             }
         }
 
-        private void LinkGithub_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        private void UpgradePage_UpgradeAllClick(object sender, EventArgs e)
         {
-            LinkGithub.LinkVisited = true;
-            var url = "https://github.com/weberjonathan/Chocolatey-AutoUpdate";
-            Process.Start(new ProcessStartInfo("cmd", $"/c start {url}"));
-        }
-
-        private void BtnUpgradeAll_Click(object sender, EventArgs e)
-        {
-            foreach (ListViewItem item in LstPackages.Items)
-            {
-                PackageNamesForUpgrading.Add(item.Text);
-            }
+            SelectedPackages = UpgradePage.OutdatedPackages;
             this.DialogResult = DialogResult.OK;
             this.Close();
         }
 
-        private void LstPackages_ItemChecked(object sender, ItemCheckedEventArgs e)
+        private void UpgradePage_UpgradeSelectedClick(object sender, EventArgs e)
         {
-            BtnUpgradeChecked.Text = $"Upgrade ({LstPackages.CheckedItems.Count})";
+            SelectedPackages = UpgradePage.SelectedPackages;
+            this.DialogResult = DialogResult.OK;
+            this.Close();
         }
 
-        private void BtnUpgradeChecked_Click(object sender, EventArgs e)
+        private void UpgradePage_CancelClick(object sender, EventArgs e)
         {
-            foreach (ListViewItem item in LstPackages.CheckedItems)
-            {
-                PackageNamesForUpgrading.Add(item.Text);
-            }
-            this.DialogResult = DialogResult.OK;
+            this.DialogResult = DialogResult.Cancel;
             this.Close();
         }
     }

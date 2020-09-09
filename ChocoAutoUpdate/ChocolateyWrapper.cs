@@ -75,16 +75,16 @@ namespace ChocoAutoUpdate
         }
 
         /// <exception cref="ChocolateyException"></exception>
-        public static void Upgrade(List<string> pckgNames)
+        public static void Upgrade(List<ChocolateyPackage> packages)
         {
-            string pckgs = "";
-            foreach (string pckg in pckgNames)
+            string argument = "";
+            foreach (ChocolateyPackage pckg in packages)
             {
-                pckgs += pckg + " ";
+                argument += pckg.Name + " ";
             }
 
             // launch process
-            ProcessStartInfo procInfo = new ProcessStartInfo(CHOCO_BIN, $"upgrade {pckgs} -y")
+            ProcessStartInfo procInfo = new ProcessStartInfo(CHOCO_BIN, $"upgrade {argument} -y")
             {
                 UseShellExecute = false,
 

@@ -8,7 +8,7 @@ using System.Windows.Forms;
 
 namespace ChocoAutoUpdate
 {
-    public class ApplicationContext : System.Windows.Forms.ApplicationContext
+    public class ChocoAutoUpdateTray : System.Windows.Forms.ApplicationContext
     {
         [DllImport("kernel32.dll", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
@@ -25,7 +25,7 @@ namespace ChocoAutoUpdate
 
         public bool IsElevated { get; set; }
 
-        public ApplicationContext()
+        public ChocoAutoUpdateTray()
         {
             // create context menu
             ToolStripItem exitItem = new ToolStripMenuItem
@@ -136,7 +136,7 @@ namespace ChocoAutoUpdate
 
                     try
                     {
-                        ChocolateyWrapper.Upgrade(form.PackageNamesForUpgrading);
+                        ChocolateyWrapper.Upgrade(form.SelectedPackages);
                     }
                     catch (ChocolateyException e)
                     {

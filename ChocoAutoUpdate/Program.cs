@@ -6,9 +6,27 @@ namespace ChocoAutoUpdate
 {
     static class Program
     {
+        private static bool SILENT_MODE = false;
+
         [STAThread]
         static void Main(string[] args)
         {
+            // check arguments
+            for (int i = 0; i < args.Length; i++)
+            {
+                switch (args[i])
+                {
+                    case "--silent":
+                        SILENT_MODE = true;
+                        break;
+                    case "-s":
+                        SILENT_MODE = true;
+                        break;
+                    default:
+                        break;
+                }
+            }
+            
             // check whether app is elevated (admin privileges)
             bool isElevated;
             using (WindowsIdentity identity = WindowsIdentity.GetCurrent())
@@ -22,12 +40,24 @@ namespace ChocoAutoUpdate
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            ApplicationContext appContext = new ApplicationContext
+            if (SILENT_MODE)
             {
-                IsElevated = isElevated
-            };
+                ChocoAutoUpdateTray appContext = new ChocoAutoUpdateTray
+                {
+                    IsElevated = isElevated
+                };
+                Application.Run(appContext);
+            }
+            else
+            {
+                ChocoAutoUpdateForm form = new ChocoAutoUpdateForm
+                {
+                    IsElevated = isElevated
+                };
+                Application.Run(form);
+            }
 
-            Application.Run(appContext);
+            
         }
     }
 }
