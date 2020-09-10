@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Security.Principal;
 using System.Windows.Forms;
 
 namespace ChocoAutoUpdate
@@ -22,7 +23,7 @@ namespace ChocoAutoUpdate
 
         private void ChocoAutoUpdateForm_Load(object sender, EventArgs e)
         {
-            if (Program.IsElevated())
+            if (HasAdminPrivileges())
             {
                 TopPanel.Visible = false;
                 this.Text = $"{Application.ProductName} v{Application.ProductVersion}";
@@ -66,6 +67,15 @@ namespace ChocoAutoUpdate
         {
             List<ChocolateyPackage> packages = await ChocolateyWrapper.ListInstalledAsync();
             InstalledPage.Packages = packages;
+        }
+
+        private bool HasAdminPrivileges()
+        {
+            using (WindowsIdentity identity = WindowsIdentity.GetCurrent())
+            {
+                WindowsPrincipal principal = new WindowsPrincipal(identity);
+                return principal.IsInRole(WindowsBuiltInRole.Administrator);
+            }
         }
     }
 }

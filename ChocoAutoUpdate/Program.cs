@@ -6,7 +6,6 @@ namespace ChocoAutoUpdate
 {
     static class Program
     {
-        private static bool ADMIN_MODE;
         private static bool SILENT_MODE = false;
 
         [STAThread]
@@ -28,13 +27,6 @@ namespace ChocoAutoUpdate
                 }
             }
             
-            // check whether app is elevated (admin privileges)
-            using (WindowsIdentity identity = WindowsIdentity.GetCurrent())
-            {
-                WindowsPrincipal principal = new WindowsPrincipal(identity);
-                ADMIN_MODE = principal.IsInRole(WindowsBuiltInRole.Administrator);
-            }
-
             // launch application
             Application.SetHighDpiMode(HighDpiMode.SystemAware);
             Application.EnableVisualStyles();
@@ -48,11 +40,6 @@ namespace ChocoAutoUpdate
             {
                 Application.Run(new ChocoAutoUpdateForm());
             }
-        }
-
-        public static bool IsElevated()
-        {
-            return ADMIN_MODE;
         }
     }
 }
