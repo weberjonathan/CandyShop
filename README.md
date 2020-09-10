@@ -1,9 +1,11 @@
 # Candy Shop
-![Choco AutoUpdate](/docs/example.jpg)
+![CandyShop Example](/docs/example.jpg)
 
 _Candy Shop_ (formely _Choco AutoUpdate_) is a minimal UI for managing installed _[Chocolatey](https://chocolatey.org/)_ packages. It checks for outdated packages in the background, notifies the user and installs them by the push of a button. The application also provides an overview of installed packages.
 
 * Requires `choco` to be in PATH.
+
+__[Visit the gallery.](/docs/gallery.md)__
 
 ## Features
 * Start the application and see outdated and installed packages.
