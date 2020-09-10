@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
@@ -179,6 +181,57 @@ namespace CandyShop
         public static async Task<List<ChocolateyPackage>> ListInstalledAsync()
         {
             return await Task.Run(ListInstalled);
+        }
+
+        public static string GetInfo(ChocolateyPackage package)
+        {
+            StringBuilder rtn = new StringBuilder();
+            
+            // launch process
+            ProcessStartInfo procInfo = new ProcessStartInfo(CHOCO_BIN, $"info {package.Name}")
+            {
+                RedirectStandardOutput = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
+
+            Process proc = Process.Start(procInfo);
+            string output = proc.StandardOutput.ReadToEnd();
+
+            proc.WaitForExit();
+            if (proc.ExitCode != 0)
+            {
+                throw new ChocolateyException($"choco did not exit cleanly. Returned {proc.ExitCode}. ");
+            }
+
+            // parse head
+            Queue<string> outputLines = new Queue<string>(output.Split("\r\n"));
+            if (!outputLines.Dequeue().StartsWith("Chocolatey v"))
+            {
+                // TOOD version checks? "Chocolatey v0.10.15"
+            }
+
+            outputLines.Dequeue(); // TODO e. g. "cpu-z 1.93 [Approved]"
+
+            // parse info
+            while (outputLines.Count > 0)
+            {
+                string line = outputLines.Dequeue();
+                if (line.Equals("1 packages found."))
+                {
+                    break;
+                }
+
+                rtn.Append(line);
+                rtn.Append(Environment.NewLine);
+            }
+
+            return rtn.ToString();
+        }
+
+        public static async Task<string> GetInfoAsync(ChocolateyPackage package)
+        {
+            return await Task.Run(() => GetInfo(package));
         }
     }
 }
