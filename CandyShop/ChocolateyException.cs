@@ -1,4 +1,4 @@
-﻿namespace ChocoAutoUpdate
+﻿namespace CandyShop
 {
     // use for exceptions with Chocolatey software
 

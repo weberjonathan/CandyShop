@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace ChocoAutoUpdate
+namespace CandyShop
 {
     public class ChocolateyWrapper
     {
@@ -11,7 +11,7 @@ namespace ChocoAutoUpdate
         private const string CHOCO_BIN = "choco";
 
         /// <exception cref="ChocolateyException"></exception>
-        /// <exception cref="ChocoAutoUpdateException"></exception>
+        /// <exception cref="CandyShopException"></exception>
         public static List<ChocolateyPackage> CheckOutdated()
         {
             List<ChocolateyPackage> packages = new List<ChocolateyPackage>();
@@ -44,7 +44,7 @@ namespace ChocoAutoUpdate
                 !outputLines.Dequeue().Equals(" Output is package name | current version | available version | pinned?") ||
                 !outputLines.Dequeue().Equals(""))
             {
-                throw new ChocoAutoUpdateException(TXT_ERR_PARSE);
+                throw new CandyShopException(TXT_ERR_PARSE);
             }
 
             // parse outdated packages
@@ -69,14 +69,14 @@ namespace ChocoAutoUpdate
             Match summaryMatch = Regex.Match(outputLines.Dequeue(), summaryPattern);
             if (!summaryMatch.Success)
             {
-                throw new ChocoAutoUpdateException(TXT_ERR_PARSE);
+                throw new CandyShopException(TXT_ERR_PARSE);
             }
 
             return packages;
         }
 
         /// <exception cref="ChocolateyException"></exception>
-        /// <exception cref="ChocoAutoUpdateException"></exception>
+        /// <exception cref="CandyShopException"></exception>
         public static async Task<List<ChocolateyPackage>> CheckOutdatedAsync()
         {
             return await Task.Run(CheckOutdated);

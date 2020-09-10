@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Security.Principal;
 using System.Windows.Forms;
 
-namespace ChocoAutoUpdate
+namespace CandyShop
 {
-    public partial class ChocoAutoUpdateForm : Form
+    public partial class CandyShopForm : Form
     {
-        public ChocoAutoUpdateForm()
+        public CandyShopForm()
         {
             InitializeComponent();
 

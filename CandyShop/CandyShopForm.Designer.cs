@@ -1,6 +1,6 @@
-﻿namespace ChocoAutoUpdate
+﻿namespace CandyShop
 {
-    partial class ChocoAutoUpdateForm
+    partial class CandyShopForm
     {
         /// <summary>
         /// Required designer variable.
@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ChocoAutoUpdateForm));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CandyShopForm));
             this.BottomPanel = new System.Windows.Forms.Panel();
             this.BtnUpgradeChecked = new System.Windows.Forms.Button();
             this.LinkGithub = new System.Windows.Forms.LinkLabel();
@@ -37,9 +37,9 @@
             this.MainPanel = new System.Windows.Forms.Panel();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.TabUpgrade = new System.Windows.Forms.TabPage();
-            this.UpgradePage = new ChocoAutoUpdate.UpgradePage();
+            this.UpgradePage = new CandyShop.UpgradePage();
             this.TabInstalled = new System.Windows.Forms.TabPage();
-            this.InstalledPage = new ChocoAutoUpdate.InstalledPage();
+            this.InstalledPage = new CandyShop.InstalledPage();
             this.TopPanel = new System.Windows.Forms.Panel();
             this.label1 = new System.Windows.Forms.Label();
             this.columnHeader1 = new System.Windows.Forms.ColumnHeader();

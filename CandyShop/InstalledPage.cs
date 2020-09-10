@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Windows.Forms;
 
-namespace ChocoAutoUpdate
+namespace CandyShop
 {
     public partial class InstalledPage : UserControl
     {

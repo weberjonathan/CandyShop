@@ -1,4 +1,4 @@
-﻿namespace ChocoAutoUpdate
+﻿namespace CandyShop
 {
     public class ChocolateyPackage
     {

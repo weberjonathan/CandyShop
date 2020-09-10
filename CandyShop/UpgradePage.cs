@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Windows.Forms;
 
-namespace ChocoAutoUpdate
+namespace CandyShop
 {
     public partial class UpgradePage : UserControl
     {

@@ -1,4 +1,4 @@
-﻿using ChocoAutoUpdate.Properties;
+﻿using CandyShop.Properties;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
 
-namespace ChocoAutoUpdate
+namespace CandyShop
 {
     public class ChocoAutoUpdateTray : System.Windows.Forms.ApplicationContext
     {
@@ -89,7 +89,7 @@ namespace ChocoAutoUpdate
                 );
                 Exit();
             }
-            catch (ChocoAutoUpdateException e)
+            catch (CandyShopException e)
             {
                 MessageBox.Show(
                     e.Message,
@@ -105,7 +105,7 @@ namespace ChocoAutoUpdate
 
         private void InitiateUpgrade()
         {
-            ChocoAutoUpdateForm form = new ChocoAutoUpdateForm();
+            CandyShopForm form = new CandyShopForm();
             if (form.ShowDialog().Equals(DialogResult.OK))
             {
                 // setup watcher for desktop shortcuts

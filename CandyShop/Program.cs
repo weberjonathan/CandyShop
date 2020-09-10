@@ -1,8 +1,7 @@
 using System;
-using System.Security.Principal;
 using System.Windows.Forms;
 
-namespace ChocoAutoUpdate
+namespace CandyShop
 {
     static class Program
     {
@@ -38,7 +37,7 @@ namespace ChocoAutoUpdate
             }
             else
             {
-                Application.Run(new ChocoAutoUpdateForm());
+                Application.Run(new CandyShopForm());
             }
         }
     }
