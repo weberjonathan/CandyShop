@@ -37,13 +37,17 @@ namespace ChocoAutoUpdate
                 BtnUpgradeAll.Enabled = true;
                 foreach (ChocolateyPackage pckg in value)
                 {
-                    AddListViewItem(new ListViewItem(new string[]
+                    
+                    ListViewItem item = new ListViewItem(new string[]
                     {
                         pckg.Name,
                         pckg.CurrVer,
                         pckg.AvailVer,
                         pckg.Pinned.ToString()
-                    }));
+                    });
+
+                    item.Checked = true;
+                    LstPackages.Items.Add(item);
                 }
             }
         }
@@ -67,14 +71,7 @@ namespace ChocoAutoUpdate
         private void LstPackages_Resize(object sender, EventArgs e)
         {
             const int pinnedWidth = 60;
-            int availWidth = LstPackages.Width - pinnedWidth - LstPackages.Margin.Left - LstPackages.Margin.Right;
-
-            const int headerHeight = 25;
-            int lineHeight = LstPackages.Items.Count > 0 ? LstPackages.GetItemRect(0).Height : 19;
-            if (LstPackages.Items.Count * lineHeight + headerHeight > LstPackages.Height)
-            {
-                availWidth -= SystemInformation.VerticalScrollBarWidth;
-            }
+            int availWidth = LstPackages.Width - pinnedWidth - LstPackages.Margin.Left - LstPackages.Margin.Right - SystemInformation.VerticalScrollBarWidth;
 
             LstPackages.Columns[0].Width = (int)Math.Floor(availWidth * .4);
             LstPackages.Columns[1].Width = (int)Math.Floor(availWidth * .3);
@@ -88,13 +85,6 @@ namespace ChocoAutoUpdate
             var url = "https://github.com/weberjonathan/Chocolatey-AutoUpdate";
          
             Process.Start(new ProcessStartInfo("cmd", $"/c start {url}"));
-        }
-
-        private void AddListViewItem(ListViewItem item)
-        {
-            item.Checked = true;
-            LstPackages.Items.Add(item);
-            LstPackages_Resize(this, new EventArgs());
         }
     }
 }
