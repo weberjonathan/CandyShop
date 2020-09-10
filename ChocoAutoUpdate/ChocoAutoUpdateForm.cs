@@ -6,10 +6,6 @@ namespace ChocoAutoUpdate
 {
     public partial class ChocoAutoUpdateForm : Form
     {
-        public List<ChocolateyPackage> SelectedPackages { get; set; }
-
-        public bool IsElevated { get; set; } = false;
-
         public ChocoAutoUpdateForm()
         {
             InitializeComponent();
@@ -21,6 +17,10 @@ namespace ChocoAutoUpdate
             UpgradePage.UpgradeSelectedClick += UpgradePage_UpgradeSelectedClick;
             UpgradePage.CancelClick += UpgradePage_CancelClick;
         }
+
+        public List<ChocolateyPackage> SelectedPackages { get; set; }
+
+        public bool IsElevated { get; set; } = false;
 
         private void ChocoAutoUpdateForm_Load(object sender, EventArgs e)
         {

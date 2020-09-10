@@ -56,8 +56,6 @@ namespace ChocoAutoUpdate
                 };
                 Application.Run(form);
             }
-
-            
         }
     }
 }

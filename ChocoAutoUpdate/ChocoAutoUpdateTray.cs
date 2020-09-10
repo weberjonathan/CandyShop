@@ -12,18 +12,16 @@ namespace ChocoAutoUpdate
     {
         [DllImport("kernel32.dll", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        static extern bool AllocConsole();
+        private static extern bool AllocConsole();
 
         [DllImport("kernel32.dll", ExactSpelling = true)]
-        public static extern IntPtr GetConsoleWindow();
+        private static extern IntPtr GetConsoleWindow();
 
         [DllImport("user32.dll")]
         [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool SetForegroundWindow(IntPtr hWnd);
+        private static extern bool SetForegroundWindow(IntPtr hWnd);
 
         private NotifyIcon _TrayIcon;
-
-        public bool IsElevated { get; set; }
 
         public ChocoAutoUpdateTray()
         {
@@ -74,6 +72,8 @@ namespace ChocoAutoUpdate
             }
         }
 
+        public bool IsElevated { get; set; }
+
         private int GetOutdatedCount()
         {
             List<ChocolateyPackage> outdatedPckgs = new List<ChocolateyPackage>();
@@ -104,7 +104,6 @@ namespace ChocoAutoUpdate
 
             return outdatedPckgs.Count;
         }
-        
 
         private void InitiateUpgrade()
         {
