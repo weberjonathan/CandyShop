@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace ChocoAutoUpdate
 {
@@ -76,6 +77,13 @@ namespace ChocoAutoUpdate
         }
 
         /// <exception cref="ChocolateyException"></exception>
+        /// <exception cref="ChocoAutoUpdateException"></exception>
+        public static async Task<List<ChocolateyPackage>> CheckOutdatedAsync()
+        {
+            return await Task.Run(CheckOutdated);
+        }
+
+        /// <exception cref="ChocolateyException"></exception>
         public static void Upgrade(List<ChocolateyPackage> packages)
         {
             string argument = "";
@@ -115,16 +123,63 @@ namespace ChocoAutoUpdate
             }
         }
 
+        /// <exception cref="ChocolateyException"></exception>
         public static List<ChocolateyPackage> ListInstalled()
         {
-            Thread.Sleep(5000);
-            List<ChocolateyPackage> rtn = new List<ChocolateyPackage>();
-            rtn.Add(new ChocolateyPackage()
+            List<ChocolateyPackage> packages = new List<ChocolateyPackage>();
+
+            // launch process
+            ProcessStartInfo procInfo = new ProcessStartInfo(CHOCO_BIN, "list --local-only")
             {
-                Name = "test",
-                CurrVer = "0.1",
-            });
-            return rtn;
+                RedirectStandardOutput = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
+
+            Process proc = Process.Start(procInfo);
+            string output = proc.StandardOutput.ReadToEnd();
+
+            proc.WaitForExit();
+            if (proc.ExitCode != 0)
+            {
+                throw new ChocolateyException($"choco did not exit cleanly. Returned {proc.ExitCode}. ");
+            }
+
+            // parse head
+            Queue<string> outputLines = new Queue<string>(output.Split("\r\n"));
+            if (!outputLines.Dequeue().StartsWith("Chocolatey v"))
+            {
+                // TOOD version checks? "Chocolatey v0.10.15"
+            }
+
+            // parse packages
+            while (outputLines.Count > 0)
+            {
+                string line = outputLines.Dequeue();
+                
+                string summaryPattern = @"[0-9]* packages installed\.";
+                Match summaryMatch = Regex.Match(line, summaryPattern);
+                if (summaryMatch.Success)
+                {
+                    // TODO parse number, compare with packages, raise ChocoAutoUptdatedException on !=
+                    break;
+                }
+
+                // retrieve package
+                ChocolateyPackage pckg = new ChocolateyPackage();
+                string[] entry = line.Split(' ');
+                pckg.Name = entry[0];
+                pckg.CurrVer = entry[1];
+                packages.Add(pckg);
+            }
+
+            return packages;
+        }
+
+        /// <exception cref="ChocolateyException"></exception>
+        public static async Task<List<ChocolateyPackage>> ListInstalledAsync()
+        {
+            return await Task.Run(ListInstalled);
         }
     }
 }
