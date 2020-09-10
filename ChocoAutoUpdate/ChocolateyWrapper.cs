@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
+using System.Threading;
 
 namespace ChocoAutoUpdate
 {
@@ -112,6 +113,18 @@ namespace ChocoAutoUpdate
             {
                 throw new ChocolateyException($"choco did not exit cleanly. Returned {proc.ExitCode}. ");
             }
+        }
+
+        public static List<ChocolateyPackage> ListInstalled()
+        {
+            Thread.Sleep(5000);
+            List<ChocolateyPackage> rtn = new List<ChocolateyPackage>();
+            rtn.Add(new ChocolateyPackage()
+            {
+                Name = "test",
+                CurrVer = "0.1",
+            });
+            return rtn;
         }
     }
 }

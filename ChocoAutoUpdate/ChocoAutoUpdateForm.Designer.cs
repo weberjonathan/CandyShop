@@ -35,18 +35,20 @@
             this.BtnUpgradeAll = new System.Windows.Forms.Button();
             this.BtnCancel = new System.Windows.Forms.Button();
             this.MainPanel = new System.Windows.Forms.Panel();
+            this.tabControl1 = new System.Windows.Forms.TabControl();
+            this.TabUpgrade = new System.Windows.Forms.TabPage();
             this.UpgradePage = new ChocoAutoUpdate.UpgradePage();
+            this.TabInstalled = new System.Windows.Forms.TabPage();
+            this.InstalledPage = new ChocoAutoUpdate.InstalledPage();
             this.TopPanel = new System.Windows.Forms.Panel();
             this.label1 = new System.Windows.Forms.Label();
             this.columnHeader1 = new System.Windows.Forms.ColumnHeader();
-            this.tabControl1 = new System.Windows.Forms.TabControl();
-            this.TabUpgrade = new System.Windows.Forms.TabPage();
-            this.TabInstalled = new System.Windows.Forms.TabPage();
             this.BottomPanel.SuspendLayout();
             this.MainPanel.SuspendLayout();
-            this.TopPanel.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.TabUpgrade.SuspendLayout();
+            this.TabInstalled.SuspendLayout();
+            this.TopPanel.SuspendLayout();
             this.SuspendLayout();
             // 
             // BottomPanel
@@ -112,33 +114,6 @@
             this.MainPanel.Size = new System.Drawing.Size(730, 534);
             this.MainPanel.TabIndex = 1;
             // 
-            // UpgradePage
-            // 
-            this.UpgradePage.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.UpgradePage.Location = new System.Drawing.Point(3, 3);
-            this.UpgradePage.Name = "UpgradePage";
-            this.UpgradePage.Size = new System.Drawing.Size(716, 500);
-            this.UpgradePage.TabIndex = 2;
-            // 
-            // TopPanel
-            // 
-            this.TopPanel.BackColor = System.Drawing.SystemColors.Window;
-            this.TopPanel.Controls.Add(this.label1);
-            this.TopPanel.Location = new System.Drawing.Point(0, 0);
-            this.TopPanel.Name = "TopPanel";
-            this.TopPanel.Size = new System.Drawing.Size(604, 47);
-            this.TopPanel.TabIndex = 2;
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(12, 18);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(446, 15);
-            this.label1.TabIndex = 0;
-            this.label1.Text = "!!! ChocoAuto Update does not have administrator privileges. Proceed with caution" +
-    "!";
-            // 
             // tabControl1
             // 
             this.tabControl1.Controls.Add(this.TabUpgrade);
@@ -161,15 +136,51 @@
             this.TabUpgrade.Text = "Upgrade";
             this.TabUpgrade.UseVisualStyleBackColor = true;
             // 
+            // UpgradePage
+            // 
+            this.UpgradePage.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.UpgradePage.Location = new System.Drawing.Point(3, 3);
+            this.UpgradePage.Name = "UpgradePage";
+            this.UpgradePage.Size = new System.Drawing.Size(716, 500);
+            this.UpgradePage.TabIndex = 2;
+            // 
             // TabInstalled
             // 
+            this.TabInstalled.Controls.Add(this.InstalledPage);
             this.TabInstalled.Location = new System.Drawing.Point(4, 24);
             this.TabInstalled.Name = "TabInstalled";
             this.TabInstalled.Padding = new System.Windows.Forms.Padding(3);
-            this.TabInstalled.Size = new System.Drawing.Size(192, 72);
+            this.TabInstalled.Size = new System.Drawing.Size(722, 506);
             this.TabInstalled.TabIndex = 1;
             this.TabInstalled.Text = "Installed";
             this.TabInstalled.UseVisualStyleBackColor = true;
+            // 
+            // InstalledPage
+            // 
+            this.InstalledPage.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.InstalledPage.Location = new System.Drawing.Point(3, 3);
+            this.InstalledPage.Name = "InstalledPage";
+            this.InstalledPage.Size = new System.Drawing.Size(716, 500);
+            this.InstalledPage.TabIndex = 0;
+            // 
+            // TopPanel
+            // 
+            this.TopPanel.BackColor = System.Drawing.SystemColors.Window;
+            this.TopPanel.Controls.Add(this.label1);
+            this.TopPanel.Location = new System.Drawing.Point(0, 0);
+            this.TopPanel.Name = "TopPanel";
+            this.TopPanel.Size = new System.Drawing.Size(604, 47);
+            this.TopPanel.TabIndex = 2;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(12, 18);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(446, 15);
+            this.label1.TabIndex = 0;
+            this.label1.Text = "!!! ChocoAuto Update does not have administrator privileges. Proceed with caution" +
+    "!";
             // 
             // ChocoAutoUpdateForm
             // 
@@ -190,10 +201,11 @@
             this.BottomPanel.ResumeLayout(false);
             this.BottomPanel.PerformLayout();
             this.MainPanel.ResumeLayout(false);
-            this.TopPanel.ResumeLayout(false);
-            this.TopPanel.PerformLayout();
             this.tabControl1.ResumeLayout(false);
             this.TabUpgrade.ResumeLayout(false);
+            this.TabInstalled.ResumeLayout(false);
+            this.TopPanel.ResumeLayout(false);
+            this.TopPanel.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -213,5 +225,6 @@
         private System.Windows.Forms.TabControl tabControl1;
         private System.Windows.Forms.TabPage TabUpgrade;
         private System.Windows.Forms.TabPage TabInstalled;
+        private InstalledPage InstalledPage;
     }
 }

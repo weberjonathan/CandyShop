@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace ChocoAutoUpdate
@@ -24,6 +26,8 @@ namespace ChocoAutoUpdate
             };
             _BackgroundWorker.DoWork += _BackgroundWorker_DoWork;
             _BackgroundWorker.RunWorkerCompleted += _BackgroundWorker_RunWorkerCompleted;
+
+            GetInstalledAsync();
 
             UpgradePage.UpgradeAllClick += UpgradePage_UpgradeAllClick;
             UpgradePage.UpgradeSelectedClick += UpgradePage_UpgradeSelectedClick;
@@ -94,6 +98,16 @@ namespace ChocoAutoUpdate
         {
             this.DialogResult = DialogResult.Cancel;
             this.Close();
+        }
+
+        private async void GetInstalledAsync()
+        {
+            List<ChocolateyPackage> packages = await Task<List<ChocolateyPackage>>.Run(() =>
+            {
+                return ChocolateyWrapper.ListInstalled();
+            });
+
+            InstalledPage.Packages = packages;
         }
     }
 }

@@ -37,7 +37,8 @@ namespace ChocoAutoUpdate
                 BtnUpgradeAll.Enabled = true;
                 foreach (ChocolateyPackage pckg in value)
                 {
-                    AddListViewItem(new ListViewItem(new string[] {
+                    AddListViewItem(new ListViewItem(new string[]
+                    {
                         pckg.Name,
                         pckg.CurrVer,
                         pckg.AvailVer,
