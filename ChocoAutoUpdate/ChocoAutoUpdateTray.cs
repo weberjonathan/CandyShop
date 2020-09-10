@@ -72,8 +72,6 @@ namespace ChocoAutoUpdate
             }
         }
 
-        public bool IsElevated { get; set; }
-
         private int GetOutdatedCount()
         {
             List<ChocolateyPackage> outdatedPckgs = new List<ChocolateyPackage>();
@@ -107,11 +105,7 @@ namespace ChocoAutoUpdate
 
         private void InitiateUpgrade()
         {
-            ChocoAutoUpdateForm form = new ChocoAutoUpdateForm()
-            {
-                IsElevated = this.IsElevated
-            };
-            
+            ChocoAutoUpdateForm form = new ChocoAutoUpdateForm();
             if (form.ShowDialog().Equals(DialogResult.OK))
             {
                 // setup watcher for desktop shortcuts

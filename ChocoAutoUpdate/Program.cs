@@ -6,6 +6,7 @@ namespace ChocoAutoUpdate
 {
     static class Program
     {
+        private static bool ADMIN_MODE;
         private static bool SILENT_MODE = false;
 
         [STAThread]
@@ -28,11 +29,10 @@ namespace ChocoAutoUpdate
             }
             
             // check whether app is elevated (admin privileges)
-            bool isElevated;
             using (WindowsIdentity identity = WindowsIdentity.GetCurrent())
             {
                 WindowsPrincipal principal = new WindowsPrincipal(identity);
-                isElevated = principal.IsInRole(WindowsBuiltInRole.Administrator);
+                ADMIN_MODE = principal.IsInRole(WindowsBuiltInRole.Administrator);
             }
 
             // launch application
@@ -42,20 +42,17 @@ namespace ChocoAutoUpdate
 
             if (SILENT_MODE)
             {
-                ChocoAutoUpdateTray appContext = new ChocoAutoUpdateTray
-                {
-                    IsElevated = isElevated
-                };
-                Application.Run(appContext);
+                Application.Run(new ChocoAutoUpdateTray());
             }
             else
             {
-                ChocoAutoUpdateForm form = new ChocoAutoUpdateForm
-                {
-                    IsElevated = isElevated
-                };
-                Application.Run(form);
+                Application.Run(new ChocoAutoUpdateForm());
             }
+        }
+
+        public static bool IsElevated()
+        {
+            return ADMIN_MODE;
         }
     }
 }

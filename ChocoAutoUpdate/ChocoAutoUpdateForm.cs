@@ -20,17 +20,16 @@ namespace ChocoAutoUpdate
 
         public List<ChocolateyPackage> SelectedPackages { get; set; }
 
-        public bool IsElevated { get; set; } = false;
-
         private void ChocoAutoUpdateForm_Load(object sender, EventArgs e)
         {
-            TopPanel.Visible = !IsElevated;
-            if (IsElevated)
+            if (Program.IsElevated())
             {
+                TopPanel.Visible = false;
                 this.Text = $"{Application.ProductName} v{Application.ProductVersion}";
             }
             else
             {
+                TopPanel.Visible = true;
                 this.Text = $"{Application.ProductName} v{Application.ProductVersion} (no administrator privileges)";
             }
 
