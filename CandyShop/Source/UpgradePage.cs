@@ -27,6 +27,15 @@ namespace CandyShop
 
         public event EventHandler CancelClick;
 
+        public bool ShowAdminWarning {
+            get {
+                return PanelTop.Visible;
+            }
+            set {
+                PanelTop.Visible = value;
+            }
+        }
+
         public List<ChocolateyPackage> OutdatedPackages {
             get => _OutdatedPackages;
             set {

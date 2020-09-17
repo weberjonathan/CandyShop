@@ -65,7 +65,7 @@ namespace CandyShop.Chocolatey
                     int outdatedCount;
                     if (summary.Count == 1 &&
                         summary[0].StartsWith("Chocolatey has determined ") &&
-                        summary[0].EndsWith(" package(s) are outdated.") &&
+                        summary[0].EndsWith(" package(s) are outdated. ") &&
                         summary[0].Length > 51 &&
                         int.TryParse(summary[0].Substring(26, summary[0].Length - 51), out outdatedCount))
                     {

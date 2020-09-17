@@ -50,7 +50,6 @@ namespace CandyShop
             try
             {
                 count = ChocolateyWrapper.CheckOutdated().Count;
-                throw new ChocolateyException(""); // TODO test
             }
             catch (ChocolateyException)
             {

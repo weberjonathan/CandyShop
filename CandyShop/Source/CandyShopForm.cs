@@ -30,12 +30,12 @@ namespace CandyShop
         {
             if (HasAdminPrivileges())
             {
-                TopPanel.Visible = false;
+                UpgradePage.ShowAdminWarning = false;
                 this.Text = $"{Application.ProductName} v{Application.ProductVersion}";
             }
             else
             {
-                TopPanel.Visible = true;
+                UpgradePage.ShowAdminWarning = true;
                 this.Text = $"{Application.ProductName} v{Application.ProductVersion} (no administrator privileges)";
             }
 

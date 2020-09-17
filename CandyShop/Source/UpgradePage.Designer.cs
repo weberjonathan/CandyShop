@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             this.LblAdmin = new System.Windows.Forms.Label();
-            this.panel1 = new System.Windows.Forms.Panel();
+            this.PanelTop = new System.Windows.Forms.Panel();
             this.BtnUpgradeSelected = new System.Windows.Forms.Button();
             this.LinkGithub = new System.Windows.Forms.LinkLabel();
             this.BtnUpgradeAll = new System.Windows.Forms.Button();
@@ -41,7 +41,7 @@
             this.colCurrent = new System.Windows.Forms.ColumnHeader();
             this.colAvail = new System.Windows.Forms.ColumnHeader();
             this.colPinned = new System.Windows.Forms.ColumnHeader();
-            this.panel1.SuspendLayout();
+            this.PanelTop.SuspendLayout();
             this.panel2.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -55,15 +55,15 @@
             this.LblAdmin.Text = "!!! ChocoAuto Update does not have administrator privileges. Proceed with caution" +
     "!";
             // 
-            // panel1
+            // PanelTop
             // 
-            this.panel1.BackColor = System.Drawing.SystemColors.Window;
-            this.panel1.Controls.Add(this.LblAdmin);
-            this.panel1.Dock = System.Windows.Forms.DockStyle.Top;
-            this.panel1.Location = new System.Drawing.Point(0, 0);
-            this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(637, 47);
-            this.panel1.TabIndex = 2;
+            this.PanelTop.BackColor = System.Drawing.SystemColors.Window;
+            this.PanelTop.Controls.Add(this.LblAdmin);
+            this.PanelTop.Dock = System.Windows.Forms.DockStyle.Top;
+            this.PanelTop.Location = new System.Drawing.Point(0, 0);
+            this.PanelTop.Name = "PanelTop";
+            this.PanelTop.Size = new System.Drawing.Size(637, 47);
+            this.PanelTop.TabIndex = 2;
             // 
             // BtnUpgradeSelected
             // 
@@ -169,18 +169,18 @@
             // 
             this.colPinned.Text = "Pinned";
             // 
-            // UserControl1
+            // UpgradePage
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.LblLoading);
             this.Controls.Add(this.LstPackages);
             this.Controls.Add(this.panel2);
-            this.Controls.Add(this.panel1);
-            this.Name = "UserControl1";
+            this.Controls.Add(this.PanelTop);
+            this.Name = "UpgradePage";
             this.Size = new System.Drawing.Size(637, 533);
-            this.panel1.ResumeLayout(false);
-            this.panel1.PerformLayout();
+            this.PanelTop.ResumeLayout(false);
+            this.PanelTop.PerformLayout();
             this.panel2.ResumeLayout(false);
             this.panel2.PerformLayout();
             this.ResumeLayout(false);
@@ -191,7 +191,7 @@
         #endregion
 
         private System.Windows.Forms.Label LblAdmin;
-        private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.Panel PanelTop;
         private System.Windows.Forms.Button BtnUpgradeSelected;
         private System.Windows.Forms.LinkLabel LinkGithub;
         private System.Windows.Forms.Button BtnUpgradeAll;
