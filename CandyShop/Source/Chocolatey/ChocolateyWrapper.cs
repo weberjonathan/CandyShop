@@ -173,12 +173,9 @@ namespace CandyShop.Chocolatey
             {
                 if (block.Count > 0)
                 {
-                    if (block[0].StartsWith($"{package.Name} {package.CurrVer}"))
+                    for (int i = 0; i < block.Count; i++)
                     {
-                        for (int i = 1; i < block.Count; i++)
-                        {
-                            rtn.AppendLine(block[i].Trim());
-                        }
+                        rtn.AppendLine(block[i].Trim());
                     }
                 }
             }
