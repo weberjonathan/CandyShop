@@ -101,7 +101,6 @@
             // BtnCancel
             // 
             this.BtnCancel.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            this.BtnCancel.Enabled = false;
             this.BtnCancel.Location = new System.Drawing.Point(546, 15);
             this.BtnCancel.Name = "BtnCancel";
             this.BtnCancel.Size = new System.Drawing.Size(75, 23);

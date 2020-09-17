@@ -45,7 +45,6 @@ namespace CandyShop
 
                 if (value.Count > 0)
                 {
-                    BtnCancel.Enabled = true;
                     BtnUpgradeSelected.Enabled = true;
                     BtnUpgradeAll.Enabled = true;
 
