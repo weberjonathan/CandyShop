@@ -1,7 +1,7 @@
-﻿using System;
+﻿using CandyShop.Chocolatey;
+using System;
 using System.Collections.Generic;
 using System.Security.Principal;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace CandyShop
@@ -9,7 +9,6 @@ namespace CandyShop
     public partial class CandyShopForm : Form
     {
         private Dictionary<string, string> InstalledPackageDetails = new Dictionary<string, string>();
-
 
         public CandyShopForm()
         {
@@ -71,10 +70,17 @@ namespace CandyShop
             string details;
             if (!InstalledPackageDetails.TryGetValue(selectedPackageName, out details))
             {
-                details = await ChocolateyWrapper.GetInfoAsync(InstalledPage.SelectedPackage);
-                if (!InstalledPackageDetails.ContainsKey(selectedPackageName))
+                try
                 {
-                    InstalledPackageDetails.Add(selectedPackageName, details);
+                    details = await ChocolateyWrapper.GetInfoAsync(InstalledPage.SelectedPackage);
+                    if (!InstalledPackageDetails.ContainsKey(selectedPackageName))
+                    {
+                        InstalledPackageDetails.Add(selectedPackageName, details);
+                    }
+                }
+                catch (ChocolateyException)
+                {
+                    details = Properties.strings.Form_Err_GetInfo;
                 }
             }
             
@@ -90,14 +96,29 @@ namespace CandyShop
 
         private async void GetOutdatedAsync()
         {
-            var packages = await ChocolateyWrapper.CheckOutdatedAsync();
-            UpgradePage.OutdatedPackages = packages;
+            try
+            {
+                List<ChocolateyPackage> packages = await ChocolateyWrapper.CheckOutdatedAsync();
+                UpgradePage.OutdatedPackages = packages;
+            }
+            catch (ChocolateyException)
+            {
+                ShowErrorDialog(Properties.strings.Form_Err_CheckOutdated);
+            }
+
         }
 
         private async void GetInstalledAsync()
         {
-            List<ChocolateyPackage> packages = await ChocolateyWrapper.ListInstalledAsync();
-            InstalledPage.Packages = packages;
+            try
+            {
+                List<ChocolateyPackage> packages = await ChocolateyWrapper.ListInstalledAsync();
+                InstalledPage.Packages = packages;
+            }
+            catch (ChocolateyException)
+            {
+                ShowErrorDialog(Properties.strings.Form_Err_ListInstalled);
+            }
         }
 
         private bool HasAdminPrivileges()
@@ -107,6 +128,11 @@ namespace CandyShop
                 WindowsPrincipal principal = new WindowsPrincipal(identity);
                 return principal.IsInRole(WindowsBuiltInRole.Administrator);
             }
+        }
+
+        private void ShowErrorDialog(string msg)
+        {
+            MessageBox.Show(msg, Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }
 }

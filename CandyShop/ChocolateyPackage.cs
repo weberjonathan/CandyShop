@@ -1,4 +1,4 @@
-﻿namespace CandyShop
+﻿namespace CandyShop.Chocolatey
 {
     public class ChocolateyPackage
     {

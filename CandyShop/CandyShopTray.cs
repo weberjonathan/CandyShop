@@ -1,4 +1,5 @@
-﻿using CandyShop.Properties;
+﻿using CandyShop.Chocolatey;
+using CandyShop.Properties;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -45,7 +46,21 @@ namespace CandyShop
             };
 
             // check outdated
-            int count = GetOutdatedCount();
+            int count = 0;
+            try
+            {
+                count = ChocolateyWrapper.CheckOutdated().Count;
+                throw new ChocolateyException(""); // TODO test
+            }
+            catch (ChocolateyException)
+            {
+                _TrayIcon.BalloonTipIcon = ToolTipIcon.Error;
+                _TrayIcon.Text = Application.ProductName;
+                _TrayIcon.BalloonTipTitle = $"Candy Shop";
+                _TrayIcon.BalloonTipText = $"Could not check for outdated packages.";
+                _TrayIcon.ShowBalloonTip(2000);
+                Exit();
+            }
 
             #if DEBUG
             count = 3;
@@ -72,37 +87,6 @@ namespace CandyShop
             }
         }
 
-        private int GetOutdatedCount()
-        {
-            List<ChocolateyPackage> outdatedPckgs = new List<ChocolateyPackage>();
-            try
-            {
-                outdatedPckgs = ChocolateyWrapper.CheckOutdated();
-            }
-            catch (ChocolateyException e)
-            {
-                MessageBox.Show(
-                    $"An error occurred while executing Chocolatey: \"{e.Message}\"",
-                    $"{Application.ProductName} Error",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Error
-                );
-                Exit();
-            }
-            catch (CandyShopException e)
-            {
-                MessageBox.Show(
-                    e.Message,
-                    $"{Application.ProductName} Error",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Error
-                );
-                Exit();
-            }
-
-            return outdatedPckgs.Count;
-        }
-
         private void InitiateUpgrade()
         {
             CandyShopForm form = new CandyShopForm();
@@ -125,7 +109,6 @@ namespace CandyShop
                     // upgrade
                     AllocConsole();
                     Console.CursorVisible = false;
-                    // Console.WriteLine($"> choco upgrade {_Choco.Outdated.MarkedPackages.GetPackagesAsString()} -y"); // TODO
 
                     try
                     {
@@ -182,7 +165,7 @@ namespace CandyShop
                 IntPtr handle = GetConsoleWindow();
                 if (!IntPtr.Zero.Equals(handle))
                 {
-                    SetForegroundWindow(handle); // TODO test
+                    SetForegroundWindow(handle);
                 }
                 Console.CursorVisible = false;
                 Console.Write("\nPress any key to terminate... ");

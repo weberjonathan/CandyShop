@@ -1,88 +1,29 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System.Collections.Generic;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace CandyShop
+namespace CandyShop.Chocolatey
 {
     public class ChocolateyWrapper
     {
-        private const string TXT_ERR_PARSE = "Could not parse chocolatey output.";
-        private const string CHOCO_BIN = "choco";
-
-        /// <exception cref="ChocolateyException"></exception>
-        /// <exception cref="CandyShopException"></exception>
-        public static List<ChocolateyPackage> CheckOutdated()
-        {
-            List<ChocolateyPackage> packages = new List<ChocolateyPackage>();
-            
-            // launch process
-            ProcessStartInfo procInfo = new ProcessStartInfo(CHOCO_BIN, "outdated")
-            {
-                RedirectStandardOutput = true,
-                UseShellExecute = false,
-                CreateNoWindow = true
-            };
-
-            Process proc = Process.Start(procInfo);
-            string output = proc.StandardOutput.ReadToEnd();
-
-            proc.WaitForExit();
-            if (proc.ExitCode != 0)
-            {
-                throw new ChocolateyException($"choco did not exit cleanly. Returned {proc.ExitCode}. ");
-            }
-
-            // parse head
-            Queue<string> outputLines = new Queue<string>(output.Split("\r\n"));
-            if (!outputLines.Dequeue().StartsWith("Chocolatey v"))
-            {
-                // TOOD version checks? "Chocolatey v0.10.15"
-            }
-
-            if (!outputLines.Dequeue().Equals("Outdated Packages") ||
-                !outputLines.Dequeue().Equals(" Output is package name | current version | available version | pinned?") ||
-                !outputLines.Dequeue().Equals(""))
-            {
-                throw new CandyShopException(TXT_ERR_PARSE);
-            }
-
-            // parse outdated packages
-            while (outputLines.Count > 0)
-            {
-                string line = outputLines.Dequeue();
-                if (line.Equals("")) break;
-
-                // retrieve package
-                ChocolateyPackage pckg = new ChocolateyPackage();
-                string[] entry = line.Split('|');
-                pckg.Name = entry[0];
-                pckg.CurrVer = entry[1];
-                pckg.AvailVer = entry[2];
-                pckg.Pinned = entry[3].Equals("true");
-                pckg.Outdated = true;
-                packages.Add(pckg);
-            }
-
-            // parse summary
-            string summaryPattern = @"Chocolatey has determined [0-9]* package\(s\) are outdated\.";
-            Match summaryMatch = Regex.Match(outputLines.Dequeue(), summaryPattern);
-            if (!summaryMatch.Success)
-            {
-                throw new CandyShopException(TXT_ERR_PARSE);
-            }
-
-            return packages;
-        }
-
-        /// <exception cref="ChocolateyException"></exception>
-        /// <exception cref="CandyShopException"></exception>
-        public static async Task<List<ChocolateyPackage>> CheckOutdatedAsync()
-        {
-            return await Task.Run(CheckOutdated);
-        }
+        /* Parsing Chocolatey data
+         *  Choco may add disclaimers and other text either above
+         *  or below the desired output, which needs to be filtered
+         *  out. These texts are usually seperated from desired out
+         *  by empty lines, so the entire output can be organized in
+         *  blocks seperated by empty lines. Unwanted blocks can be 
+         *  identified and discarded.
+         *  
+         *  ChocolateyProcess.FormattedOutput provides these blocks
+         *  for hidden ChocolateyProcesses.
+         *  
+         *  Note that the desired output may contain empty lines
+         *  aswell, which means it may stretch over multiple
+         *  consecutive blocks. See individual functions for clarity.
+         *  
+         *  The output always starts with a version string like
+         *  "Chocolatey v0.10.15".
+         */
 
         /// <exception cref="ChocolateyException"></exception>
         public static void Upgrade(List<ChocolateyPackage> packages)
@@ -94,34 +35,69 @@ namespace CandyShop
             }
 
             // launch process
-            ProcessStartInfo procInfo = new ProcessStartInfo(CHOCO_BIN, $"upgrade {argument} -y")
+            ChocolateyProcess p = new ChocolateyProcess($"upgrade {argument} -y");
+            p.Execute();
+        }
+
+        /// <exception cref="ChocolateyException"></exception>
+        public static List<ChocolateyPackage> CheckOutdated()
+        {
+            List<ChocolateyPackage> packages = new List<ChocolateyPackage>();
+
+            // launch process
+            ChocolateyProcess p = new ChocolateyProcess("outdated");
+            p.ExecuteHidden();
+
+            // parse (find header block, followed by package block, followed by summary block)
+            List<List<string>> blocks = p.FormattedOutput;
+            for (int i = 0; i < blocks.Count; i++)
             {
-                UseShellExecute = false,
+                // find header block
+                if (blocks[i].Count == 2 &&
+                    blocks[i][0].Equals("Outdated Packages") &&
+                    blocks[i][1].Equals(" Output is package name | current version | available version | pinned?") &&
+                    i + 2 < blocks.Count)
+                {
+                    List<string> packageList = blocks[i + 1];
+                    List<string> summary = blocks[i + 2];
 
-                // set true to redirect output; will prevent stuff from being printed in allocated console (see ApplicationContext)
-                // RedirectStandardOutput = true
-            };
-
-            Process proc = new Process()
-            {
-                StartInfo = procInfo
-            };
-
-            // redirect output handler
-            //proc.OutputDataReceived += new DataReceivedEventHandler((sender, e) =>
-            //{
-            //    UpgradeOutput.Add(e.Data);
-            //});
-
-            proc.Start();
-            // proc.BeginOutputReadLine(); // needed to redirect output
-
-            proc.WaitForExit();
-
-            if (proc.ExitCode != 0)
-            {
-                throw new ChocolateyException($"choco did not exit cleanly. Returned {proc.ExitCode}. ");
+                    // check summary
+                    int outdatedCount;
+                    if (summary.Count == 1 &&
+                        summary[0].StartsWith("Chocolatey has determined ") &&
+                        summary[0].EndsWith(" package(s) are outdated.") &&
+                        summary[0].Length > 51 &&
+                        int.TryParse(summary[0].Substring(26, summary[0].Length - 51), out outdatedCount))
+                    {
+                        if (outdatedCount == packageList.Count)
+                        {
+                            // check packages
+                            foreach (string line in packageList)
+                            {
+                                // retrieve package
+                                string[] entry = line.Split('|');
+                                if (entry.Length == 4)
+                                {
+                                    ChocolateyPackage pckg = new ChocolateyPackage();
+                                    pckg.Name = entry[0];
+                                    pckg.CurrVer = entry[1];
+                                    pckg.AvailVer = entry[2];
+                                    pckg.Pinned = entry[3].Equals("true");
+                                    packages.Add(pckg);
+                                }
+                            }
+                        }
+                    }
+                }
             }
+
+            return packages;
+        }
+
+        /// <exception cref="ChocolateyException"></exception>
+        public static async Task<List<ChocolateyPackage>> CheckOutdatedAsync()
+        {
+            return await Task.Run(CheckOutdated);
         }
 
         /// <exception cref="ChocolateyException"></exception>
@@ -129,49 +105,48 @@ namespace CandyShop
         {
             List<ChocolateyPackage> packages = new List<ChocolateyPackage>();
 
-            // launch process
-            ProcessStartInfo procInfo = new ProcessStartInfo(CHOCO_BIN, "list --local-only")
-            {
-                RedirectStandardOutput = true,
-                UseShellExecute = false,
-                CreateNoWindow = true
-            };
+            // launch process TODO try catch
+            ChocolateyProcess p = new ChocolateyProcess("list --local-only");
+            p.ExecuteHidden();
 
-            Process proc = Process.Start(procInfo);
-            string output = proc.StandardOutput.ReadToEnd();
-
-            proc.WaitForExit();
-            if (proc.ExitCode != 0)
+            // parse output (get blocks, all wanted info is in single block)
+            // conditions
+            // - final line looks like "54 packages included."; match count
+            // - package list entries look like "name version"
+            List<List<string>> blocks = p.FormattedOutput;
+            foreach (List<string> block in blocks)
             {
-                throw new ChocolateyException($"choco did not exit cleanly. Returned {proc.ExitCode}. ");
-            }
-
-            // parse head
-            Queue<string> outputLines = new Queue<string>(output.Split("\r\n"));
-            if (!outputLines.Dequeue().StartsWith("Chocolatey v"))
-            {
-                // TOOD version checks? "Chocolatey v0.10.15"
-            }
-
-            // parse packages
-            while (outputLines.Count > 0)
-            {
-                string line = outputLines.Dequeue();
-                
-                string summaryPattern = @"[0-9]* packages installed\.";
-                Match summaryMatch = Regex.Match(line, summaryPattern);
-                if (summaryMatch.Success)
+                // check final line and match count
+                string summary = block[block.Count - 1];
+                if (summary.Contains(' '))
                 {
-                    // TODO parse number, compare with packages, raise ChocoAutoUptdatedException on !=
-                    break;
-                }
+                    int indexOf = summary.IndexOf(' ');
+                    string packageCountStr = summary.Substring(0, indexOf);
+                    int packageCount;
 
-                // retrieve package
-                ChocolateyPackage pckg = new ChocolateyPackage();
-                string[] entry = line.Split(' ');
-                pckg.Name = entry[0];
-                pckg.CurrVer = entry[1];
-                packages.Add(pckg);
+                    if (int.TryParse(packageCountStr, out packageCount))
+                    {
+                        if (packageCount == block.Count - 1 && summary.Substring(indexOf).Equals(" packages installed."))
+                        {
+                            // check potential package list entries
+                            for (int i = 0; i < block.Count - 1; i++)
+                            {
+                                if (block[i].Contains(' '))
+                                {
+                                    // retrieve package
+                                    string[] entry = block[i].Split(' ');
+                                    if (entry.Length == 2)
+                                    {
+                                        ChocolateyPackage pckg = new ChocolateyPackage();
+                                        pckg.Name = entry[0];
+                                        pckg.CurrVer = entry[1];
+                                        packages.Add(pckg);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
 
             return packages;
@@ -183,52 +158,35 @@ namespace CandyShop
             return await Task.Run(ListInstalled);
         }
 
+        /// <exception cref="ChocolateyException"></exception>
         public static string GetInfo(ChocolateyPackage package)
         {
             StringBuilder rtn = new StringBuilder();
-            
+
             // launch process
-            ProcessStartInfo procInfo = new ProcessStartInfo(CHOCO_BIN, $"info {package.Name}")
+            ChocolateyProcess p = new ChocolateyProcess($"info {package.Name}");
+            p.ExecuteHidden();
+
+            // parse
+            List<List<string>> blocks = p.FormattedOutput;
+            foreach (List<string> block in blocks)
             {
-                RedirectStandardOutput = true,
-                UseShellExecute = false,
-                CreateNoWindow = true
-            };
-
-            Process proc = Process.Start(procInfo);
-            string output = proc.StandardOutput.ReadToEnd();
-
-            proc.WaitForExit();
-            if (proc.ExitCode != 0)
-            {
-                throw new ChocolateyException($"choco did not exit cleanly. Returned {proc.ExitCode}. ");
-            }
-
-            // parse head
-            Queue<string> outputLines = new Queue<string>(output.Split("\r\n"));
-            if (!outputLines.Dequeue().StartsWith("Chocolatey v"))
-            {
-                // TOOD version checks? "Chocolatey v0.10.15"
-            }
-
-            outputLines.Dequeue(); // TODO e. g. "cpu-z 1.93 [Approved]"
-
-            // parse info
-            while (outputLines.Count > 0)
-            {
-                string line = outputLines.Dequeue();
-                if (line.Equals("1 packages found."))
+                if (block.Count > 0)
                 {
-                    break;
+                    if (block[0].StartsWith($"{package.Name} {package.CurrVer}"))
+                    {
+                        for (int i = 1; i < block.Count; i++)
+                        {
+                            rtn.AppendLine(block[i].Trim());
+                        }
+                    }
                 }
-
-                rtn.Append(line);
-                rtn.Append(Environment.NewLine);
             }
 
             return rtn.ToString();
         }
 
+        /// <exception cref="ChocolateyException"></exception>
         public static async Task<string> GetInfoAsync(ChocolateyPackage package)
         {
             return await Task.Run(() => GetInfo(package));

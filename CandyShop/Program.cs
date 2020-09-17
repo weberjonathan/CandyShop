@@ -1,4 +1,7 @@
 using System;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.IO;
 using System.Windows.Forms;
 
 namespace CandyShop
@@ -25,12 +28,35 @@ namespace CandyShop
                         break;
                 }
             }
-            
-            // launch application
+
+            // prepare launch 
             Application.SetHighDpiMode(HighDpiMode.SystemAware);
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
+            // check if Chocolatey is in path
+            try
+            {
+                ProcessStartInfo pi = new ProcessStartInfo("choco", "--version")
+                {
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                };
+                Process p = Process.Start(pi);
+                p.WaitForExit();
+            }
+            catch (Win32Exception)
+            {
+                MessageBox.Show(
+                    "Error: An error occurred while starting the Chocolatey application. Please make sure it is installed and in PATH.",
+                    Application.ProductName,
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error
+                );
+                return;
+            }
+
+            // launch application
             if (SILENT_MODE)
             {
                 Application.Run(new ChocoAutoUpdateTray());

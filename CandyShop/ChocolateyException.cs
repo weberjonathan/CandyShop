@@ -1,4 +1,4 @@
-﻿namespace CandyShop
+﻿namespace CandyShop.Chocolatey
 {
     // use for exceptions with Chocolatey software
 

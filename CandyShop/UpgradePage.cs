@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CandyShop.Chocolatey;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Windows.Forms;
@@ -32,22 +33,26 @@ namespace CandyShop
                 _OutdatedPackages.AddRange(value);
 
                 LblLoading.Visible = false;
-                BtnCancel.Enabled = true;
-                BtnUpgradeSelected.Enabled = true;
-                BtnUpgradeAll.Enabled = true;
-                foreach (ChocolateyPackage pckg in value)
+
+                if (value.Count > 0)
                 {
-                    
-                    ListViewItem item = new ListViewItem(new string[]
+                    BtnCancel.Enabled = true;
+                    BtnUpgradeSelected.Enabled = true;
+                    BtnUpgradeAll.Enabled = true;
+
+                    foreach (ChocolateyPackage pckg in value)
                     {
+                        ListViewItem item = new ListViewItem(new string[]
+                        {
                         pckg.Name,
                         pckg.CurrVer,
                         pckg.AvailVer,
                         pckg.Pinned.ToString()
-                    });
+                        });
 
-                    item.Checked = true;
-                    LstPackages.Items.Add(item);
+                        item.Checked = true;
+                        LstPackages.Items.Add(item);
+                    }
                 }
             }
         }
