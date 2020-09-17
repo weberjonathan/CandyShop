@@ -1,38 +1,18 @@
+using CandyShop.Chocolatey;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.IO;
 using System.Windows.Forms;
 
 namespace CandyShop
 {
     static class Program
     {
-        private static bool SILENT_MODE = false;
-
         [STAThread]
         static void Main(string[] args)
         {
-            // check arguments
-            for (int i = 0; i < args.Length; i++)
-            {
-                switch (args[i])
-                {
-                    case "--silent":
-                        SILENT_MODE = true;
-                        break;
-                    case "-s":
-                        SILENT_MODE = true;
-                        break;
-                    default:
-                        break;
-                }
-            }
-
-            // prepare launch 
-            Application.SetHighDpiMode(HighDpiMode.SystemAware);
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
+            
 
             // check if Chocolatey is in path
             try
@@ -57,14 +37,12 @@ namespace CandyShop
             }
 
             // launch application
-            if (SILENT_MODE)
-            {
-                Application.Run(new ChocoAutoUpdateTray());
-            }
-            else
-            {
-                Application.Run(new CandyShopForm());
-            }
+            Application.SetHighDpiMode(HighDpiMode.SystemAware);
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+
+            CandyShopApplicationContext context = new CandyShopApplicationContext();
+            Application.Run(context);
         }
     }
 }
