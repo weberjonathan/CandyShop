@@ -9,6 +9,7 @@ __[Visit the gallery.](/docs/gallery.md)__
 
 ## Features
 * Start the application and see outdated and installed packages.
+* Upgrade all or a selected number of outdated packages.
 * Schedule the launch using the Windows Task Scheduler and specify the `--silent` (or `-s`) option to check for outdated packages in the background on system start.
 
 ## TODO
