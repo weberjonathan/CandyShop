@@ -1,4 +1,6 @@
-﻿namespace CandyShop
+﻿using CandyShop.Properties;
+
+namespace CandyShop
 {
     partial class UpgradePage
     {
@@ -28,8 +30,10 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(UpgradePage));
             this.LblAdmin = new System.Windows.Forms.Label();
             this.PanelTop = new System.Windows.Forms.Panel();
+            this.panel1 = new System.Windows.Forms.Panel();
             this.BtnUpgradeSelected = new System.Windows.Forms.Button();
             this.LinkGithub = new System.Windows.Forms.LinkLabel();
             this.BtnUpgradeAll = new System.Windows.Forms.Button();
@@ -48,22 +52,32 @@
             // LblAdmin
             // 
             this.LblAdmin.AutoSize = true;
-            this.LblAdmin.Location = new System.Drawing.Point(12, 18);
+            this.LblAdmin.Location = new System.Drawing.Point(38, 17);
             this.LblAdmin.Name = "LblAdmin";
-            this.LblAdmin.Size = new System.Drawing.Size(446, 15);
+            this.LblAdmin.Size = new System.Drawing.Size(396, 15);
             this.LblAdmin.TabIndex = 0;
-            this.LblAdmin.Text = "!!! ChocoAuto Update does not have administrator privileges. Proceed with caution" +
-    "!";
+            this.LblAdmin.Text = "Candy Shop does not have administrator privileges. Proceed with caution!";
             // 
             // PanelTop
             // 
-            this.PanelTop.BackColor = System.Drawing.SystemColors.Window;
+            this.PanelTop.BackColor = System.Drawing.SystemColors.Info;
+            this.PanelTop.Controls.Add(this.panel1);
             this.PanelTop.Controls.Add(this.LblAdmin);
             this.PanelTop.Dock = System.Windows.Forms.DockStyle.Top;
             this.PanelTop.Location = new System.Drawing.Point(0, 0);
             this.PanelTop.Name = "PanelTop";
             this.PanelTop.Size = new System.Drawing.Size(637, 47);
             this.PanelTop.TabIndex = 2;
+            // 
+            // panel1
+            // 
+            this.panel1.BackColor = System.Drawing.SystemColors.Info;
+            this.panel1.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("panel1.BackgroundImage")));
+            this.panel1.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.panel1.Location = new System.Drawing.Point(16, 16);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(16, 16);
+            this.panel1.TabIndex = 1;
             // 
             // BtnUpgradeSelected
             // 
@@ -202,5 +216,6 @@
         private System.Windows.Forms.ColumnHeader colCurrent;
         private System.Windows.Forms.ColumnHeader colAvail;
         private System.Windows.Forms.ColumnHeader colPinned;
+        private System.Windows.Forms.Panel panel1;
     }
 }
