@@ -34,6 +34,8 @@
             this.PanelTop = new System.Windows.Forms.Panel();
             this.SplitContainer = new System.Windows.Forms.SplitContainer();
             this.TxtDetails = new System.Windows.Forms.TextBox();
+            this.CheckHideMeta = new System.Windows.Forms.CheckBox();
+            this.PanelTop.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.SplitContainer)).BeginInit();
             this.SplitContainer.Panel1.SuspendLayout();
             this.SplitContainer.Panel2.SuspendLayout();
@@ -51,7 +53,7 @@
             this.LstPackages.HideSelection = false;
             this.LstPackages.Location = new System.Drawing.Point(0, 0);
             this.LstPackages.Name = "LstPackages";
-            this.LstPackages.Size = new System.Drawing.Size(600, 200);
+            this.LstPackages.Size = new System.Drawing.Size(600, 250);
             this.LstPackages.TabIndex = 0;
             this.LstPackages.UseCompatibleStateImageBehavior = false;
             this.LstPackages.View = System.Windows.Forms.View.Details;
@@ -66,17 +68,18 @@
             // 
             // PanelTop
             // 
+            this.PanelTop.Controls.Add(this.CheckHideMeta);
             this.PanelTop.Dock = System.Windows.Forms.DockStyle.Top;
             this.PanelTop.Location = new System.Drawing.Point(0, 0);
             this.PanelTop.Name = "PanelTop";
-            this.PanelTop.Size = new System.Drawing.Size(600, 94);
+            this.PanelTop.Size = new System.Drawing.Size(600, 44);
             this.PanelTop.TabIndex = 1;
             // 
             // SplitContainer
             // 
             this.SplitContainer.Dock = System.Windows.Forms.DockStyle.Fill;
             this.SplitContainer.FixedPanel = System.Windows.Forms.FixedPanel.Panel2;
-            this.SplitContainer.Location = new System.Drawing.Point(0, 94);
+            this.SplitContainer.Location = new System.Drawing.Point(0, 44);
             this.SplitContainer.Name = "SplitContainer";
             this.SplitContainer.Orientation = System.Windows.Forms.Orientation.Horizontal;
             // 
@@ -87,8 +90,8 @@
             // SplitContainer.Panel2
             // 
             this.SplitContainer.Panel2.Controls.Add(this.TxtDetails);
-            this.SplitContainer.Size = new System.Drawing.Size(600, 358);
-            this.SplitContainer.SplitterDistance = 200;
+            this.SplitContainer.Size = new System.Drawing.Size(600, 408);
+            this.SplitContainer.SplitterDistance = 250;
             this.SplitContainer.TabIndex = 2;
             this.SplitContainer.Text = "splitContainer1";
             // 
@@ -103,6 +106,20 @@
             this.TxtDetails.TabIndex = 0;
             this.TxtDetails.WordWrap = false;
             // 
+            // CheckHideMeta
+            // 
+            this.CheckHideMeta.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.CheckHideMeta.AutoSize = true;
+            this.CheckHideMeta.Checked = true;
+            this.CheckHideMeta.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.CheckHideMeta.Location = new System.Drawing.Point(455, 15);
+            this.CheckHideMeta.Name = "CheckHideMeta";
+            this.CheckHideMeta.Size = new System.Drawing.Size(133, 19);
+            this.CheckHideMeta.TabIndex = 0;
+            this.CheckHideMeta.Text = "Hide &meta packages";
+            this.CheckHideMeta.UseVisualStyleBackColor = true;
+            this.CheckHideMeta.CheckedChanged += new System.EventHandler(this.CheckHideMeta_CheckedChanged);
+            // 
             // InstalledPage
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -111,6 +128,8 @@
             this.Controls.Add(this.PanelTop);
             this.Name = "InstalledPage";
             this.Size = new System.Drawing.Size(600, 452);
+            this.PanelTop.ResumeLayout(false);
+            this.PanelTop.PerformLayout();
             this.SplitContainer.Panel1.ResumeLayout(false);
             this.SplitContainer.Panel2.ResumeLayout(false);
             this.SplitContainer.Panel2.PerformLayout();
@@ -128,5 +147,6 @@
         private System.Windows.Forms.Panel PanelTop;
         private System.Windows.Forms.SplitContainer SplitContainer;
         private System.Windows.Forms.TextBox TxtDetails;
+        private System.Windows.Forms.CheckBox CheckHideMeta;
     }
 }

@@ -13,7 +13,6 @@ namespace CandyShop
         public InstalledPage()
         {
             InitializeComponent();
-            PanelTop.Visible = false; // TODO # of packages, filter .portable .install etc.
             // SplitContainer.Panel2Collapsed = true;
 
             LstPackages.SelectedIndexChanged += new EventHandler((sender, e) =>
@@ -39,11 +38,10 @@ namespace CandyShop
                 _Packages = value;
                 foreach (ChocolateyPackage pckg in value)
                 {
-                    LstPackages.Items.Add(new ListViewItem(new string[]
+                    if (!(CheckHideMeta.Checked && pckg.IsMetaPackage))
                     {
-                        pckg.Name,
-                        pckg.CurrVer
-                    }));
+                        LstPackages.Items.Add(PackageToListView(pckg));
+                    }
                 }
             }
         }
@@ -69,6 +67,36 @@ namespace CandyShop
                     return null;
                 }
             }
+        }
+
+        private void CheckHideMeta_CheckedChanged(object sender, EventArgs e)
+        {
+            for (int i = 0; i < _Packages.Count; i++)
+            {
+                if (_Packages[i].IsMetaPackage)
+                {
+                    if (CheckHideMeta.Checked)
+                    {
+                        LstPackages.Items[_Packages[i].Name].Remove();
+                    }
+                    else
+                    {
+                        LstPackages.Items.Insert(i, PackageToListView(_Packages[i]));
+                    }
+                }
+            }
+        }
+
+        private ListViewItem PackageToListView(ChocolateyPackage pckg)
+        {
+            ListViewItem rtn = new ListViewItem(new string[]
+            {
+                pckg.Name,
+                pckg.CurrVer
+            });
+
+            rtn.Name = pckg.Name;
+            return rtn;
         }
     }
 }
