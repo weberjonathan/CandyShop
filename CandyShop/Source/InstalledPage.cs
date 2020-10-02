@@ -43,6 +43,11 @@ namespace CandyShop
                         LstPackages.Items.Add(PackageToListView(pckg));
                     }
                 }
+
+                if (LstPackages.Items.Count > 0)
+                {
+                    LstPackages.Items[0].Selected = true;
+                }
             }
         }
 
@@ -77,7 +82,7 @@ namespace CandyShop
                 {
                     if (CheckHideMeta.Checked)
                     {
-                        LstPackages.Items[_Packages[i].Name].Remove();
+                        LstPackages.FindItemWithText(_Packages[i].Name).Remove();
                     }
                     else
                     {
@@ -94,8 +99,7 @@ namespace CandyShop
                 pckg.Name,
                 pckg.CurrVer
             });
-
-            rtn.Name = pckg.Name;
+            
             return rtn;
         }
     }
