@@ -18,7 +18,7 @@ namespace CandyShop
 
             this.Resize += new EventHandler((sender, e) =>
             {
-                TextSearch.Size = new System.Drawing.Size(CheckHideMeta.Location.X - 20, TextSearch.Height);
+                TextSearch.Size = new System.Drawing.Size(CheckHideSuffixed.Location.X - 20, TextSearch.Height);
             });
 
             LstPackages.SelectedIndexChanged += new EventHandler((sender, e) =>
@@ -44,7 +44,7 @@ namespace CandyShop
                 _Packages = value;
                 foreach (ChocolateyPackage pckg in value)
                 {
-                    if (!(CheckHideMeta.Checked && pckg.IsMetaPackage))
+                    if (!(CheckHideSuffixed.Checked && pckg.HasSuffix))
                     {
                         LstPackages.Items.Add(PackageToListView(pckg));
                     }
@@ -80,7 +80,7 @@ namespace CandyShop
             }
         }
 
-        private void CheckHideMeta_CheckedChanged(object sender, EventArgs e)
+        private void CheckHideSuffixed_CheckedChanged(object sender, EventArgs e)
         {
             SyncListView();
         }
@@ -137,14 +137,14 @@ namespace CandyShop
         private void SyncListView()
         {
             string filterName = TextSearch.Text;
-            bool hideMeta = CheckHideMeta.Checked;
+            bool hideSuffixed = CheckHideSuffixed.Checked;
 
             foreach (ChocolateyPackage package in _Packages)
             {
                 bool packageAllowed = true;
                 
                 // determine whether package should be displayed
-                if (hideMeta && package.IsMetaPackage)
+                if (hideSuffixed && package.HasSuffix)
                 {
                     packageAllowed = false;
                 }

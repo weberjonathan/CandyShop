@@ -33,7 +33,7 @@
             this.colVer = new System.Windows.Forms.ColumnHeader();
             this.PanelTop = new System.Windows.Forms.Panel();
             this.TextSearch = new System.Windows.Forms.TextBox();
-            this.CheckHideMeta = new System.Windows.Forms.CheckBox();
+            this.CheckHideSuffixed = new System.Windows.Forms.CheckBox();
             this.SplitContainer = new System.Windows.Forms.SplitContainer();
             this.TxtDetails = new System.Windows.Forms.TextBox();
             this.PanelTop.SuspendLayout();
@@ -70,7 +70,7 @@
             // PanelTop
             // 
             this.PanelTop.Controls.Add(this.TextSearch);
-            this.PanelTop.Controls.Add(this.CheckHideMeta);
+            this.PanelTop.Controls.Add(this.CheckHideSuffixed);
             this.PanelTop.Dock = System.Windows.Forms.DockStyle.Top;
             this.PanelTop.Location = new System.Drawing.Point(0, 0);
             this.PanelTop.Name = "PanelTop";
@@ -82,25 +82,24 @@
             this.TextSearch.Location = new System.Drawing.Point(0, 13);
             this.TextSearch.Name = "TextSearch";
             this.TextSearch.PlaceholderText = "Search";
-            this.TextSearch.Size = new System.Drawing.Size(435, 23);
+            this.TextSearch.Size = new System.Drawing.Size(371, 23);
             this.TextSearch.TabIndex = 1;
             this.TextSearch.TextChanged += new System.EventHandler(this.TextSearch_TextChanged);
             this.TextSearch.KeyDown += new System.Windows.Forms.KeyEventHandler(this.TextSearch_KeyDown);
-
             // 
-            // CheckHideMeta
+            // CheckHideSuffixed
             // 
-            this.CheckHideMeta.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.CheckHideMeta.AutoSize = true;
-            this.CheckHideMeta.Checked = true;
-            this.CheckHideMeta.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.CheckHideMeta.Location = new System.Drawing.Point(455, 15);
-            this.CheckHideMeta.Name = "CheckHideMeta";
-            this.CheckHideMeta.Size = new System.Drawing.Size(133, 19);
-            this.CheckHideMeta.TabIndex = 0;
-            this.CheckHideMeta.Text = "Hide &meta packages";
-            this.CheckHideMeta.UseVisualStyleBackColor = true;
-            this.CheckHideMeta.CheckedChanged += new System.EventHandler(this.CheckHideMeta_CheckedChanged);
+            this.CheckHideSuffixed.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.CheckHideSuffixed.AutoSize = true;
+            this.CheckHideSuffixed.Checked = true;
+            this.CheckHideSuffixed.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.CheckHideSuffixed.Location = new System.Drawing.Point(440, 15);
+            this.CheckHideSuffixed.Name = "CheckHideSuffixed";
+            this.CheckHideSuffixed.Size = new System.Drawing.Size(148, 19);
+            this.CheckHideSuffixed.TabIndex = 0;
+            this.CheckHideSuffixed.Text = "&Hide suffixed packages";
+            this.CheckHideSuffixed.UseVisualStyleBackColor = true;
+            this.CheckHideSuffixed.CheckedChanged += new System.EventHandler(this.CheckHideSuffixed_CheckedChanged);
             // 
             // SplitContainer
             // 
@@ -160,7 +159,7 @@
         private System.Windows.Forms.Panel PanelTop;
         private System.Windows.Forms.SplitContainer SplitContainer;
         private System.Windows.Forms.TextBox TxtDetails;
-        private System.Windows.Forms.CheckBox CheckHideMeta;
+        private System.Windows.Forms.CheckBox CheckHideSuffixed;
         private System.Windows.Forms.TextBox TextSearch;
     }
 }

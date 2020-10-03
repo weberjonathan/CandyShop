@@ -9,7 +9,7 @@ namespace CandyShop.Chocolatey
         public string AvailVer { get; set; }
         public bool Pinned { get; set; }
 
-        public bool IsMetaPackage {
+        public bool HasSuffix {
             get {
                 int i = Name.LastIndexOf('.');
                 if (i > 0)
