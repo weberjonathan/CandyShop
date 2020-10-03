@@ -16,6 +16,11 @@ namespace CandyShop
             InitializeComponent();
             // SplitContainer.Panel2Collapsed = true;
 
+            this.Resize += new EventHandler((sender, e) =>
+            {
+                TextSearch.Size = new System.Drawing.Size(CheckHideMeta.Location.X - 20, TextSearch.Height);
+            });
+
             LstPackages.SelectedIndexChanged += new EventHandler((sender, e) =>
             {
                 DetailsText = "Loading ...";
