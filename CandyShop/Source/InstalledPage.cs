@@ -1,6 +1,7 @@
 ﻿using CandyShop.Chocolatey;
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Windows.Forms;
 
 namespace CandyShop
@@ -76,19 +77,19 @@ namespace CandyShop
 
         private void CheckHideMeta_CheckedChanged(object sender, EventArgs e)
         {
-            for (int i = 0; i < _Packages.Count; i++)
+            SyncListView();
+        }
+
+        private void TextSearch_TextChanged(object sender, EventArgs e)
+        {
+            SyncListView();
+        }
+
+        private void TextSearch_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode.Equals(Keys.Enter) && LstPackages.Items.Count > 0)
             {
-                if (_Packages[i].IsMetaPackage)
-                {
-                    if (CheckHideMeta.Checked)
-                    {
-                        LstPackages.FindItemWithText(_Packages[i].Name).Remove();
-                    }
-                    else
-                    {
-                        LstPackages.Items.Insert(i, PackageToListView(_Packages[i]));
-                    }
-                }
+                LstPackages.Items[0].Selected = true;
             }
         }
 
@@ -99,8 +100,72 @@ namespace CandyShop
                 pckg.Name,
                 pckg.CurrVer
             });
-            
+
             return rtn;
+        }
+
+        private void InsertPackageInListView(ChocolateyPackage package)
+        {
+            int length = _Packages.IndexOf(package);
+            ListViewItem lastVisibilePackage = null;
+
+            // find package that is supposed to be directly above it
+            for (int j = 0; j < length; j++)
+            {
+                ListViewItem previousPackage = LstPackages.FindItemWithText(_Packages[j].Name);
+                if (previousPackage != null)
+                {
+                    lastVisibilePackage = previousPackage;
+                }
+            }
+
+            // insert
+            int index = 0;
+            if (lastVisibilePackage != null)
+            {
+                index = LstPackages.Items.IndexOf(lastVisibilePackage) + 1;
+            }
+
+            LstPackages.Items.Insert(index, PackageToListView(package));
+        }
+
+        private void SyncListView()
+        {
+            string filterName = TextSearch.Text;
+            bool hideMeta = CheckHideMeta.Checked;
+
+            foreach (ChocolateyPackage package in _Packages)
+            {
+                bool packageAllowed = true;
+                
+                // determine whether package should be displayed
+                if (hideMeta && package.IsMetaPackage)
+                {
+                    packageAllowed = false;
+                }
+
+                if (!String.IsNullOrEmpty(filterName) && !package.Name.Contains(filterName))
+                {
+                    packageAllowed = false;
+                }
+                
+                // determine whether it is displayed
+                ListViewItem listviewItem = LstPackages.FindItemWithText(package.Name);
+                if (listviewItem == null)
+                {
+                    if (packageAllowed)
+                    {
+                        InsertPackageInListView(package);
+                    }
+                }
+                else
+                {
+                    if (!packageAllowed)
+                    {
+                        listviewItem.Remove();
+                    }
+                }
+            }
         }
     }
 }

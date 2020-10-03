@@ -32,9 +32,10 @@
             this.colName = new System.Windows.Forms.ColumnHeader();
             this.colVer = new System.Windows.Forms.ColumnHeader();
             this.PanelTop = new System.Windows.Forms.Panel();
+            this.TextSearch = new System.Windows.Forms.TextBox();
+            this.CheckHideMeta = new System.Windows.Forms.CheckBox();
             this.SplitContainer = new System.Windows.Forms.SplitContainer();
             this.TxtDetails = new System.Windows.Forms.TextBox();
-            this.CheckHideMeta = new System.Windows.Forms.CheckBox();
             this.PanelTop.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.SplitContainer)).BeginInit();
             this.SplitContainer.Panel1.SuspendLayout();
@@ -68,12 +69,38 @@
             // 
             // PanelTop
             // 
+            this.PanelTop.Controls.Add(this.TextSearch);
             this.PanelTop.Controls.Add(this.CheckHideMeta);
             this.PanelTop.Dock = System.Windows.Forms.DockStyle.Top;
             this.PanelTop.Location = new System.Drawing.Point(0, 0);
             this.PanelTop.Name = "PanelTop";
             this.PanelTop.Size = new System.Drawing.Size(600, 44);
             this.PanelTop.TabIndex = 1;
+            // 
+            // TextSearch
+            // 
+            this.TextSearch.Location = new System.Drawing.Point(0, 13);
+            this.TextSearch.Name = "TextSearch";
+            this.TextSearch.PlaceholderText = "Search";
+            this.TextSearch.Size = new System.Drawing.Size(435, 23);
+            this.TextSearch.TabIndex = 1;
+            this.TextSearch.TextChanged += new System.EventHandler(this.TextSearch_TextChanged);
+            this.TextSearch.KeyDown += new System.Windows.Forms.KeyEventHandler(this.TextSearch_KeyDown);
+
+            // 
+            // CheckHideMeta
+            // 
+            this.CheckHideMeta.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.CheckHideMeta.AutoSize = true;
+            this.CheckHideMeta.Checked = true;
+            this.CheckHideMeta.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.CheckHideMeta.Location = new System.Drawing.Point(455, 15);
+            this.CheckHideMeta.Name = "CheckHideMeta";
+            this.CheckHideMeta.Size = new System.Drawing.Size(133, 19);
+            this.CheckHideMeta.TabIndex = 0;
+            this.CheckHideMeta.Text = "Hide &meta packages";
+            this.CheckHideMeta.UseVisualStyleBackColor = true;
+            this.CheckHideMeta.CheckedChanged += new System.EventHandler(this.CheckHideMeta_CheckedChanged);
             // 
             // SplitContainer
             // 
@@ -106,20 +133,6 @@
             this.TxtDetails.TabIndex = 0;
             this.TxtDetails.WordWrap = false;
             // 
-            // CheckHideMeta
-            // 
-            this.CheckHideMeta.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.CheckHideMeta.AutoSize = true;
-            this.CheckHideMeta.Checked = true;
-            this.CheckHideMeta.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.CheckHideMeta.Location = new System.Drawing.Point(455, 15);
-            this.CheckHideMeta.Name = "CheckHideMeta";
-            this.CheckHideMeta.Size = new System.Drawing.Size(133, 19);
-            this.CheckHideMeta.TabIndex = 0;
-            this.CheckHideMeta.Text = "Hide &meta packages";
-            this.CheckHideMeta.UseVisualStyleBackColor = true;
-            this.CheckHideMeta.CheckedChanged += new System.EventHandler(this.CheckHideMeta_CheckedChanged);
-            // 
             // InstalledPage
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -148,5 +161,6 @@
         private System.Windows.Forms.SplitContainer SplitContainer;
         private System.Windows.Forms.TextBox TxtDetails;
         private System.Windows.Forms.CheckBox CheckHideMeta;
+        private System.Windows.Forms.TextBox TextSearch;
     }
 }
