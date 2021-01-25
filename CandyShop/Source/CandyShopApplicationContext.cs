@@ -22,31 +22,27 @@ namespace CandyShop
         [return: MarshalAs(UnmanagedType.Bool)]
         private static extern bool SetForegroundWindow(IntPtr hWnd);
 
-        private NotifyIcon _TrayIcon;
-
         public CandyShopApplicationContext()
         {
-            Application.ApplicationExit += new EventHandler((sender, e) =>
-            {
-                if (_TrayIcon != null) _TrayIcon.Visible = false;
-            });
-
+            // determine silent mode
             List<string> args = new List<string>(Environment.GetCommandLineArgs());
             Silent = args.Find(s => s.Equals("--silent") || s.Equals("-s")) != null;
 
+            // launch with form or in tray
             if (Silent)
             {
-                DisplayNotifyIcon();
+                NotifyIcon icon = CreateAndShowNotifyIcon();
+                GetOutdatedAndShowNotification(icon);
             }
             else
             {
-                DisplayForm();
+                BuildForm().Show();
             }
         }
 
         public bool Silent { get; }
 
-        private void DisplayNotifyIcon()
+        private NotifyIcon CreateAndShowNotifyIcon()
         {
             // create context menu
             ToolStripItem exitItem = new ToolStripMenuItem
@@ -59,7 +55,7 @@ namespace CandyShop
             contextMenu.Items.Add(exitItem);
 
             // Initialize Tray Icon
-            _TrayIcon = new NotifyIcon()
+            NotifyIcon rtn = new NotifyIcon()
             {
                 // Icon = Resources.AppIcon,
                 Icon = Resources.IconNew,
@@ -67,51 +63,79 @@ namespace CandyShop
                 ContextMenuStrip = contextMenu
             };
 
-            // check outdated
-            int count = 0;
+            // make sure tray icon is removed on application exit
+            Application.ApplicationExit += new EventHandler((sender, e) =>
+            {
+                if (rtn != null) rtn.Visible = false;
+            });
+
+            return rtn;
+        }
+
+        private async void GetOutdatedAndShowNotification(NotifyIcon icon)
+        {
+            List<ChocolateyPackage> packages = null;
+
+            // obtain outdated packages
             try
             {
-                count = ChocolateyWrapper.CheckOutdated().Count;
+                packages = await ChocolateyWrapper.CheckOutdatedAsync();
             }
             catch (ChocolateyException)
             {
-                _TrayIcon.BalloonTipIcon = ToolTipIcon.Error;
-                _TrayIcon.Text = Application.ProductName;
-                _TrayIcon.BalloonTipTitle = $"Candy Shop";
-                _TrayIcon.BalloonTipText = $"Could not check for outdated packages.";
-                _TrayIcon.ShowBalloonTip(2000);
+                icon.BalloonTipIcon = ToolTipIcon.Error;
+                icon.Text = Application.ProductName;
+                icon.BalloonTipTitle = $"Candy Shop";
+                icon.BalloonTipText = Properties.strings.Err_CheckOutdated;
+                icon.ShowBalloonTip(2000);
                 Environment.Exit(0);
             }
 
-            // prepare balloon and click handlers
-            if (count > 0)
+            // show notification and create click handlers
+            if (packages.Count > 0)
             {
-                _TrayIcon.BalloonTipClicked += new EventHandler((sender, e) => { DisplayForm(); });
-                _TrayIcon.MouseClick += new MouseEventHandler((sender, e) =>
+                icon.BalloonTipClicked += new EventHandler((sender, e) =>
                 {
-                    if (e.Button.Equals(MouseButtons.Left)) DisplayForm();
+                    BuildFormWith(packages).Show();
                 });
 
-                _TrayIcon.BalloonTipIcon = ToolTipIcon.Info;
-                _TrayIcon.Text = Application.ProductName;
-                _TrayIcon.BalloonTipTitle = $"{count} package{(count == 1 ? " is" : "s are")} outdated.";
-                _TrayIcon.BalloonTipText = $"To upgrade click here or the tray icon later.";
-                _TrayIcon.ShowBalloonTip(2000);
+                icon.MouseClick += new MouseEventHandler((sender, e) =>
+                {
+                    if (e.Button.Equals(MouseButtons.Left))
+                    {
+                        BuildFormWith(packages).Show();
+                    }
+                });
+
+                icon.BalloonTipIcon = ToolTipIcon.Info;
+                icon.Text = Application.ProductName;
+                icon.BalloonTipTitle = $"{packages.Count} package{(packages.Count == 1 ? " is" : "s are")} outdated.";
+                icon.BalloonTipText = $"To upgrade click here or the tray icon later.";
+                icon.ShowBalloonTip(2000);
             }
             else
             {
+                // terminate, bc app was launched silently but no packages are outdated and thus nothing is to be done
                 Environment.Exit(0);
             }
         }
 
-        private void DisplayForm()
+        private CandyShopForm BuildForm()
         {
-            /* form.Show() has to be used (not ShowDialog()),
-             * else Application.Run() in Program.cs may not have run
-             * which causes ExitThread() to not function.
-             */
-            
-            CandyShopForm form = new CandyShopForm();
+            CandyShopForm rtn = new CandyShopForm();
+            RegisterFormHandlers(rtn);
+            return rtn;
+        }
+
+        private CandyShopForm BuildFormWith(List<ChocolateyPackage> outdatedPackages)
+        {
+            CandyShopForm rtn = new CandyShopForm(outdatedPackages);
+            RegisterFormHandlers(rtn);
+            return rtn;
+        }
+
+        private void RegisterFormHandlers(CandyShopForm form)
+        {
             form.FormClosed += new FormClosedEventHandler((sender, e) =>
             {
                 form.ShowInTaskbar = false;
@@ -119,7 +143,7 @@ namespace CandyShop
 
                 if (form.DialogResult.Equals(DialogResult.OK))
                 {
-                    DisplayUpgradeConsole(form.SelectedPackages);
+                    LaunchUpgradeConsole(form.SelectedPackages);
                 }
                 else
                 {
@@ -129,11 +153,9 @@ namespace CandyShop
                     }
                 }
             });
-
-            form.Show();
         }
 
-        private void DisplayUpgradeConsole(List<ChocolateyPackage> packages)
+        private void LaunchUpgradeConsole(List<ChocolateyPackage> packages)
         {
             // setup watcher for desktop shortcuts
             Queue<string> shortcuts = new Queue<string>();

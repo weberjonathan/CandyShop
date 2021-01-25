@@ -38,8 +38,8 @@
             this.columnHeader1 = new System.Windows.Forms.ColumnHeader();
             this.CandyShopMenu = new System.Windows.Forms.MenuStrip();
             this.MenuExtras = new System.Windows.Forms.ToolStripMenuItem();
-            this.MenuHelp = new System.Windows.Forms.ToolStripMenuItem();
             this.MenuExtrasCreateTask = new System.Windows.Forms.ToolStripMenuItem();
+            this.MenuHelp = new System.Windows.Forms.ToolStripMenuItem();
             this.MenuHelpGithub = new System.Windows.Forms.ToolStripMenuItem();
             this.MenuHelpLicense = new System.Windows.Forms.ToolStripMenuItem();
             this.MainPanel.SuspendLayout();
@@ -96,7 +96,7 @@
             this.TabInstalled.Location = new System.Drawing.Point(4, 24);
             this.TabInstalled.Name = "TabInstalled";
             this.TabInstalled.Padding = new System.Windows.Forms.Padding(3);
-            this.TabInstalled.Size = new System.Drawing.Size(722, 506);
+            this.TabInstalled.Size = new System.Drawing.Size(722, 482);
             this.TabInstalled.TabIndex = 1;
             this.TabInstalled.Text = "Installed";
             this.TabInstalled.UseVisualStyleBackColor = true;
@@ -107,11 +107,12 @@
             this.InstalledPage.Dock = System.Windows.Forms.DockStyle.Fill;
             this.InstalledPage.Location = new System.Drawing.Point(3, 3);
             this.InstalledPage.Name = "InstalledPage";
-            this.InstalledPage.Size = new System.Drawing.Size(716, 500);
+            this.InstalledPage.Size = new System.Drawing.Size(716, 476);
             this.InstalledPage.TabIndex = 0;
             // 
             // CandyShopMenu
             // 
+            this.CandyShopMenu.BackColor = System.Drawing.SystemColors.Window;
             this.CandyShopMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.MenuExtras,
             this.MenuHelp});
@@ -129,6 +130,13 @@
             this.MenuExtras.Size = new System.Drawing.Size(50, 20);
             this.MenuExtras.Text = "&Extras";
             // 
+            // MenuExtrasCreateTask
+            // 
+            this.MenuExtrasCreateTask.Name = "MenuExtrasCreateTask";
+            this.MenuExtrasCreateTask.Size = new System.Drawing.Size(344, 22);
+            this.MenuExtrasCreateTask.Text = "&Display notification for outdated packages on login";
+            this.MenuExtrasCreateTask.Click += new System.EventHandler(this.MenuExtrasCreateTask_Click);
+            // 
             // MenuHelp
             // 
             this.MenuHelp.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -137,13 +145,6 @@
             this.MenuHelp.Name = "MenuHelp";
             this.MenuHelp.Size = new System.Drawing.Size(44, 20);
             this.MenuHelp.Text = "&Help";
-            // 
-            // MenuExtrasCreateTask
-            // 
-            this.MenuExtrasCreateTask.Name = "MenuExtrasCreateTask";
-            this.MenuExtrasCreateTask.Size = new System.Drawing.Size(267, 22);
-            this.MenuExtrasCreateTask.Text = "&Display notification for outdated packages on login";
-            this.MenuExtrasCreateTask.Click += new System.EventHandler(this.MenuExtrasCreateTask_Click);
             // 
             // MenuHelpGithub
             // 

@@ -63,9 +63,9 @@ namespace CandyShop.Properties {
         /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Failed to retrieve list of outdated applications. An error occurred during the execution of the Chocolatey program. ähnelt.
         /// </summary>
-        internal static string Form_Err_CheckOutdated {
+        internal static string Err_CheckOutdated {
             get {
-                return ResourceManager.GetString("Form_Err_CheckOutdated", resourceCulture);
+                return ResourceManager.GetString("Err_CheckOutdated", resourceCulture);
             }
         }
         

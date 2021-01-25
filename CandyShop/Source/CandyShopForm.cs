@@ -18,26 +18,28 @@ namespace CandyShop
         public CandyShopForm()
         {
             InitializeComponent();
-
             GetInstalledAsync();
             GetOutdatedAsync();
+        }
 
-            UpgradePage.UpgradeAllClick += UpgradePage_UpgradeAllClick;
-            UpgradePage.UpgradeSelectedClick += UpgradePage_UpgradeSelectedClick;
-            UpgradePage.CancelClick += UpgradePage_CancelClick;
-
-            InstalledPage.SelectedPackageChanged += InstalledPage_SelectedPackageChanged;
-
-            using (TaskService ts = new TaskService())
-            {
-                WindowsTaskExists = ts.GetTask(TASKNAME) != null;
-            }
+        public CandyShopForm(List<ChocolateyPackage> outdatedPackages)
+        {
+            InitializeComponent();
+            GetInstalledAsync();
+            UpgradePage.OutdatedPackages = outdatedPackages;
+            // TODO implement refresh that prompts on new outdated packages
         }
 
         public List<ChocolateyPackage> SelectedPackages { get; set; }
 
         private void ChocoAutoUpdateForm_Load(object sender, EventArgs e)
         {
+            // register handlers
+            UpgradePage.UpgradeAllClick += UpgradePage_UpgradeAllClick;
+            UpgradePage.UpgradeSelectedClick += UpgradePage_UpgradeSelectedClick;
+            UpgradePage.CancelClick += UpgradePage_CancelClick;
+            InstalledPage.SelectedPackageChanged += InstalledPage_SelectedPackageChanged;
+
             // display admin warning or not
             if (HasAdminPrivileges())
             {
@@ -51,6 +53,10 @@ namespace CandyShop
             }
 
             // check task entry or not
+            using (TaskService ts = new TaskService())
+            {
+                WindowsTaskExists = ts.GetTask(TASKNAME) != null;
+            }
             MenuExtrasCreateTask.Checked = WindowsTaskExists;
 
             this.Activate();
@@ -184,7 +190,7 @@ namespace CandyShop
             }
             catch (ChocolateyException)
             {
-                ShowErrorDialog(Properties.strings.Form_Err_CheckOutdated);
+                ShowErrorDialog(Properties.strings.Err_CheckOutdated);
             }
 
         }
