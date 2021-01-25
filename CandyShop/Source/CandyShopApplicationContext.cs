@@ -143,6 +143,7 @@ namespace CandyShop
                 watcher.Filter = "*.lnk";
                 watcher.IncludeSubdirectories = false;
                 watcher.NotifyFilter = NotifyFilters.FileName;
+                watcher.InternalBufferSize = 65536; // TODO test; incurs performance penalty so remove if not useful
                 watcher.Created += new FileSystemEventHandler((sender, e) =>
                 {
                     shortcuts.Enqueue(e.FullPath);
