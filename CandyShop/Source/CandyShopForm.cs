@@ -1,6 +1,9 @@
 ﻿using CandyShop.Chocolatey;
+using Microsoft.Win32.TaskScheduler;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Security.Principal;
 using System.Windows.Forms;
 
@@ -8,6 +11,8 @@ namespace CandyShop
 {
     public partial class CandyShopForm : Form
     {
+        private const string TASKNAME = "CandyShopLaunch";
+        private bool WindowsTaskExists; // TODO create Context or properties class that contains information like this
         private Dictionary<string, string> InstalledPackageDetails = new Dictionary<string, string>();
 
         public CandyShopForm()
@@ -22,12 +27,18 @@ namespace CandyShop
             UpgradePage.CancelClick += UpgradePage_CancelClick;
 
             InstalledPage.SelectedPackageChanged += InstalledPage_SelectedPackageChanged;
+
+            using (TaskService ts = new TaskService())
+            {
+                WindowsTaskExists = ts.GetTask(TASKNAME) != null;
+            }
         }
 
         public List<ChocolateyPackage> SelectedPackages { get; set; }
 
         private void ChocoAutoUpdateForm_Load(object sender, EventArgs e)
         {
+            // display admin warning or not
             if (HasAdminPrivileges())
             {
                 UpgradePage.ShowAdminWarning = false;
@@ -39,7 +50,77 @@ namespace CandyShop
                 this.Text = $"{Application.ProductName} v{Application.ProductVersion} (no administrator privileges)";
             }
 
+            // check task entry or not
+            MenuExtrasCreateTask.Checked = WindowsTaskExists;
+
             this.Activate();
+        }
+
+        private void MenuExtrasCreateTask_Click(object sender, EventArgs e)
+        {
+            if (!HasAdminPrivileges())
+            {
+                ShowErrorDialog(Properties.strings.Form_Err_RequireAdmin);
+                return;
+            }
+
+            using (TaskService ts = new TaskService())
+            {
+                if (WindowsTaskExists)
+                {
+                    // remove task
+                    Task task = ts.GetTask(TASKNAME);
+                    if (task != null)
+                    {
+                        ts.RootFolder.DeleteTask(TASKNAME);
+                    }
+
+                    WindowsTaskExists = false;
+                }
+                else
+                {
+                    // create task
+                    string executable = Process.GetCurrentProcess().MainModule.FileName;
+                    string dir = Directory.GetParent(executable).FullName;
+
+                    TaskDefinition definition = TaskService.Instance.NewTask();
+                    definition.RegistrationInfo.Description = "Launch CandyShop with elevated privileges to display outdated packages on login.";
+                    definition.Principal.LogonType = TaskLogonType.InteractiveToken;
+
+                    LogonTrigger trigger = new LogonTrigger();
+
+                    definition.Triggers.Add(trigger);
+                    definition.Actions.Add(executable, "-s", dir);
+                    definition.Principal.RunLevel = TaskRunLevel.Highest;
+
+                    TaskService.Instance.RootFolder.RegisterTaskDefinition(TASKNAME, definition);
+
+                    WindowsTaskExists = true;
+                }
+
+                MenuExtrasCreateTask.Checked = WindowsTaskExists;
+            }
+        }
+
+        private void MenuHelpGithub_Click(object sender, EventArgs e)
+        {
+            string url = "https://github.com/weberjonathan/CandyShop";
+            ProcessStartInfo info = new ProcessStartInfo() {
+                FileName = "cmd",
+                Arguments = $"/c start {url}",
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
+            
+            Process.Start(info);
+        }
+
+        private void MenuHelpLicense_Click(object sender, EventArgs e)
+        {
+            using (LicenseForm form = new LicenseForm())
+            {
+                form.ShowDialog();
+            }
         }
 
         private void UpgradePage_UpgradeAllClick(object sender, EventArgs e)

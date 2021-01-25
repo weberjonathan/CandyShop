@@ -35,7 +35,6 @@ namespace CandyShop
             this.PanelTop = new System.Windows.Forms.Panel();
             this.panel1 = new System.Windows.Forms.Panel();
             this.BtnUpgradeSelected = new System.Windows.Forms.Button();
-            this.LinkGithub = new System.Windows.Forms.LinkLabel();
             this.BtnUpgradeAll = new System.Windows.Forms.Button();
             this.BtnCancel = new System.Windows.Forms.Button();
             this.panel2 = new System.Windows.Forms.Panel();
@@ -90,17 +89,6 @@ namespace CandyShop
             this.BtnUpgradeSelected.Text = "&Upgrade";
             this.BtnUpgradeSelected.UseVisualStyleBackColor = true;
             // 
-            // LinkGithub
-            // 
-            this.LinkGithub.AutoSize = true;
-            this.LinkGithub.Location = new System.Drawing.Point(12, 19);
-            this.LinkGithub.Name = "LinkGithub";
-            this.LinkGithub.Size = new System.Drawing.Size(45, 15);
-            this.LinkGithub.TabIndex = 1;
-            this.LinkGithub.TabStop = true;
-            this.LinkGithub.Text = "GitHub";
-            this.LinkGithub.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.LinkGithub_LinkClicked);
-            // 
             // BtnUpgradeAll
             // 
             this.BtnUpgradeAll.Anchor = System.Windows.Forms.AnchorStyles.Right;
@@ -125,7 +113,6 @@ namespace CandyShop
             // panel2
             // 
             this.panel2.Controls.Add(this.BtnUpgradeSelected);
-            this.panel2.Controls.Add(this.LinkGithub);
             this.panel2.Controls.Add(this.BtnUpgradeAll);
             this.panel2.Controls.Add(this.BtnCancel);
             this.panel2.Dock = System.Windows.Forms.DockStyle.Bottom;
@@ -195,7 +182,6 @@ namespace CandyShop
             this.PanelTop.ResumeLayout(false);
             this.PanelTop.PerformLayout();
             this.panel2.ResumeLayout(false);
-            this.panel2.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -206,7 +192,6 @@ namespace CandyShop
         private System.Windows.Forms.Label LblAdmin;
         private System.Windows.Forms.Panel PanelTop;
         private System.Windows.Forms.Button BtnUpgradeSelected;
-        private System.Windows.Forms.LinkLabel LinkGithub;
         private System.Windows.Forms.Button BtnUpgradeAll;
         private System.Windows.Forms.Button BtnCancel;
         private System.Windows.Forms.Panel panel2;

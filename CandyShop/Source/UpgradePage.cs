@@ -91,13 +91,5 @@ namespace CandyShop
             LstPackages.Columns[2].Width = (int)Math.Floor(availWidth * .3);
             LstPackages.Columns[3].Width = pinnedWidth;
         }
-
-        private void LinkGithub_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
-        {
-            LinkGithub.LinkVisited = true;
-            var url = "https://github.com/weberjonathan/Chocolatey-AutoUpdate";
-         
-            Process.Start(new ProcessStartInfo("cmd", $"/c start {url}"));
-        }
     }
 }

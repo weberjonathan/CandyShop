@@ -36,10 +36,17 @@
             this.TabInstalled = new System.Windows.Forms.TabPage();
             this.InstalledPage = new CandyShop.InstalledPage();
             this.columnHeader1 = new System.Windows.Forms.ColumnHeader();
+            this.CandyShopMenu = new System.Windows.Forms.MenuStrip();
+            this.MenuExtras = new System.Windows.Forms.ToolStripMenuItem();
+            this.MenuHelp = new System.Windows.Forms.ToolStripMenuItem();
+            this.MenuExtrasCreateTask = new System.Windows.Forms.ToolStripMenuItem();
+            this.MenuHelpGithub = new System.Windows.Forms.ToolStripMenuItem();
+            this.MenuHelpLicense = new System.Windows.Forms.ToolStripMenuItem();
             this.MainPanel.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.TabUpgrade.SuspendLayout();
             this.TabInstalled.SuspendLayout();
+            this.CandyShopMenu.SuspendLayout();
             this.SuspendLayout();
             // 
             // MainPanel
@@ -47,9 +54,9 @@
             this.MainPanel.BackColor = System.Drawing.SystemColors.Window;
             this.MainPanel.Controls.Add(this.tabControl1);
             this.MainPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.MainPanel.Location = new System.Drawing.Point(0, 0);
+            this.MainPanel.Location = new System.Drawing.Point(0, 24);
             this.MainPanel.Name = "MainPanel";
-            this.MainPanel.Size = new System.Drawing.Size(730, 534);
+            this.MainPanel.Size = new System.Drawing.Size(730, 510);
             this.MainPanel.TabIndex = 1;
             // 
             // tabControl1
@@ -60,7 +67,7 @@
             this.tabControl1.Location = new System.Drawing.Point(0, 0);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(730, 534);
+            this.tabControl1.Size = new System.Drawing.Size(730, 510);
             this.tabControl1.TabIndex = 3;
             // 
             // TabUpgrade
@@ -69,7 +76,7 @@
             this.TabUpgrade.Location = new System.Drawing.Point(4, 24);
             this.TabUpgrade.Name = "TabUpgrade";
             this.TabUpgrade.Padding = new System.Windows.Forms.Padding(3);
-            this.TabUpgrade.Size = new System.Drawing.Size(722, 506);
+            this.TabUpgrade.Size = new System.Drawing.Size(722, 482);
             this.TabUpgrade.TabIndex = 0;
             this.TabUpgrade.Text = "Upgrade";
             this.TabUpgrade.UseVisualStyleBackColor = true;
@@ -79,7 +86,8 @@
             this.UpgradePage.Dock = System.Windows.Forms.DockStyle.Fill;
             this.UpgradePage.Location = new System.Drawing.Point(3, 3);
             this.UpgradePage.Name = "UpgradePage";
-            this.UpgradePage.Size = new System.Drawing.Size(716, 500);
+            this.UpgradePage.ShowAdminWarning = true;
+            this.UpgradePage.Size = new System.Drawing.Size(716, 476);
             this.UpgradePage.TabIndex = 2;
             // 
             // TabInstalled
@@ -102,14 +110,65 @@
             this.InstalledPage.Size = new System.Drawing.Size(716, 500);
             this.InstalledPage.TabIndex = 0;
             // 
+            // CandyShopMenu
+            // 
+            this.CandyShopMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.MenuExtras,
+            this.MenuHelp});
+            this.CandyShopMenu.Location = new System.Drawing.Point(0, 0);
+            this.CandyShopMenu.Name = "CandyShopMenu";
+            this.CandyShopMenu.Size = new System.Drawing.Size(730, 24);
+            this.CandyShopMenu.TabIndex = 3;
+            this.CandyShopMenu.Text = "Menu";
+            // 
+            // MenuExtras
+            // 
+            this.MenuExtras.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.MenuExtrasCreateTask});
+            this.MenuExtras.Name = "MenuExtras";
+            this.MenuExtras.Size = new System.Drawing.Size(50, 20);
+            this.MenuExtras.Text = "&Extras";
+            // 
+            // MenuHelp
+            // 
+            this.MenuHelp.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.MenuHelpGithub,
+            this.MenuHelpLicense});
+            this.MenuHelp.Name = "MenuHelp";
+            this.MenuHelp.Size = new System.Drawing.Size(44, 20);
+            this.MenuHelp.Text = "&Help";
+            // 
+            // MenuExtrasCreateTask
+            // 
+            this.MenuExtrasCreateTask.Name = "MenuExtrasCreateTask";
+            this.MenuExtrasCreateTask.Size = new System.Drawing.Size(267, 22);
+            this.MenuExtrasCreateTask.Text = "&Display notification for outdated packages on login";
+            this.MenuExtrasCreateTask.Click += new System.EventHandler(this.MenuExtrasCreateTask_Click);
+            // 
+            // MenuHelpGithub
+            // 
+            this.MenuHelpGithub.Name = "MenuHelpGithub";
+            this.MenuHelpGithub.Size = new System.Drawing.Size(113, 22);
+            this.MenuHelpGithub.Text = "&Github";
+            this.MenuHelpGithub.Click += new System.EventHandler(this.MenuHelpGithub_Click);
+            // 
+            // MenuHelpLicense
+            // 
+            this.MenuHelpLicense.Name = "MenuHelpLicense";
+            this.MenuHelpLicense.Size = new System.Drawing.Size(113, 22);
+            this.MenuHelpLicense.Text = "&License";
+            this.MenuHelpLicense.Click += new System.EventHandler(this.MenuHelpLicense_Click);
+            // 
             // CandyShopForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(730, 534);
             this.Controls.Add(this.MainPanel);
+            this.Controls.Add(this.CandyShopMenu);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.MainMenuStrip = this.CandyShopMenu;
             this.MaximizeBox = false;
             this.Name = "CandyShopForm";
             this.Text = "ChocoAutoUpdateForm";
@@ -118,7 +177,10 @@
             this.tabControl1.ResumeLayout(false);
             this.TabUpgrade.ResumeLayout(false);
             this.TabInstalled.ResumeLayout(false);
+            this.CandyShopMenu.ResumeLayout(false);
+            this.CandyShopMenu.PerformLayout();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -130,5 +192,11 @@
         private System.Windows.Forms.TabPage TabUpgrade;
         private System.Windows.Forms.TabPage TabInstalled;
         private InstalledPage InstalledPage;
+        private System.Windows.Forms.MenuStrip CandyShopMenu;
+        private System.Windows.Forms.ToolStripMenuItem MenuExtras;
+        private System.Windows.Forms.ToolStripMenuItem MenuExtrasCreateTask;
+        private System.Windows.Forms.ToolStripMenuItem MenuHelp;
+        private System.Windows.Forms.ToolStripMenuItem MenuHelpGithub;
+        private System.Windows.Forms.ToolStripMenuItem MenuHelpLicense;
     }
 }

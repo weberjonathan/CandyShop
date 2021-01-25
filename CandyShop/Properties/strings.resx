@@ -126,4 +126,7 @@
   <data name="Form_Err_ListInstalled" xml:space="preserve">
     <value>Failed to retrieve list of installed applications. An error occurred during the execution of the Chocolatey program.</value>
   </data>
+  <data name="Form_Err_RequireAdmin" xml:space="preserve">
+    <value>Administration privileges are required for this operation.</value>
+  </data>
 </root>
