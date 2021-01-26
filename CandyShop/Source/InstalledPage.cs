@@ -1,7 +1,6 @@
 ﻿using CandyShop.Chocolatey;
 using System;
 using System.Collections.Generic;
-using System.Net;
 using System.Windows.Forms;
 
 namespace CandyShop
@@ -111,11 +110,11 @@ namespace CandyShop
 
         private void InsertPackageInListView(ChocolateyPackage package)
         {
-            int length = _Packages.IndexOf(package);
+            int latestPossibleIndex = _Packages.IndexOf(package);
             ListViewItem lastVisibilePackage = null;
 
             // find package that is supposed to be directly above it
-            for (int j = 0; j < length; j++)
+            for (int j = 0; j < latestPossibleIndex; j++)
             {
                 ListViewItem previousPackage = LstPackages.FindItemWithText(_Packages[j].Name);
                 if (previousPackage != null)
