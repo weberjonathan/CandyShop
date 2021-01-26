@@ -99,6 +99,7 @@ namespace CandyShop
             this.BtnUpgradeAll.TabIndex = 2;
             this.BtnUpgradeAll.Text = "Upgrade &All";
             this.BtnUpgradeAll.UseVisualStyleBackColor = true;
+            this.BtnUpgradeAll.Visible = false;
             // 
             // BtnCancel
             // 
