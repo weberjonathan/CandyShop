@@ -62,6 +62,16 @@ namespace CandyShop
             this.Activate();
         }
 
+        private void MenuEditSelectAll_Click(object sender, EventArgs e)
+        {
+            UpgradePage.CheckAllItems();
+        }
+
+        private void MenuEditDeselectAll_Click(object sender, EventArgs e)
+        {
+            UpgradePage.UncheckAllItems();
+        }
+
         private void MenuExtrasCreateTask_Click(object sender, EventArgs e)
         {
             if (!HasAdminPrivileges())
@@ -139,8 +149,11 @@ namespace CandyShop
         private void UpgradePage_UpgradeSelectedClick(object sender, EventArgs e)
         {
             SelectedPackages = UpgradePage.SelectedPackages;
-            this.DialogResult = DialogResult.OK;
-            this.Close();
+            if (SelectedPackages.Count > 0)
+            {
+                this.DialogResult = DialogResult.OK;
+                this.Close();
+            }
         }
 
         private void UpgradePage_CancelClick(object sender, EventArgs e)

@@ -75,6 +75,22 @@ namespace CandyShop
             }
         }
 
+        public void CheckAllItems()
+        {
+            foreach (ListViewItem item in LstPackages.Items)
+            {
+                item.Checked = true;
+            }
+        }
+
+        public void UncheckAllItems()
+        {
+            foreach (ListViewItem item in LstPackages.Items)
+            {
+                item.Checked = false;
+            }
+        }
+
         private void LstPackages_ItemChecked(object sender, ItemCheckedEventArgs e)
         {
             BtnUpgradeSelected.Text = $"Upgrade ({LstPackages.CheckedItems.Count})";
