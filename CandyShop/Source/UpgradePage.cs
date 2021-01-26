@@ -1,7 +1,6 @@
 ﻿using CandyShop.Chocolatey;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Windows.Forms;
 
 namespace CandyShop
@@ -39,7 +38,7 @@ namespace CandyShop
         public List<ChocolateyPackage> OutdatedPackages {
             get => _OutdatedPackages;
             set {
-                _OutdatedPackages.AddRange(value);
+                _OutdatedPackages.AddRange(value); // TODO surely this should not be added but assigned ?
 
                 LblLoading.Visible = false;
 
@@ -52,13 +51,13 @@ namespace CandyShop
                     {
                         ListViewItem item = new ListViewItem(new string[]
                         {
-                        pckg.Name,
-                        pckg.CurrVer,
-                        pckg.AvailVer,
-                        pckg.Pinned.ToString()
+                            pckg.Name,
+                            pckg.CurrVer,
+                            pckg.AvailVer,
+                            pckg.Pinned.ToString()
                         });
 
-                        item.Checked = true;
+                        item.Checked = !pckg.HasSuffix;
                         LstPackages.Items.Add(item);
                     }
                 }
