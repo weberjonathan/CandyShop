@@ -12,8 +12,6 @@ namespace CandyShop
         [STAThread]
         static void Main(string[] args)
         {
-            
-
             // check if Chocolatey is in path
             try
             {
