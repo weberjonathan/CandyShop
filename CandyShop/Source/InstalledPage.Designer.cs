@@ -58,6 +58,7 @@
             this.LstPackages.TabIndex = 0;
             this.LstPackages.UseCompatibleStateImageBehavior = false;
             this.LstPackages.View = System.Windows.Forms.View.Details;
+            this.LstPackages.SelectedIndexChanged += new System.EventHandler(this.LstPackages_SelectedIndexChanged);
             // 
             // colName
             // 

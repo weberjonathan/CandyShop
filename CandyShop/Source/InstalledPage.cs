@@ -8,7 +8,7 @@ namespace CandyShop
     public partial class InstalledPage : UserControl
     {
         private List<ChocolateyPackage> _Packages = new List<ChocolateyPackage>();
-        private string _DetailsText;
+        private Dictionary<string, string> PackageDetailsCache = new Dictionary<string, string>();
 
         public InstalledPage()
         {
@@ -20,12 +20,6 @@ namespace CandyShop
                 TextSearch.Size = new System.Drawing.Size(CheckHideSuffixed.Location.X - 20, TextSearch.Height);
             });
 
-            LstPackages.SelectedIndexChanged += new EventHandler((sender, e) =>
-            {
-                DetailsText = "Loading ...";
-                SelectedPackageChanged?.Invoke(this, e);
-            });
-
             LstPackages.Resize += new EventHandler((sender, e) =>
             {
                 int availWidth = LstPackages.Width - LstPackages.Margin.Left - LstPackages.Margin.Right - SystemInformation.VerticalScrollBarWidth;
@@ -34,8 +28,6 @@ namespace CandyShop
                 LstPackages.Columns[1].Width = (int)Math.Floor(availWidth * .4);
             });
         }
-
-        public event EventHandler SelectedPackageChanged;
 
         public List<ChocolateyPackage> Packages {
             get => _Packages;
@@ -56,15 +48,6 @@ namespace CandyShop
             }
         }
 
-        public string DetailsText {
-            get => _DetailsText;
-            set {
-                _DetailsText = value;
-                TxtDetails.Text = value;
-                // SplitContainer.Panel2Collapsed = String.Empty.Equals(value);
-            }
-        }
-
         public ChocolateyPackage SelectedPackage {
             get {
                 if (LstPackages.SelectedItems.Count > 0)
@@ -75,6 +58,40 @@ namespace CandyShop
                 else
                 {
                     return null;
+                }
+            }
+        }
+
+        private async void LstPackages_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (SelectedPackage == null) return;
+
+            TxtDetails.Text = "Loading ...";
+
+            string selectedPackageName = SelectedPackage.Name;
+            string details;
+            if (!PackageDetailsCache.TryGetValue(selectedPackageName, out details))
+            {
+                try
+                {
+                    details = await ChocolateyWrapper.GetInfoAsync(SelectedPackage);
+                    if (!PackageDetailsCache.ContainsKey(selectedPackageName))
+                    {
+                        PackageDetailsCache.Add(selectedPackageName, details);
+                    }
+                }
+                catch (ChocolateyException)
+                {
+                    details = Properties.strings.Form_Err_GetInfo;
+                }
+            }
+
+            // check if package whose info was waited on is still selected
+            if (SelectedPackage != null)
+            {
+                if (SelectedPackage.Name.Equals(selectedPackageName))
+                {
+                    TxtDetails.Text = details;
                 }
             }
         }

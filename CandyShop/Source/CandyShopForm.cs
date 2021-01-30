@@ -13,7 +13,6 @@ namespace CandyShop
     {
         private const string TASKNAME = "CandyShopLaunch";
         private bool WindowsTaskExists; // TODO create Context or properties class that contains information like this
-        private Dictionary<string, string> InstalledPackageDetails = new Dictionary<string, string>();
 
         public CandyShopForm()
         {
@@ -38,7 +37,6 @@ namespace CandyShop
             UpgradePage.UpgradeAllClick += UpgradePage_UpgradeAllClick;
             UpgradePage.UpgradeSelectedClick += UpgradePage_UpgradeSelectedClick;
             UpgradePage.CancelClick += UpgradePage_CancelClick;
-            InstalledPage.SelectedPackageChanged += InstalledPage_SelectedPackageChanged;
 
             // display admin warning or not
             if (HasAdminPrivileges())
@@ -164,37 +162,7 @@ namespace CandyShop
             this.Close();
         }
 
-        private async void InstalledPage_SelectedPackageChanged(object sender, EventArgs e)
-        {
-            if (InstalledPage.SelectedPackage == null) return;
-            
-            string selectedPackageName = InstalledPage.SelectedPackage.Name;
-            string details;
-            if (!InstalledPackageDetails.TryGetValue(selectedPackageName, out details))
-            {
-                try
-                {
-                    details = await ChocolateyWrapper.GetInfoAsync(InstalledPage.SelectedPackage);
-                    if (!InstalledPackageDetails.ContainsKey(selectedPackageName))
-                    {
-                        InstalledPackageDetails.Add(selectedPackageName, details);
-                    }
-                }
-                catch (ChocolateyException)
-                {
-                    details = Properties.strings.Form_Err_GetInfo;
-                }
-            }
-            
-            // check if package whose info was waited on is still selected
-            if (InstalledPage.SelectedPackage != null)
-            {
-                if (InstalledPage.SelectedPackage.Name.Equals(selectedPackageName))
-                {
-                    InstalledPage.DetailsText = details;
-                }
-            }
-        }
+        
 
         private async void GetOutdatedAsync()
         {

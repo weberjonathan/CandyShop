@@ -108,7 +108,6 @@
             // 
             // InstalledPage
             // 
-            this.InstalledPage.DetailsText = null;
             this.InstalledPage.Dock = System.Windows.Forms.DockStyle.Fill;
             this.InstalledPage.Location = new System.Drawing.Point(3, 3);
             this.InstalledPage.Name = "InstalledPage";
@@ -169,6 +168,7 @@
             // 
             // MenuExtrasCreateTask
             // 
+            this.MenuExtrasCreateTask.CheckOnClick = true;
             this.MenuExtrasCreateTask.Name = "MenuExtrasCreateTask";
             this.MenuExtrasCreateTask.Size = new System.Drawing.Size(344, 22);
             this.MenuExtrasCreateTask.Text = "&Display notification for outdated packages on login";
