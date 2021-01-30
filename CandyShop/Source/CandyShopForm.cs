@@ -125,15 +125,7 @@ namespace CandyShop
 
         private void MenuHelpGithub_Click(object sender, EventArgs e)
         {
-            string url = "https://github.com/weberjonathan/CandyShop";
-            ProcessStartInfo info = new ProcessStartInfo() {
-                FileName = "cmd",
-                Arguments = $"/c start {url}",
-                UseShellExecute = false,
-                CreateNoWindow = true
-            };
-            
-            Process.Start(info);
+            launchUrl("https://github.com/weberjonathan/CandyShop");
         }
 
         private void MenuHelpLicense_Click(object sender, EventArgs e)
@@ -142,6 +134,11 @@ namespace CandyShop
             {
                 form.ShowDialog();
             }
+        }
+
+        private void MenuHelpMetaPackages_Click(object sender, EventArgs e)
+        {
+            launchUrl("https://docs.chocolatey.org/en-us/faqs#what-is-the-difference-between-packages-no-suffix-as-compared-to.install.portable");
         }
 
         private void UpgradePage_UpgradeAllClick(object sender, EventArgs e)
@@ -210,7 +207,6 @@ namespace CandyShop
             {
                 ShowErrorDialog(Properties.strings.Err_CheckOutdated);
             }
-
         }
 
         private async void GetInstalledAsync()
@@ -238,6 +234,19 @@ namespace CandyShop
         private void ShowErrorDialog(string msg)
         {
             MessageBox.Show(msg, Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+
+        private void launchUrl(string url)
+        {
+            ProcessStartInfo info = new ProcessStartInfo()
+            {
+                FileName = "cmd",
+                Arguments = $"/c start {url}",
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
+
+            Process.Start(info);
         }
     }
 }
