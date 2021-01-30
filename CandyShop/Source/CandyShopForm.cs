@@ -111,7 +111,7 @@ namespace CandyShop
                     LogonTrigger trigger = new LogonTrigger();
 
                     definition.Triggers.Add(trigger);
-                    definition.Actions.Add(executable, "-s", dir);
+                    definition.Actions.Add(executable, "--background", dir);
                     definition.Principal.RunLevel = TaskRunLevel.Highest;
 
                     TaskService.Instance.RootFolder.RegisterTaskDefinition(TASKNAME, definition);

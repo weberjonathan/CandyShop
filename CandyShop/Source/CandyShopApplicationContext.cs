@@ -26,10 +26,11 @@ namespace CandyShop
         {
             // determine silent mode
             List<string> args = new List<string>(Environment.GetCommandLineArgs());
-            Silent = args.Find(s => s.Equals("--silent") || s.Equals("-s")) != null;
+            LaunchInBackground = args.Find(s => s.Equals("--background") ||
+                                                s.Equals("-b")) != null;
 
             // launch with form or in tray
-            if (Silent)
+            if (LaunchInBackground)
             {
                 NotifyIcon icon = CreateAndShowNotifyIcon();
                 GetOutdatedAndShowNotification(icon);
@@ -40,7 +41,7 @@ namespace CandyShop
             }
         }
 
-        public bool Silent { get; }
+        public bool LaunchInBackground { get; }
 
         private NotifyIcon CreateAndShowNotifyIcon()
         {
@@ -147,7 +148,7 @@ namespace CandyShop
                 }
                 else
                 {
-                    if (!Silent)
+                    if (!LaunchInBackground)
                     {
                         ExitThread();
                     }
