@@ -116,8 +116,6 @@ namespace CandyShop
 
                     WindowsTaskExists = true;
                 }
-
-                MenuExtrasCreateTask.Checked = WindowsTaskExists;
             }
         }
 
