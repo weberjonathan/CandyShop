@@ -91,7 +91,7 @@ namespace CandyShop.Chocolatey
                 }
             }
 
-            return packages;
+            return addMetaPackageInformation(packages);
         }
 
         /// <exception cref="ChocolateyException"></exception>
@@ -149,7 +149,7 @@ namespace CandyShop.Chocolatey
                 }
             }
 
-            return packages;
+            return addMetaPackageInformation(packages);
         }
 
         /// <exception cref="ChocolateyException"></exception>
@@ -187,6 +187,25 @@ namespace CandyShop.Chocolatey
         public static async Task<string> GetInfoAsync(ChocolateyPackage package)
         {
             return await Task.Run(() => GetInfo(package));
+        }
+
+        private static List<ChocolateyPackage> addMetaPackageInformation(List<ChocolateyPackage> packages)
+        {
+            foreach (ChocolateyPackage childPackageCandidate in packages)
+            {
+                if (childPackageCandidate.HasSuffix)
+                {
+                    foreach (ChocolateyPackage metaPackageCandidate in packages)
+                    {
+                        if (childPackageCandidate.ClearName.Equals(metaPackageCandidate.Name))
+                        {
+                            childPackageCandidate.MetaPackage = metaPackageCandidate;
+                        }
+                    }
+                }
+            }
+
+            return packages;
         }
     }
 }

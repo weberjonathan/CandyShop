@@ -57,7 +57,7 @@ namespace CandyShop
                             pckg.Pinned.ToString()
                         });
 
-                        item.Checked = !pckg.HasSuffix;
+                        item.Checked = !(pckg.HasSuffix && pckg.HasMetaPackage);
                         LstPackages.Items.Add(item);
                     }
                 }
