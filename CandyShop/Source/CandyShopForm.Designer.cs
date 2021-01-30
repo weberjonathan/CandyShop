@@ -37,14 +37,15 @@
             this.InstalledPage = new CandyShop.InstalledPage();
             this.columnHeader1 = new System.Windows.Forms.ColumnHeader();
             this.CandyShopMenu = new System.Windows.Forms.MenuStrip();
+            this.MenuEdit = new System.Windows.Forms.ToolStripMenuItem();
+            this.MenuEditSelectAll = new System.Windows.Forms.ToolStripMenuItem();
+            this.MenuEditDeselectAll = new System.Windows.Forms.ToolStripMenuItem();
             this.MenuExtras = new System.Windows.Forms.ToolStripMenuItem();
             this.MenuExtrasCreateTask = new System.Windows.Forms.ToolStripMenuItem();
             this.MenuHelp = new System.Windows.Forms.ToolStripMenuItem();
             this.MenuHelpGithub = new System.Windows.Forms.ToolStripMenuItem();
             this.MenuHelpLicense = new System.Windows.Forms.ToolStripMenuItem();
-            this.MenuEdit = new System.Windows.Forms.ToolStripMenuItem();
-            this.MenuEditSelectAll = new System.Windows.Forms.ToolStripMenuItem();
-            this.MenuEditDeselectAll = new System.Windows.Forms.ToolStripMenuItem();
+            this.MenuEditSelectRelevant = new System.Windows.Forms.ToolStripMenuItem();
             this.MainPanel.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.TabUpgrade.SuspendLayout();
@@ -126,6 +127,30 @@
             this.CandyShopMenu.TabIndex = 3;
             this.CandyShopMenu.Text = "Menu";
             // 
+            // MenuEdit
+            // 
+            this.MenuEdit.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.MenuEditSelectAll,
+            this.MenuEditSelectRelevant,
+            this.MenuEditDeselectAll});
+            this.MenuEdit.Name = "MenuEdit";
+            this.MenuEdit.Size = new System.Drawing.Size(39, 20);
+            this.MenuEdit.Text = "&Edit";
+            // 
+            // MenuEditSelectAll
+            // 
+            this.MenuEditSelectAll.Name = "MenuEditSelectAll";
+            this.MenuEditSelectAll.Size = new System.Drawing.Size(251, 22);
+            this.MenuEditSelectAll.Text = "&Select all";
+            this.MenuEditSelectAll.Click += new System.EventHandler(this.MenuEditSelectAll_Click);
+            // 
+            // MenuEditDeselectAll
+            // 
+            this.MenuEditDeselectAll.Name = "MenuEditDeselectAll";
+            this.MenuEditDeselectAll.Size = new System.Drawing.Size(251, 22);
+            this.MenuEditDeselectAll.Text = "&Deselect all";
+            this.MenuEditDeselectAll.Click += new System.EventHandler(this.MenuEditDeselectAll_Click);
+            // 
             // MenuExtras
             // 
             this.MenuExtras.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -164,28 +189,12 @@
             this.MenuHelpLicense.Text = "&License";
             this.MenuHelpLicense.Click += new System.EventHandler(this.MenuHelpLicense_Click);
             // 
-            // MenuEdit
+            // MenuEditSelectRelevant
             // 
-            this.MenuEdit.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.MenuEditSelectAll,
-            this.MenuEditDeselectAll});
-            this.MenuEdit.Name = "MenuEdit";
-            this.MenuEdit.Size = new System.Drawing.Size(39, 20);
-            this.MenuEdit.Text = "&Edit";
-            // 
-            // MenuEditSelectAll
-            // 
-            this.MenuEditSelectAll.Name = "MenuEditSelectAll";
-            this.MenuEditSelectAll.Size = new System.Drawing.Size(133, 22);
-            this.MenuEditSelectAll.Text = "&Select all";
-            this.MenuEditSelectAll.Click += new System.EventHandler(this.MenuEditSelectAll_Click);
-            // 
-            // MenuEditDeselectAll
-            // 
-            this.MenuEditDeselectAll.Name = "MenuEditDeselectAll";
-            this.MenuEditDeselectAll.Size = new System.Drawing.Size(133, 22);
-            this.MenuEditDeselectAll.Text = "&Deselect all";
-            this.MenuEditDeselectAll.Click += new System.EventHandler(this.MenuEditDeselectAll_Click);
+            this.MenuEditSelectRelevant.Name = "MenuEditSelectRelevant";
+            this.MenuEditSelectRelevant.Size = new System.Drawing.Size(251, 22);
+            this.MenuEditSelectRelevant.Text = "Select &normal and meta packages";
+            this.MenuEditSelectRelevant.Click += new System.EventHandler(this.MenuEditSelectRelevant_Click);
             // 
             // CandyShopForm
             // 
@@ -229,5 +238,6 @@
         private System.Windows.Forms.ToolStripMenuItem MenuEdit;
         private System.Windows.Forms.ToolStripMenuItem MenuEditSelectAll;
         private System.Windows.Forms.ToolStripMenuItem MenuEditDeselectAll;
+        private System.Windows.Forms.ToolStripMenuItem MenuEditSelectRelevant;
     }
 }

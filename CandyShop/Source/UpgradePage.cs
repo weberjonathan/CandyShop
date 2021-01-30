@@ -57,10 +57,11 @@ namespace CandyShop
                             pckg.Pinned.ToString()
                         });
 
-                        item.Checked = !(pckg.HasSuffix && pckg.HasMetaPackage);
                         LstPackages.Items.Add(item);
                     }
                 }
+
+                CheckNormalAndMetaItems();
             }
         }
 
@@ -69,17 +70,27 @@ namespace CandyShop
                 List<ChocolateyPackage> rtn = new List<ChocolateyPackage>();
                 foreach (ListViewItem item in LstPackages.CheckedItems)
                 {
-                    rtn.Add(_OutdatedPackages.Find(pckg => pckg.Name.Equals(item.Text)));
+                    rtn.Add(FindPackageByName(item.Text));
                 }
                 return rtn;
             }
         }
+
 
         public void CheckAllItems()
         {
             foreach (ListViewItem item in LstPackages.Items)
             {
                 item.Checked = true;
+            }
+        }
+
+        public void CheckNormalAndMetaItems()
+        {
+            foreach (ListViewItem item in LstPackages.Items)
+            {
+                ChocolateyPackage pckg = FindPackageByName(item.Text);
+                item.Checked = !(pckg.HasMetaPackage && pckg.HasSuffix);
             }
         }
 
@@ -105,6 +116,12 @@ namespace CandyShop
             LstPackages.Columns[1].Width = (int)Math.Floor(availWidth * .3);
             LstPackages.Columns[2].Width = (int)Math.Floor(availWidth * .3);
             LstPackages.Columns[3].Width = pinnedWidth;
+        }
+
+        // TODO why no dict?
+        private ChocolateyPackage FindPackageByName(string name)
+        {
+            return _OutdatedPackages.Find(pckg => pckg.Name.Equals(name));
         }
     }
 }

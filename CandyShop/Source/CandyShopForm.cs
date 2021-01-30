@@ -67,6 +67,11 @@ namespace CandyShop
             UpgradePage.CheckAllItems();
         }
 
+        private void MenuEditSelectRelevant_Click(object sender, EventArgs e)
+        {
+            UpgradePage.CheckNormalAndMetaItems();
+        }
+
         private void MenuEditDeselectAll_Click(object sender, EventArgs e)
         {
             UpgradePage.UncheckAllItems();
