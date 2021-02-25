@@ -15,7 +15,7 @@ __[Visit the gallery.](/docs/gallery.md)__
 
 ## Build Instructions
 1. Make sure the .NET Core SDK 3.1 or higher is installed on your system (`dotnet --version`) or download it (https://dotnet.microsoft.com/download/dotnet-core/3.1).
-1. `git clone https://github.com/weberjonathan/CandyShop.git`
+1. `git clone https://github.com/weberjonathan/CandyShop.git -b release-0.2`
 2. `cd ./CandyShop/CandyShop/`
 3. Run `dotnet publish` with appropriate options. See example below or visit https://docs.microsoft.com/en-us/dotnet/core/tools/dotnet-build for more information.
 
