@@ -193,6 +193,16 @@ namespace CandyShop
                 }
             }
 
+            // display results
+            IntPtr handle = GetConsoleWindow();
+            if (!IntPtr.Zero.Equals(handle))
+            {
+                SetForegroundWindow(handle);
+            }
+            Console.CursorVisible = false;
+            Console.Write("\nPress any key to continue... ");
+            Console.ReadKey();
+
             // remove shortcuts
             if (shortcuts.Count > 0)
             {
@@ -229,14 +239,6 @@ namespace CandyShop
             }
 
             // exit
-            IntPtr handle = GetConsoleWindow();
-            if (!IntPtr.Zero.Equals(handle))
-            {
-                SetForegroundWindow(handle);
-            }
-            Console.CursorVisible = false;
-            Console.Write("\nPress any key to terminate... ");
-            Console.ReadKey();
             ExitThread();
         }
     }
