@@ -224,7 +224,7 @@ namespace CandyShop
             this.ProgressBarTotal.Name = "ProgressBarTotal";
             this.ProgressBarTotal.Size = new System.Drawing.Size(605, 23);
             this.ProgressBarTotal.Step = 1;
-            this.ProgressBarTotal.Style = System.Windows.Forms.ProgressBarStyle.Marquee;
+            this.ProgressBarTotal.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
             this.ProgressBarTotal.TabIndex = 0;
             // 
             // UpgradePage
