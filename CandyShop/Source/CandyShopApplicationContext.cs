@@ -162,16 +162,20 @@ namespace CandyShop
             Queue<string> shortcuts = new Queue<string>();
             using (FileSystemWatcher watcher = new FileSystemWatcher())
             {
+                watcher.BeginInit();
+                
                 watcher.Path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
                 watcher.Filter = "*.lnk";
                 watcher.IncludeSubdirectories = false;
                 watcher.NotifyFilter = NotifyFilters.FileName;
                 watcher.InternalBufferSize = 65536; // TODO test; incurs performance penalty so remove if not useful
+                watcher.EnableRaisingEvents = true;
                 watcher.Created += new FileSystemEventHandler((sender, e) =>
                 {
                     shortcuts.Enqueue(e.FullPath);
                 });
-                watcher.EnableRaisingEvents = true;
+                
+                watcher.EndInit();
 
                 // upgrade
                 AllocConsole();
