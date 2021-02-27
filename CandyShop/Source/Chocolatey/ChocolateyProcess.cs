@@ -16,7 +16,9 @@ namespace CandyShop.Chocolatey
             Args = args;
         }
 
-        public string Output { get; private set; } = "";
+        public event DataReceivedEventHandler OutputDataReceived;
+
+        public List<string> Output { get; private set; } = new List<string>();
 
         public List<List<string>> FormattedOutput { get; private set; } = new List<List<string>>();
 
@@ -33,10 +35,17 @@ namespace CandyShop.Chocolatey
             try
             {
                 Process proc = Process.Start(procInfo);
-                string output = proc.StandardOutput.ReadToEnd();
+
+                // TODO testing!!!
+                proc.BeginOutputReadLine();
+                proc.OutputDataReceived += new DataReceivedEventHandler((sender, e) =>
+                {
+                    OutputDataReceived?.Invoke(this, e);
+                    Output.Add(e.Data);
+                });
+                // ---
 
                 proc.WaitForExit();
-                Output = output;
 
                 if (proc.ExitCode != 0)
                 {
@@ -77,12 +86,12 @@ namespace CandyShop.Chocolatey
             }
         }
 
-        private List<List<string>> FormatChocoOut(string output)
+        private List<List<string>> FormatChocoOut(List<string> output)
         {
             List<List<string>> rtn = new List<List<string>>();
 
             // parse head
-            Queue<string> outputLines = new Queue<string>(output.Split("\r\n"));
+            Queue<string> outputLines = new Queue<string>(output);
             if (outputLines.Count > 0)
             {
                 if (!outputLines.Dequeue().StartsWith("Chocolatey v"))
