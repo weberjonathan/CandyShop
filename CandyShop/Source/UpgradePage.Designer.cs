@@ -37,21 +37,15 @@ namespace CandyShop
             this.BtnUpgradeSelected = new System.Windows.Forms.Button();
             this.BtnUpgradeAll = new System.Windows.Forms.Button();
             this.BtnCancel = new System.Windows.Forms.Button();
-            this.PanelBottom = new System.Windows.Forms.Panel();
+            this.panel2 = new System.Windows.Forms.Panel();
             this.LblLoading = new System.Windows.Forms.Label();
             this.LstPackages = new System.Windows.Forms.ListView();
             this.colName = new System.Windows.Forms.ColumnHeader();
             this.colCurrent = new System.Windows.Forms.ColumnHeader();
             this.colAvail = new System.Windows.Forms.ColumnHeader();
             this.colPinned = new System.Windows.Forms.ColumnHeader();
-            this.PanelProgress = new System.Windows.Forms.Panel();
-            this.label1 = new System.Windows.Forms.Label();
-            this.ProgressBarPackage = new System.Windows.Forms.ProgressBar();
-            this.lblTotalProgress = new System.Windows.Forms.Label();
-            this.ProgressBarTotal = new System.Windows.Forms.ProgressBar();
             this.PanelTop.SuspendLayout();
-            this.PanelBottom.SuspendLayout();
-            this.PanelProgress.SuspendLayout();
+            this.panel2.SuspendLayout();
             this.SuspendLayout();
             // 
             // LblAdmin
@@ -117,16 +111,16 @@ namespace CandyShop
             this.BtnCancel.Text = "&Cancel";
             this.BtnCancel.UseVisualStyleBackColor = true;
             // 
-            // PanelBottom
+            // panel2
             // 
-            this.PanelBottom.Controls.Add(this.BtnUpgradeSelected);
-            this.PanelBottom.Controls.Add(this.BtnUpgradeAll);
-            this.PanelBottom.Controls.Add(this.BtnCancel);
-            this.PanelBottom.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.PanelBottom.Location = new System.Drawing.Point(0, 478);
-            this.PanelBottom.Name = "PanelBottom";
-            this.PanelBottom.Size = new System.Drawing.Size(637, 55);
-            this.PanelBottom.TabIndex = 0;
+            this.panel2.Controls.Add(this.BtnUpgradeSelected);
+            this.panel2.Controls.Add(this.BtnUpgradeAll);
+            this.panel2.Controls.Add(this.BtnCancel);
+            this.panel2.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.panel2.Location = new System.Drawing.Point(0, 478);
+            this.panel2.Name = "panel2";
+            this.panel2.Size = new System.Drawing.Size(637, 55);
+            this.panel2.TabIndex = 0;
             // 
             // LblLoading
             // 
@@ -176,73 +170,19 @@ namespace CandyShop
             // 
             this.colPinned.Text = "Pinned";
             // 
-            // PanelProgress
-            // 
-            this.PanelProgress.Controls.Add(this.label1);
-            this.PanelProgress.Controls.Add(this.ProgressBarPackage);
-            this.PanelProgress.Controls.Add(this.lblTotalProgress);
-            this.PanelProgress.Controls.Add(this.ProgressBarTotal);
-            this.PanelProgress.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.PanelProgress.Location = new System.Drawing.Point(0, 332);
-            this.PanelProgress.Name = "PanelProgress";
-            this.PanelProgress.Size = new System.Drawing.Size(637, 146);
-            this.PanelProgress.TabIndex = 5;
-            this.PanelProgress.Visible = false;
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(16, 19);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(99, 15);
-            this.label1.TabIndex = 3;
-            this.label1.Text = "Package progress";
-            // 
-            // ProgressBarPackage
-            // 
-            this.ProgressBarPackage.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.ProgressBarPackage.Location = new System.Drawing.Point(16, 39);
-            this.ProgressBarPackage.Name = "ProgressBarPackage";
-            this.ProgressBarPackage.Size = new System.Drawing.Size(605, 23);
-            this.ProgressBarPackage.Step = 1;
-            this.ProgressBarPackage.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
-            this.ProgressBarPackage.TabIndex = 2;
-            // 
-            // lblTotalProgress
-            // 
-            this.lblTotalProgress.AutoSize = true;
-            this.lblTotalProgress.Location = new System.Drawing.Point(16, 83);
-            this.lblTotalProgress.Name = "lblTotalProgress";
-            this.lblTotalProgress.Size = new System.Drawing.Size(80, 15);
-            this.lblTotalProgress.TabIndex = 1;
-            this.lblTotalProgress.Text = "Total progress";
-            // 
-            // ProgressBarTotal
-            // 
-            this.ProgressBarTotal.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.ProgressBarTotal.Location = new System.Drawing.Point(16, 103);
-            this.ProgressBarTotal.Name = "ProgressBarTotal";
-            this.ProgressBarTotal.Size = new System.Drawing.Size(605, 23);
-            this.ProgressBarTotal.Step = 1;
-            this.ProgressBarTotal.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
-            this.ProgressBarTotal.TabIndex = 0;
-            // 
             // UpgradePage
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.Controls.Add(this.PanelProgress);
             this.Controls.Add(this.LblLoading);
             this.Controls.Add(this.LstPackages);
-            this.Controls.Add(this.PanelBottom);
+            this.Controls.Add(this.panel2);
             this.Controls.Add(this.PanelTop);
             this.Name = "UpgradePage";
             this.Size = new System.Drawing.Size(637, 533);
             this.PanelTop.ResumeLayout(false);
             this.PanelTop.PerformLayout();
-            this.PanelBottom.ResumeLayout(false);
-            this.PanelProgress.ResumeLayout(false);
-            this.PanelProgress.PerformLayout();
+            this.panel2.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -255,7 +195,7 @@ namespace CandyShop
         private System.Windows.Forms.Button BtnUpgradeSelected;
         private System.Windows.Forms.Button BtnUpgradeAll;
         private System.Windows.Forms.Button BtnCancel;
-        private System.Windows.Forms.Panel PanelBottom;
+        private System.Windows.Forms.Panel panel2;
         private System.Windows.Forms.Label LblLoading;
         private System.Windows.Forms.ListView LstPackages;
         private System.Windows.Forms.ColumnHeader colName;
@@ -263,10 +203,5 @@ namespace CandyShop
         private System.Windows.Forms.ColumnHeader colAvail;
         private System.Windows.Forms.ColumnHeader colPinned;
         private System.Windows.Forms.Panel panel1;
-        private System.Windows.Forms.Panel PanelProgress;
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.ProgressBar ProgressBarPackage;
-        private System.Windows.Forms.Label lblTotalProgress;
-        private System.Windows.Forms.ProgressBar ProgressBarTotal;
     }
 }
