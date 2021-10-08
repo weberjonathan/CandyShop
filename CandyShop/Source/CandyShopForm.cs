@@ -4,13 +4,26 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Security.Principal;
+using System.Text;
 using System.Windows.Forms;
 
 namespace CandyShop
 {
     public partial class CandyShopForm : Form
     {
+        [DllImport("kernel32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private static extern bool AllocConsole();
+
+        [DllImport("kernel32.dll", ExactSpelling = true)]
+        private static extern IntPtr GetConsoleWindow();
+
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private static extern bool SetForegroundWindow(IntPtr hWnd);
+
         private const string TASKNAME = "CandyShopLaunch";
         private bool WindowsTaskExists; // TODO create Context or properties class that contains information like this
 
@@ -121,7 +134,7 @@ namespace CandyShop
 
         private void MenuHelpGithub_Click(object sender, EventArgs e)
         {
-            launchUrl("https://github.com/weberjonathan/CandyShop");
+            LaunchUrl("https://github.com/weberjonathan/CandyShop");
         }
 
         private void MenuHelpLicense_Click(object sender, EventArgs e)
@@ -134,12 +147,13 @@ namespace CandyShop
 
         private void MenuHelpMetaPackages_Click(object sender, EventArgs e)
         {
-            launchUrl("https://docs.chocolatey.org/en-us/faqs#what-is-the-difference-between-packages-no-suffix-as-compared-to.install.portable");
+            LaunchUrl("https://docs.chocolatey.org/en-us/faqs#what-is-the-difference-between-packages-no-suffix-as-compared-to.install.portable");
         }
 
         private void UpgradePage_UpgradeAllClick(object sender, EventArgs e)
         {
             SelectedPackages = UpgradePage.OutdatedPackages;
+            LaunchUpgradeConsole(SelectedPackages);
             this.DialogResult = DialogResult.OK;
             this.Close();
         }
@@ -149,6 +163,7 @@ namespace CandyShop
             SelectedPackages = UpgradePage.SelectedPackages;
             if (SelectedPackages.Count > 0)
             {
+                LaunchUpgradeConsole(SelectedPackages);
                 this.DialogResult = DialogResult.OK;
                 this.Close();
             }
@@ -202,7 +217,7 @@ namespace CandyShop
             MessageBox.Show(msg, Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
 
-        private void launchUrl(string url)
+        private void LaunchUrl(string url)
         {
             ProcessStartInfo info = new ProcessStartInfo()
             {
@@ -213,6 +228,98 @@ namespace CandyShop
             };
 
             Process.Start(info);
+        }
+
+        private void LaunchUpgradeConsole(List<ChocolateyPackage> packages)
+        {
+            this.Hide();
+            
+            // setup watcher for desktop shortcuts
+            Queue<string> shortcuts = new Queue<string>();
+            using (FileSystemWatcher watcher = new FileSystemWatcher())
+            {
+                watcher.BeginInit();
+
+                watcher.Path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+                watcher.Filter = "*.lnk";
+                watcher.IncludeSubdirectories = false;
+                watcher.NotifyFilter = NotifyFilters.FileName;
+                watcher.InternalBufferSize = 65536; // TODO test; incurs performance penalty so remove if not useful
+                watcher.EnableRaisingEvents = true;
+                watcher.Created += new FileSystemEventHandler((sender, e) =>
+                {
+                    shortcuts.Enqueue(e.FullPath);
+                });
+
+                watcher.EndInit();
+
+                // upgrade
+                AllocConsole();
+                Console.CursorVisible = false;
+
+                try
+                {
+                    ChocolateyWrapper.Upgrade(packages);
+                }
+                catch (ChocolateyException e)
+                {
+                    MessageBox.Show(
+                        $"An error occurred while executing Chocolatey: \"{e.Message}\"",
+                        $"{Application.ProductName} Error",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Error
+                    );
+                    Application.Exit(); // TODO test
+                }
+            }
+
+            // display results
+            IntPtr handle = GetConsoleWindow();
+            if (!IntPtr.Zero.Equals(handle))
+            {
+                SetForegroundWindow(handle);
+            }
+            Console.CursorVisible = false;
+            Console.Write("\nPress any key to continue... ");
+            Console.ReadKey();
+
+            // remove shortcuts
+            if (shortcuts.Count > 0)
+            {
+                StringBuilder msg = new StringBuilder();
+                msg.Append($"During the upgrade process {shortcuts.Count} new desktop shortcut(s) were created:\n\n");
+                foreach (string shortcut in shortcuts)
+                {
+                    msg.Append($"- {Path.GetFileNameWithoutExtension(shortcut)}\n");
+                }
+                msg.Append($"\nDo you want to delete all {shortcuts.Count} shortcut(s)?");
+
+                DialogResult result = MessageBox.Show(
+                    msg.ToString(),
+                    Application.ProductName,
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Question,
+                    MessageBoxDefaultButton.Button1);
+
+                if (result.Equals(DialogResult.Yes))
+                {
+                    while (shortcuts.Count > 0)
+                    {
+                        string shortcut = shortcuts.Dequeue();
+                        try
+                        {
+                            File.Delete(shortcut);
+                        }
+                        catch (IOException)
+                        {
+                            // TODO
+                        }
+                    }
+                }
+            }
+
+            // exit
+            Application.Exit();
         }
     }
 }
