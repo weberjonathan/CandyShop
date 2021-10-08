@@ -69,8 +69,7 @@ namespace CandyShop.Presentation
             TxtDetails.Text = "Loading ...";
 
             string selectedPackageName = SelectedPackage.Name;
-            string details;
-            if (!PackageDetailsCache.TryGetValue(selectedPackageName, out details))
+            if (!PackageDetailsCache.TryGetValue(selectedPackageName, out string details))
             {
                 try
                 {

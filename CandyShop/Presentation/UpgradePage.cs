@@ -38,7 +38,7 @@ namespace CandyShop
         public List<ChocolateyPackage> OutdatedPackages {
             get => _OutdatedPackages;
             set {
-                _OutdatedPackages.AddRange(value); // TODO surely this should not be added but assigned ?
+                _OutdatedPackages = value;
 
                 LblLoading.Visible = false;
 

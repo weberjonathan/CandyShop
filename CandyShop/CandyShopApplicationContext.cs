@@ -3,9 +3,6 @@ using CandyShop.Presentation;
 using CandyShop.Properties;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Runtime.InteropServices;
-using System.Text;
 using System.Windows.Forms;
 
 namespace CandyShop
@@ -16,18 +13,15 @@ namespace CandyShop
         {
             // determine silent mode
             List<string> args = new List<string>(Environment.GetCommandLineArgs());
-            LaunchInBackground = args.Find(s => s.Equals("--background") ||
+            bool launchMinimized = args.Find(s => s.Equals("--background") ||
                                                 s.Equals("-b")) != null;
 
-            // hier ein service, darin outdated fetchen
-            // durch event des service in dieser klasse notification showen
-            // durch event die Liste in der Form füllen
-
             // launch with form or in tray
-            if (LaunchInBackground)
+            if (launchMinimized)
             {
-                NotifyIcon icon = InitTrayIcon();
-                FetchOutdatedAndShowNotificationAsync(icon);
+                // creates a tray icon, displays a notification if outdated packages
+                // are found and opens the upgrade UI on click
+                RunInBackground();
             }
             else
             {
@@ -35,7 +29,53 @@ namespace CandyShop
             }
         }
 
-        public bool LaunchInBackground { get; }
+        private async void RunInBackground()
+        {
+            List<ChocolateyPackage> packages = null;
+
+            // create tray icon
+            NotifyIcon icon = InitTrayIcon();
+
+            // obtain outdated packages
+            try
+            {
+                packages = await ChocolateyWrapper.CheckOutdatedAsync();
+            }
+            catch (ChocolateyException)
+            {
+                icon.BalloonTipIcon = ToolTipIcon.Error;
+                icon.Text = Application.ProductName;
+                icon.BalloonTipTitle = $"Candy Shop";
+                icon.BalloonTipText = Properties.strings.Err_CheckOutdated;
+                icon.ShowBalloonTip(2000);
+                Environment.Exit(0);
+            }
+
+            // create click handlers
+            icon.BalloonTipClicked += new EventHandler((sender, e) =>
+            {
+                new CandyShopForm(packages).Show();
+            });
+
+            icon.MouseClick += new MouseEventHandler((sender, e) =>
+            {
+                if (e.Button.Equals(MouseButtons.Left))
+                {
+                    new CandyShopForm(packages).Show();
+                }
+            });
+
+
+            if (packages.Count > 0)
+            {
+                CandyShopForm form = new CandyShopForm(packages);
+                ShowNotification(packages.Count, icon);
+            }
+            else
+            {
+                Environment.Exit(0);
+            }
+        }
 
         private NotifyIcon InitTrayIcon()
         {
@@ -67,52 +107,13 @@ namespace CandyShop
             return rtn;
         }
 
-        private async void FetchOutdatedAndShowNotificationAsync(NotifyIcon icon)
+        private void ShowNotification(int packageCount, NotifyIcon icon)
         {
-            List<ChocolateyPackage> packages = null;
-
-            // obtain outdated packages
-            try
-            {
-                packages = await ChocolateyWrapper.CheckOutdatedAsync();
-            }
-            catch (ChocolateyException)
-            {
-                icon.BalloonTipIcon = ToolTipIcon.Error;
-                icon.Text = Application.ProductName;
-                icon.BalloonTipTitle = $"Candy Shop";
-                icon.BalloonTipText = Properties.strings.Err_CheckOutdated;
-                icon.ShowBalloonTip(2000);
-                Environment.Exit(0);
-            }
-
-            // show notification and create click handlers
-            if (packages.Count > 0)
-            {
-                icon.BalloonTipClicked += new EventHandler((sender, e) =>
-                {
-                    new CandyShopForm(packages).Show();
-                });
-
-                icon.MouseClick += new MouseEventHandler((sender, e) =>
-                {
-                    if (e.Button.Equals(MouseButtons.Left))
-                    {
-                        new CandyShopForm(packages).Show();
-                    }
-                });
-
-                icon.BalloonTipIcon = ToolTipIcon.Info;
-                icon.Text = Application.ProductName;
-                icon.BalloonTipTitle = $"{packages.Count} package{(packages.Count == 1 ? " is" : "s are")} outdated.";
-                icon.BalloonTipText = $"To upgrade click here or the tray icon later.";
-                icon.ShowBalloonTip(2000);
-            }
-            else
-            {
-                // terminate, bc app was launched silently but no packages are outdated and thus nothing is to be done
-                Environment.Exit(0);
-            }
+            icon.BalloonTipIcon = ToolTipIcon.Info;
+            icon.Text = Application.ProductName;
+            icon.BalloonTipTitle = $"{packageCount} package{(packageCount == 1 ? " is" : "s are")} outdated.";
+            icon.BalloonTipText = $"To upgrade click here or the tray icon later.";
+            icon.ShowBalloonTip(2000);
         }
     }
 }

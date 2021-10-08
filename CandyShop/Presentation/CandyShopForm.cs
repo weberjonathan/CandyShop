@@ -153,7 +153,7 @@ namespace CandyShop.Presentation
         private void UpgradePage_UpgradeAllClick(object sender, EventArgs e)
         {
             SelectedPackages = UpgradePage.OutdatedPackages;
-            LaunchUpgradeConsole(SelectedPackages);
+            PerformPackageUpgrade(SelectedPackages);
             this.DialogResult = DialogResult.OK;
             this.Close();
         }
@@ -163,7 +163,7 @@ namespace CandyShop.Presentation
             SelectedPackages = UpgradePage.SelectedPackages;
             if (SelectedPackages.Count > 0)
             {
-                LaunchUpgradeConsole(SelectedPackages);
+                PerformPackageUpgrade(SelectedPackages);
                 this.DialogResult = DialogResult.OK;
                 this.Close();
             }
@@ -174,8 +174,6 @@ namespace CandyShop.Presentation
             this.DialogResult = DialogResult.Cancel;
             this.Close();
         }
-
-        
 
         private async void GetOutdatedAsync()
         {
@@ -230,7 +228,7 @@ namespace CandyShop.Presentation
             Process.Start(info);
         }
 
-        private void LaunchUpgradeConsole(List<ChocolateyPackage> packages)
+        private void PerformPackageUpgrade(List<ChocolateyPackage> packages)
         {
             this.Hide();
             
