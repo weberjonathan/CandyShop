@@ -212,10 +212,8 @@
             this.ClientSize = new System.Drawing.Size(730, 534);
             this.Controls.Add(this.MainPanel);
             this.Controls.Add(this.CandyShopMenu);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.CandyShopMenu;
-            this.MaximizeBox = false;
             this.Name = "CandyShopForm";
             this.Text = "ChocoAutoUpdateForm";
             this.Load += new System.EventHandler(this.ChocoAutoUpdateForm_Load);
