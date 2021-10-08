@@ -36,7 +36,17 @@ namespace CandyShop.Chocolatey
 
             // launch process
             ChocolateyProcess p = new ChocolateyProcess($"upgrade {argument} -y");
+            p.FailOnNonZeroExitCode = false;
             p.Execute();
+
+            // check exit
+            // TODO send appropriate messages for non-zero valid exit codes
+            // no priority because console is displayed and choco displays that information in console
+            var validExitCodes = new List<int> { 0, 1641, 3010, 350, 1604 };
+            if (!validExitCodes.Contains(p.ExitCode))
+            {
+                throw new ChocolateyException($"choco did not exit cleanly. Returned {p.ExitCode}.");
+            }
         }
 
         /// <exception cref="ChocolateyException"></exception>

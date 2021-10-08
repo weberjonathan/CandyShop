@@ -20,6 +20,10 @@ namespace CandyShop.Chocolatey
 
         public List<List<string>> FormattedOutput { get; private set; } = new List<List<string>>();
 
+        public int ExitCode { get; private set; }
+
+        public bool FailOnNonZeroExitCode { get; set; } = true;
+
         /// <exception cref="ChocolateyException"></exception>
         public void ExecuteHidden()
         {
@@ -37,8 +41,9 @@ namespace CandyShop.Chocolatey
 
                 proc.WaitForExit();
                 Output = output;
+                ExitCode = proc.ExitCode;
 
-                if (proc.ExitCode != 0)
+                if (FailOnNonZeroExitCode && proc.ExitCode != 0)
                 {
                     throw new ChocolateyException($"choco did not exit cleanly. Returned {proc.ExitCode}.");
                 }
@@ -65,8 +70,9 @@ namespace CandyShop.Chocolatey
             {
                 Process proc = Process.Start(procInfo);
                 proc.WaitForExit();
+                ExitCode = proc.ExitCode;
 
-                if (proc.ExitCode != 0)
+                if (FailOnNonZeroExitCode && proc.ExitCode != 0)
                 {
                     throw new ChocolateyException($"choco did not exit cleanly. Returned {proc.ExitCode}.");
                 }
