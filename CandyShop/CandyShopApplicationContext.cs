@@ -1,5 +1,5 @@
 ﻿using CandyShop.Chocolatey;
-using CandyShop.Presentation;
+using CandyShop.Controls;
 using CandyShop.Properties;
 using System;
 using System.Collections.Generic;
