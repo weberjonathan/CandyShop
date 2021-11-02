@@ -1,7 +1,7 @@
 # Candy Shop
 ![CandyShop Example](/docs/example.jpg)
 
-_Candy Shop_ is a minimal UI for managing installed _[Chocolatey](https://chocolatey.org/)_ packages. It may also check for outdated packages in the background, notify the user and allow the installation of new versions by the push of a button. The application also provides an overview of installed packages.
+_Candy Shop_ is a minimal UI for managing installed _[Chocolatey](https://chocolatey.org/)_ packages. It may also check for outdated packages in the background, notify the user and allows upgrading packages through the push of a button. The application also provides an overview of installed packages.
 
 * Requires `choco` to be in PATH.
 * Default build requires administrator privileges. If this is not desired please swap the [`app.manifest`](CandyShop/app.manifest)-file with [`app.manifest.noadmin`](CandyShop/app.manifest.admin) and build the software using the instructions below.
