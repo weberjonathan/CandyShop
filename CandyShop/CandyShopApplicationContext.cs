@@ -34,13 +34,40 @@ namespace CandyShop
 
             // create form; performs package upgrade onFormClosed and exits afterwards
             _MainForm = new CandyShopForm();
-            _MainForm.FormClosed += new FormClosedEventHandler((sender, e) =>
+            _MainForm.FormClosing += new FormClosingEventHandler((sender, e) =>
             {
-                if (_MainForm.DialogResult == DialogResult.OK)
+                _MainForm.Hide();
+
+                if (launchMinimized)
                 {
-                    PerformPackageUpgrade(_MainForm.SelectedPackages);
+                    // perform upgrade and exit; or exit if closed by user; else keep running in tray
+                    if (_MainForm.DialogResult == DialogResult.OK && _MainForm.HasSelectedPackages)
+                    {
+                        PerformPackageUpgrade(_MainForm.SelectedPackages);
+                        Environment.Exit(0);
+                    }
+                    else if (_MainForm.DialogResult == DialogResult.None)
+                    {
+                        // closed using 'X' in upper right corner
+                        Environment.Exit(0);
+                    }
+                    else
+                    {
+                        _MainForm.DialogResult = DialogResult.None;
+                        e.Cancel = true;
+                    }
+                }
+                else
+                {
+                    // perform upgrade if needed; always exit
+                    if (_MainForm.DialogResult == DialogResult.OK && _MainForm.HasSelectedPackages)
+                    {
+                        PerformPackageUpgrade(_MainForm.SelectedPackages);
+                    }
                     Environment.Exit(0);
                 }
+                
+                
             });
 
             // launch with form or in tray
@@ -54,7 +81,7 @@ namespace CandyShop
             {
                 // intialize loading of packages and show form
                 _MainForm.LoadPackages();
-                _MainForm.ShowDialog();
+                _MainForm.Show();
             }
         }
 
@@ -85,12 +112,12 @@ namespace CandyShop
             // create click handlers
             icon.BalloonTipClicked += new EventHandler((sender, e) =>
             {
-                _MainForm.ShowDialog();
+                _MainForm.Show();
             });
 
             icon.MouseClick += new MouseEventHandler((sender, e) =>
             {
-                _MainForm.ShowDialog();
+                _MainForm.Show();
             });
 
 

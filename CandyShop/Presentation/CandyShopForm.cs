@@ -143,7 +143,6 @@ namespace CandyShop.Presentation
         private void UpgradePage_UpgradeAllClick(object sender, EventArgs e)
         {
             SelectedPackages = UpgradePage.OutdatedPackages;
-            this.Hide();
             this.DialogResult = DialogResult.OK;
             this.Close();
         }
@@ -153,7 +152,6 @@ namespace CandyShop.Presentation
             SelectedPackages = UpgradePage.SelectedPackages;
             if (SelectedPackages.Count > 0)
             {
-                this.Hide();
                 this.DialogResult = DialogResult.OK;
                 this.Close();
             }
