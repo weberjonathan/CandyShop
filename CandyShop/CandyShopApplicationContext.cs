@@ -3,18 +3,45 @@ using CandyShop.Presentation;
 using CandyShop.Properties;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Runtime.InteropServices;
+using System.Text;
 using System.Windows.Forms;
 
 namespace CandyShop
 {
     public class CandyShopApplicationContext : ApplicationContext
     {
+        [DllImport("kernel32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private static extern bool AllocConsole();
+
+        [DllImport("kernel32.dll", ExactSpelling = true)]
+        private static extern IntPtr GetConsoleWindow();
+
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private static extern bool SetForegroundWindow(IntPtr hWnd);
+
+        private CandyShopForm _MainForm;
+
         public CandyShopApplicationContext()
         {
             // determine silent mode
             List<string> args = new List<string>(Environment.GetCommandLineArgs());
             bool launchMinimized = args.Find(s => s.Equals("--background") ||
                                                 s.Equals("-b")) != null;
+
+            // create form; performs package upgrade onFormClosed and exits afterwards
+            _MainForm = new CandyShopForm();
+            _MainForm.FormClosed += new FormClosedEventHandler((sender, e) =>
+            {
+                if (_MainForm.DialogResult == DialogResult.OK)
+                {
+                    PerformPackageUpgrade(_MainForm.SelectedPackages);
+                    Environment.Exit(0);
+                }
+            });
 
             // launch with form or in tray
             if (launchMinimized)
@@ -25,7 +52,9 @@ namespace CandyShop
             }
             else
             {
-                new CandyShopForm().Show();
+                // intialize loading of packages and show form
+                _MainForm.LoadPackages();
+                _MainForm.ShowDialog();
             }
         }
 
@@ -51,24 +80,22 @@ namespace CandyShop
                 Environment.Exit(0);
             }
 
+            _MainForm.SetOutdatedPackages(packages);
+
             // create click handlers
             icon.BalloonTipClicked += new EventHandler((sender, e) =>
             {
-                new CandyShopForm(packages).Show();
+                _MainForm.ShowDialog();
             });
 
             icon.MouseClick += new MouseEventHandler((sender, e) =>
             {
-                if (e.Button.Equals(MouseButtons.Left))
-                {
-                    new CandyShopForm(packages).Show();
-                }
+                _MainForm.ShowDialog();
             });
 
 
             if (packages.Count > 0)
             {
-                CandyShopForm form = new CandyShopForm(packages);
                 ShowNotification(packages.Count, icon);
             }
             else
@@ -114,6 +141,94 @@ namespace CandyShop
             icon.BalloonTipTitle = $"{packageCount} package{(packageCount == 1 ? " is" : "s are")} outdated.";
             icon.BalloonTipText = $"To upgrade click here or the tray icon later.";
             icon.ShowBalloonTip(2000);
+        }
+
+        private void PerformPackageUpgrade(List<ChocolateyPackage> packages)
+        {
+            // setup watcher for desktop shortcuts
+            Queue<string> shortcuts = new Queue<string>();
+            using (FileSystemWatcher watcher = new FileSystemWatcher())
+            {
+                watcher.BeginInit();
+
+                watcher.Path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+                watcher.Filter = "*.lnk";
+                watcher.IncludeSubdirectories = false;
+                watcher.NotifyFilter = NotifyFilters.FileName;
+                watcher.InternalBufferSize = 65536; // TODO test; incurs performance penalty so remove if not useful
+                watcher.EnableRaisingEvents = true;
+                watcher.Created += new FileSystemEventHandler((sender, e) =>
+                {
+                    shortcuts.Enqueue(e.FullPath);
+                });
+
+                watcher.EndInit();
+
+                // upgrade
+                AllocConsole();
+                Console.CursorVisible = false;
+
+                try
+                {
+                    ChocolateyWrapper.Upgrade(packages);
+                }
+                catch (ChocolateyException e)
+                {
+                    MessageBox.Show(
+                        $"An error occurred while executing Chocolatey: \"{e.Message}\"",
+                        $"{Application.ProductName} Error",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Error
+                    );
+
+                    return;
+                }
+            }
+
+            // display results
+            IntPtr handle = GetConsoleWindow();
+            if (!IntPtr.Zero.Equals(handle))
+            {
+                SetForegroundWindow(handle);
+            }
+            Console.CursorVisible = false;
+            Console.Write("\nPress any key to continue... ");
+            Console.ReadKey();
+
+            // remove shortcuts
+            if (shortcuts.Count > 0)
+            {
+                StringBuilder msg = new StringBuilder();
+                msg.Append($"During the upgrade process {shortcuts.Count} new desktop shortcut(s) were created:\n\n");
+                foreach (string shortcut in shortcuts)
+                {
+                    msg.Append($"- {Path.GetFileNameWithoutExtension(shortcut)}\n");
+                }
+                msg.Append($"\nDo you want to delete all {shortcuts.Count} shortcut(s)?");
+
+                DialogResult result = MessageBox.Show(
+                    msg.ToString(),
+                    Application.ProductName,
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Question,
+                    MessageBoxDefaultButton.Button1);
+
+                if (result.Equals(DialogResult.Yes))
+                {
+                    while (shortcuts.Count > 0)
+                    {
+                        string shortcut = shortcuts.Dequeue();
+                        try
+                        {
+                            File.Delete(shortcut);
+                        }
+                        catch (IOException)
+                        {
+                            // TODO
+                        }
+                    }
+                }
+            }
         }
     }
 }
