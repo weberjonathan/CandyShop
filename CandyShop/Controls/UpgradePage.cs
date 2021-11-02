@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
 
-namespace CandyShop
+namespace CandyShop.Controls
 {
     public partial class UpgradePage : UserControl
     {

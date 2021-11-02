@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
 
-namespace CandyShop.Presentation
+namespace CandyShop.Controls
 {
     public partial class InstalledPage : UserControl
     {

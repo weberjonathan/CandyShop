@@ -1,4 +1,4 @@
-﻿namespace CandyShop.Presentation
+﻿namespace CandyShop.Controls
 {
     partial class CandyShopForm
     {
@@ -32,9 +32,9 @@
             this.MainPanel = new System.Windows.Forms.Panel();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.TabUpgrade = new System.Windows.Forms.TabPage();
-            this.UpgradePage = new CandyShop.UpgradePage();
+            this.UpgradePage = new CandyShop.Controls.UpgradePage();
             this.TabInstalled = new System.Windows.Forms.TabPage();
-            this.InstalledPage = new CandyShop.Presentation.InstalledPage();
+            this.InstalledPage = new CandyShop.Controls.InstalledPage();
             this.columnHeader1 = new System.Windows.Forms.ColumnHeader();
             this.CandyShopMenu = new System.Windows.Forms.MenuStrip();
             this.MenuEdit = new System.Windows.Forms.ToolStripMenuItem();

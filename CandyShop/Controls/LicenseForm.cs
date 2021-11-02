@@ -1,6 +1,6 @@
 ﻿using System.Windows.Forms;
 
-namespace CandyShop.Presentation
+namespace CandyShop.Controls
 {
     public partial class LicenseForm : Form
     {

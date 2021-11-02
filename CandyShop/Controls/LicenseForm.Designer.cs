@@ -1,5 +1,5 @@
 ﻿
-namespace CandyShop.Presentation
+namespace CandyShop.Controls
 {
     partial class LicenseForm
     {

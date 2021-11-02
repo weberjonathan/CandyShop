@@ -7,7 +7,7 @@ using System.IO;
 using System.Security.Principal;
 using System.Windows.Forms;
 
-namespace CandyShop.Presentation
+namespace CandyShop.Controls
 {
     public partial class CandyShopForm : Form
     {

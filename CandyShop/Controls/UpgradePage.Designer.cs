@@ -1,6 +1,6 @@
 ﻿using CandyShop.Properties;
 
-namespace CandyShop
+namespace CandyShop.Controls
 {
     partial class UpgradePage
     {
