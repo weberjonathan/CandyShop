@@ -1,4 +1,5 @@
-﻿using System.Windows.Forms;
+﻿using System;
+using System.Windows.Forms;
 
 namespace CandyShop.Controls
 {
@@ -7,7 +8,7 @@ namespace CandyShop.Controls
         public LicenseForm()
         {
             InitializeComponent();
-            this.Text = $"{Application.ProductName} License";
+            this.Text = String.Format(Properties.Strings.License_Title, Application.ProductName);
             RtfLicense.SelectedRtf = Properties.Resources.AllLicenses;
             RtfLicense.DeselectAll();
         }

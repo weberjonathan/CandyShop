@@ -1,19 +1,28 @@
 ﻿using CandyShop.Chocolatey;
+using CandyShop.Properties;
 using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
 
 namespace CandyShop.Controls
 {
-    public partial class InstalledPage : UserControl
+    class PackageChangedEventArgs : EventArgs
+    {
+        public PackageChangedEventArgs(ChocolateyPackage selectedPackage)
+        {
+            SelectedPackage = selectedPackage;
+        }
+
+        public ChocolateyPackage SelectedPackage { get; }
+    }
+
+    partial class InstalledPage : UserControl
     {
         private List<ChocolateyPackage> _Packages = new List<ChocolateyPackage>();
-        private Dictionary<string, string> PackageDetailsCache = new Dictionary<string, string>();
 
         public InstalledPage()
         {
             InitializeComponent();
-            // SplitContainer.Panel2Collapsed = true;
 
             this.Resize += new EventHandler((sender, e) =>
             {
@@ -28,6 +37,10 @@ namespace CandyShop.Controls
                 LstPackages.Columns[1].Width = (int)Math.Floor(availWidth * .4);
             });
         }
+
+        public event EventHandler<PackageChangedEventArgs> SelectedPackageChanged;
+
+        public ChocolateyService ChocolateyService { get; set; }
 
         public List<ChocolateyPackage> Packages {
             get => _Packages;
@@ -62,37 +75,22 @@ namespace CandyShop.Controls
             }
         }
 
-        private async void LstPackages_SelectedIndexChanged(object sender, EventArgs e)
+        public void SetPackageDetails(ChocolateyPackage package, string packageDetails) {
+            if (SelectedPackage != null)
+            {
+                if (SelectedPackage.Name.Equals(package.Name))
+                {
+                    TxtDetails.Text = packageDetails;
+                }
+            }
+        }
+
+        private void LstPackages_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (SelectedPackage == null) return;
 
-            TxtDetails.Text = "Loading ...";
-
-            string selectedPackageName = SelectedPackage.Name;
-            if (!PackageDetailsCache.TryGetValue(selectedPackageName, out string details))
-            {
-                try
-                {
-                    details = await ChocolateyWrapper.GetInfoAsync(SelectedPackage);
-                    if (!PackageDetailsCache.ContainsKey(selectedPackageName))
-                    {
-                        PackageDetailsCache.Add(selectedPackageName, details);
-                    }
-                }
-                catch (ChocolateyException)
-                {
-                    details = Properties.strings.Form_Err_GetInfo;
-                }
-            }
-
-            // check if package whose info was waited on is still selected
-            if (SelectedPackage != null)
-            {
-                if (SelectedPackage.Name.Equals(selectedPackageName))
-                {
-                    TxtDetails.Text = details;
-                }
-            }
+            TxtDetails.Text = Strings.Txt_Loading;
+            SelectedPackageChanged?.Invoke(this, new PackageChangedEventArgs(SelectedPackage));
         }
 
         private void CheckHideSuffixed_CheckedChanged(object sender, EventArgs e)

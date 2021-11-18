@@ -117,16 +117,37 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="Btn_UpgradeSelected" xml:space="preserve">
+    <value>Upgrade ({0})</value>
+  </data>
   <data name="Err_CheckOutdated" xml:space="preserve">
-    <value>Failed to retrieve list of outdated applications. An error occurred during the execution of the Chocolatey program.</value>
+    <value>Failed to retrieve list of outdated applications. An error occurred during the execution of Chocolatey.</value>
   </data>
-  <data name="Form_Err_GetInfo" xml:space="preserve">
-    <value>Failed to retrieve package info. An error occurred during the execution of the Chocolatey program.</value>
+  <data name="Err_GetInfo" xml:space="preserve">
+    <value>Failed to retrieve package info. An error occurred during the execution of Chocolatey.</value>
   </data>
-  <data name="Form_Err_ListInstalled" xml:space="preserve">
-    <value>Failed to retrieve list of installed applications. An error occurred during the execution of the Chocolatey program.</value>
+  <data name="Err_ListInstalled" xml:space="preserve">
+    <value>Failed to retrieve list of installed applications. An error occurred during the execution of Chocolatey.</value>
   </data>
-  <data name="Form_Err_RequireAdmin" xml:space="preserve">
+  <data name="Err_RequireAdmin" xml:space="preserve">
     <value>Administration privileges are required for this operation.</value>
+  </data>
+  <data name="Form_Title" xml:space="preserve">
+    <value>{0} v{1}</value>
+  </data>
+  <data name="Form_Title_AdminHint" xml:space="preserve">
+    <value> (no administrator privileges)</value>
+  </data>
+  <data name="License_Title" xml:space="preserve">
+    <value>{0} License</value>
+  </data>
+  <data name="Txt_Loading" xml:space="preserve">
+    <value>Loading ...</value>
+  </data>
+  <data name="Url_Github" xml:space="preserve">
+    <value>https://github.com/weberjonathan/CandyShop</value>
+  </data>
+  <data name="Url_MetaPackages" xml:space="preserve">
+    <value>https://docs.chocolatey.org/en-us/faqs#what-is-the-difference-between-packages-no-suffix-as-compared-to.install.portable</value>
   </data>
 </root>

@@ -6,16 +6,19 @@ using System.Diagnostics;
 using System.IO;
 using System.Security.Principal;
 using System.Windows.Forms;
+using CandyShop.Properties;
 
 namespace CandyShop.Controls
 {
-    public partial class CandyShopForm : Form
+    partial class CandyShopForm : Form
     {
-        private const string TASKNAME = "CandyShopLaunch";
-        private bool LaunchWithWindowsTaskEnabled;
+        private ChocolateyService ChocolateyService;
+        private WindowsTaskService WindowsTaskService;
 
-        public CandyShopForm()
+        public CandyShopForm(ChocolateyService chocolateyService)
         {
+            ChocolateyService = chocolateyService;
+            WindowsTaskService = new WindowsTaskService();
             InitializeComponent();
         }
 
@@ -40,25 +43,22 @@ namespace CandyShop.Controls
             UpgradePage.UpgradeAllClick += UpgradePage_UpgradeAllClick;
             UpgradePage.UpgradeSelectedClick += UpgradePage_UpgradeSelectedClick;
             UpgradePage.CancelClick += UpgradePage_CancelClick;
+            InstalledPage.SelectedPackageChanged += InstallPage_SelectedPackageChanged;
 
             // display admin warning or not
+            this.Text = String.Format(Strings.Form_Title, Application.ProductName, Application.ProductVersion);
             if (HasAdminPrivileges())
             {
                 UpgradePage.ShowAdminWarning = false;
-                this.Text = $"{Application.ProductName} v{Application.ProductVersion}";
             }
             else
             {
                 UpgradePage.ShowAdminWarning = true;
-                this.Text = $"{Application.ProductName} v{Application.ProductVersion} (no administrator privileges)";
+                this.Text += Strings.Form_Title;
             }
 
             // check task entry or not
-            using (TaskService ts = new TaskService())
-            {
-                LaunchWithWindowsTaskEnabled = ts.GetTask(TASKNAME) != null;
-            }
-            MenuExtrasCreateTask.Checked = LaunchWithWindowsTaskEnabled;
+            MenuExtrasCreateTask.Checked = WindowsTaskService.TaskExists();
 
             this.Activate();
         }
@@ -82,49 +82,16 @@ namespace CandyShop.Controls
         {
             if (!HasAdminPrivileges())
             {
-                ShowErrorDialog(Properties.strings.Form_Err_RequireAdmin);
+                ShowErrorDialog(Strings.Err_RequireAdmin);
                 return;
             }
 
-            using (TaskService ts = new TaskService())
-            {
-                if (LaunchWithWindowsTaskEnabled)
-                {
-                    // remove task
-                    Task task = ts.GetTask(TASKNAME);
-                    if (task != null)
-                    {
-                        ts.RootFolder.DeleteTask(TASKNAME);
-                    }
-
-                    LaunchWithWindowsTaskEnabled = false;
-                }
-                else
-                {
-                    // create task
-                    string executable = Process.GetCurrentProcess().MainModule.FileName;
-                    string dir = Directory.GetParent(executable).FullName;
-
-                    TaskDefinition definition = TaskService.Instance.NewTask();
-                    definition.RegistrationInfo.Description = "Launch CandyShop with elevated privileges to display outdated packages on login.";
-                    definition.Principal.LogonType = TaskLogonType.InteractiveToken;
-
-                    LogonTrigger trigger = new LogonTrigger();
-
-                    definition.Triggers.Add(trigger);
-                    definition.Actions.Add(executable, "--background", dir);
-                    definition.Principal.RunLevel = TaskRunLevel.Highest;
-
-                    TaskService.Instance.RootFolder.RegisterTaskDefinition(TASKNAME, definition);
-
-                    LaunchWithWindowsTaskEnabled = true;
-                }
-            }
+            WindowsTaskService.ToggleTask();
         }
 
         private void MenuHelpGithub_Click(object sender, EventArgs e)
         {
-            LaunchUrl("https://github.com/weberjonathan/CandyShop");
+            LaunchUrl(Strings.Url_Github);
         }
 
         private void MenuHelpLicense_Click(object sender, EventArgs e)
@@ -137,7 +104,7 @@ namespace CandyShop.Controls
 
         private void MenuHelpMetaPackages_Click(object sender, EventArgs e)
         {
-            LaunchUrl("https://docs.chocolatey.org/en-us/faqs#what-is-the-difference-between-packages-no-suffix-as-compared-to.install.portable");
+            LaunchUrl(Strings.Url_MetaPackages);
         }
 
         private void UpgradePage_UpgradeAllClick(object sender, EventArgs e)
@@ -163,17 +130,33 @@ namespace CandyShop.Controls
             this.Close();
         }
 
+        private async void InstallPage_SelectedPackageChanged(object sender, PackageChangedEventArgs e)
+        {
+            string info;
+            try
+            {
+                info = await ChocolateyService.GetInfo(e.SelectedPackage);
+            }
+            catch (ChocolateyException)
+            {
+                info = Properties.Strings.Err_GetInfo;
+            }
+
+
+            InstalledPage.SetPackageDetails(e.SelectedPackage, info);
+        }
+
         private async void LoadOutdatedAsync()
         {
             List<ChocolateyPackage> packages;
             try
             {
-                packages = await ChocolateyWrapper.CheckOutdatedAsync();
+                packages = await ChocolateyService.FetchOutdatedAsync();
                 
             }
             catch (ChocolateyException)
             {
-                ShowErrorDialog(Properties.strings.Err_CheckOutdated);
+                ShowErrorDialog(Strings.Err_CheckOutdated);
                 packages = new List<ChocolateyPackage>();
             }
 
@@ -186,11 +169,11 @@ namespace CandyShop.Controls
 
             try
             {
-                 packages = await ChocolateyWrapper.ListInstalledAsync();
+                 packages = await ChocolateyService.FetchInstalledAsync();
             }
             catch (ChocolateyException)
             {
-                ShowErrorDialog(Properties.strings.Form_Err_ListInstalled);
+                ShowErrorDialog(Strings.Err_ListInstalled);
                 packages = new List<ChocolateyPackage>();
             }
             

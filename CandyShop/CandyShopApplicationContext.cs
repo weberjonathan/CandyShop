@@ -23,17 +23,24 @@ namespace CandyShop
         [return: MarshalAs(UnmanagedType.Bool)]
         private static extern bool SetForegroundWindow(IntPtr hWnd);
 
-        private CandyShopForm _MainForm;
+        private const string OPTION_BACKGROUND = "--background";
+        private const string OPTION_BACKGROUND_SHORT = "-b";
+
+        private readonly CandyShopForm _MainForm;
+
+        private readonly ChocolateyService _ChocolateyService;
 
         public CandyShopApplicationContext()
         {
+            _ChocolateyService = new ChocolateyService();
+
             // determine silent mode
             List<string> args = new List<string>(Environment.GetCommandLineArgs());
-            bool launchMinimized = args.Find(s => s.Equals("--background") ||
-                                                s.Equals("-b")) != null;
+            bool launchMinimized = args.Find(s => s.Equals(OPTION_BACKGROUND) ||
+                                                  s.Equals(OPTION_BACKGROUND_SHORT)) != null;
 
             // create form; performs package upgrade onFormClosed and exits afterwards
-            _MainForm = new CandyShopForm();
+            _MainForm = new CandyShopForm(_ChocolateyService);
             _MainForm.FormClosing += new FormClosingEventHandler((sender, e) =>
             {
                 _MainForm.Hide();
@@ -53,8 +60,9 @@ namespace CandyShop
                     }
                     else
                     {
+                        // closed using Cancel button; app continues to run in tray, form is hidden
                         _MainForm.DialogResult = DialogResult.None;
-                        e.Cancel = true;
+                        e.Cancel = true; // prevent disposing of form
                     }
                 }
                 else
@@ -95,14 +103,14 @@ namespace CandyShop
             // obtain outdated packages
             try
             {
-                packages = await ChocolateyWrapper.CheckOutdatedAsync();
+                packages = await _ChocolateyService.FetchOutdatedAsync();
             }
             catch (ChocolateyException)
             {
                 icon.BalloonTipIcon = ToolTipIcon.Error;
                 icon.Text = Application.ProductName;
-                icon.BalloonTipTitle = $"Candy Shop";
-                icon.BalloonTipText = Properties.strings.Err_CheckOutdated;
+                icon.BalloonTipTitle = String.Format(Strings.Form_Title, Application.ProductName, Application.ProductVersion);
+                icon.BalloonTipText = Strings.Err_CheckOutdated;
                 icon.ShowBalloonTip(2000);
                 Environment.Exit(0);
             }
@@ -197,7 +205,7 @@ namespace CandyShop
 
                 try
                 {
-                    ChocolateyWrapper.Upgrade(packages);
+                    _ChocolateyService.Upgrade(packages);
                 }
                 catch (ChocolateyException e)
                 {
