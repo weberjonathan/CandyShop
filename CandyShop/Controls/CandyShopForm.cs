@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Security.Principal;
 using System.Windows.Forms;
+using CandyShop.Properties;
 
 namespace CandyShop.Controls
 {
@@ -45,15 +46,15 @@ namespace CandyShop.Controls
             InstalledPage.SelectedPackageChanged += InstallPage_SelectedPackageChanged;
 
             // display admin warning or not
+            this.Text = String.Format(Strings.Form_Title, Application.ProductName, Application.ProductVersion);
             if (HasAdminPrivileges())
             {
                 UpgradePage.ShowAdminWarning = false;
-                this.Text = $"{Application.ProductName} v{Application.ProductVersion}";
             }
             else
             {
                 UpgradePage.ShowAdminWarning = true;
-                this.Text = $"{Application.ProductName} v{Application.ProductVersion} (no administrator privileges)";
+                this.Text += Strings.Form_Title;
             }
 
             // check task entry or not
@@ -81,7 +82,7 @@ namespace CandyShop.Controls
         {
             if (!HasAdminPrivileges())
             {
-                ShowErrorDialog(Properties.strings.Form_Err_RequireAdmin);
+                ShowErrorDialog(Strings.Err_RequireAdmin);
                 return;
             }
 
@@ -90,7 +91,7 @@ namespace CandyShop.Controls
 
         private void MenuHelpGithub_Click(object sender, EventArgs e)
         {
-            LaunchUrl("https://github.com/weberjonathan/CandyShop");
+            LaunchUrl(Strings.Url_Github);
         }
 
         private void MenuHelpLicense_Click(object sender, EventArgs e)
@@ -103,7 +104,7 @@ namespace CandyShop.Controls
 
         private void MenuHelpMetaPackages_Click(object sender, EventArgs e)
         {
-            LaunchUrl("https://docs.chocolatey.org/en-us/faqs#what-is-the-difference-between-packages-no-suffix-as-compared-to.install.portable");
+            LaunchUrl(Strings.Url_MetaPackages);
         }
 
         private void UpgradePage_UpgradeAllClick(object sender, EventArgs e)
@@ -131,7 +132,17 @@ namespace CandyShop.Controls
 
         private async void InstallPage_SelectedPackageChanged(object sender, PackageChangedEventArgs e)
         {
-            string info = await ChocolateyService.GetInfo(e.SelectedPackage);
+            string info;
+            try
+            {
+                info = await ChocolateyService.GetInfo(e.SelectedPackage);
+            }
+            catch (ChocolateyException)
+            {
+                info = Properties.Strings.Err_GetInfo;
+            }
+
+
             InstalledPage.SetPackageDetails(e.SelectedPackage, info);
         }
 
@@ -145,7 +156,7 @@ namespace CandyShop.Controls
             }
             catch (ChocolateyException)
             {
-                ShowErrorDialog(Properties.strings.Err_CheckOutdated);
+                ShowErrorDialog(Strings.Err_CheckOutdated);
                 packages = new List<ChocolateyPackage>();
             }
 
@@ -162,7 +173,7 @@ namespace CandyShop.Controls
             }
             catch (ChocolateyException)
             {
-                ShowErrorDialog(Properties.strings.Form_Err_ListInstalled);
+                ShowErrorDialog(Strings.Err_ListInstalled);
                 packages = new List<ChocolateyPackage>();
             }
             

@@ -136,17 +136,10 @@ namespace CandyShop
         {
             if (!PackageInfoCache.TryGetValue(package.Name, out string info))
             {
-                try
+                info = await FetchInfoAsync(package);
+                if (!PackageInfoCache.ContainsKey(package.Name))
                 {
-                    info = await FetchInfoAsync(package);
-                    if (!PackageInfoCache.ContainsKey(package.Name))
-                    {
-                        PackageInfoCache.Add(package.Name, info);
-                    }
-                }
-                catch (ChocolateyException)
-                {
-                    info = Properties.strings.Form_Err_GetInfo;
+                    PackageInfoCache.Add(package.Name, info);
                 }
             }
 

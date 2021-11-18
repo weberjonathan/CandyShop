@@ -23,6 +23,9 @@ namespace CandyShop
         [return: MarshalAs(UnmanagedType.Bool)]
         private static extern bool SetForegroundWindow(IntPtr hWnd);
 
+        private const string OPTION_BACKGROUND = "--background";
+        private const string OPTION_BACKGROUND_SHORT = "-b";
+
         private readonly CandyShopForm _MainForm;
 
         private readonly ChocolateyService _ChocolateyService;
@@ -33,8 +36,8 @@ namespace CandyShop
 
             // determine silent mode
             List<string> args = new List<string>(Environment.GetCommandLineArgs());
-            bool launchMinimized = args.Find(s => s.Equals("--background") ||
-                                                s.Equals("-b")) != null;
+            bool launchMinimized = args.Find(s => s.Equals(OPTION_BACKGROUND) ||
+                                                  s.Equals(OPTION_BACKGROUND_SHORT)) != null;
 
             // create form; performs package upgrade onFormClosed and exits afterwards
             _MainForm = new CandyShopForm(_ChocolateyService);
@@ -105,8 +108,8 @@ namespace CandyShop
             {
                 icon.BalloonTipIcon = ToolTipIcon.Error;
                 icon.Text = Application.ProductName;
-                icon.BalloonTipTitle = $"Candy Shop";
-                icon.BalloonTipText = Properties.strings.Err_CheckOutdated;
+                icon.BalloonTipTitle = String.Format(Strings.Form_Title, Application.ProductName, Application.ProductVersion);
+                icon.BalloonTipText = Strings.Err_CheckOutdated;
                 icon.ShowBalloonTip(2000);
                 Environment.Exit(0);
             }

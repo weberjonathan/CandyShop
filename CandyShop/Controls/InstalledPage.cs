@@ -1,4 +1,5 @@
 ﻿using CandyShop.Chocolatey;
+using CandyShop.Properties;
 using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
@@ -88,7 +89,7 @@ namespace CandyShop.Controls
         {
             if (SelectedPackage == null) return;
 
-            TxtDetails.Text = "Loading ...";
+            TxtDetails.Text = Strings.Txt_Loading;
             SelectedPackageChanged?.Invoke(this, new PackageChangedEventArgs(SelectedPackage));
         }
 

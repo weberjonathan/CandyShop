@@ -104,7 +104,7 @@ namespace CandyShop.Controls
 
         private void LstPackages_ItemChecked(object sender, ItemCheckedEventArgs e)
         {
-            BtnUpgradeSelected.Text = $"Upgrade ({LstPackages.CheckedItems.Count})";
+            BtnUpgradeSelected.Text = String.Format(Properties.Strings.Btn_UpgradeSelected, LstPackages.CheckedItems.Count);
         }
 
         private void LstPackages_Resize(object sender, EventArgs e)
