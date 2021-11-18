@@ -9,16 +9,16 @@ namespace CandyShop.Chocolatey
     {
         private const string CHOCO_BIN = "choco";
 
-        private string Args;
-
         public ChocolateyProcess(string args)
         {
-            Args = args;
+            Arguments = args;
         }
 
+        public string Arguments { get; private set; }
+        
         public string Output { get; private set; } = "";
 
-        public List<List<string>> FormattedOutput { get; private set; } = new List<List<string>>();
+        public List<string[]> OutputBySection { get; private set; } = new List<string[]>();
 
         public int ExitCode { get; private set; }
 
@@ -27,7 +27,7 @@ namespace CandyShop.Chocolatey
         /// <exception cref="ChocolateyException"></exception>
         public void ExecuteHidden()
         {
-            ProcessStartInfo procInfo = new ProcessStartInfo(CHOCO_BIN, Args)
+            ProcessStartInfo procInfo = new ProcessStartInfo(CHOCO_BIN, Arguments)
             {
                 RedirectStandardOutput = true,
                 UseShellExecute = false,
@@ -53,7 +53,7 @@ namespace CandyShop.Chocolatey
                 throw new ChocolateyException("An error occurred while running choco.", e);
             }
 
-            FormattedOutput = FormatChocoOut(Output);
+            OutputBySection = ParseSectionsFromOutput(Output);
         }
 
         /// <exception cref="ChocolateyException"></exception>
@@ -61,7 +61,7 @@ namespace CandyShop.Chocolatey
         {
             // TODO potentially redirect output and expose events
 
-            ProcessStartInfo procInfo = new ProcessStartInfo(CHOCO_BIN, Args)
+            ProcessStartInfo procInfo = new ProcessStartInfo(CHOCO_BIN, Arguments)
             {
                 UseShellExecute = false,
             };
@@ -83,9 +83,9 @@ namespace CandyShop.Chocolatey
             }
         }
 
-        private List<List<string>> FormatChocoOut(string output)
+        private List<string[]> ParseSectionsFromOutput(string output)
         {
-            List<List<string>> rtn = new List<List<string>>();
+            List<string[]> rtn = new List<string[]>();
 
             // parse head
             Queue<string> outputLines = new Queue<string>(output.Split("\r\n"));
@@ -103,7 +103,7 @@ namespace CandyShop.Chocolatey
                     string line = outputLines.Dequeue();
                     if (String.Empty.Equals(line))
                     {
-                        rtn.Add(currentBlock);
+                        rtn.Add(currentBlock.ToArray());
                         currentBlock = new List<string>();
                     }
                     else

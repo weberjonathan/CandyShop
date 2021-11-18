@@ -5,7 +5,7 @@ using System.Windows.Forms;
 
 namespace CandyShop.Controls
 {
-    public partial class InstalledPage : UserControl
+    partial class InstalledPage : UserControl
     {
         private List<ChocolateyPackage> _Packages = new List<ChocolateyPackage>();
         private Dictionary<string, string> PackageDetailsCache = new Dictionary<string, string>();
@@ -28,6 +28,8 @@ namespace CandyShop.Controls
                 LstPackages.Columns[1].Width = (int)Math.Floor(availWidth * .4);
             });
         }
+
+        public ChocolateyService ChocolateyService { get; set; }
 
         public List<ChocolateyPackage> Packages {
             get => _Packages;
@@ -73,7 +75,7 @@ namespace CandyShop.Controls
             {
                 try
                 {
-                    details = await ChocolateyWrapper.GetInfoAsync(SelectedPackage);
+                    details = await ChocolateyService.GetInfoAsync(SelectedPackage);
                     if (!PackageDetailsCache.ContainsKey(selectedPackageName))
                     {
                         PackageDetailsCache.Add(selectedPackageName, details);

@@ -9,13 +9,17 @@ using System.Windows.Forms;
 
 namespace CandyShop.Controls
 {
-    public partial class CandyShopForm : Form
+    partial class CandyShopForm : Form
     {
         private const string TASKNAME = "CandyShopLaunch";
+        
         private bool LaunchWithWindowsTaskEnabled;
 
-        public CandyShopForm()
+        private ChocolateyService ChocolateyService;
+
+        public CandyShopForm(ChocolateyService chocolateyService)
         {
+            ChocolateyService = chocolateyService;
             InitializeComponent();
         }
 
@@ -168,7 +172,7 @@ namespace CandyShop.Controls
             List<ChocolateyPackage> packages;
             try
             {
-                packages = await ChocolateyWrapper.CheckOutdatedAsync();
+                packages = await ChocolateyService.CheckOutdatedAsync();
                 
             }
             catch (ChocolateyException)
@@ -186,7 +190,7 @@ namespace CandyShop.Controls
 
             try
             {
-                 packages = await ChocolateyWrapper.ListInstalledAsync();
+                 packages = await ChocolateyService.ListInstalledAsync();
             }
             catch (ChocolateyException)
             {

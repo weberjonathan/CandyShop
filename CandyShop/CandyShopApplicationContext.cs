@@ -23,17 +23,21 @@ namespace CandyShop
         [return: MarshalAs(UnmanagedType.Bool)]
         private static extern bool SetForegroundWindow(IntPtr hWnd);
 
-        private CandyShopForm _MainForm;
+        private readonly CandyShopForm _MainForm;
+
+        private readonly ChocolateyService _ChocolateyService;
 
         public CandyShopApplicationContext()
         {
+            _ChocolateyService = new ChocolateyService();
+
             // determine silent mode
             List<string> args = new List<string>(Environment.GetCommandLineArgs());
             bool launchMinimized = args.Find(s => s.Equals("--background") ||
                                                 s.Equals("-b")) != null;
 
             // create form; performs package upgrade onFormClosed and exits afterwards
-            _MainForm = new CandyShopForm();
+            _MainForm = new CandyShopForm(_ChocolateyService);
             _MainForm.FormClosing += new FormClosingEventHandler((sender, e) =>
             {
                 _MainForm.Hide();
@@ -95,7 +99,7 @@ namespace CandyShop
             // obtain outdated packages
             try
             {
-                packages = await ChocolateyWrapper.CheckOutdatedAsync();
+                packages = await _ChocolateyService.CheckOutdatedAsync();
             }
             catch (ChocolateyException)
             {
@@ -197,7 +201,7 @@ namespace CandyShop
 
                 try
                 {
-                    ChocolateyWrapper.Upgrade(packages);
+                    _ChocolateyService.Upgrade(packages);
                 }
                 catch (ChocolateyException e)
                 {
