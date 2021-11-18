@@ -60,8 +60,9 @@ namespace CandyShop
                     }
                     else
                     {
+                        // closed using Cancel button; app continues to run in tray, form is hidden
                         _MainForm.DialogResult = DialogResult.None;
-                        e.Cancel = true;
+                        e.Cancel = true; // prevent disposing of form
                     }
                 }
                 else
