@@ -11,15 +11,13 @@ namespace CandyShop.Controls
 {
     partial class CandyShopForm : Form
     {
-        private const string TASKNAME = "CandyShopLaunch";
-        
-        private bool LaunchWithWindowsTaskEnabled;
-
         private ChocolateyService ChocolateyService;
+        private WindowsTaskService WindowsTaskService;
 
         public CandyShopForm(ChocolateyService chocolateyService)
         {
             ChocolateyService = chocolateyService;
+            WindowsTaskService = new WindowsTaskService();
             InitializeComponent();
         }
 
@@ -44,6 +42,7 @@ namespace CandyShop.Controls
             UpgradePage.UpgradeAllClick += UpgradePage_UpgradeAllClick;
             UpgradePage.UpgradeSelectedClick += UpgradePage_UpgradeSelectedClick;
             UpgradePage.CancelClick += UpgradePage_CancelClick;
+            InstalledPage.SelectedPackageChanged += InstallPage_SelectedPackageChanged;
 
             // display admin warning or not
             if (HasAdminPrivileges())
@@ -58,11 +57,7 @@ namespace CandyShop.Controls
             }
 
             // check task entry or not
-            using (TaskService ts = new TaskService())
-            {
-                LaunchWithWindowsTaskEnabled = ts.GetTask(TASKNAME) != null;
-            }
-            MenuExtrasCreateTask.Checked = LaunchWithWindowsTaskEnabled;
+            MenuExtrasCreateTask.Checked = WindowsTaskService.TaskExists();
 
             this.Activate();
         }
@@ -90,40 +85,7 @@ namespace CandyShop.Controls
                 return;
             }
 
-            using (TaskService ts = new TaskService())
-            {
-                if (LaunchWithWindowsTaskEnabled)
-                {
-                    // remove task
-                    Task task = ts.GetTask(TASKNAME);
-                    if (task != null)
-                    {
-                        ts.RootFolder.DeleteTask(TASKNAME);
-                    }
-
-                    LaunchWithWindowsTaskEnabled = false;
-                }
-                else
-                {
-                    // create task
-                    string executable = Process.GetCurrentProcess().MainModule.FileName;
-                    string dir = Directory.GetParent(executable).FullName;
-
-                    TaskDefinition definition = TaskService.Instance.NewTask();
-                    definition.RegistrationInfo.Description = "Launch CandyShop with elevated privileges to display outdated packages on login.";
-                    definition.Principal.LogonType = TaskLogonType.InteractiveToken;
-
-                    LogonTrigger trigger = new LogonTrigger();
-
-                    definition.Triggers.Add(trigger);
-                    definition.Actions.Add(executable, "--background", dir);
-                    definition.Principal.RunLevel = TaskRunLevel.Highest;
-
-                    TaskService.Instance.RootFolder.RegisterTaskDefinition(TASKNAME, definition);
-
-                    LaunchWithWindowsTaskEnabled = true;
-                }
-            }
+            WindowsTaskService.ToggleTask();
         }
 
         private void MenuHelpGithub_Click(object sender, EventArgs e)
@@ -167,12 +129,18 @@ namespace CandyShop.Controls
             this.Close();
         }
 
+        private async void InstallPage_SelectedPackageChanged(object sender, PackageChangedEventArgs e)
+        {
+            string info = await ChocolateyService.GetInfo(e.SelectedPackage);
+            InstalledPage.SetPackageDetails(e.SelectedPackage, info);
+        }
+
         private async void LoadOutdatedAsync()
         {
             List<ChocolateyPackage> packages;
             try
             {
-                packages = await ChocolateyService.CheckOutdatedAsync();
+                packages = await ChocolateyService.FetchOutdatedAsync();
                 
             }
             catch (ChocolateyException)
@@ -190,7 +158,7 @@ namespace CandyShop.Controls
 
             try
             {
-                 packages = await ChocolateyService.ListInstalledAsync();
+                 packages = await ChocolateyService.FetchInstalledAsync();
             }
             catch (ChocolateyException)
             {

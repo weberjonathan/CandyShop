@@ -99,7 +99,7 @@ namespace CandyShop
             // obtain outdated packages
             try
             {
-                packages = await _ChocolateyService.CheckOutdatedAsync();
+                packages = await _ChocolateyService.FetchOutdatedAsync();
             }
             catch (ChocolateyException)
             {
