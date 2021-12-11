@@ -146,12 +146,14 @@ namespace CandyShop
             return info;
         }
 
+        /// <summary>Fetches detailed information for a given package. Use <see cref="GetInfo(ChocolateyPackage)"/> to utilize cached details.</summary>
         /// <exception cref="ChocolateyException"></exception>
         public async Task<string> FetchInfoAsync(ChocolateyPackage package)
         {
             return await Task.Run(() => FetchInfo(package));
         }
 
+        /// <summary>Fetches detailed information for a given package. Use <see cref="GetInfo(ChocolateyPackage)"/> to utilize cached details.</summary>
         /// <exception cref="ChocolateyException"></exception>
         public string FetchInfo(ChocolateyPackage package)
         {

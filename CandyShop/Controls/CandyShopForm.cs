@@ -12,25 +12,28 @@ namespace CandyShop.Controls
 {
     partial class CandyShopForm : Form
     {
-        private ChocolateyService ChocolateyService;
-        private WindowsTaskService WindowsTaskService;
+        // TODO remove WindowsTaskService, use controller
+        // remove and sort usings
+        // check namepsaces
+        // consistent behavior between controls
+        // use controller for all methods in here
+        // use consistent naming for private members
+        // use consistent layout privates -> constructor -> properties -> methods https://docs.microsoft.com/en-us/dotnet/csharp/fundamentals/coding-style/coding-conventions
+        // https://github.com/DotNetAnalyzers/StyleCopAnalyzers/blob/master/documentation/SA1201.md
 
-        public CandyShopForm(ChocolateyService chocolateyService)
+        private WindowsTaskService WindowsTaskService; // TODO remove
+        private readonly CandyShopController CandyShopController;
+
+        public CandyShopForm(CandyShopController candyShopController)
         {
-            ChocolateyService = chocolateyService;
             WindowsTaskService = new WindowsTaskService();
+            CandyShopController = candyShopController;
             InitializeComponent();
         }
 
         public List<ChocolateyPackage> SelectedPackages { get; set; }
 
         public bool HasSelectedPackages => SelectedPackages != null && SelectedPackages.Count > 0;
-
-        public void LoadPackages()
-        {
-            LoadInstalledAsync();
-            LoadOutdatedAsync();
-        }
 
         public void SetOutdatedPackages(List<ChocolateyPackage> packages)
         {
@@ -47,7 +50,7 @@ namespace CandyShop.Controls
 
             // display admin warning or not
             this.Text = String.Format(Strings.Form_Title, Application.ProductName, Application.ProductVersion);
-            if (HasAdminPrivileges())
+            if (CandyShopController.HasAdminPrivileges)
             {
                 UpgradePage.ShowAdminWarning = false;
             }
@@ -80,7 +83,7 @@ namespace CandyShop.Controls
 
         private void MenuExtrasCreateTask_Click(object sender, EventArgs e)
         {
-            if (!HasAdminPrivileges())
+            if (CandyShopController.HasAdminPrivileges)
             {
                 ShowErrorDialog(Strings.Err_RequireAdmin);
                 return;
@@ -91,20 +94,17 @@ namespace CandyShop.Controls
 
         private void MenuHelpGithub_Click(object sender, EventArgs e)
         {
-            LaunchUrl(Strings.Url_Github);
+            CandyShopController.LaunchUrl(Strings.Url_Github);
         }
 
         private void MenuHelpLicense_Click(object sender, EventArgs e)
         {
-            using (LicenseForm form = new LicenseForm())
-            {
-                form.ShowDialog();
-            }
+            CandyShopController.ShowLicenseForm();
         }
 
         private void MenuHelpMetaPackages_Click(object sender, EventArgs e)
         {
-            LaunchUrl(Strings.Url_MetaPackages);
+            CandyShopController.LaunchUrl(Strings.Url_MetaPackages);
         }
 
         private void UpgradePage_UpgradeAllClick(object sender, EventArgs e)
@@ -130,37 +130,38 @@ namespace CandyShop.Controls
             this.Close();
         }
 
-        private async void InstallPage_SelectedPackageChanged(object sender, PackageChangedEventArgs e)
+        private void InstallPage_SelectedPackageChanged(object sender, PackageChangedEventArgs e)
         {
-            string info;
+            // all of this can go in InstalledPage, if installed page gets access to controller
+            // just pass package name here, not entire package; saves weird shit in InstalledPage
             try
             {
-                info = await ChocolateyService.GetInfo(e.SelectedPackage);
+                CandyShopController.GetPackageDetails(e.SelectedPackage.Name, (details) =>
+                {
+                    InstalledPage.SetPackageDetails(e.SelectedPackage, details);
+                });
             }
-            catch (ChocolateyException)
+            catch (CandyShopException)
             {
-                info = Properties.Strings.Err_GetInfo;
+                InstalledPage.SetPackageDetails(e.SelectedPackage, String.Empty);
             }
-
-
-            InstalledPage.SetPackageDetails(e.SelectedPackage, info);
         }
 
-        private async void LoadOutdatedAsync()
+        private void LoadOutdated()
         {
-            List<ChocolateyPackage> packages;
+            // TODO adjust LoadInstalled accordingly; these two methods should probably go into the controller; the form should be created in the controller
+            
             try
             {
-                packages = await ChocolateyService.FetchOutdatedAsync();
-                
+                CandyShopController.GetOutdatedPackagesAsync((packages) =>
+                {
+                    UpgradePage.OutdatedPackages = packages; // TODO this should be a method call, or fetching details in InstallPage_SelectedPackageChanged should be a property
+                });
             }
             catch (ChocolateyException)
             {
                 ShowErrorDialog(Strings.Err_CheckOutdated);
-                packages = new List<ChocolateyPackage>();
             }
-
-            UpgradePage.OutdatedPackages = packages;
         }
 
         private async void LoadInstalledAsync()
@@ -180,31 +181,9 @@ namespace CandyShop.Controls
             InstalledPage.Packages = packages;
         }
 
-        private bool HasAdminPrivileges()
-        {
-            using (WindowsIdentity identity = WindowsIdentity.GetCurrent())
-            {
-                WindowsPrincipal principal = new WindowsPrincipal(identity);
-                return principal.IsInRole(WindowsBuiltInRole.Administrator);
-            }
-        }
-
         private void ShowErrorDialog(string msg)
         {
             MessageBox.Show(msg, Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error);
-        }
-
-        private void LaunchUrl(string url)
-        {
-            ProcessStartInfo info = new ProcessStartInfo()
-            {
-                FileName = "cmd",
-                Arguments = $"/c start {url}",
-                UseShellExecute = false,
-                CreateNoWindow = true
-            };
-
-            Process.Start(info);
         }
     }
 }
