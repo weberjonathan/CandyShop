@@ -1,14 +1,12 @@
-﻿using CandyShop.Chocolatey;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace CandyShop.Controls
 {
     public partial class UpgradePage : UserControl
     {
-        private List<ChocolateyPackage> _OutdatedPackages = new List<ChocolateyPackage>();
-
         public UpgradePage()
         {
             InitializeComponent();
@@ -26,6 +24,20 @@ namespace CandyShop.Controls
 
         public event EventHandler CancelClick;
 
+        public string[] ItemNames
+        {
+            get
+            {
+                string[] rtn = new string[LstPackages.Items.Count];
+                for (int i = 0; i < rtn.Length; i++)
+                {
+                    rtn[i] = LstPackages.Items[i].Text;
+                }
+
+                return rtn;
+            }
+        }
+
         public bool ShowAdminWarning {
             get {
                 return PanelTop.Visible;
@@ -35,47 +47,36 @@ namespace CandyShop.Controls
             }
         }
 
-        public List<ChocolateyPackage> OutdatedPackages {
-            get => _OutdatedPackages;
-            set {
-                _OutdatedPackages = value;
-
-                LblLoading.Visible = false;
-
-                if (value.Count > 0)
-                {
-                    BtnUpgradeSelected.Enabled = true;
-                    BtnUpgradeAll.Enabled = true;
-
-                    foreach (ChocolateyPackage pckg in value)
-                    {
-                        ListViewItem item = new ListViewItem(new string[]
-                        {
-                            pckg.Name,
-                            pckg.CurrVer,
-                            pckg.AvailVer,
-                            pckg.Pinned.ToString()
-                        });
-
-                        LstPackages.Items.Add(item);
-                    }
-                }
-
-                CheckNormalAndMetaItems();
-            }
-        }
-
-        public List<ChocolateyPackage> SelectedPackages {
+        public string[] SelectedItemNames {
             get {
-                List<ChocolateyPackage> rtn = new List<ChocolateyPackage>();
-                foreach (ListViewItem item in LstPackages.CheckedItems)
+                string[] rtn = new string[LstPackages.CheckedItems.Count];
+                for (int i = 0; i < rtn.Length; i++)
                 {
-                    rtn.Add(FindPackageByName(item.Text));
+                    rtn[i] = LstPackages.CheckedItems[i].Text;
                 }
+
                 return rtn;
             }
         }
 
+        public void UpdatePackageView(string[][] items)
+        {
+            LblLoading.Visible = false;
+
+            if (items.Length > 0)
+            {
+                BtnUpgradeSelected.Enabled = true;
+                BtnUpgradeAll.Enabled = true;
+
+                ListViewItem[] listViewItems = items
+                    .Select(item => new ListViewItem(item)
+                    {
+                        Name = item[0]
+                    })
+                    .ToArray();
+                LstPackages.Items.AddRange(listViewItems);
+            }
+        }
 
         public void CheckAllItems()
         {
@@ -85,12 +86,14 @@ namespace CandyShop.Controls
             }
         }
 
-        public void CheckNormalAndMetaItems()
+        public void CheckItemsByName(List<string> items)
         {
-            foreach (ListViewItem item in LstPackages.Items)
+            foreach (string key in items)
             {
-                ChocolateyPackage pckg = FindPackageByName(item.Text);
-                item.Checked = !(pckg.HasMetaPackage && pckg.HasSuffix);
+                if (LstPackages.Items.ContainsKey(key))
+                {
+                    LstPackages.Items[key].Checked = true;
+                }
             }
         }
 
@@ -116,12 +119,6 @@ namespace CandyShop.Controls
             LstPackages.Columns[1].Width = (int)Math.Floor(availWidth * .3);
             LstPackages.Columns[2].Width = (int)Math.Floor(availWidth * .3);
             LstPackages.Columns[3].Width = pinnedWidth;
-        }
-
-        // TODO why no dict?
-        private ChocolateyPackage FindPackageByName(string name)
-        {
-            return _OutdatedPackages.Find(pckg => pckg.Name.Equals(name));
         }
     }
 }

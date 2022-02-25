@@ -40,8 +40,6 @@ namespace CandyShop.Controls
 
         public event EventHandler<PackageChangedEventArgs> SelectedPackageChanged;
 
-        public ChocolateyService ChocolateyService { get; set; }
-
         public List<ChocolateyPackage> Packages {
             get => _Packages;
             set {
@@ -75,7 +73,7 @@ namespace CandyShop.Controls
             }
         }
 
-        public void SetPackageDetails(ChocolateyPackage package, string packageDetails) {
+        public void UpdatePackageDetails(ChocolateyPackage package, string packageDetails) {
             if (SelectedPackage != null)
             {
                 if (SelectedPackage.Name.Equals(package.Name))

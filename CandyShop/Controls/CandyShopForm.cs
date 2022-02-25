@@ -7,6 +7,7 @@ using System.IO;
 using System.Security.Principal;
 using System.Windows.Forms;
 using CandyShop.Properties;
+using System.Linq;
 
 namespace CandyShop.Controls
 {
@@ -29,15 +30,31 @@ namespace CandyShop.Controls
             WindowsTaskService = new WindowsTaskService();
             CandyShopController = candyShopController;
             InitializeComponent();
+
+            this.FormClosed += new FormClosedEventHandler((sender, e) => CandyShopController.CloseForm());
         }
 
-        public List<ChocolateyPackage> SelectedPackages { get; set; }
-
-        public bool HasSelectedPackages => SelectedPackages != null && SelectedPackages.Count > 0;
-
-        public void SetOutdatedPackages(List<ChocolateyPackage> packages)
+        public void UpdateInstalledView(List<ChocolateyPackage> packages)
         {
-            UpgradePage.OutdatedPackages = packages;
+            InstalledPage.UpdatePackageView(packages);
+        }
+
+        public void UpdateOutdatedView(List<ChocolateyPackage> packages)
+        {
+            if (packages == null)
+            {
+                ShowError(Strings.Err_CheckOutdated);
+            }
+
+            string[][] items = packages.Select(package => new string[] {
+                package.Name,
+                package.CurrVer,
+                package.AvailVer,
+                package.Pinned.ToString()
+            }).ToArray();
+
+            UpgradePage.UpdatePackageView(items);
+            UpgradePage.CheckItemsByName(CandyShopController.SelectNormalAndMetaPackages(packages));
         }
 
         private void ChocoAutoUpdateForm_Load(object sender, EventArgs e)
@@ -73,7 +90,9 @@ namespace CandyShop.Controls
 
         private void MenuEditSelectRelevant_Click(object sender, EventArgs e)
         {
-            UpgradePage.CheckNormalAndMetaItems();
+            List<string> packageNames = UpgradePage.ItemNames.ToList();
+            packageNames = CandyShopController.SelectNormalAndMetaPackages(packageNames);
+            UpgradePage.CheckItemsByName(packageNames);
         }
 
         private void MenuEditDeselectAll_Click(object sender, EventArgs e)
@@ -85,7 +104,7 @@ namespace CandyShop.Controls
         {
             if (CandyShopController.HasAdminPrivileges)
             {
-                ShowErrorDialog(Strings.Err_RequireAdmin);
+                ShowError(Strings.Err_RequireAdmin);
                 return;
             }
 
@@ -109,25 +128,22 @@ namespace CandyShop.Controls
 
         private void UpgradePage_UpgradeAllClick(object sender, EventArgs e)
         {
-            SelectedPackages = UpgradePage.OutdatedPackages;
-            this.DialogResult = DialogResult.OK;
-            this.Close();
+            List<ChocolateyPackage> packages =
+                CandyShopController.GetPackagesByName(UpgradePage.ItemNames.ToList());
+            CandyShopController.PerformUpgrade(packages);
         }
 
         private void UpgradePage_UpgradeSelectedClick(object sender, EventArgs e)
         {
-            SelectedPackages = UpgradePage.SelectedPackages;
-            if (SelectedPackages.Count > 0)
-            {
-                this.DialogResult = DialogResult.OK;
-                this.Close();
-            }
+            List<ChocolateyPackage> packages =
+                CandyShopController.GetPackagesByName(UpgradePage.SelectedItemNames.ToList());
+
+            if (packages.Count > 0) CandyShopController.PerformUpgrade(packages);
         }
 
         private void UpgradePage_CancelClick(object sender, EventArgs e)
         {
-            this.DialogResult = DialogResult.Cancel;
-            this.Close();
+            CandyShopController.CancelForm();
         }
 
         private void InstallPage_SelectedPackageChanged(object sender, PackageChangedEventArgs e)
@@ -136,52 +152,18 @@ namespace CandyShop.Controls
             // just pass package name here, not entire package; saves weird shit in InstalledPage
             try
             {
-                CandyShopController.GetPackageDetails(e.SelectedPackage.Name, (details) =>
+                CandyShopController.GetPackageDetailsAsync(e.SelectedPackage.Name, (details) =>
                 {
-                    InstalledPage.SetPackageDetails(e.SelectedPackage, details);
+                    InstalledPage.UpdatePackageDetails(e.SelectedPackage, details);
                 });
             }
             catch (CandyShopException)
             {
-                InstalledPage.SetPackageDetails(e.SelectedPackage, String.Empty);
+                InstalledPage.UpdatePackageDetails(e.SelectedPackage, String.Empty);
             }
         }
 
-        private void LoadOutdated()
-        {
-            // TODO adjust LoadInstalled accordingly; these two methods should probably go into the controller; the form should be created in the controller
-            
-            try
-            {
-                CandyShopController.GetOutdatedPackagesAsync((packages) =>
-                {
-                    UpgradePage.OutdatedPackages = packages; // TODO this should be a method call, or fetching details in InstallPage_SelectedPackageChanged should be a property
-                });
-            }
-            catch (ChocolateyException)
-            {
-                ShowErrorDialog(Strings.Err_CheckOutdated);
-            }
-        }
-
-        private async void LoadInstalledAsync()
-        {
-            List<ChocolateyPackage> packages;
-
-            try
-            {
-                 packages = await ChocolateyService.FetchInstalledAsync();
-            }
-            catch (ChocolateyException)
-            {
-                ShowErrorDialog(Strings.Err_ListInstalled);
-                packages = new List<ChocolateyPackage>();
-            }
-            
-            InstalledPage.Packages = packages;
-        }
-
-        private void ShowErrorDialog(string msg)
+        private void ShowError(string msg)
         {
             MessageBox.Show(msg, Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error);
         }

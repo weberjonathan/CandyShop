@@ -132,7 +132,7 @@ namespace CandyShop
 
         /// <summary>Get detailed information for a given package. Fetches it, if not available.</summary>
         /// <exception cref="ChocolateyException"></exception>
-        public async Task<string> GetInfo(ChocolateyPackage package)
+        public async Task<string> GetOrFetchInfo(ChocolateyPackage package)
         {
             if (!PackageInfoCache.TryGetValue(package.Name, out string info))
             {
@@ -146,14 +146,14 @@ namespace CandyShop
             return info;
         }
 
-        /// <summary>Fetches detailed information for a given package. Use <see cref="GetInfo(ChocolateyPackage)"/> to utilize cached details.</summary>
+        /// <summary>Fetches detailed information for a given package. Use <see cref="GetOrFetchInfo(ChocolateyPackage)"/> to utilize cached details.</summary>
         /// <exception cref="ChocolateyException"></exception>
         public async Task<string> FetchInfoAsync(ChocolateyPackage package)
         {
             return await Task.Run(() => FetchInfo(package));
         }
 
-        /// <summary>Fetches detailed information for a given package. Use <see cref="GetInfo(ChocolateyPackage)"/> to utilize cached details.</summary>
+        /// <summary>Fetches detailed information for a given package. Use <see cref="GetOrFetchInfo(ChocolateyPackage)"/> to utilize cached details.</summary>
         /// <exception cref="ChocolateyException"></exception>
         public string FetchInfo(ChocolateyPackage package)
         {
