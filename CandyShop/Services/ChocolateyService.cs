@@ -2,12 +2,24 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace CandyShop
 {
     class ChocolateyService
     {
         private Dictionary<string, string> PackageInfoCache = new Dictionary<string, string>();
+
+        private Dictionary<string, ChocolateyPackage> InstalledPackages = new Dictionary<string, ChocolateyPackage>();
+
+        public IEnumerable<ChocolateyPackage> GetPackagesByName(IEnumerable<string> names)
+        {
+            return names.Select(name =>
+            {
+                InstalledPackages.TryGetValue(name, out ChocolateyPackage rtn);
+                return rtn;
+            });
+        }
 
         /// <exception cref="ChocolateyException"></exception>
         public async Task<List<ChocolateyPackage>> FetchInstalledAsync()
@@ -65,7 +77,12 @@ namespace CandyShop
                 }
             }
 
-            return GuessMetaPackages(packages);
+            packages = GuessMetaPackages(packages);
+
+            InstalledPackages.Clear();
+            packages.ForEach(p => InstalledPackages.Add(p.Name, p));
+
+            return packages;
         }
 
         /// <exception cref="ChocolateyException"></exception>

@@ -9,7 +9,7 @@ using System.Windows.Forms;
 using CandyShop.Properties;
 using System.Linq;
 
-namespace CandyShop.Controls
+namespace CandyShop.View
 {
     partial class CandyShopForm : Form
     {
@@ -25,6 +25,8 @@ namespace CandyShop.Controls
         private WindowsTaskService WindowsTaskService; // TODO remove
         private readonly CandyShopController CandyShopController;
 
+        public IInstalledPageView InstalledPackagesPage => InstalledPage;
+
         public CandyShopForm(CandyShopController candyShopController)
         {
             WindowsTaskService = new WindowsTaskService();
@@ -32,11 +34,6 @@ namespace CandyShop.Controls
             InitializeComponent();
 
             this.FormClosed += new FormClosedEventHandler((sender, e) => CandyShopController.CloseForm());
-        }
-
-        public void UpdateInstalledView(List<ChocolateyPackage> packages)
-        {
-            InstalledPage.UpdatePackageView(packages);
         }
 
         public void UpdateOutdatedView(List<ChocolateyPackage> packages)
@@ -63,7 +60,6 @@ namespace CandyShop.Controls
             UpgradePage.UpgradeAllClick += UpgradePage_UpgradeAllClick;
             UpgradePage.UpgradeSelectedClick += UpgradePage_UpgradeSelectedClick;
             UpgradePage.CancelClick += UpgradePage_CancelClick;
-            InstalledPage.SelectedPackageChanged += InstallPage_SelectedPackageChanged;
 
             // display admin warning or not
             this.Text = String.Format(Strings.Form_Title, Application.ProductName, Application.ProductVersion);
@@ -144,23 +140,6 @@ namespace CandyShop.Controls
         private void UpgradePage_CancelClick(object sender, EventArgs e)
         {
             CandyShopController.CancelForm();
-        }
-
-        private void InstallPage_SelectedPackageChanged(object sender, PackageChangedEventArgs e)
-        {
-            // all of this can go in InstalledPage, if installed page gets access to controller
-            // just pass package name here, not entire package; saves weird shit in InstalledPage
-            try
-            {
-                CandyShopController.GetPackageDetailsAsync(e.SelectedPackage.Name, (details) =>
-                {
-                    InstalledPage.UpdatePackageDetails(e.SelectedPackage, details);
-                });
-            }
-            catch (CandyShopException)
-            {
-                InstalledPage.UpdatePackageDetails(e.SelectedPackage, String.Empty);
-            }
         }
 
         private void ShowError(string msg)

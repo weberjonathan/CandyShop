@@ -1,5 +1,5 @@
 ﻿using CandyShop.Chocolatey;
-using CandyShop.Controls;
+using CandyShop.View;
 using CandyShop.Properties;
 using System;
 using System.Collections.Generic;
@@ -7,6 +7,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
+using CandyShop.Controller;
 
 namespace CandyShop
 {
@@ -38,8 +39,16 @@ namespace CandyShop
             }
             else
             {
-                _CandyShopController.ShowForm();
+                RunInWindow();
             }
+        }
+
+        private void RunInWindow()
+        {
+            // TODO all controllers, views should be initialised from here, if possible (eval)
+            _CandyShopController.ShowForm();
+            InstalledPageController installedPackagesController =
+                new InstalledPageController(_ChocolateyService, _CandyShopController.MainWindow.InstalledPackagesPage);
         }
 
         private async void RunInBackground()

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 
-namespace CandyShop.Controls
+namespace CandyShop.View
 {
     public partial class LicenseForm : Form
     {

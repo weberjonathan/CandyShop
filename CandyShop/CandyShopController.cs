@@ -1,5 +1,6 @@
 ﻿using CandyShop.Chocolatey;
-using CandyShop.Controls;
+using CandyShop.Controller;
+using CandyShop.View;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -30,6 +31,8 @@ namespace CandyShop
             _CandyShopForm = new CandyShopForm(this);
         }
 
+        public CandyShopForm MainWindow => _CandyShopForm;
+
         public bool LaunchedMinimized { get; set; } = false;
         
         private bool? _HasAdminPrivileges;
@@ -46,18 +49,6 @@ namespace CandyShop
 
                 return _HasAdminPrivileges.Value;
             }
-        }
-
-        /// <exception cref="ChocolateyException"></exception>
-        public async void GetPackageDetailsAsync(string packageName, Action<string> callback)
-        {
-            ChocolateyPackage packageMock = new ChocolateyPackage()
-            {
-                Name = packageName
-            };
-
-            string details = await _ChocolateyService.GetOrFetchInfo(packageMock);
-            callback(details);
         }
 
         public void LaunchUrl(string url)
@@ -222,7 +213,7 @@ namespace CandyShop
 
         public void SetInstalledPackages(List<ChocolateyPackage> outdatedPackages)
         {
-            _CandyShopForm.UpdateInstalledView(outdatedPackages);
+            //_CandyShopForm.UpdateInstalledView(outdatedPackages);
         }
 
         public void ShowForm()
