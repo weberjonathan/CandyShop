@@ -4,7 +4,7 @@ using CandyShop.Controller;
 
 namespace CandyShop.View
 {
-    partial class MainWindow : Form, IMainWindow
+    partial class MainWindow : Form, IMainWindowView
     {
         // remove and sort usings
         // check namepsaces
@@ -30,8 +30,8 @@ namespace CandyShop.View
         public event EventHandler CreateTaskEnabledChanged;
         public event EventHandler CancelPressed;
 
-        public IInstalledPage InstalledPackagesPage => InstalledPage;
-        public IUpgradePage UpgradePackagesPage => UpgradePage;
+        public IInstalledPageView InstalledPackagesPage => InstalledPage;
+        public IUpgradePageView UpgradePackagesPage => UpgradePage;
 
         public bool CreateTaskEnabled
         {

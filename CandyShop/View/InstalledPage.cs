@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace CandyShop.View
 {
-    partial class InstalledPage : UserControl, IInstalledPage
+    partial class InstalledPage : UserControl, IInstalledPageView
     {
         public InstalledPage()
         {

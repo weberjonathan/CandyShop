@@ -20,7 +20,7 @@ namespace CandyShop.Controller
         private readonly ChocolateyService ChocolateyService;
         private readonly WindowsTaskService WindowsTaskService;
         private readonly CandyShopContext CandyShopContext;
-        private IMainWindow MainView;
+        private IMainWindowView MainView;
 
         public MainWindowController(ChocolateyService chocolateyService, WindowsTaskService windowsTaskService, CandyShopContext candyShopContext)
         {
@@ -29,7 +29,7 @@ namespace CandyShop.Controller
             CandyShopContext = candyShopContext;
         }
 
-        public void SetView(IMainWindow mainView)
+        public void SetView(IMainWindowView mainView)
         {
             MainView = mainView;
         }

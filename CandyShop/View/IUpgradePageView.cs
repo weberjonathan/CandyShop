@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace CandyShop.View
 {
-    interface IUpgradePage
+    interface IUpgradePageView
     {
         public event EventHandler UpgradeAllClick;
         public event EventHandler UpgradeSelectedClick;

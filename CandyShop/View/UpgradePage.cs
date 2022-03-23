@@ -4,7 +4,7 @@ using System.Windows.Forms;
 
 namespace CandyShop.View
 {
-    public partial class UpgradePage : UserControl, IUpgradePage
+    public partial class UpgradePage : UserControl, IUpgradePageView
     {
         public UpgradePage()
         {

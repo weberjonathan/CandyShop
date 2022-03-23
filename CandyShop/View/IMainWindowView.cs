@@ -3,12 +3,12 @@ using System.Windows.Forms;
 
 namespace CandyShop.View
 {
-    interface IMainWindow
+    interface IMainWindowView
     {
         event EventHandler CancelPressed;
 
-        IInstalledPage InstalledPackagesPage { get; }
-        IUpgradePage UpgradePackagesPage { get; }
+        IInstalledPageView InstalledPackagesPage { get; }
+        IUpgradePageView UpgradePackagesPage { get; }
         bool CreateTaskEnabled { get; set; }
 
         void DisplayError(string msg);

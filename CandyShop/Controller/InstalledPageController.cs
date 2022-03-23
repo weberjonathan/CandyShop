@@ -10,9 +10,9 @@ namespace CandyShop.Controller
     class InstalledPageController
     {
         private readonly ChocolateyService ChocolateyService;
-        private readonly IInstalledPage View;
+        private readonly IInstalledPageView View;
 
-        public InstalledPageController(ChocolateyService chocolateyService, IInstalledPage view)
+        public InstalledPageController(ChocolateyService chocolateyService, IInstalledPageView view)
         {
             ChocolateyService = chocolateyService;
             View = view;

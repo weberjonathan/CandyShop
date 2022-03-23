@@ -25,8 +25,8 @@ namespace CandyShop
             WindowsTaskService windowsTaskService = new WindowsTaskService();
             MainWindowController candyShopController = new MainWindowController(chocolateyService, windowsTaskService, context);
             
-            IMainWindow mainView = new MainWindow(candyShopController);
-            IInstalledPage pageView = mainView.InstalledPackagesPage;
+            IMainWindowView mainView = new MainWindow(candyShopController);
+            IInstalledPageView pageView = mainView.InstalledPackagesPage;
 
             InstalledPageController installedPageController = new InstalledPageController(chocolateyService, pageView);
 

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace CandyShop.View
 {
-    interface IInstalledPage
+    interface IInstalledPageView
     {
         event EventHandler HideDependenciesChanged;
         event EventHandler FilterTextChanged;
