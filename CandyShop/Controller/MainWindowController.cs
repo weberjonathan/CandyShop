@@ -1,6 +1,7 @@
 ﻿using CandyShop.Chocolatey;
 using CandyShop.Controller;
 using CandyShop.View;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -12,16 +13,16 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace CandyShop
+namespace CandyShop.Controller
 {
-    internal class CandyShopController
+    internal class MainWindowController : IMainWindowController
     {
         private readonly ChocolateyService ChocolateyService;
         private readonly WindowsTaskService WindowsTaskService;
         private readonly CandyShopContext CandyShopContext;
         private IMainWindow MainView;
 
-        public CandyShopController(ChocolateyService chocolateyService, WindowsTaskService windowsTaskService, CandyShopContext candyShopContext)
+        public MainWindowController(ChocolateyService chocolateyService, WindowsTaskService windowsTaskService, CandyShopContext candyShopContext)
         {
             ChocolateyService = chocolateyService;
             WindowsTaskService = windowsTaskService;
@@ -31,39 +32,6 @@ namespace CandyShop
         public void SetView(IMainWindow mainView)
         {
             MainView = mainView;
-        }
-
-        public void OpenUrl(string url)
-        {
-            ProcessStartInfo info = new ProcessStartInfo()
-            {
-                FileName = "cmd",
-                Arguments = $"/c start {url}",
-                UseShellExecute = false,
-                CreateNoWindow = true
-            };
-
-            Process.Start(info);
-        }
-
-        public void ShowLicenseForm()
-        {
-            using LicenseForm form = new LicenseForm();
-            form.ShowDialog();
-        }
-
-        public List<string> SelectNormalAndMetaPackages(List<ChocolateyPackage> packages)
-        {
-            return packages
-                .Where(p => !(p.HasMetaPackage && p.HasSuffix))
-                .Select(p => p.Name)
-                .ToList();
-        }
-
-        public List<string> SelectNormalAndMetaPackages(List<string> packageNames)
-        {
-            List<ChocolateyPackage> packages = ChocolateyService.GetInstalledPackagesByName(packageNames);
-            return SelectNormalAndMetaPackages(packages);
         }
 
         public void PerformUpgrade(List<ChocolateyPackage> packages)
@@ -159,33 +127,78 @@ namespace CandyShop
             Environment.Exit(0);
         }
 
-        public void CloseForm()
-        {
-            Environment.Exit(0);
-        }
-
-        public void CancelForm()
-        {
-            if (CandyShopContext.LaunchedMinimized)
-            {
-                MainView.ToForm().Hide();
-            }
-            else
-            {
-                Environment.Exit(0);
-            }
-        }
-
         public void InitView()
         {
+            if (MainView == null) throw new InvalidOperationException("Set a view before intialising it!");
+
             RequestOutdatedPackagesAsync();
 
-            if (CandyShopContext.HasAdminPrivileges)
-                MainView.ClearAdminHints();
-            else
-                MainView.ShowAdminHints();
+            if (CandyShopContext.HasAdminPrivileges) MainView.ClearAdminHints();
+            else MainView.ShowAdminHints();
+
+            // TODO sure about this? was just taken from somewhere else but doesnt make sense?
+            MainView.ToForm().FormClosed += new FormClosedEventHandler((sender, e) =>
+            {
+                Log.Debug("Invoked FormClosed event handler on {}", MainView.ToForm());
+                Environment.Exit(0);
+            });
+
+            MainView.CancelPressed += new EventHandler((sender, e) =>
+            {
+                if (CandyShopContext.LaunchedMinimized) MainView.ToForm().Hide();
+                else Environment.Exit(0);
+            });
+
+            MainView.CreateTaskEnabled = WindowsTaskService.TaskExists();
 
             MainView.ToForm().Show();
+        }
+
+        public void SmartSelectPackages()
+        {
+            string[] displayedItemNames = MainView.UpgradePackagesPage.Items;
+            List<ChocolateyPackage> packages = ChocolateyService.GetInstalledPackagesByName(displayedItemNames.ToList());
+
+            List<string> smartSelected = packages
+                .Where(p => !(p.HasMetaPackage && p.HasSuffix))
+                .Select(p => p.Name)
+                .ToList();
+
+            List<string> newSelection = packages
+                .Where(p => !(p.HasMetaPackage && p.HasSuffix))
+                .Select(p => p.Name)
+                .ToList();
+
+            MainView.UpgradePackagesPage.CheckItemsByText(newSelection);
+        }
+
+        public void ShowGithub()
+        {
+            OpenUrl(Properties.Strings.Url_Github);
+        }
+
+        public void ShowMetaPackageHelp()
+        {
+            OpenUrl(Properties.Strings.Url_MetaPackages);
+        }
+
+        public void ShowLicenses()
+        {
+            using LicenseForm form = new LicenseForm();
+            form.ShowDialog();
+        }
+
+        public void ToggleCreateTask()
+        {
+            if (MainView.CreateTaskEnabled && !WindowsTaskService.TaskExists())
+            {
+                WindowsTaskService.CreateTask();
+            }
+
+            if (!MainView.CreateTaskEnabled && WindowsTaskService.TaskExists())
+            {
+                WindowsTaskService.RemoveTask();
+            }
         }
 
         private async void RequestOutdatedPackagesAsync()
@@ -208,7 +221,20 @@ namespace CandyShop
                 p.Pinned.ToString()
             }));
 
-            MainView.UpgradePackagesPage.CheckItemsByText(SelectNormalAndMetaPackages(packages));
+            SmartSelectPackages();
+        }
+
+        private void OpenUrl(string url)
+        {
+            ProcessStartInfo info = new ProcessStartInfo()
+            {
+                FileName = "cmd",
+                Arguments = $"/c start {url}",
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
+
+            Process.Start(info);
         }
     }
 }

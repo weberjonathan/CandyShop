@@ -6,16 +6,9 @@ namespace CandyShop
 {
     class WindowsTaskService
     {
-        private const string TASKNAME = "CandyShopLaunch";
+        internal const string TASKNAME = "CandyShopLaunch";
 
-        public WindowsTaskService()
-        {
-            LaunchWithWindows = TaskExists();
-        }
-
-        public bool LaunchWithWindows { get; private set; }
-
-        public void CreateTask()
+        internal void CreateTask()
         {
             string executable = Process.GetCurrentProcess().MainModule.FileName;
             string dir = Directory.GetParent(executable).FullName;
@@ -31,11 +24,9 @@ namespace CandyShop
             definition.Principal.RunLevel = TaskRunLevel.Highest;
 
             TaskService.Instance.RootFolder.RegisterTaskDefinition(TASKNAME, definition);
-
-            LaunchWithWindows = true;
         }
 
-        public void RemoveTask()
+        internal void RemoveTask()
         {
             using (TaskService ts = new TaskService())
             {
@@ -45,26 +36,18 @@ namespace CandyShop
                     ts.RootFolder.DeleteTask(TASKNAME);
                 }
             }
-
-            LaunchWithWindows = false;
         }
         
-        public bool TaskExists()
+        internal bool TaskExists()
         {
             using TaskService ts = new TaskService();
             return ts.GetTask(TASKNAME) != null;
         }
 
-        public void ToggleTask()
+        internal void ToggleTask()
         {
-            if (LaunchWithWindows)
-            {
-                RemoveTask();
-            }
-            else
-            {
-                CreateTask();
-            }
+            if (TaskExists()) RemoveTask();
+            if (!TaskExists()) CreateTask();
         }
     }
 }

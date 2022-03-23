@@ -1,6 +1,6 @@
 ﻿namespace CandyShop.View
 {
-    partial class CandyShopForm
+    partial class MainWindow
     {
         /// <summary>
         /// Required designer variable.
@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CandyShopForm));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainWindow));
             this.MainPanel = new System.Windows.Forms.Panel();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.TabUpgrade = new System.Windows.Forms.TabPage();
@@ -172,6 +172,7 @@
             this.MenuExtrasCreateTask.Name = "MenuExtrasCreateTask";
             this.MenuExtrasCreateTask.Size = new System.Drawing.Size(344, 22);
             this.MenuExtrasCreateTask.Text = "&Display notification for outdated packages on login";
+            this.MenuExtrasCreateTask.CheckedChanged += new System.EventHandler(this.MenuExtrasCreateTask_CheckedChanged);
             // 
             // MenuHelp
             // 

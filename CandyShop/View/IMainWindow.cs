@@ -1,13 +1,17 @@
-﻿using System.Windows.Forms;
+﻿using System;
+using System.Windows.Forms;
 
 namespace CandyShop.View
 {
     interface IMainWindow
     {
+        event EventHandler CancelPressed;
+
         IInstalledPage InstalledPackagesPage { get; }
         IUpgradePage UpgradePackagesPage { get; }
-        bool CreateTaskEnabled { get; }
+        bool CreateTaskEnabled { get; set; }
 
+        void DisplayError(string msg);
         void ClearAdminHints();
         void ShowAdminHints();
 

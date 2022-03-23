@@ -23,9 +23,9 @@ namespace CandyShop
             BeginLoadingOutdatedPackages(chocolateyService);
 
             WindowsTaskService windowsTaskService = new WindowsTaskService();
-            CandyShopController candyShopController = new CandyShopController(chocolateyService, windowsTaskService, context);
+            MainWindowController candyShopController = new MainWindowController(chocolateyService, windowsTaskService, context);
             
-            IMainWindow mainView = new CandyShopForm(candyShopController);
+            IMainWindow mainView = new MainWindow(candyShopController);
             IInstalledPage pageView = mainView.InstalledPackagesPage;
 
             InstalledPageController installedPageController = new InstalledPageController(chocolateyService, pageView);
@@ -51,7 +51,7 @@ namespace CandyShop
             await service.GetOutdatedPackagesAsync();
         }
 
-        private async void RunInBackground(CandyShopController controller, ChocolateyService service)
+        private async void RunInBackground(MainWindowController controller, ChocolateyService service)
         {
             List<ChocolateyPackage> packages = null;
 
