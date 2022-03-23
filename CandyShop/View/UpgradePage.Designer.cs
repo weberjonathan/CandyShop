@@ -67,6 +67,7 @@ namespace CandyShop.View
             this.PanelTop.Name = "PanelTop";
             this.PanelTop.Size = new System.Drawing.Size(637, 47);
             this.PanelTop.TabIndex = 2;
+            this.PanelTop.Visible = false;
             // 
             // panel1
             // 

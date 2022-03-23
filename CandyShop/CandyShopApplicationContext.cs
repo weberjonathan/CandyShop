@@ -6,52 +6,52 @@ using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Linq;
 using System.Windows.Forms;
 using CandyShop.Controller;
+using Serilog;
 
 namespace CandyShop
 {
     public class CandyShopApplicationContext : ApplicationContext
     {
-        private const string OPTION_BACKGROUND = "--background";
-        private const string OPTION_BACKGROUND_SHORT = "-b";
-
-        private readonly CandyShopController _CandyShopController;
-
-        private readonly ChocolateyService _ChocolateyService;
-
         public CandyShopApplicationContext()
         {
-            _ChocolateyService = new ChocolateyService();
-            _CandyShopController = new CandyShopController(_ChocolateyService, null); // TODO
+            CandyShopContext context = new CandyShopContext();
+            
+            ChocolateyService chocolateyService = new ChocolateyService();
+            BeginLoadingOutdatedPackages(chocolateyService);
 
-            // determine silent mode
-            List<string> args = new List<string>(Environment.GetCommandLineArgs());
-            _CandyShopController.LaunchedMinimized = args.Find(s => s.Equals(OPTION_BACKGROUND) ||
-                                                  s.Equals(OPTION_BACKGROUND_SHORT)) != null; // TODO eval != null
+            WindowsTaskService windowsTaskService = new WindowsTaskService();
+            CandyShopController candyShopController = new CandyShopController(chocolateyService, windowsTaskService, context);
+            
+            IMainWindow mainView = new CandyShopForm(candyShopController);
+            IInstalledPage pageView = mainView.InstalledPackagesPage;
+
+            InstalledPageController installedPageController = new InstalledPageController(chocolateyService, pageView);
+
+            candyShopController.SetView(mainView);
 
             // launch with form or in tray
-            if (_CandyShopController.LaunchedMinimized)
+            if (context.LaunchedMinimized)
             {
                 // creates a tray icon, displays a notification if outdated packages
                 // are found and opens the upgrade UI on click
-                RunInBackground();
+                RunInBackground(candyShopController, chocolateyService);
             }
             else
             {
-                RunInWindow();
+                // launch window
+                candyShopController.InitView();
             }
         }
 
-        private void RunInWindow()
+        private async void BeginLoadingOutdatedPackages(ChocolateyService service)
         {
-            // TODO all controllers, views should be initialised from here, if possible (eval)
-            _CandyShopController.ShowForm();
-            InstalledPageController installedPackagesController =
-                new InstalledPageController(_ChocolateyService, _CandyShopController.MainWindow.InstalledPackagesPage);
+            await service.GetOutdatedPackagesAsync();
         }
 
-        private async void RunInBackground()
+        private async void RunInBackground(CandyShopController controller, ChocolateyService service)
         {
             List<ChocolateyPackage> packages = null;
 
@@ -61,7 +61,7 @@ namespace CandyShop
             // obtain outdated packages
             try
             {
-                packages = await _ChocolateyService.FetchOutdatedAsync();
+                packages = await service.GetOutdatedPackagesAsync();
             }
             catch (ChocolateyException)
             {
@@ -73,17 +73,15 @@ namespace CandyShop
                 Environment.Exit(0);
             }
 
-            _CandyShopController.SetOutdatedPackages(packages);
-
             // create click handlers
             icon.BalloonTipClicked += new EventHandler((sender, e) =>
             {
-                _CandyShopController.ShowForm();
+                controller.InitView();
             });
 
             icon.MouseClick += new MouseEventHandler((sender, e) =>
             {
-                _CandyShopController.ShowForm();
+                controller.InitView();
             });
 
 

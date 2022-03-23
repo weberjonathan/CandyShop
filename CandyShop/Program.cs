@@ -1,3 +1,4 @@
+using Serilog;
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -10,6 +11,13 @@ namespace CandyShop
         [STAThread]
         static void Main(string[] args)
         {
+            // configure logger
+            Log.Logger = new LoggerConfiguration()
+                .MinimumLevel.Debug()
+                .WriteTo.Debug()
+                //.WriteTo.File("test.log")
+                .CreateLogger();
+
             // check if Chocolatey is in path
             try
             {

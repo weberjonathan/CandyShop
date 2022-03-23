@@ -1,14 +1,11 @@
-﻿using CandyShop.Chocolatey;
-using CandyShop.Controller;
-using CandyShop.Properties;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
 using System.Linq;
 
 namespace CandyShop.View
 {
-    partial class InstalledPage : UserControl, IInstalledPageView
+    partial class InstalledPage : UserControl, IInstalledPage
     {
         public InstalledPage()
         {
@@ -28,6 +25,10 @@ namespace CandyShop.View
             });
         }
 
+        public event EventHandler HideDependenciesChanged;
+        public event EventHandler FilterTextChanged;
+        public event EventHandler SelectedItemChanged;
+
         public string SelectedItem
         {
             get
@@ -41,48 +42,45 @@ namespace CandyShop.View
 
         public bool HideDependencies => CheckHideSuffixed.Checked;
 
-        public List<string> Items
-        {
-            get
-            {
-                var listViewItems = (IEnumerable<ListViewItem>) LstPackages.Items;
-                return listViewItems.Select(item => item.Text).ToList();
-            }
-        }
+        public List<string> Items => LstPackages.Items
+            .Cast<ListViewItem>()
+            .Select(item => item.Text)
+            .ToList();
 
-        public string FilterText => throw new NotImplementedException();
-
-        public event EventHandler HideDependenciesChanged;
-        public event EventHandler FilterTextChanged;
-        public event EventHandler SelectedItemChanged;
+        public string FilterText => TextSearch.Text;
 
         public void AppendItem(string name, string version)
         {
             LstPackages.Items.Add(new ListViewItem(new string[] { name, version }));
         }
 
-        public void InsertItem(string name, string version)
+        //public void InsertItem(string name, string version)
+        //{
+        //    int latestPossibleIndex = LstPackages.FindItemWithText(name).Index;
+        //    ListViewItem lastVisibilePackage = null;
+
+        //    // find package that is supposed to be directly above it
+        //    for (int j = 0; j < latestPossibleIndex; j++)
+        //    {
+        //        ListViewItem previousPackage = LstPackages.FindItemWithText(Items[j]);
+        //        if (previousPackage != null)
+        //        {
+        //            lastVisibilePackage = previousPackage;
+        //        }
+        //    }
+
+        //    // insert
+        //    int index = 0;
+        //    if (lastVisibilePackage != null)
+        //    {
+        //        index = LstPackages.Items.IndexOf(lastVisibilePackage) + 1;
+        //    }
+
+        //    LstPackages.Items.Insert(index, new ListViewItem(new string[] { name, version }));
+        //}
+
+        public void InsertItem(int index, string name, string version)
         {
-            int latestPossibleIndex = LstPackages.FindItemWithText(name).Index;
-            ListViewItem lastVisibilePackage = null;
-
-            // find package that is supposed to be directly above it
-            for (int j = 0; j < latestPossibleIndex; j++)
-            {
-                ListViewItem previousPackage = LstPackages.FindItemWithText(Items[j]);
-                if (previousPackage != null)
-                {
-                    lastVisibilePackage = previousPackage;
-                }
-            }
-
-            // insert
-            int index = 0;
-            if (lastVisibilePackage != null)
-            {
-                index = LstPackages.Items.IndexOf(lastVisibilePackage) + 1;
-            }
-
             LstPackages.Items.Insert(index, new ListViewItem(new string[] { name, version }));
         }
 

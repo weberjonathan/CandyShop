@@ -8,10 +8,11 @@ using System.Security.Principal;
 using System.Windows.Forms;
 using CandyShop.Properties;
 using System.Linq;
+using Serilog;
 
 namespace CandyShop.View
 {
-    partial class CandyShopForm : Form
+    partial class CandyShopForm : Form, IMainWindow
     {
         // TODO remove WindowsTaskService, use controller
         // remove and sort usings
@@ -23,9 +24,7 @@ namespace CandyShop.View
         // https://github.com/DotNetAnalyzers/StyleCopAnalyzers/blob/master/documentation/SA1201.md
 
         private WindowsTaskService WindowsTaskService; // TODO remove
-        private readonly CandyShopController CandyShopController;
-
-        public IInstalledPageView InstalledPackagesPage => InstalledPage;
+        private readonly CandyShopController CandyShopController; // TODO remove
 
         public CandyShopForm(CandyShopController candyShopController)
         {
@@ -33,25 +32,29 @@ namespace CandyShop.View
             CandyShopController = candyShopController;
             InitializeComponent();
 
-            this.FormClosed += new FormClosedEventHandler((sender, e) => CandyShopController.CloseForm());
+            Text = String.Format(Properties.Strings.Form_Title, Application.ProductName, Application.ProductVersion);
+            
+            FormClosed += new FormClosedEventHandler((sender, e) => CandyShopController.CloseForm());
+            MenuExtrasCreateTask.CheckedChanged += new EventHandler((sender, e) => CreateTaskEnabledChanged?.Invoke(sender, e));
         }
 
-        public void UpdateOutdatedView(List<ChocolateyPackage> packages)
+        public event EventHandler CreateTaskEnabledChanged;
+
+        public IInstalledPage InstalledPackagesPage => InstalledPage;
+        public IUpgradePage UpgradePackagesPage => UpgradePage;
+
+        public bool CreateTaskEnabled => MenuExtrasCreateTask.Checked;
+
+        public void ShowAdminHints()
         {
-            if (packages == null)
-            {
-                ShowError(Strings.Err_CheckOutdated);
-            }
+            UpgradePage.ShowAdminWarning = true;
+            this.Text = String.Format(Properties.Strings.Form_Title, Application.ProductName, Application.ProductVersion) + Properties.Strings.Form_Title_AdminHint;
+        }
 
-            string[][] items = packages.Select(package => new string[] {
-                package.Name,
-                package.CurrVer,
-                package.AvailVer,
-                package.Pinned.ToString()
-            }).ToArray();
-
-            UpgradePage.UpdatePackageView(items);
-            UpgradePage.CheckItemsByName(CandyShopController.SelectNormalAndMetaPackages(packages));
+        public void ClearAdminHints()
+        {
+            UpgradePage.ShowAdminWarning = false;
+            this.Text = String.Format(Properties.Strings.Form_Title, Application.ProductName, Application.ProductVersion);
         }
 
         private void ChocoAutoUpdateForm_Load(object sender, EventArgs e)
@@ -60,18 +63,6 @@ namespace CandyShop.View
             UpgradePage.UpgradeAllClick += UpgradePage_UpgradeAllClick;
             UpgradePage.UpgradeSelectedClick += UpgradePage_UpgradeSelectedClick;
             UpgradePage.CancelClick += UpgradePage_CancelClick;
-
-            // display admin warning or not
-            this.Text = String.Format(Strings.Form_Title, Application.ProductName, Application.ProductVersion);
-            if (CandyShopController.HasAdminPrivileges)
-            {
-                UpgradePage.ShowAdminWarning = false;
-            }
-            else
-            {
-                UpgradePage.ShowAdminWarning = true;
-                this.Text += Strings.Form_Title;
-            }
 
             // check task entry or not
             MenuExtrasCreateTask.Checked = WindowsTaskService.TaskExists();
@@ -86,9 +77,9 @@ namespace CandyShop.View
 
         private void MenuEditSelectRelevant_Click(object sender, EventArgs e)
         {
-            List<string> packageNames = UpgradePage.ItemNames.ToList();
+            List<string> packageNames = UpgradePage.Items.ToList();
             packageNames = CandyShopController.SelectNormalAndMetaPackages(packageNames);
-            UpgradePage.CheckItemsByName(packageNames);
+            UpgradePage.CheckItemsByText(packageNames);
         }
 
         private void MenuEditDeselectAll_Click(object sender, EventArgs e)
@@ -96,20 +87,9 @@ namespace CandyShop.View
             UpgradePage.UncheckAllItems();
         }
 
-        private void MenuExtrasCreateTask_Click(object sender, EventArgs e)
-        {
-            if (CandyShopController.HasAdminPrivileges)
-            {
-                ShowError(Strings.Err_RequireAdmin);
-                return;
-            }
-
-            WindowsTaskService.ToggleTask();
-        }
-
         private void MenuHelpGithub_Click(object sender, EventArgs e)
         {
-            CandyShopController.LaunchUrl(Strings.Url_Github);
+            CandyShopController.OpenUrl(Strings.Url_Github);
         }
 
         private void MenuHelpLicense_Click(object sender, EventArgs e)
@@ -119,22 +99,22 @@ namespace CandyShop.View
 
         private void MenuHelpMetaPackages_Click(object sender, EventArgs e)
         {
-            CandyShopController.LaunchUrl(Strings.Url_MetaPackages);
+            CandyShopController.OpenUrl(Strings.Url_MetaPackages);
         }
 
         private void UpgradePage_UpgradeAllClick(object sender, EventArgs e)
         {
-            List<ChocolateyPackage> packages =
-                CandyShopController.GetPackagesByName(UpgradePage.ItemNames.ToList());
-            CandyShopController.PerformUpgrade(packages);
+            //List<ChocolateyPackage> packages =
+            //    CandyShopController.GetPackagesByName(UpgradePage.Items.ToList());
+            //CandyShopController.PerformUpgrade(packages);
         }
 
         private void UpgradePage_UpgradeSelectedClick(object sender, EventArgs e)
         {
-            List<ChocolateyPackage> packages =
-                CandyShopController.GetPackagesByName(UpgradePage.SelectedItemNames.ToList());
+            //List<ChocolateyPackage> packages =
+            //    CandyShopController.GetPackagesByName(UpgradePage.SelectedItems.ToList());
 
-            if (packages.Count > 0) CandyShopController.PerformUpgrade(packages);
+            //if (packages.Count > 0) CandyShopController.PerformUpgrade(packages);
         }
 
         private void UpgradePage_CancelClick(object sender, EventArgs e)

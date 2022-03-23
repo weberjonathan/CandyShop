@@ -16,42 +16,24 @@ namespace CandyShop
 {
     internal class CandyShopController
     {
-        private readonly ChocolateyService _ChocolateyService;
-        private readonly WindowsTaskService _WindowsTaskService;
-        private CandyShopForm _CandyShopForm;
+        private readonly ChocolateyService ChocolateyService;
+        private readonly WindowsTaskService WindowsTaskService;
+        private readonly CandyShopContext CandyShopContext;
+        private IMainWindow MainView;
 
-        private Dictionary<string, ChocolateyPackage> _InstalledPackages;
-        private List<ChocolateyPackage> _OutdatedPackages;
-
-        public CandyShopController(ChocolateyService chocolateyService, WindowsTaskService windowsTaskService)
+        public CandyShopController(ChocolateyService chocolateyService, WindowsTaskService windowsTaskService, CandyShopContext candyShopContext)
         {
-            _ChocolateyService = chocolateyService;
-            _WindowsTaskService = windowsTaskService;
-
-            _CandyShopForm = new CandyShopForm(this);
+            ChocolateyService = chocolateyService;
+            WindowsTaskService = windowsTaskService;
+            CandyShopContext = candyShopContext;
         }
 
-        public CandyShopForm MainWindow => _CandyShopForm;
-
-        public bool LaunchedMinimized { get; set; } = false;
-        
-        private bool? _HasAdminPrivileges;
-        public bool HasAdminPrivileges
+        public void SetView(IMainWindow mainView)
         {
-            get
-            {
-                if (_HasAdminPrivileges == null)
-                {
-                    using WindowsIdentity identity = WindowsIdentity.GetCurrent();
-                    WindowsPrincipal principal = new WindowsPrincipal(identity);
-                    _HasAdminPrivileges = principal.IsInRole(WindowsBuiltInRole.Administrator);
-                }
-
-                return _HasAdminPrivileges.Value;
-            }
+            MainView = mainView;
         }
 
-        public void LaunchUrl(string url)
+        public void OpenUrl(string url)
         {
             ProcessStartInfo info = new ProcessStartInfo()
             {
@@ -80,25 +62,13 @@ namespace CandyShop
 
         public List<string> SelectNormalAndMetaPackages(List<string> packageNames)
         {
-            List<ChocolateyPackage> packages = GetPackagesByName(packageNames);
+            List<ChocolateyPackage> packages = ChocolateyService.GetInstalledPackagesByName(packageNames);
             return SelectNormalAndMetaPackages(packages);
-        }
-
-        // TODO eval
-        public List<ChocolateyPackage> GetPackagesByName(List<string> names)
-        {
-            // TODO fetch shit if needed, but lock
-            // make it safe
-
-            List<ChocolateyPackage> packages =
-                names.Select(name => _InstalledPackages[name]).ToList();
-
-            return packages;
         }
 
         public void PerformUpgrade(List<ChocolateyPackage> packages)
         {
-            _CandyShopForm.Hide();
+            MainView.ToForm().Hide();
 
             // setup watcher for desktop shortcuts
             Queue<string> shortcuts = new Queue<string>();
@@ -124,7 +94,7 @@ namespace CandyShop
 
                 try
                 {
-                    _ChocolateyService.Upgrade(packages);
+                    ChocolateyService.Upgrade(packages);
                 }
                 catch (ChocolateyException e)
                 {
@@ -196,9 +166,9 @@ namespace CandyShop
 
         public void CancelForm()
         {
-            if (LaunchedMinimized)
+            if (CandyShopContext.LaunchedMinimized)
             {
-                _CandyShopForm.Hide();
+                MainView.ToForm().Hide();
             }
             else
             {
@@ -206,52 +176,39 @@ namespace CandyShop
             }
         }
 
-        public void SetOutdatedPackages(List<ChocolateyPackage> outdatedPackages)
+        public void InitView()
         {
-            _CandyShopForm.UpdateOutdatedView(outdatedPackages);
+            RequestOutdatedPackagesAsync();
+
+            if (CandyShopContext.HasAdminPrivileges)
+                MainView.ClearAdminHints();
+            else
+                MainView.ShowAdminHints();
+
+            MainView.ToForm().Show();
         }
 
-        public void SetInstalledPackages(List<ChocolateyPackage> outdatedPackages)
+        private async void RequestOutdatedPackagesAsync()
         {
-            //_CandyShopForm.UpdateInstalledView(outdatedPackages);
-        }
-
-        public void ShowForm()
-        {
-            if (!LaunchedMinimized)
-            {
-                LoadPackages();
-            }
-
-            _CandyShopForm.Show();
-        }
-
-        private async void LoadPackages()
-        {
-            List<ChocolateyPackage> outdatedPackages = null;
-            List<ChocolateyPackage> installedPackages = null;
-
+            List<ChocolateyPackage> packages = new List<ChocolateyPackage>();
             try
             {
-                outdatedPackages = await _ChocolateyService.FetchOutdatedAsync();
+                packages = await ChocolateyService.GetOutdatedPackagesAsync();
             }
             catch (ChocolateyException)
             {
-                // TODO
-            }
-
-            try
-            {
-                installedPackages = await _ChocolateyService.FetchInstalledAsync();
-            }
-            catch (ChocolateyException)
-            {
-
                 throw;
             }
 
-            SetOutdatedPackages(outdatedPackages);
-            SetInstalledPackages(installedPackages);
+            packages.ForEach(p => MainView.UpgradePackagesPage.AddItem(new string[]
+            {
+                p.Name,
+                p.CurrVer,
+                p.AvailVer,
+                p.Pinned.ToString()
+            }));
+
+            MainView.UpgradePackagesPage.CheckItemsByText(SelectNormalAndMetaPackages(packages));
         }
     }
 }

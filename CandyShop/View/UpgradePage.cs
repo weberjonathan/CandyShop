@@ -1,15 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Windows.Forms;
 
 namespace CandyShop.View
 {
-    public partial class UpgradePage : UserControl
+    public partial class UpgradePage : UserControl, IUpgradePage
     {
         public UpgradePage()
         {
             InitializeComponent();
+
+            PanelTop.Visible = false;
 
             LstPackages.ItemChecked += LstPackages_ItemChecked;
             LstPackages.Resize += LstPackages_Resize;
@@ -19,12 +20,10 @@ namespace CandyShop.View
         }
 
         public event EventHandler UpgradeAllClick;
-
         public event EventHandler UpgradeSelectedClick;
-
         public event EventHandler CancelClick;
 
-        public string[] ItemNames
+        public string[] Items
         {
             get
             {
@@ -37,17 +36,8 @@ namespace CandyShop.View
                 return rtn;
             }
         }
-
-        public bool ShowAdminWarning {
-            get {
-                return PanelTop.Visible;
-            }
-            set {
-                PanelTop.Visible = value;
-            }
-        }
-
-        public string[] SelectedItemNames {
+        
+        public string[] SelectedItems {
             get {
                 string[] rtn = new string[LstPackages.CheckedItems.Count];
                 for (int i = 0; i < rtn.Length; i++)
@@ -59,23 +49,26 @@ namespace CandyShop.View
             }
         }
 
-        public void UpdatePackageView(string[][] items)
+        public bool ShowAdminWarning
         {
-            LblLoading.Visible = false;
-
-            if (items.Length > 0)
+            get
             {
-                BtnUpgradeSelected.Enabled = true;
-                BtnUpgradeAll.Enabled = true;
-
-                ListViewItem[] listViewItems = items
-                    .Select(item => new ListViewItem(item)
-                    {
-                        Name = item[0]
-                    })
-                    .ToArray();
-                LstPackages.Items.AddRange(listViewItems);
+                return PanelTop.Visible;
             }
+            set
+            {
+                PanelTop.Visible = value;
+            }
+        }
+
+        public void AddItem(string[] data)
+        {
+            ListViewItem item = new ListViewItem(data);
+            LstPackages.Items.Add(item);
+            
+            LblLoading.Visible = false;
+            BtnUpgradeSelected.Enabled = true;
+            BtnUpgradeAll.Enabled = true;
         }
 
         public void CheckAllItems()
@@ -86,13 +79,14 @@ namespace CandyShop.View
             }
         }
 
-        public void CheckItemsByName(List<string> items)
+        public void CheckItemsByText(List<string> texts)
         {
-            foreach (string key in items)
+            foreach (string text in texts)
             {
-                if (LstPackages.Items.ContainsKey(key))
+                ListViewItem item = LstPackages.FindItemWithText(text);
+                if (item != null)
                 {
-                    LstPackages.Items[key].Checked = true;
+                    item.Checked = true;
                 }
             }
         }
