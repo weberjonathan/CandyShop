@@ -7,7 +7,7 @@ using CandyShop.Services;
 
 namespace CandyShop.Controller
 {
-    class InstalledPageController
+    class InstalledPageController : IInstalledPageController
     {
         private readonly ChocolateyService ChocolateyService;
         private IInstalledPageView View;
@@ -15,7 +15,6 @@ namespace CandyShop.Controller
         public InstalledPageController(ChocolateyService chocolateyService)
         {
             ChocolateyService = chocolateyService;
-            RequestInstalledPackagesAsync();
         }
 
         public void InjectView(IInstalledPageView view)
@@ -25,6 +24,11 @@ namespace CandyShop.Controller
             View.FilterTextChanged += new EventHandler((sender, e) => SyncListView());
             View.HideDependenciesChanged += new EventHandler((sender, e) => SyncListView());
             View.SelectedItemChanged += OnSelectedItemChanged;
+        }
+
+        public void InitView()
+        {
+            RequestInstalledPackagesAsync();
         }
 
         private async void RequestInstalledPackagesAsync()

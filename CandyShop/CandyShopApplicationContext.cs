@@ -41,6 +41,7 @@ namespace CandyShop
             {
                 // launch window
                 candyShopController.InitView();
+                installedPageController.InitView();
             }
         }
 
