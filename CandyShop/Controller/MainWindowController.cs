@@ -1,16 +1,12 @@
 ﻿using CandyShop.Chocolatey;
-using CandyShop.Controller;
+using CandyShop.Services;
 using CandyShop.View;
-using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Security.Principal;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace CandyShop.Controller
@@ -29,14 +25,14 @@ namespace CandyShop.Controller
             CandyShopContext = candyShopContext;
         }
 
-        public void SetView(IMainWindowView mainView)
+        public void InjectView(IMainWindowView mainView)
         {
             MainView = mainView;
         }
 
         public void PerformUpgrade(List<ChocolateyPackage> packages)
         {
-            MainView.ToForm().Hide();
+            MainView?.ToForm().Hide();
 
             // setup watcher for desktop shortcuts
             Queue<string> shortcuts = new Queue<string>();
@@ -57,7 +53,7 @@ namespace CandyShop.Controller
                 watcher.EndInit();
 
                 // upgrade
-                ConsoleManager.AllocConsole();
+                WindowsConsole.AllocConsole();
                 Console.CursorVisible = false;
 
                 try
@@ -79,10 +75,10 @@ namespace CandyShop.Controller
             }
 
             // display results
-            IntPtr handle = ConsoleManager.GetConsoleWindow();
+            IntPtr handle = WindowsConsole.GetConsoleWindow();
             if (!IntPtr.Zero.Equals(handle))
             {
-                ConsoleManager.SetForegroundWindow(handle);
+                WindowsConsole.SetForegroundWindow(handle);
             }
             Console.CursorVisible = false;
             Console.Write("\nPress any key to continue... ");
@@ -136,13 +132,13 @@ namespace CandyShop.Controller
             if (CandyShopContext.HasAdminPrivileges) MainView.ClearAdminHints();
             else MainView.ShowAdminHints();
 
-            // TODO sure about this? was just taken from somewhere else but doesnt make sense?
+            // exit application on 'X'
             MainView.ToForm().FormClosed += new FormClosedEventHandler((sender, e) =>
             {
-                Log.Debug("Invoked FormClosed event handler on {}", MainView.ToForm());
                 Environment.Exit(0);
             });
 
+            // exit or hide application on 'Cancel', depending on how it was created
             MainView.CancelPressed += new EventHandler((sender, e) =>
             {
                 if (CandyShopContext.LaunchedMinimized) MainView.ToForm().Hide();

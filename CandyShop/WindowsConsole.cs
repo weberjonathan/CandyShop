@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace CandyShop
 {
-    internal class ConsoleManager
+    internal class WindowsConsole
     {
         [DllImport("kernel32.dll", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]

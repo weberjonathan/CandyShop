@@ -4,14 +4,17 @@ using System.Security.Principal;
 
 namespace CandyShop
 {
-    class CandyShopContext
+    /// <summary>
+    /// Determines and contains relevant information for the execution of CandyShop, such as command-line options
+    /// </summary>
+    internal class CandyShopContext
     {
-        internal const string OPTION_BACKGROUND = "--background";
-        internal const string OPTION_BACKGROUND_SHORT = "-b";
+        private const string OPTION_BACKGROUND = "--background";
+        private const string OPTION_BACKGROUND_SHORT = "-b";
 
-        internal static bool ContainsArguments(params string[] arguments)
+        private static bool ContainsLaunchOption(params string[] options)
         {
-            return Environment.GetCommandLineArgs().Intersect(arguments).Count() > 0;
+            return Environment.GetCommandLineArgs().Intersect(options).Count() > 0;
         }
 
         public CandyShopContext()
@@ -22,11 +25,11 @@ namespace CandyShop
                 HasAdminPrivileges = principal.IsInRole(WindowsBuiltInRole.Administrator);
             }
 
-            LaunchedMinimized = ContainsArguments(OPTION_BACKGROUND, OPTION_BACKGROUND_SHORT);
+            LaunchedMinimized = ContainsLaunchOption(OPTION_BACKGROUND, OPTION_BACKGROUND_SHORT);
         }
 
-        internal bool LaunchedMinimized { get; set; } = false;
+        public bool LaunchedMinimized { get; set; } = false;
 
-        internal bool HasAdminPrivileges { get; set; } = false;
+        public bool HasAdminPrivileges { get; set; } = false;
     }
 }

@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using CandyShop.View;
 
 namespace CandyShop.Controller
 {
     interface IMainWindowController
     {
+        void InjectView(IMainWindowView mainView);
+        void InitView();
         void SmartSelectPackages();
         void ShowGithub();
         void ShowMetaPackageHelp();

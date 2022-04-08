@@ -54,31 +54,6 @@ namespace CandyShop.View
             LstPackages.Items.Add(new ListViewItem(new string[] { name, version }));
         }
 
-        //public void InsertItem(string name, string version)
-        //{
-        //    int latestPossibleIndex = LstPackages.FindItemWithText(name).Index;
-        //    ListViewItem lastVisibilePackage = null;
-
-        //    // find package that is supposed to be directly above it
-        //    for (int j = 0; j < latestPossibleIndex; j++)
-        //    {
-        //        ListViewItem previousPackage = LstPackages.FindItemWithText(Items[j]);
-        //        if (previousPackage != null)
-        //        {
-        //            lastVisibilePackage = previousPackage;
-        //        }
-        //    }
-
-        //    // insert
-        //    int index = 0;
-        //    if (lastVisibilePackage != null)
-        //    {
-        //        index = LstPackages.Items.IndexOf(lastVisibilePackage) + 1;
-        //    }
-
-        //    LstPackages.Items.Insert(index, new ListViewItem(new string[] { name, version }));
-        //}
-
         public void InsertItem(int index, string name, string version)
         {
             LstPackages.Items.Insert(index, new ListViewItem(new string[] { name, version }));

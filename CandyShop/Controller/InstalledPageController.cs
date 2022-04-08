@@ -3,25 +3,28 @@ using System;
 using System.Collections.Generic;
 using CandyShop.View;
 using CandyShop.Properties;
-using System.Linq;
+using CandyShop.Services;
 
 namespace CandyShop.Controller
 {
     class InstalledPageController
     {
         private readonly ChocolateyService ChocolateyService;
-        private readonly IInstalledPageView View;
+        private IInstalledPageView View;
 
-        public InstalledPageController(ChocolateyService chocolateyService, IInstalledPageView view)
+        public InstalledPageController(ChocolateyService chocolateyService)
         {
             ChocolateyService = chocolateyService;
+            RequestInstalledPackagesAsync();
+        }
+
+        public void InjectView(IInstalledPageView view)
+        {
             View = view;
 
             View.FilterTextChanged += new EventHandler((sender, e) => SyncListView());
             View.HideDependenciesChanged += new EventHandler((sender, e) => SyncListView());
             View.SelectedItemChanged += OnSelectedItemChanged;
-
-            RequestInstalledPackagesAsync();
         }
 
         private async void RequestInstalledPackagesAsync()

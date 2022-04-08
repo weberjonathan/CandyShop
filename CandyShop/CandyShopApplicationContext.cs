@@ -3,34 +3,32 @@ using CandyShop.View;
 using CandyShop.Properties;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Linq;
 using System.Windows.Forms;
 using CandyShop.Controller;
-using Serilog;
+using CandyShop.Services;
 
 namespace CandyShop
 {
-    public class CandyShopApplicationContext : ApplicationContext
+    internal class CandyShopApplicationContext : ApplicationContext
     {
         public CandyShopApplicationContext()
         {
+            // init context, services
             CandyShopContext context = new CandyShopContext();
-            
             ChocolateyService chocolateyService = new ChocolateyService();
-            BeginLoadingOutdatedPackages(chocolateyService);
-
             WindowsTaskService windowsTaskService = new WindowsTaskService();
-            MainWindowController candyShopController = new MainWindowController(chocolateyService, windowsTaskService, context);
             
+            LoadOutdatedPackagesAsync(chocolateyService);
+
+            // init controller
+            MainWindowController candyShopController = new MainWindowController(chocolateyService, windowsTaskService, context);
+            InstalledPageController installedPageController = new InstalledPageController(chocolateyService);
+
+            // init views
             IMainWindowView mainView = new MainWindow(candyShopController);
             IInstalledPageView pageView = mainView.InstalledPackagesPage;
-
-            InstalledPageController installedPageController = new InstalledPageController(chocolateyService, pageView);
-
-            candyShopController.SetView(mainView);
+            installedPageController.InjectView(pageView);
+            candyShopController.InjectView(mainView);
 
             // launch with form or in tray
             if (context.LaunchedMinimized)
@@ -46,7 +44,7 @@ namespace CandyShop
             }
         }
 
-        private async void BeginLoadingOutdatedPackages(ChocolateyService service)
+        private async void LoadOutdatedPackagesAsync(ChocolateyService service)
         {
             await service.GetOutdatedPackagesAsync();
         }

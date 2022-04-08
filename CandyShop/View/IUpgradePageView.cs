@@ -5,9 +5,9 @@ namespace CandyShop.View
 {
     interface IUpgradePageView
     {
-        public event EventHandler UpgradeAllClick;
-        public event EventHandler UpgradeSelectedClick;
-        public event EventHandler CancelClick;
+        event EventHandler UpgradeAllClick;
+        event EventHandler UpgradeSelectedClick;
+        event EventHandler CancelClick;
 
         string[] Items { get; }
         string[] SelectedItems { get; }

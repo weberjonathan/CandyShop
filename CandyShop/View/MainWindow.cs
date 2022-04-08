@@ -6,15 +6,6 @@ namespace CandyShop.View
 {
     partial class MainWindow : Form, IMainWindowView
     {
-        // remove and sort usings
-        // check namepsaces
-        // consistent behavior between controls
-        // use controller for all methods in here
-        // use consistent naming for private members
-        // use consistent layout privates -> constructor -> properties -> methods https://docs.microsoft.com/en-us/dotnet/csharp/fundamentals/coding-style/coding-conventions
-        // https://github.com/DotNetAnalyzers/StyleCopAnalyzers/blob/master/documentation/SA1201.md
-        // clean names of string table
-
         private IMainWindowController Controller;
 
         public MainWindow(IMainWindowController candyShopController)
@@ -23,11 +14,8 @@ namespace CandyShop.View
             InitializeComponent();
 
             Text = String.Format(Properties.Strings.Form_Title, Application.ProductName, Application.ProductVersion);
-            
-            MenuExtrasCreateTask.CheckedChanged += new EventHandler((sender, e) => CreateTaskEnabledChanged?.Invoke(sender, e));
         }
 
-        public event EventHandler CreateTaskEnabledChanged;
         public event EventHandler CancelPressed;
 
         public IInstalledPageView InstalledPackagesPage => InstalledPage;

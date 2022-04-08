@@ -2,13 +2,16 @@
 using System.Diagnostics;
 using System.IO;
 
-namespace CandyShop
+namespace CandyShop.Services
 {
-    class WindowsTaskService
+    /// <summary>
+    /// This service class allows access to the Windows Task that can be used to launch CandyShop on system start
+    /// </summary>
+    internal class WindowsTaskService
     {
-        internal const string TASKNAME = "CandyShopLaunch";
+        private const string TASKNAME = "CandyShopLaunch";
 
-        internal void CreateTask()
+        public void CreateTask()
         {
             string executable = Process.GetCurrentProcess().MainModule.FileName;
             string dir = Directory.GetParent(executable).FullName;
@@ -26,7 +29,7 @@ namespace CandyShop
             TaskService.Instance.RootFolder.RegisterTaskDefinition(TASKNAME, definition);
         }
 
-        internal void RemoveTask()
+        public void RemoveTask()
         {
             using (TaskService ts = new TaskService())
             {
@@ -37,14 +40,14 @@ namespace CandyShop
                 }
             }
         }
-        
-        internal bool TaskExists()
+
+        public bool TaskExists()
         {
             using TaskService ts = new TaskService();
             return ts.GetTask(TASKNAME) != null;
         }
 
-        internal void ToggleTask()
+        public void ToggleTask()
         {
             if (TaskExists()) RemoveTask();
             if (!TaskExists()) CreateTask();

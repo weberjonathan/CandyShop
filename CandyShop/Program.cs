@@ -15,7 +15,6 @@ namespace CandyShop
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Debug()
                 .WriteTo.Debug()
-                //.WriteTo.File("test.log")
                 .CreateLogger();
 
             // check if Chocolatey is in path

@@ -4,9 +4,12 @@ using System.Threading.Tasks;
 using System.Linq;
 using System.Threading;
 
-namespace CandyShop
+namespace CandyShop.Services
 {
-    class ChocolateyService
+    /// <summary>
+    /// This service class allows asynchronous access to Chocolatey and implements a cache.
+    /// </summary>
+    internal class ChocolateyService
     {
         private readonly SemaphoreSlim OutdatedPckgLock = new SemaphoreSlim(1);
         private readonly SemaphoreSlim InstalledPckgLock = new SemaphoreSlim(1);

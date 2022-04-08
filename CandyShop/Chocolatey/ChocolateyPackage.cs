@@ -44,7 +44,7 @@ namespace CandyShop.Chocolatey
         }
 
         /// <summary>
-        /// Removes valid suffixes from Name and returns it; Returns Name if no suffix is present.
+        /// The name of the package without any suffixes.
         /// </summary>
         public string ClearName
         {
