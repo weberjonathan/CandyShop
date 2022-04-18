@@ -45,7 +45,7 @@ namespace CandyShop.Chocolatey
 
                 if (FailOnNonZeroExitCode && proc.ExitCode != 0)
                 {
-                    throw new ChocolateyException($"choco did not exit cleanly. Returned {proc.ExitCode}.");
+                    throw new ChocolateyException($"Chocolatey did not exit cleanly. Returned {proc.ExitCode}.");
                 }
             }
             catch (Win32Exception e)

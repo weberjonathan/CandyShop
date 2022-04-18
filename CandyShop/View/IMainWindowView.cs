@@ -11,7 +11,7 @@ namespace CandyShop.View
         IUpgradePageView UpgradePackagesPage { get; }
         bool CreateTaskEnabled { get; set; }
 
-        void DisplayError(string msg);
+        void DisplayError(string msg, params string[] args);
         void ClearAdminHints();
         void ShowAdminHints();
 

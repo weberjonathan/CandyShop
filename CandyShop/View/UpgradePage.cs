@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CandyShop.Properties;
+using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
 
@@ -11,6 +12,17 @@ namespace CandyShop.View
             InitializeComponent();
 
             PanelTop.Visible = false;
+
+            // labels
+            BtnCancel.Text = LocaleEN.TEXT_CANCEL;
+            BtnUpgradeSelected.Text = String.Format(LocaleEN.TEXT_UPGRADE_SELECTED, 0);
+            BtnUpgradeAll.Text = LocaleEN.TEXT_UPGRADE_ALL;
+            LblAdmin.Text = LocaleEN.TEXT_NO_ADMIN_HINT;
+            LblLoading.Text = LocaleEN.TEXT_LOADING;
+            LstPackages.Columns[0].Text = LocaleEN.TEXT_COL_NAME;
+            LstPackages.Columns[1].Text = LocaleEN.TEXT_COL_CURRENT;
+            LstPackages.Columns[2].Text = LocaleEN.TEXT_COL_AVAILABLE;
+            LstPackages.Columns[3].Text = LocaleEN.TEXT_COL_PINNED;
 
             LstPackages.ItemChecked += LstPackages_ItemChecked;
             LstPackages.Resize += LstPackages_Resize;
@@ -101,7 +113,7 @@ namespace CandyShop.View
 
         private void LstPackages_ItemChecked(object sender, ItemCheckedEventArgs e)
         {
-            BtnUpgradeSelected.Text = String.Format(Properties.Strings.Btn_UpgradeSelected, LstPackages.CheckedItems.Count);
+            BtnUpgradeSelected.Text = String.Format(LocaleEN.TEXT_UPGRADE_SELECTED, LstPackages.CheckedItems.Count);
         }
 
         private void LstPackages_Resize(object sender, EventArgs e)

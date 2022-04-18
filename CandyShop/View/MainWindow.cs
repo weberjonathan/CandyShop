@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 using CandyShop.Controller;
+using CandyShop.Properties;
 
 namespace CandyShop.View
 {
@@ -13,7 +14,7 @@ namespace CandyShop.View
             Controller = candyShopController;
             InitializeComponent();
 
-            Text = String.Format(Properties.Strings.Form_Title, Application.ProductName, Application.ProductVersion);
+            Text = String.Format(LocaleEN.TEXT_APP_TITLE, Application.ProductName, Application.ProductVersion);
         }
 
         public event EventHandler CancelPressed;
@@ -38,16 +39,22 @@ namespace CandyShop.View
             MessageBox.Show(msg, Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
 
+        public void DisplayError(string msg, params string[] args)
+        {
+            if (args != null && args.Length > 0) msg = String.Format(msg, args);
+            MessageBox.Show(msg, Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+
         public void ShowAdminHints()
         {
             UpgradePage.ShowAdminWarning = true;
-            this.Text = String.Format(Properties.Strings.Form_Title, Application.ProductName, Application.ProductVersion) + Properties.Strings.Form_Title_AdminHint;
+            this.Text = String.Format(LocaleEN.TEXT_APP_TITLE, Application.ProductName, Application.ProductVersion) + LocaleEN.TEXT_NO_ADMIN_HINT_SHORT;
         }
 
         public void ClearAdminHints()
         {
             UpgradePage.ShowAdminWarning = false;
-            this.Text = String.Format(Properties.Strings.Form_Title, Application.ProductName, Application.ProductVersion);
+            this.Text = String.Format(LocaleEN.TEXT_APP_TITLE, Application.ProductName, Application.ProductVersion);
         }
 
         private void ChocoAutoUpdateForm_Load(object sender, EventArgs e)

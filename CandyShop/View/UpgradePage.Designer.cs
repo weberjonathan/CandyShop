@@ -38,12 +38,12 @@ namespace CandyShop.View
             this.BtnUpgradeAll = new System.Windows.Forms.Button();
             this.BtnCancel = new System.Windows.Forms.Button();
             this.panel2 = new System.Windows.Forms.Panel();
-            this.LblLoading = new System.Windows.Forms.Label();
             this.LstPackages = new System.Windows.Forms.ListView();
             this.colName = new System.Windows.Forms.ColumnHeader();
             this.colCurrent = new System.Windows.Forms.ColumnHeader();
             this.colAvail = new System.Windows.Forms.ColumnHeader();
             this.colPinned = new System.Windows.Forms.ColumnHeader();
+            this.LblLoading = new System.Windows.Forms.Label();
             this.PanelTop.SuspendLayout();
             this.panel2.SuspendLayout();
             this.SuspendLayout();
@@ -100,7 +100,6 @@ namespace CandyShop.View
             this.BtnUpgradeAll.TabIndex = 2;
             this.BtnUpgradeAll.Text = "Upgrade &All";
             this.BtnUpgradeAll.UseVisualStyleBackColor = true;
-            this.BtnUpgradeAll.Visible = false;
             // 
             // BtnCancel
             // 
@@ -122,17 +121,6 @@ namespace CandyShop.View
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(637, 55);
             this.panel2.TabIndex = 0;
-            // 
-            // LblLoading
-            // 
-            this.LblLoading.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.LblLoading.AutoSize = true;
-            this.LblLoading.BackColor = System.Drawing.Color.Transparent;
-            this.LblLoading.Location = new System.Drawing.Point(265, 263);
-            this.LblLoading.Name = "LblLoading";
-            this.LblLoading.Size = new System.Drawing.Size(62, 15);
-            this.LblLoading.TabIndex = 1;
-            this.LblLoading.Text = "Loading ...";
             // 
             // LstPackages
             // 
@@ -171,21 +159,31 @@ namespace CandyShop.View
             // 
             this.colPinned.Text = "Pinned";
             // 
+            // LblLoading
+            // 
+            this.LblLoading.BackColor = System.Drawing.Color.Transparent;
+            this.LblLoading.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.LblLoading.Location = new System.Drawing.Point(0, 47);
+            this.LblLoading.Name = "LblLoading";
+            this.LblLoading.Size = new System.Drawing.Size(637, 431);
+            this.LblLoading.TabIndex = 1;
+            this.LblLoading.Text = "Loading ...";
+            this.LblLoading.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
             // UpgradePage
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.LblLoading);
             this.Controls.Add(this.LstPackages);
-            this.Controls.Add(this.panel2);
             this.Controls.Add(this.PanelTop);
+            this.Controls.Add(this.panel2);
             this.Name = "UpgradePage";
             this.Size = new System.Drawing.Size(637, 533);
             this.PanelTop.ResumeLayout(false);
             this.PanelTop.PerformLayout();
             this.panel2.ResumeLayout(false);
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
@@ -197,12 +195,12 @@ namespace CandyShop.View
         private System.Windows.Forms.Button BtnUpgradeAll;
         private System.Windows.Forms.Button BtnCancel;
         private System.Windows.Forms.Panel panel2;
-        private System.Windows.Forms.Label LblLoading;
         private System.Windows.Forms.ListView LstPackages;
         private System.Windows.Forms.ColumnHeader colName;
         private System.Windows.Forms.ColumnHeader colCurrent;
         private System.Windows.Forms.ColumnHeader colAvail;
         private System.Windows.Forms.ColumnHeader colPinned;
         private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.Label LblLoading;
     }
 }

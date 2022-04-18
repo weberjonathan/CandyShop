@@ -1,4 +1,5 @@
 ﻿using CandyShop.Chocolatey;
+using CandyShop.Properties;
 using CandyShop.Services;
 using CandyShop.View;
 using System;
@@ -170,12 +171,12 @@ namespace CandyShop.Controller
 
         public void ShowGithub()
         {
-            OpenUrl(Properties.Strings.Url_Github);
+            OpenUrl(LocaleEN.URL_GITHUB);
         }
 
         public void ShowMetaPackageHelp()
         {
-            OpenUrl(Properties.Strings.Url_MetaPackages);
+            OpenUrl(LocaleEN.URL_META_PACKAGES);
         }
 
         public void ShowLicenses()
@@ -206,7 +207,7 @@ namespace CandyShop.Controller
             }
             catch (ChocolateyException)
             {
-                throw;
+                MainView?.DisplayError("Failed to retrieve outdated packages: {}");
             }
 
             packages.ForEach(p => MainView.UpgradePackagesPage.AddItem(new string[]

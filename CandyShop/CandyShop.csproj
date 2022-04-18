@@ -32,10 +32,10 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Update="Properties\strings.Designer.cs">
+    <Compile Update="Properties\LocaleEN.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
-      <DependentUpon>Strings.resx</DependentUpon>
+      <DependentUpon>LocaleEN.resx</DependentUpon>
     </Compile>
   </ItemGroup>
 
@@ -44,9 +44,9 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <EmbeddedResource Update="Properties\Strings.resx">
+    <EmbeddedResource Update="Properties\LocaleEN.resx">
       <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>strings.Designer.cs</LastGenOutput>
+      <LastGenOutput>LocaleEN.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
 

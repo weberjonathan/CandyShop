@@ -5,7 +5,7 @@ using Serilog;
 
 namespace CandyShop.Chocolatey
 {
-    class ChocolateyWrapper
+    public class ChocolateyWrapper
     {
         /// <exception cref="ChocolateyException"></exception>
         public static async Task<List<ChocolateyPackage>> FetchInstalledAsync()

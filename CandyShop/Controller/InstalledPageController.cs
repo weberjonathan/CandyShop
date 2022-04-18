@@ -55,7 +55,7 @@ namespace CandyShop.Controller
                 return;
             }
 
-            View.UpdateDetails(Strings.Txt_Loading);
+            View.UpdateDetails(LocaleEN.TEXT_LOADING);
 
             ChocolateyPackage packageMock = new ChocolateyPackage()
             {
@@ -78,12 +78,12 @@ namespace CandyShop.Controller
             }
         }
 
-        private async void SyncListView()
+        private void SyncListView()
         {
             string filterName = View.FilterText;
             bool hideSuffixed = View.HideDependencies;
 
-            List<ChocolateyPackage> packages = await ChocolateyService.GetInstalledPackagesAsync();
+            List<ChocolateyPackage> packages = ChocolateyService.GetInstalledPackagesByName(View.Items);
 
             foreach (ChocolateyPackage package in packages)
             {

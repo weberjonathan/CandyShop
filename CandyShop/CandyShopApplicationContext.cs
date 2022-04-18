@@ -62,12 +62,12 @@ namespace CandyShop
             {
                 packages = await service.GetOutdatedPackagesAsync();
             }
-            catch (ChocolateyException)
+            catch (ChocolateyException e)
             {
                 icon.BalloonTipIcon = ToolTipIcon.Error;
                 icon.Text = Application.ProductName;
-                icon.BalloonTipTitle = String.Format(Strings.Form_Title, Application.ProductName, Application.ProductVersion);
-                icon.BalloonTipText = Strings.Err_CheckOutdated;
+                icon.BalloonTipTitle = String.Format(LocaleEN.TEXT_APP_TITLE, Application.ProductName, Application.ProductVersion);
+                icon.BalloonTipText = String.Format(LocaleEN.ERROR_RETRIEVING_OUTDATED_PACKAGES, e.Message);
                 icon.ShowBalloonTip(2000);
                 Environment.Exit(0);
             }

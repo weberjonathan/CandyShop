@@ -7,7 +7,7 @@ using System.Threading;
 namespace CandyShop.Services
 {
     /// <summary>
-    /// This service class allows asynchronous access to Chocolatey and implements a cache.
+    /// This service class allows asynchronous, non-blocking access to Chocolatey and implements a cache.
     /// </summary>
     internal class ChocolateyService
     {
@@ -71,13 +71,10 @@ namespace CandyShop.Services
 
         public List<ChocolateyPackage> GetInstalledPackagesByName(List<string> names)
         {
-            List<ChocolateyPackage> rtn = names.Select(name =>
-            {
-                InstalledPckgCache.TryGetValue(name, out ChocolateyPackage pckg);
-                return pckg;
-            }).ToList();
-
-            return rtn;
+            return names
+                .Where(name => InstalledPckgCache.ContainsKey(name))
+                .Select(name => InstalledPckgCache[name])
+                .ToList();
         }
 
         /// <exception cref="ChocolateyException"></exception>
