@@ -31,5 +31,7 @@ namespace CandyShop
         public bool LaunchedMinimized { get; set; } = false;
 
         public bool HasAdminPrivileges { get; set; } = false;
+
+        public string CholoateyLogFolder { get; set; } = "C:\\ProgramData\\chocolatey\\logs";
     }
 }

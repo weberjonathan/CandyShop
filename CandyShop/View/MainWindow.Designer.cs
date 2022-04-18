@@ -1,4 +1,6 @@
-﻿namespace CandyShop.View
+﻿using System;
+
+namespace CandyShop.View
 {
     partial class MainWindow
     {
@@ -47,6 +49,8 @@
             this.MenuHelpGithub = new System.Windows.Forms.ToolStripMenuItem();
             this.MenuHelpLicense = new System.Windows.Forms.ToolStripMenuItem();
             this.MenuHelpMetaPackages = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.MenuExtrasOpenLogs = new System.Windows.Forms.ToolStripMenuItem();
             this.MainPanel.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.TabUpgrade.SuspendLayout();
@@ -161,7 +165,9 @@
             // MenuExtras
             // 
             this.MenuExtras.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.MenuExtrasCreateTask});
+            this.MenuExtrasCreateTask,
+            this.toolStripSeparator1,
+            this.MenuExtrasOpenLogs});
             this.MenuExtras.Name = "MenuExtras";
             this.MenuExtras.Size = new System.Drawing.Size(50, 20);
             this.MenuExtras.Text = "&Extras";
@@ -205,7 +211,19 @@
             this.MenuHelpMetaPackages.Text = "&Meta packages";
             this.MenuHelpMetaPackages.Click += new System.EventHandler(this.MenuHelpMetaPackages_Click);
             // 
-            // CandyShopForm
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(341, 6);
+            // 
+            // MenuExtrasOpenLogs
+            // 
+            this.MenuExtrasOpenLogs.Name = "MenuExtrasOpenLogs";
+            this.MenuExtrasOpenLogs.Size = new System.Drawing.Size(344, 22);
+            this.MenuExtrasOpenLogs.Text = "&Open Chocolatey logs";
+            this.MenuExtrasOpenLogs.Click += new System.EventHandler(this.MenuExtrasOpenLogs_Click);
+            // 
+            // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -214,7 +232,7 @@
             this.Controls.Add(this.CandyShopMenu);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.CandyShopMenu;
-            this.Name = "CandyShopForm";
+            this.Name = "MainWindow";
             this.Text = "ChocoAutoUpdateForm";
             this.Load += new System.EventHandler(this.ChocoAutoUpdateForm_Load);
             this.MainPanel.ResumeLayout(false);
@@ -247,5 +265,7 @@
         private System.Windows.Forms.ToolStripMenuItem MenuEditDeselectAll;
         private System.Windows.Forms.ToolStripMenuItem MenuEditSelectRelevant;
         private System.Windows.Forms.ToolStripMenuItem MenuHelpMetaPackages;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+        private System.Windows.Forms.ToolStripMenuItem MenuExtrasOpenLogs;
     }
 }

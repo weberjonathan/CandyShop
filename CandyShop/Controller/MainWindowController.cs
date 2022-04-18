@@ -4,6 +4,7 @@ using CandyShop.Services;
 using CandyShop.View;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -195,6 +196,27 @@ namespace CandyShop.Controller
             if (!MainView.CreateTaskEnabled && WindowsTaskService.TaskExists())
             {
                 WindowsTaskService.RemoveTask();
+            }
+        }
+
+        public void ShowChocoLogFolder()
+        {
+            string path = Path.GetFullPath(CandyShopContext.CholoateyLogFolder);
+            if (Directory.Exists(path))
+            {
+                try
+                {
+                    Process.Start("explorer.exe", path);
+                }
+                catch (Win32Exception e)
+                {
+                    MainView.DisplayError("An unknown error occurred: [1}", e.Message);
+                }
+                
+            }
+            else
+            {
+                MainView.DisplayError("Cannot find directory for Chocolatey logs: {1}", path);
             }
         }
 

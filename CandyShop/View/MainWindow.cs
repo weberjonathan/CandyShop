@@ -102,6 +102,11 @@ namespace CandyShop.View
             Controller.ToggleCreateTask();
         }
 
+        private void MenuExtrasOpenLogs_Click(object sender, EventArgs e)
+        {
+            Controller.ShowChocoLogFolder();
+        }
+
         private void UpgradePage_UpgradeAllClick(object sender, EventArgs e)
         {
             //List<ChocolateyPackage> packages =
