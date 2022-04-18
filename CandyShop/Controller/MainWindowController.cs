@@ -117,13 +117,13 @@ namespace CandyShop.Controller
                 }
                 catch (Win32Exception e)
                 {
-                    MainView.DisplayError("An unknown error occurred: [1}", e.Message);
+                    MainView.DisplayError("An unknown error occurred: {0}", e.Message);
                 }
                 
             }
             else
             {
-                MainView.DisplayError("Cannot find directory for Chocolatey logs: {1}", path);
+                MainView.DisplayError("Cannot find directory for Chocolatey logs: {0}", path);
             }
         }
 
@@ -163,14 +163,7 @@ namespace CandyShop.Controller
                 }
                 catch (ChocolateyException e)
                 {
-                    // TODO eval
-                    MessageBox.Show(
-                        $"An error occurred while executing Chocolatey: \"{e.Message}\"",
-                        $"{Application.ProductName} Error",
-                        MessageBoxButtons.OK,
-                        MessageBoxIcon.Error
-                    );
-
+                    MainView.DisplayError(LocaleEN.ERROR_UPGRADING_OUTDATED_PACKAGES, e.Message);
                     return;
                 }
             }

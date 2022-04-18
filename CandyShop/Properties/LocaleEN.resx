@@ -117,17 +117,14 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="ERROR_CHOCO_PATH" xml:space="preserve">
+    <value>An error occurred while starting the Chocolatey. Please make sure it is installed and in PATH and relaunch this application.</value>
+  </data>
   <data name="ERROR_RETRIEVING_OUTDATED_PACKAGES" xml:space="preserve">
     <value>Failed to retrieve outdated packages: {0}</value>
   </data>
-  <data name="Err_GetInfo" xml:space="preserve">
-    <value>Failed to retrieve package info. An error occurred during the execution of Chocolatey.</value>
-  </data>
-  <data name="Err_ListInstalled" xml:space="preserve">
-    <value>Failed to retrieve list of installed applications. An error occurred during the execution of Chocolatey.</value>
-  </data>
-  <data name="Err_RequireAdmin" xml:space="preserve">
-    <value>Administration privileges are required for this operation.</value>
+  <data name="ERROR_UPGRADING_OUTDATED_PACKAGES" xml:space="preserve">
+    <value>Error upgrading outdated packages: {0}</value>
   </data>
   <data name="TEXT_APP_TITLE" xml:space="preserve">
     <value>{0} v{1}</value>

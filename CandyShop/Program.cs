@@ -1,3 +1,4 @@
+using CandyShop.Properties;
 using Serilog;
 using System;
 using System.ComponentModel;
@@ -31,7 +32,7 @@ namespace CandyShop
             catch (Win32Exception)
             {
                 MessageBox.Show(
-                    "Error: An error occurred while starting the Chocolatey application. Please make sure it is installed and in PATH.",
+                    LocaleEN.ERROR_CHOCO_PATH,
                     Application.ProductName,
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Error

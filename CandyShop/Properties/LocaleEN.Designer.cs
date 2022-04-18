@@ -61,29 +61,11 @@ namespace CandyShop.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Failed to retrieve package info. An error occurred during the execution of Chocolatey..
+        ///   Looks up a localized string similar to An error occurred while starting the Chocolatey. Please make sure it is installed and in PATH and relaunch this application..
         /// </summary>
-        internal static string Err_GetInfo {
+        internal static string ERROR_CHOCO_PATH {
             get {
-                return ResourceManager.GetString("Err_GetInfo", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Failed to retrieve list of installed applications. An error occurred during the execution of Chocolatey..
-        /// </summary>
-        internal static string Err_ListInstalled {
-            get {
-                return ResourceManager.GetString("Err_ListInstalled", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Administration privileges are required for this operation..
-        /// </summary>
-        internal static string Err_RequireAdmin {
-            get {
-                return ResourceManager.GetString("Err_RequireAdmin", resourceCulture);
+                return ResourceManager.GetString("ERROR_CHOCO_PATH", resourceCulture);
             }
         }
         
@@ -93,6 +75,15 @@ namespace CandyShop.Properties {
         internal static string ERROR_RETRIEVING_OUTDATED_PACKAGES {
             get {
                 return ResourceManager.GetString("ERROR_RETRIEVING_OUTDATED_PACKAGES", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error upgrading outdated packages: {0}.
+        /// </summary>
+        internal static string ERROR_UPGRADING_OUTDATED_PACKAGES {
+            get {
+                return ResourceManager.GetString("ERROR_UPGRADING_OUTDATED_PACKAGES", resourceCulture);
             }
         }
         

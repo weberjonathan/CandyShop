@@ -34,11 +34,6 @@ namespace CandyShop.View
             }
         }
 
-        public void DisplayError(string msg)
-        {
-            MessageBox.Show(msg, Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error);
-        }
-
         public void DisplayError(string msg, params string[] args)
         {
             if (args != null && args.Length > 0) msg = String.Format(msg, args);
