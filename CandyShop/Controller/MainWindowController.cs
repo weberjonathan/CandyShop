@@ -32,99 +32,6 @@ namespace CandyShop.Controller
             MainView = mainView;
         }
 
-        public void PerformUpgrade(List<ChocolateyPackage> packages)
-        {
-            MainView?.ToForm().Hide();
-
-            // setup watcher for desktop shortcuts
-            Queue<string> shortcuts = new Queue<string>();
-            using (FileSystemWatcher watcher = new FileSystemWatcher())
-            {
-                watcher.BeginInit();
-
-                watcher.Path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-                watcher.Filter = "*.lnk";
-                watcher.IncludeSubdirectories = false;
-                watcher.NotifyFilter = NotifyFilters.FileName;
-                watcher.EnableRaisingEvents = true;
-                watcher.Created += new FileSystemEventHandler((sender, e) =>
-                {
-                    shortcuts.Enqueue(e.FullPath);
-                });
-
-                watcher.EndInit();
-
-                // upgrade
-                WindowsConsole.AllocConsole();
-                Console.CursorVisible = false;
-
-                try
-                {
-                    ChocolateyService.Upgrade(packages);
-                }
-                catch (ChocolateyException e)
-                {
-                    // TODO eval
-                    MessageBox.Show(
-                        $"An error occurred while executing Chocolatey: \"{e.Message}\"",
-                        $"{Application.ProductName} Error",
-                        MessageBoxButtons.OK,
-                        MessageBoxIcon.Error
-                    );
-
-                    return;
-                }
-            }
-
-            // display results
-            IntPtr handle = WindowsConsole.GetConsoleWindow();
-            if (!IntPtr.Zero.Equals(handle))
-            {
-                WindowsConsole.SetForegroundWindow(handle);
-            }
-            Console.CursorVisible = false;
-            Console.Write("\nPress any key to continue... ");
-            Console.ReadKey();
-
-            // remove shortcuts
-            if (shortcuts.Count > 0)
-            {
-                StringBuilder msg = new StringBuilder();
-                msg.Append($"During the upgrade process {shortcuts.Count} new desktop shortcut(s) were created:\n\n");
-                foreach (string shortcut in shortcuts)
-                {
-                    msg.Append($"- {Path.GetFileNameWithoutExtension(shortcut)}\n");
-                }
-                msg.Append($"\nDo you want to delete all {shortcuts.Count} shortcut(s)?");
-
-                DialogResult result = MessageBox.Show(
-                    msg.ToString(),
-                    Application.ProductName,
-                    MessageBoxButtons.YesNo,
-                    MessageBoxIcon.Question,
-                    MessageBoxDefaultButton.Button1);
-
-                if (result.Equals(DialogResult.Yes))
-                {
-                    while (shortcuts.Count > 0)
-                    {
-                        string shortcut = shortcuts.Dequeue();
-                        try
-                        {
-                            File.Delete(shortcut);
-                        }
-                        catch (IOException)
-                        {
-                            // TODO
-                        }
-                    }
-                }
-            }
-
-            // TODO eval
-            Environment.Exit(0);
-        }
-
         public void InitView()
         {
             if (MainView == null) throw new InvalidOperationException("Set a view before intialising it!");
@@ -155,7 +62,7 @@ namespace CandyShop.Controller
         public void SmartSelectPackages()
         {
             string[] displayedItemNames = MainView.UpgradePackagesPage.Items;
-            List<ChocolateyPackage> packages = ChocolateyService.GetInstalledPackagesByName(displayedItemNames.ToList());
+            List<ChocolateyPackage> packages = ChocolateyService.GetPackageByName(displayedItemNames.ToList());
 
             List<string> smartSelected = packages
                 .Where(p => !(p.HasMetaPackage && p.HasSuffix))
@@ -218,6 +125,103 @@ namespace CandyShop.Controller
             {
                 MainView.DisplayError("Cannot find directory for Chocolatey logs: {1}", path);
             }
+        }
+
+        public void PerformUpgrade(string[] packages)
+        {
+            MainView?.ToForm().Hide();
+
+            // setup watcher for desktop shortcuts
+            Queue<string> shortcuts = new Queue<string>();
+            using (FileSystemWatcher watcher = new FileSystemWatcher())
+            {
+                watcher.BeginInit();
+
+                watcher.Path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+                watcher.Filter = "*.lnk";
+                watcher.IncludeSubdirectories = false;
+                watcher.NotifyFilter = NotifyFilters.FileName;
+                watcher.EnableRaisingEvents = true;
+                watcher.Created += new FileSystemEventHandler((sender, e) =>
+                {
+                    shortcuts.Enqueue(e.FullPath);
+                });
+
+                watcher.EndInit();
+
+                // upgrade
+                WindowsConsole.AllocConsole();
+                Console.CursorVisible = false;
+
+                try
+                {
+                    List<ChocolateyPackage> chocoPackages = ChocolateyService.GetPackageByName(packages.ToList());
+                    if (chocoPackages.Count > 0)
+                    {
+                        ChocolateyService.Upgrade(chocoPackages);
+                    }
+                }
+                catch (ChocolateyException e)
+                {
+                    // TODO eval
+                    MessageBox.Show(
+                        $"An error occurred while executing Chocolatey: \"{e.Message}\"",
+                        $"{Application.ProductName} Error",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Error
+                    );
+
+                    return;
+                }
+            }
+
+            // display results
+            IntPtr handle = WindowsConsole.GetConsoleWindow();
+            if (!IntPtr.Zero.Equals(handle))
+            {
+                WindowsConsole.SetForegroundWindow(handle);
+            }
+            Console.CursorVisible = false;
+            Console.Write("\nPress any key to continue... ");
+            Console.ReadKey();
+
+            // remove shortcuts
+            if (shortcuts.Count > 0)
+            {
+                StringBuilder msg = new StringBuilder();
+                msg.Append($"During the upgrade process {shortcuts.Count} new desktop shortcut(s) were created:\n\n");
+                foreach (string shortcut in shortcuts)
+                {
+                    msg.Append($"- {Path.GetFileNameWithoutExtension(shortcut)}\n");
+                }
+                msg.Append($"\nDo you want to delete all {shortcuts.Count} shortcut(s)?");
+
+                DialogResult result = MessageBox.Show(
+                    msg.ToString(),
+                    Application.ProductName,
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Question,
+                    MessageBoxDefaultButton.Button1);
+
+                if (result.Equals(DialogResult.Yes))
+                {
+                    while (shortcuts.Count > 0)
+                    {
+                        string shortcut = shortcuts.Dequeue();
+                        try
+                        {
+                            File.Delete(shortcut);
+                        }
+                        catch (IOException)
+                        {
+                            // TODO
+                        }
+                    }
+                }
+            }
+
+            // TODO if there still are outdated packages, return to MainView
+            Environment.Exit(0);
         }
 
         private async void RequestOutdatedPackagesAsync()

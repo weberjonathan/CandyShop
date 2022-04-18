@@ -109,17 +109,15 @@ namespace CandyShop.View
 
         private void UpgradePage_UpgradeAllClick(object sender, EventArgs e)
         {
-            //List<ChocolateyPackage> packages =
-            //    CandyShopController.GetPackagesByName(UpgradePage.Items.ToList());
-            //CandyShopController.PerformUpgrade(packages);
+
+            Controller.PerformUpgrade(UpgradePage.Items);
         }
 
         private void UpgradePage_UpgradeSelectedClick(object sender, EventArgs e)
         {
-            //List<ChocolateyPackage> packages =
-            //    CandyShopController.GetPackagesByName(UpgradePage.SelectedItems.ToList());
+            var packages = UpgradePage.SelectedItems;
 
-            //if (packages.Count > 0) CandyShopController.PerformUpgrade(packages);
+            if (packages.Length > 0) Controller.PerformUpgrade(packages);
         }
 
         private void UpgradePage_CancelClick(object sender, EventArgs e)

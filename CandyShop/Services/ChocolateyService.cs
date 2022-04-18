@@ -77,6 +77,25 @@ namespace CandyShop.Services
                 .ToList();
         }
 
+        public List<ChocolateyPackage> GetPackageByName(List<string> names)
+        {
+            List<ChocolateyPackage> rtn = new List<ChocolateyPackage>();
+
+            foreach (string name in names)
+            {
+                if (InstalledPckgCache.ContainsKey(name))
+                {
+                    rtn.Add(InstalledPckgCache[name]);
+                }
+                else if (OutdatedPckgCache.ContainsKey(name))
+                {
+                    rtn.Add(OutdatedPckgCache[name]);
+                }
+            }
+
+            return rtn;
+        }
+
         /// <exception cref="ChocolateyException"></exception>
         public void Upgrade(List<ChocolateyPackage> packages)
         {
