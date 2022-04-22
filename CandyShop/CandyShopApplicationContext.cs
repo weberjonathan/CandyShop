@@ -70,7 +70,7 @@ namespace CandyShop
                 icon.BalloonTipTitle = String.Format(LocaleEN.TEXT_APP_TITLE, Application.ProductName, Application.ProductVersion);
                 icon.BalloonTipText = String.Format(LocaleEN.ERROR_RETRIEVING_OUTDATED_PACKAGES, e.Message);
                 icon.ShowBalloonTip(2000);
-                Environment.Exit(0);
+                Program.Exit();
             }
 
             // create click handlers
@@ -91,7 +91,7 @@ namespace CandyShop
             }
             else
             {
-                Environment.Exit(0);
+                Program.Exit();
             }
         }
 

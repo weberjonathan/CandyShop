@@ -38,7 +38,7 @@ namespace CandyShop.View
             this.BtnUpgradeAll = new System.Windows.Forms.Button();
             this.BtnCancel = new System.Windows.Forms.Button();
             this.panel2 = new System.Windows.Forms.Panel();
-            this.checkDeleteShortcuts = new System.Windows.Forms.CheckBox();
+            this.CheckDeleteShortcuts = new System.Windows.Forms.CheckBox();
             this.LstPackages = new System.Windows.Forms.ListView();
             this.colName = new System.Windows.Forms.ColumnHeader();
             this.colCurrent = new System.Windows.Forms.ColumnHeader();
@@ -114,7 +114,7 @@ namespace CandyShop.View
             // 
             // panel2
             // 
-            this.panel2.Controls.Add(this.checkDeleteShortcuts);
+            this.panel2.Controls.Add(this.CheckDeleteShortcuts);
             this.panel2.Controls.Add(this.BtnUpgradeSelected);
             this.panel2.Controls.Add(this.BtnUpgradeAll);
             this.panel2.Controls.Add(this.BtnCancel);
@@ -124,16 +124,17 @@ namespace CandyShop.View
             this.panel2.Size = new System.Drawing.Size(637, 91);
             this.panel2.TabIndex = 0;
             // 
-            // checkDeleteShortcuts
+            // CheckDeleteShortcuts
             // 
-            this.checkDeleteShortcuts.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.checkDeleteShortcuts.AutoSize = true;
-            this.checkDeleteShortcuts.Location = new System.Drawing.Point(507, 17);
-            this.checkDeleteShortcuts.Name = "checkDeleteShortcuts";
-            this.checkDeleteShortcuts.Size = new System.Drawing.Size(111, 19);
-            this.checkDeleteShortcuts.TabIndex = 5;
-            this.checkDeleteShortcuts.Text = "Delete &shortcuts";
-            this.checkDeleteShortcuts.UseVisualStyleBackColor = true;
+            this.CheckDeleteShortcuts.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.CheckDeleteShortcuts.AutoSize = true;
+            this.CheckDeleteShortcuts.Location = new System.Drawing.Point(507, 17);
+            this.CheckDeleteShortcuts.Name = "CheckDeleteShortcuts";
+            this.CheckDeleteShortcuts.Size = new System.Drawing.Size(111, 19);
+            this.CheckDeleteShortcuts.TabIndex = 5;
+            this.CheckDeleteShortcuts.Text = "Delete &shortcuts";
+            this.CheckDeleteShortcuts.UseVisualStyleBackColor = true;
+            this.CheckDeleteShortcuts.CheckedChanged += new System.EventHandler(this.CheckDeleteShortcuts_CheckedChanged);
             // 
             // LstPackages
             // 
@@ -216,6 +217,6 @@ namespace CandyShop.View
         private System.Windows.Forms.ColumnHeader colPinned;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Label LblLoading;
-        private System.Windows.Forms.CheckBox checkDeleteShortcuts;
+        private System.Windows.Forms.CheckBox CheckDeleteShortcuts;
     }
 }

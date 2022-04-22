@@ -10,17 +10,27 @@ namespace CandyShop
 {
     static class Program
     {
+        private static readonly CandyShopContext context = new CandyShopContext();
+
+        public static void Exit(int code = 0)
+        {
+            context?.Save();
+            Environment.Exit(code);
+        }
+
         [STAThread]
         static void Main(string[] args)
         {
-            CandyShopContext context = new CandyShopContext();
-            Directory.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData));
-
             // configure logger
             Log.Logger = new LoggerConfiguration()
+                .WriteTo.Debug(Serilog.Events.LogEventLevel.Debug)
+                .WriteTo.Logger(logger =>
+                {
+                    logger
+                    .MinimumLevel.Information()
+                    .WriteTo.File(context.LogFilepath);
+                })
                 .MinimumLevel.Debug()
-                .WriteTo.Debug()
-                .WriteTo.File(context.LogFilepath)
                 .CreateLogger();
 
             // check if Chocolatey is in path

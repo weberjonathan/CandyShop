@@ -34,6 +34,7 @@ namespace CandyShop.View
         public event EventHandler UpgradeAllClick;
         public event EventHandler UpgradeSelectedClick;
         public event EventHandler CancelClick;
+        public event EventHandler CleanShortcutsChanged;
 
         public string[] Items
         {
@@ -77,11 +78,11 @@ namespace CandyShop.View
         {
             get
             {
-                return checkDeleteShortcuts.Checked;
+                return CheckDeleteShortcuts.Checked;
             }
             set
             {
-                checkDeleteShortcuts.Checked = value;
+                CheckDeleteShortcuts.Checked = value;
             }
         }
 
@@ -137,6 +138,11 @@ namespace CandyShop.View
             LstPackages.Columns[1].Width = (int)Math.Floor(availWidth * .3);
             LstPackages.Columns[2].Width = (int)Math.Floor(availWidth * .3);
             LstPackages.Columns[3].Width = pinnedWidth;
+        }
+
+        private void CheckDeleteShortcuts_CheckedChanged(object sender, EventArgs e)
+        {
+            CleanShortcutsChanged?.Invoke(sender, e);
         }
     }
 }

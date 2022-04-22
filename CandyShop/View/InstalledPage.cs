@@ -20,8 +20,11 @@ namespace CandyShop.View
             {
                 int availWidth = LstPackages.Width - LstPackages.Margin.Left - LstPackages.Margin.Right - SystemInformation.VerticalScrollBarWidth;
 
-                LstPackages.Columns[0].Width = (int)Math.Floor(availWidth * .6);
-                LstPackages.Columns[1].Width = (int)Math.Floor(availWidth * .4);
+                if (LstPackages.Columns.Count> 0)
+                {
+                    LstPackages.Columns[0].Width = (int)Math.Floor(availWidth * .6);
+                    LstPackages.Columns[1].Width = (int)Math.Floor(availWidth * .4);
+                }
             });
         }
 

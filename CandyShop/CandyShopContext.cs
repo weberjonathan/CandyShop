@@ -1,8 +1,10 @@
-﻿using System;
+﻿using Serilog;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Security.Principal;
+using System.Text.Json;
 
 namespace CandyShop
 {
@@ -11,12 +13,23 @@ namespace CandyShop
     /// </summary>
     internal class CandyShopContext
     {
+        private class CandyShopProperties
+        {
+            public string ChocolateyLogs { get; set; } = "C:\\ProgramData\\chocolatey\\logs";
+            public bool CleanShortcuts { get; set; } = false;
+        }
+
         private const string OPTION_BACKGROUND = "--background";
         private const string OPTION_BACKGROUND_SHORT = "-b";
-        private readonly string _LogFilepath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "CandyShop.log");
+        private static readonly string _AppDataDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "CandyShop");
+        private static readonly string _ConfigFilepath = Path.Combine(_AppDataDir, "CandyShop.config");
+        private static readonly string _LogFilepath = Path.Combine(_AppDataDir, "CandyShop.log");
+        private CandyShopProperties _Properties = new CandyShopProperties();
 
         public CandyShopContext()
         {
+            Directory.CreateDirectory(_AppDataDir);
+
             using (WindowsIdentity identity = WindowsIdentity.GetCurrent())
             {
                 WindowsPrincipal principal = new WindowsPrincipal(identity);
@@ -24,6 +37,7 @@ namespace CandyShop
             }
 
             ParseArguments();
+            ParseProperties();
         }
 
         public string LogFilepath => _LogFilepath;
@@ -32,7 +46,21 @@ namespace CandyShop
 
         public bool HasAdminPrivileges { get; set; } = false;
 
-        public string CholoateyLogFolder { get; set; } = "C:\\ProgramData\\chocolatey\\logs";
+        public string CholoateyLogFolder => _Properties.ChocolateyLogs;
+
+        public bool CleanShortcuts
+        {
+            get
+            {
+                return _Properties.CleanShortcuts;
+            }
+            set
+            {
+                _Properties.CleanShortcuts = value;
+            }
+        }
+
+        public void Save() => WriteProperties();
 
         private void ParseArguments()
         {
@@ -51,6 +79,34 @@ namespace CandyShop
                     default:
                         break;
                 }
+            }
+        }
+
+        private void ParseProperties()
+        {
+            try
+            {
+                string json = File.ReadAllText(_ConfigFilepath);
+                _Properties = JsonSerializer.Deserialize<CandyShopProperties>(json);
+            }
+            catch (Exception e)
+            {
+                Log.Error($"An error occurred while reading properties from {_ConfigFilepath}: {e.Message}");
+            }
+        }
+
+        private void WriteProperties()
+        {
+            Directory.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData));
+
+            try
+            {
+                string json = JsonSerializer.Serialize(_Properties);
+                File.WriteAllText(_ConfigFilepath, json);
+            }
+            catch (Exception e)
+            {
+                Log.Error($"An error occurred while saving properties to {_ConfigFilepath}: {e.Message}");
             }
         }
     }

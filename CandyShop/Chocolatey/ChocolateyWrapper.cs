@@ -70,7 +70,6 @@ namespace CandyShop.Chocolatey
         /// <exception cref="ChocolateyException"></exception>
         public static async Task<List<ChocolateyPackage>> FetchOutdatedAsync()
         {
-            Log.Information("Asyncronously fetching outdated packages.");
             return await Task.Run(FetchOutdated);
         }
 

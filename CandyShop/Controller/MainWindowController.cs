@@ -48,17 +48,28 @@ namespace CandyShop.Controller
             // exit application on 'X'
             MainView.ToForm().FormClosed += new FormClosedEventHandler((sender, e) =>
             {
-                Environment.Exit(0);
+                Program.Exit();
             });
 
             // exit or hide application on 'Cancel', depending on how it was created
             MainView.CancelPressed += new EventHandler((sender, e) =>
             {
-                if (CandyShopContext.LaunchedMinimized) MainView.ToForm().Hide();
-                else Environment.Exit(0);
+                if (CandyShopContext.LaunchedMinimized)
+                {
+                    MainView.ToForm().Hide();
+                }
+                else
+                {
+                    MainView.ToForm().Dispose();
+                    Program.Exit();
+                }
             });
 
+            // wire upgrade page properties
+            MainView.UpgradePackagesPage.CleanShortcutsChanged += new EventHandler((sender, e) => CandyShopContext.CleanShortcuts = MainView.UpgradePackagesPage.CleanShortcuts);
+
             MainView.CreateTaskEnabled = WindowsTaskService.LaunchTaskExists();
+            MainView.UpgradePackagesPage.CleanShortcuts = CandyShopContext.CleanShortcuts;
 
             MainView.ToForm().Show();
         }
@@ -178,7 +189,8 @@ namespace CandyShop.Controller
 
             // TODO if there still are outdated packages, return to MainView
             // TODO if there was an error, offer to open log folder? go back to application?
-            Environment.Exit(0);
+            MainView?.ToForm().Dispose();
+            Program.Exit();
         }
 
         private async void RequestOutdatedPackagesAsync()

@@ -8,6 +8,7 @@ namespace CandyShop.View
         event EventHandler UpgradeAllClick;
         event EventHandler UpgradeSelectedClick;
         event EventHandler CancelClick;
+        event EventHandler CleanShortcutsChanged;
 
         string[] Items { get; }
         string[] SelectedItems { get; }
