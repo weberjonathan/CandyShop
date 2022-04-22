@@ -11,17 +11,18 @@ namespace CandyShop
 {
     internal class CandyShopApplicationContext : ApplicationContext
     {
-        public CandyShopApplicationContext()
+        public CandyShopApplicationContext(CandyShopContext context)
         {
-            // init context, services
-            CandyShopContext context = new CandyShopContext();
+            // init services
             ChocolateyService chocolateyService = new ChocolateyService();
             WindowsTaskService windowsTaskService = new WindowsTaskService();
-            
+            ShortcutService shortcutService = new ShortcutService();
+
+            //
             LoadOutdatedPackagesAsync(chocolateyService);
 
             // init controller
-            MainWindowController candyShopController = new MainWindowController(chocolateyService, windowsTaskService, context);
+            MainWindowController candyShopController = new MainWindowController(chocolateyService, windowsTaskService, shortcutService, context);
             InstalledPageController installedPageController = new InstalledPageController(chocolateyService);
 
             // init views

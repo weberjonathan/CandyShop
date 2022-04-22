@@ -38,6 +38,7 @@ namespace CandyShop.View
             this.BtnUpgradeAll = new System.Windows.Forms.Button();
             this.BtnCancel = new System.Windows.Forms.Button();
             this.panel2 = new System.Windows.Forms.Panel();
+            this.checkDeleteShortcuts = new System.Windows.Forms.CheckBox();
             this.LstPackages = new System.Windows.Forms.ListView();
             this.colName = new System.Windows.Forms.ColumnHeader();
             this.colCurrent = new System.Windows.Forms.ColumnHeader();
@@ -81,9 +82,9 @@ namespace CandyShop.View
             // 
             // BtnUpgradeSelected
             // 
-            this.BtnUpgradeSelected.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            this.BtnUpgradeSelected.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.BtnUpgradeSelected.Enabled = false;
-            this.BtnUpgradeSelected.Location = new System.Drawing.Point(449, 15);
+            this.BtnUpgradeSelected.Location = new System.Drawing.Point(446, 51);
             this.BtnUpgradeSelected.Name = "BtnUpgradeSelected";
             this.BtnUpgradeSelected.Size = new System.Drawing.Size(91, 23);
             this.BtnUpgradeSelected.TabIndex = 3;
@@ -92,9 +93,9 @@ namespace CandyShop.View
             // 
             // BtnUpgradeAll
             // 
-            this.BtnUpgradeAll.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            this.BtnUpgradeAll.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.BtnUpgradeAll.Enabled = false;
-            this.BtnUpgradeAll.Location = new System.Drawing.Point(339, 15);
+            this.BtnUpgradeAll.Location = new System.Drawing.Point(336, 51);
             this.BtnUpgradeAll.Name = "BtnUpgradeAll";
             this.BtnUpgradeAll.Size = new System.Drawing.Size(104, 23);
             this.BtnUpgradeAll.TabIndex = 2;
@@ -103,8 +104,8 @@ namespace CandyShop.View
             // 
             // BtnCancel
             // 
-            this.BtnCancel.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            this.BtnCancel.Location = new System.Drawing.Point(546, 15);
+            this.BtnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.BtnCancel.Location = new System.Drawing.Point(543, 51);
             this.BtnCancel.Name = "BtnCancel";
             this.BtnCancel.Size = new System.Drawing.Size(75, 23);
             this.BtnCancel.TabIndex = 4;
@@ -113,14 +114,26 @@ namespace CandyShop.View
             // 
             // panel2
             // 
+            this.panel2.Controls.Add(this.checkDeleteShortcuts);
             this.panel2.Controls.Add(this.BtnUpgradeSelected);
             this.panel2.Controls.Add(this.BtnUpgradeAll);
             this.panel2.Controls.Add(this.BtnCancel);
             this.panel2.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.panel2.Location = new System.Drawing.Point(0, 478);
+            this.panel2.Location = new System.Drawing.Point(0, 442);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(637, 55);
+            this.panel2.Size = new System.Drawing.Size(637, 91);
             this.panel2.TabIndex = 0;
+            // 
+            // checkDeleteShortcuts
+            // 
+            this.checkDeleteShortcuts.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.checkDeleteShortcuts.AutoSize = true;
+            this.checkDeleteShortcuts.Location = new System.Drawing.Point(507, 17);
+            this.checkDeleteShortcuts.Name = "checkDeleteShortcuts";
+            this.checkDeleteShortcuts.Size = new System.Drawing.Size(111, 19);
+            this.checkDeleteShortcuts.TabIndex = 5;
+            this.checkDeleteShortcuts.Text = "Delete &shortcuts";
+            this.checkDeleteShortcuts.UseVisualStyleBackColor = true;
             // 
             // LstPackages
             // 
@@ -138,7 +151,7 @@ namespace CandyShop.View
             this.LstPackages.MultiSelect = false;
             this.LstPackages.Name = "LstPackages";
             this.LstPackages.ShowItemToolTips = true;
-            this.LstPackages.Size = new System.Drawing.Size(637, 431);
+            this.LstPackages.Size = new System.Drawing.Size(637, 395);
             this.LstPackages.TabIndex = 3;
             this.LstPackages.UseCompatibleStateImageBehavior = false;
             this.LstPackages.View = System.Windows.Forms.View.Details;
@@ -165,7 +178,7 @@ namespace CandyShop.View
             this.LblLoading.Dock = System.Windows.Forms.DockStyle.Fill;
             this.LblLoading.Location = new System.Drawing.Point(0, 47);
             this.LblLoading.Name = "LblLoading";
-            this.LblLoading.Size = new System.Drawing.Size(637, 431);
+            this.LblLoading.Size = new System.Drawing.Size(637, 395);
             this.LblLoading.TabIndex = 1;
             this.LblLoading.Text = "Loading ...";
             this.LblLoading.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -183,6 +196,7 @@ namespace CandyShop.View
             this.PanelTop.ResumeLayout(false);
             this.PanelTop.PerformLayout();
             this.panel2.ResumeLayout(false);
+            this.panel2.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -202,5 +216,6 @@ namespace CandyShop.View
         private System.Windows.Forms.ColumnHeader colPinned;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Label LblLoading;
+        private System.Windows.Forms.CheckBox checkDeleteShortcuts;
     }
 }

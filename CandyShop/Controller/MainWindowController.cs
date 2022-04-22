@@ -9,6 +9,8 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace CandyShop.Controller
@@ -17,13 +19,15 @@ namespace CandyShop.Controller
     {
         private readonly ChocolateyService ChocolateyService;
         private readonly WindowsTaskService WindowsTaskService;
+        private readonly ShortcutService ShortcutService;
         private readonly CandyShopContext CandyShopContext;
         private IMainWindowView MainView;
 
-        public MainWindowController(ChocolateyService chocolateyService, WindowsTaskService windowsTaskService, CandyShopContext candyShopContext)
+        public MainWindowController(ChocolateyService chocolateyService, WindowsTaskService windowsTaskService, ShortcutService shortcutService, CandyShopContext candyShopContext)
         {
             ChocolateyService = chocolateyService;
             WindowsTaskService = windowsTaskService;
+            ShortcutService = shortcutService;
             CandyShopContext = candyShopContext;
         }
 
@@ -54,7 +58,7 @@ namespace CandyShop.Controller
                 else Environment.Exit(0);
             });
 
-            MainView.CreateTaskEnabled = WindowsTaskService.TaskExists();
+            MainView.CreateTaskEnabled = WindowsTaskService.LaunchTaskExists();
 
             MainView.ToForm().Show();
         }
@@ -95,14 +99,14 @@ namespace CandyShop.Controller
 
         public void ToggleCreateTask()
         {
-            if (MainView.CreateTaskEnabled && !WindowsTaskService.TaskExists())
+            if (MainView.CreateTaskEnabled && !WindowsTaskService.LaunchTaskExists())
             {
-                WindowsTaskService.CreateTask();
+                WindowsTaskService.CreateLaunchTask();
             }
 
-            if (!MainView.CreateTaskEnabled && WindowsTaskService.TaskExists())
+            if (!MainView.CreateTaskEnabled && WindowsTaskService.LaunchTaskExists())
             {
-                WindowsTaskService.RemoveTask();
+                WindowsTaskService.RemoveLaunchTask();
             }
         }
 
@@ -127,48 +131,34 @@ namespace CandyShop.Controller
             }
         }
 
-        public void PerformUpgrade(string[] packages)
+        public async void PerformUpgrade(string[] packages)
         {
             MainView?.ToForm().Hide();
 
-            // setup watcher for desktop shortcuts
-            Queue<string> shortcuts = new Queue<string>();
-            using (FileSystemWatcher watcher = new FileSystemWatcher())
+            List<string> shortcuts = new List<string>();
+            ShortcutService?.WatchDesktops(shortcut => shortcuts.Add(shortcut));
+
+            // upgrade
+            WindowsConsole.AllocConsole();
+            Console.CursorVisible = false;
+
+            try
             {
-                watcher.BeginInit();
-
-                watcher.Path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-                watcher.Filter = "*.lnk";
-                watcher.IncludeSubdirectories = false;
-                watcher.NotifyFilter = NotifyFilters.FileName;
-                watcher.EnableRaisingEvents = true;
-                watcher.Created += new FileSystemEventHandler((sender, e) =>
+                List<ChocolateyPackage> chocoPackages = ChocolateyService.GetPackageByName(packages.ToList());
+                if (chocoPackages.Count > 0)
                 {
-                    shortcuts.Enqueue(e.FullPath);
-                });
-
-                watcher.EndInit();
-
-                // upgrade
-                WindowsConsole.AllocConsole();
-                Console.CursorVisible = false;
-
-                try
-                {
-                    List<ChocolateyPackage> chocoPackages = ChocolateyService.GetPackageByName(packages.ToList());
-                    if (chocoPackages.Count > 0)
-                    {
-                        ChocolateyService.Upgrade(chocoPackages);
-                    }
+                    ChocolateyService.Upgrade(chocoPackages);
                 }
-                catch (ChocolateyException e)
-                {
-                    MainView.DisplayError(LocaleEN.ERROR_UPGRADING_OUTDATED_PACKAGES, e.Message);
-                    return;
-                }
+            }
+            catch (ChocolateyException e)
+            {
+                MainView.DisplayError(LocaleEN.ERROR_UPGRADING_OUTDATED_PACKAGES, e.Message);
+                return;
             }
 
             // display results
+            Task minDelay = Task.Run(() => Thread.Sleep(3 * 1000));
+
             IntPtr handle = WindowsConsole.GetConsoleWindow();
             if (!IntPtr.Zero.Equals(handle))
             {
@@ -178,42 +168,16 @@ namespace CandyShop.Controller
             Console.Write("\nPress any key to continue... ");
             Console.ReadKey();
 
-            // remove shortcuts
-            if (shortcuts.Count > 0)
+            // delete shortcuts
+            ShortcutService?.DisposeWatchers();
+            if (MainView.UpgradePackagesPage.CleanShortcuts)
             {
-                StringBuilder msg = new StringBuilder();
-                msg.Append($"During the upgrade process {shortcuts.Count} new desktop shortcut(s) were created:\n\n");
-                foreach (string shortcut in shortcuts)
-                {
-                    msg.Append($"- {Path.GetFileNameWithoutExtension(shortcut)}\n");
-                }
-                msg.Append($"\nDo you want to delete all {shortcuts.Count} shortcut(s)?");
-
-                DialogResult result = MessageBox.Show(
-                    msg.ToString(),
-                    Application.ProductName,
-                    MessageBoxButtons.YesNo,
-                    MessageBoxIcon.Question,
-                    MessageBoxDefaultButton.Button1);
-
-                if (result.Equals(DialogResult.Yes))
-                {
-                    while (shortcuts.Count > 0)
-                    {
-                        string shortcut = shortcuts.Dequeue();
-                        try
-                        {
-                            File.Delete(shortcut);
-                        }
-                        catch (IOException)
-                        {
-                            // TODO
-                        }
-                    }
-                }
+                await minDelay; // wait for shortcuts to be created
+                ShortcutService?.DeleteShortcuts(shortcuts);
             }
 
             // TODO if there still are outdated packages, return to MainView
+            // TODO if there was an error, offer to open log folder? go back to application?
             Environment.Exit(0);
         }
 

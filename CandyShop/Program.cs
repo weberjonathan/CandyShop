@@ -3,6 +3,7 @@ using Serilog;
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
 using System.Windows.Forms;
 
 namespace CandyShop
@@ -12,10 +13,14 @@ namespace CandyShop
         [STAThread]
         static void Main(string[] args)
         {
+            CandyShopContext context = new CandyShopContext();
+            Directory.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData));
+
             // configure logger
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Debug()
                 .WriteTo.Debug()
+                .WriteTo.File(context.LogFilepath)
                 .CreateLogger();
 
             // check if Chocolatey is in path
@@ -45,8 +50,8 @@ namespace CandyShop
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            CandyShopApplicationContext context = new CandyShopApplicationContext();
-            Application.Run(context);
+            CandyShopApplicationContext appContext = new CandyShopApplicationContext(context);
+            Application.Run(appContext);
         }
     }
 }

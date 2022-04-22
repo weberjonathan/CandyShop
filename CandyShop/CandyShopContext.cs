@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Security.Principal;
 
@@ -11,11 +13,7 @@ namespace CandyShop
     {
         private const string OPTION_BACKGROUND = "--background";
         private const string OPTION_BACKGROUND_SHORT = "-b";
-
-        private static bool ContainsLaunchOption(params string[] options)
-        {
-            return Environment.GetCommandLineArgs().Intersect(options).Count() > 0;
-        }
+        private readonly string _LogFilepath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "CandyShop.log");
 
         public CandyShopContext()
         {
@@ -25,13 +23,35 @@ namespace CandyShop
                 HasAdminPrivileges = principal.IsInRole(WindowsBuiltInRole.Administrator);
             }
 
-            LaunchedMinimized = ContainsLaunchOption(OPTION_BACKGROUND, OPTION_BACKGROUND_SHORT);
+            ParseArguments();
         }
+
+        public string LogFilepath => _LogFilepath;
 
         public bool LaunchedMinimized { get; set; } = false;
 
         public bool HasAdminPrivileges { get; set; } = false;
 
         public string CholoateyLogFolder { get; set; } = "C:\\ProgramData\\chocolatey\\logs";
+
+        private void ParseArguments()
+        {
+            Queue<string> arguments = new Queue<string>(Environment.GetCommandLineArgs());
+            while (arguments.Count > 0)
+            {
+                string arg = arguments.Dequeue();
+                switch (arg)
+                {
+                    case OPTION_BACKGROUND:
+                        LaunchedMinimized = true;
+                        break;
+                    case OPTION_BACKGROUND_SHORT:
+                        LaunchedMinimized = true;
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
     }
 }

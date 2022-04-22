@@ -73,6 +73,18 @@ namespace CandyShop.View
             }
         }
 
+        public bool CleanShortcuts
+        {
+            get
+            {
+                return checkDeleteShortcuts.Checked;
+            }
+            set
+            {
+                checkDeleteShortcuts.Checked = value;
+            }
+        }
+
         public void AddItem(string[] data)
         {
             ListViewItem item = new ListViewItem(data);
