@@ -102,6 +102,11 @@ namespace CandyShop.View
             Controller.ShowChocoLogFolder();
         }
 
+        private void MenuExtrasOpenCandyShopConfig_Click(object sender, EventArgs e)
+        {
+            Controller.ShowCandyShopConfigFolder();
+        }
+
         private void UpgradePage_UpgradeAllClick(object sender, EventArgs e)
         {
 

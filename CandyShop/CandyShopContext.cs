@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Security.Principal;
 using System.Text.Json;
 
@@ -39,6 +38,8 @@ namespace CandyShop
             ParseArguments();
             ParseProperties();
         }
+
+        public string ConfigFolder => _AppDataDir;
 
         public string LogFilepath => _LogFilepath;
 
@@ -84,15 +85,25 @@ namespace CandyShop
 
         private void ParseProperties()
         {
+            CandyShopProperties p;
+
+            // read properties
             try
             {
                 string json = File.ReadAllText(_ConfigFilepath);
-                _Properties = JsonSerializer.Deserialize<CandyShopProperties>(json);
+                p = JsonSerializer.Deserialize<CandyShopProperties>(json);
             }
             catch (Exception e)
             {
                 Log.Error($"An error occurred while reading properties from {_ConfigFilepath}: {e.Message}");
+                return;
             }
+
+            // apply valid ones
+            if (p.ChocolateyLogs != null && Directory.Exists(p.ChocolateyLogs))
+                _Properties.ChocolateyLogs = Path.GetFullPath(p.ChocolateyLogs);
+
+            _Properties.CleanShortcuts = p.CleanShortcuts;
         }
 
         private void WriteProperties()
@@ -101,7 +112,8 @@ namespace CandyShop
 
             try
             {
-                string json = JsonSerializer.Serialize(_Properties);
+                JsonSerializerOptions options = new JsonSerializerOptions() { WriteIndented = true };
+                string json = JsonSerializer.Serialize(_Properties, options);
                 File.WriteAllText(_ConfigFilepath, json);
             }
             catch (Exception e)

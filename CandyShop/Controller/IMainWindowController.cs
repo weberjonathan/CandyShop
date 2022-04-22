@@ -12,6 +12,7 @@ namespace CandyShop.Controller
         void ShowLicenses();
         void ToggleCreateTask();
         void ShowChocoLogFolder();
+        void ShowCandyShopConfigFolder();
         void PerformUpgrade(string[] packages);
     }
 }

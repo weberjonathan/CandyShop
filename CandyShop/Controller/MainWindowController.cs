@@ -142,6 +142,27 @@ namespace CandyShop.Controller
             }
         }
 
+        public void ShowCandyShopConfigFolder()
+        {
+            if (Directory.Exists(CandyShopContext.ConfigFolder))
+            {
+                CandyShopContext.Save();
+
+                try
+                {
+                    Process.Start("explorer.exe", CandyShopContext.ConfigFolder);
+                }
+                catch (Win32Exception e)
+                {
+                    MainView.DisplayError("An unknown error occurred: {0}", e.Message);
+                }
+            }
+            else
+            {
+                MainView.DisplayError("Cannot find CandyShop configuration directory at '{0}'", CandyShopContext.ConfigFolder);
+            }
+        }
+
         public async void PerformUpgrade(string[] packages)
         {
             MainView?.ToForm().Hide();
