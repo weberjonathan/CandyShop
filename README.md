@@ -26,13 +26,18 @@ Configuration and log files are placed in `%localappdata%\CandyShop`. The config
 ```
 
 ## Build Instructions
-1. Make sure the .NET Core SDK 3.1 or higher is installed on your system or download it (https://dotnet.microsoft.com/download/dotnet/3.1).
-1. `git clone https://github.com/weberjonathan/CandyShop.git`
-2. `cd ./CandyShop/CandyShop/`
-3. Run `dotnet publish CandyShop.csproj -c Release -f netcoreapp3.1 -p:PublishReadyToRun=true -p:PublishSingleFile=true --no-self-contained -r win-x64 -o ./bin` to create a build for win-x64 systems that depends on the .NET Core Runtime. If this not what you're looking for please specify your own options. (See https://docs.microsoft.com/en-us/dotnet/core/tools/dotnet-publish for details.)
-4. Find the executable in `/bin`.
+A build script is available at `.\CandyShop\scripts\build.ps1`.
+1. Make sure the .NET Core SDK 3.1 or higher is installed on your system or download it (https://dotnet.microsoft.com/download/dotnet/3.1) and launch a powershell console.
+1. Clone the repo: `git clone https://github.com/weberjonathan/CandyShop.git`
+2. Navigate to project root or scripts folder: `cd .\CandyShop\`
+3. Execute build script: `.\build.ps1`
+4. Locate executable in `\CandyShop\build\`
 
-Note, that by default CandyShop requires adminstrator privileges, which depending on your setup may not always be necessary for your Chocolatey installation. To build CandyShop without this requirement, simply switch the [`app.manifest`](CandyShop/app.manifest)-file with [`app.manifest.noadmin`](CandyShop/app.manifest.admin) in your repository.
+The build script is interactive and asks, whether the runtime should be included in the build and whether launching CandyShop requires administrator privileges, or not. Defaults are provided.
+
+See https://docs.microsoft.com/en-us/dotnet/core/tools/dotnet-publish for further build instructions.
+
+(Note, that by default CandyShop requires adminstrator privileges, which depending on your setup may not always be necessary for your Chocolatey installation. To build CandyShop without this requirement, simply switch the [`app.manifest`](CandyShop/app.manifest)-file with [`app.manifest.noadmin`](CandyShop/app.manifest.admin) in your repository.)
 
 ## Notes
 * When the "Clean shortcuts" option is selected, any desktop shortcuts that are created between the start and the end of the upgrade process will be deleted. A record of any such operation is logged.
