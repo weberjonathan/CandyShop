@@ -1,7 +1,8 @@
 ﻿namespace CandyShop.Chocolatey
 {
-    // use for exceptions with Chocolatey software
-
+    /// <summary>
+    /// The exception that is thrown when Chocolatey returned an error or the communication with Chocolatey failed.
+    /// </summary>
     [System.Serializable]
     public class ChocolateyException : System.Exception
     {

@@ -354,3 +354,5 @@ MigrationBackup/
 
 # Custom additions
 */Properties/launchSettings.json
+icons/
+/build/*

@@ -1,99 +1,57 @@
 ﻿using CandyShop.Chocolatey;
-using CandyShop.Controls;
+using CandyShop.View;
 using CandyShop.Properties;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Runtime.InteropServices;
-using System.Text;
 using System.Windows.Forms;
+using CandyShop.Controller;
+using CandyShop.Services;
 
 namespace CandyShop
 {
-    public class CandyShopApplicationContext : ApplicationContext
+    internal class CandyShopApplicationContext : ApplicationContext
     {
-        [DllImport("kernel32.dll", SetLastError = true)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        private static extern bool AllocConsole();
-
-        [DllImport("kernel32.dll", ExactSpelling = true)]
-        private static extern IntPtr GetConsoleWindow();
-
-        [DllImport("user32.dll")]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        private static extern bool SetForegroundWindow(IntPtr hWnd);
-
-        private const string OPTION_BACKGROUND = "--background";
-        private const string OPTION_BACKGROUND_SHORT = "-b";
-
-        private readonly CandyShopForm _MainForm;
-
-        private readonly ChocolateyService _ChocolateyService;
-
-        public CandyShopApplicationContext()
+        public CandyShopApplicationContext(CandyShopContext context)
         {
-            _ChocolateyService = new ChocolateyService();
+            // init services
+            ChocolateyService chocolateyService = new ChocolateyService();
+            WindowsTaskService windowsTaskService = new WindowsTaskService();
+            ShortcutService shortcutService = new ShortcutService();
 
-            // determine silent mode
-            List<string> args = new List<string>(Environment.GetCommandLineArgs());
-            bool launchMinimized = args.Find(s => s.Equals(OPTION_BACKGROUND) ||
-                                                  s.Equals(OPTION_BACKGROUND_SHORT)) != null;
+            //
+            LoadOutdatedPackagesAsync(chocolateyService);
 
-            // create form; performs package upgrade onFormClosed and exits afterwards
-            _MainForm = new CandyShopForm(_ChocolateyService);
-            _MainForm.FormClosing += new FormClosingEventHandler((sender, e) =>
-            {
-                _MainForm.Hide();
+            // init controller
+            MainWindowController candyShopController = new MainWindowController(chocolateyService, windowsTaskService, shortcutService, context);
+            InstalledPageController installedPageController = new InstalledPageController(chocolateyService);
 
-                if (launchMinimized)
-                {
-                    // perform upgrade and exit; or exit if closed by user; else keep running in tray
-                    if (_MainForm.DialogResult == DialogResult.OK && _MainForm.HasSelectedPackages)
-                    {
-                        PerformPackageUpgrade(_MainForm.SelectedPackages);
-                        Environment.Exit(0);
-                    }
-                    else if (_MainForm.DialogResult == DialogResult.None)
-                    {
-                        // closed using 'X' in upper right corner
-                        Environment.Exit(0);
-                    }
-                    else
-                    {
-                        // closed using Cancel button; app continues to run in tray, form is hidden
-                        _MainForm.DialogResult = DialogResult.None;
-                        e.Cancel = true; // prevent disposing of form
-                    }
-                }
-                else
-                {
-                    // perform upgrade if needed; always exit
-                    if (_MainForm.DialogResult == DialogResult.OK && _MainForm.HasSelectedPackages)
-                    {
-                        PerformPackageUpgrade(_MainForm.SelectedPackages);
-                    }
-                    Environment.Exit(0);
-                }
-                
-                
-            });
+            // init views
+            IMainWindowView mainView = new MainWindow(candyShopController);
+            IInstalledPageView pageView = mainView.InstalledPackagesPage;
+            installedPageController.InjectView(pageView);
+            candyShopController.InjectView(mainView);
 
             // launch with form or in tray
-            if (launchMinimized)
+            if (context.LaunchedMinimized)
             {
                 // creates a tray icon, displays a notification if outdated packages
                 // are found and opens the upgrade UI on click
-                RunInBackground();
+                RunInBackground(candyShopController, chocolateyService);
             }
             else
             {
-                // intialize loading of packages and show form
-                _MainForm.LoadPackages();
-                _MainForm.Show();
+                // launch window
+                candyShopController.InitView();
+                installedPageController.InitView();
             }
         }
 
-        private async void RunInBackground()
+        private async void LoadOutdatedPackagesAsync(ChocolateyService service)
+        {
+            await service.GetOutdatedPackagesAsync();
+        }
+
+        private async void RunInBackground(MainWindowController controller, ChocolateyService service)
         {
             List<ChocolateyPackage> packages = null;
 
@@ -103,29 +61,27 @@ namespace CandyShop
             // obtain outdated packages
             try
             {
-                packages = await _ChocolateyService.FetchOutdatedAsync();
+                packages = await service.GetOutdatedPackagesAsync();
             }
-            catch (ChocolateyException)
+            catch (ChocolateyException e)
             {
                 icon.BalloonTipIcon = ToolTipIcon.Error;
                 icon.Text = Application.ProductName;
-                icon.BalloonTipTitle = String.Format(Strings.Form_Title, Application.ProductName, Application.ProductVersion);
-                icon.BalloonTipText = Strings.Err_CheckOutdated;
+                icon.BalloonTipTitle = String.Format(LocaleEN.TEXT_APP_TITLE, Application.ProductName, Application.ProductVersion);
+                icon.BalloonTipText = String.Format(LocaleEN.ERROR_RETRIEVING_OUTDATED_PACKAGES, e.Message);
                 icon.ShowBalloonTip(2000);
-                Environment.Exit(0);
+                Program.Exit();
             }
-
-            _MainForm.SetOutdatedPackages(packages);
 
             // create click handlers
             icon.BalloonTipClicked += new EventHandler((sender, e) =>
             {
-                _MainForm.Show();
+                controller.InitView();
             });
 
             icon.MouseClick += new MouseEventHandler((sender, e) =>
             {
-                _MainForm.Show();
+                controller.InitView();
             });
 
 
@@ -135,7 +91,7 @@ namespace CandyShop
             }
             else
             {
-                Environment.Exit(0);
+                Program.Exit();
             }
         }
 
@@ -176,94 +132,6 @@ namespace CandyShop
             icon.BalloonTipTitle = $"{packageCount} package{(packageCount == 1 ? " is" : "s are")} outdated.";
             icon.BalloonTipText = $"To upgrade click here or the tray icon later.";
             icon.ShowBalloonTip(2000);
-        }
-
-        private void PerformPackageUpgrade(List<ChocolateyPackage> packages)
-        {
-            // setup watcher for desktop shortcuts
-            Queue<string> shortcuts = new Queue<string>();
-            using (FileSystemWatcher watcher = new FileSystemWatcher())
-            {
-                watcher.BeginInit();
-
-                watcher.Path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-                watcher.Filter = "*.lnk";
-                watcher.IncludeSubdirectories = false;
-                watcher.NotifyFilter = NotifyFilters.FileName;
-                watcher.InternalBufferSize = 65536; // TODO test; incurs performance penalty so remove if not useful
-                watcher.EnableRaisingEvents = true;
-                watcher.Created += new FileSystemEventHandler((sender, e) =>
-                {
-                    shortcuts.Enqueue(e.FullPath);
-                });
-
-                watcher.EndInit();
-
-                // upgrade
-                AllocConsole();
-                Console.CursorVisible = false;
-
-                try
-                {
-                    _ChocolateyService.Upgrade(packages);
-                }
-                catch (ChocolateyException e)
-                {
-                    MessageBox.Show(
-                        $"An error occurred while executing Chocolatey: \"{e.Message}\"",
-                        $"{Application.ProductName} Error",
-                        MessageBoxButtons.OK,
-                        MessageBoxIcon.Error
-                    );
-
-                    return;
-                }
-            }
-
-            // display results
-            IntPtr handle = GetConsoleWindow();
-            if (!IntPtr.Zero.Equals(handle))
-            {
-                SetForegroundWindow(handle);
-            }
-            Console.CursorVisible = false;
-            Console.Write("\nPress any key to continue... ");
-            Console.ReadKey();
-
-            // remove shortcuts
-            if (shortcuts.Count > 0)
-            {
-                StringBuilder msg = new StringBuilder();
-                msg.Append($"During the upgrade process {shortcuts.Count} new desktop shortcut(s) were created:\n\n");
-                foreach (string shortcut in shortcuts)
-                {
-                    msg.Append($"- {Path.GetFileNameWithoutExtension(shortcut)}\n");
-                }
-                msg.Append($"\nDo you want to delete all {shortcuts.Count} shortcut(s)?");
-
-                DialogResult result = MessageBox.Show(
-                    msg.ToString(),
-                    Application.ProductName,
-                    MessageBoxButtons.YesNo,
-                    MessageBoxIcon.Question,
-                    MessageBoxDefaultButton.Button1);
-
-                if (result.Equals(DialogResult.Yes))
-                {
-                    while (shortcuts.Count > 0)
-                    {
-                        string shortcut = shortcuts.Dequeue();
-                        try
-                        {
-                            File.Delete(shortcut);
-                        }
-                        catch (IOException)
-                        {
-                            // TODO
-                        }
-                    }
-                }
-            }
         }
     }
 }

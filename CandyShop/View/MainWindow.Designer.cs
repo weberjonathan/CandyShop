@@ -1,6 +1,8 @@
-﻿namespace CandyShop.Controls
+﻿using System;
+
+namespace CandyShop.View
 {
-    partial class CandyShopForm
+    partial class MainWindow
     {
         /// <summary>
         /// Required designer variable.
@@ -28,13 +30,13 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CandyShopForm));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainWindow));
             this.MainPanel = new System.Windows.Forms.Panel();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.TabUpgrade = new System.Windows.Forms.TabPage();
-            this.UpgradePage = new CandyShop.Controls.UpgradePage();
+            this.UpgradePage = new CandyShop.View.UpgradePage();
             this.TabInstalled = new System.Windows.Forms.TabPage();
-            this.InstalledPage = new CandyShop.Controls.InstalledPage();
+            this.InstalledPage = new CandyShop.View.InstalledPage();
             this.columnHeader1 = new System.Windows.Forms.ColumnHeader();
             this.CandyShopMenu = new System.Windows.Forms.MenuStrip();
             this.MenuEdit = new System.Windows.Forms.ToolStripMenuItem();
@@ -43,10 +45,13 @@
             this.MenuEditDeselectAll = new System.Windows.Forms.ToolStripMenuItem();
             this.MenuExtras = new System.Windows.Forms.ToolStripMenuItem();
             this.MenuExtrasCreateTask = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.MenuExtrasOpenLogs = new System.Windows.Forms.ToolStripMenuItem();
             this.MenuHelp = new System.Windows.Forms.ToolStripMenuItem();
             this.MenuHelpGithub = new System.Windows.Forms.ToolStripMenuItem();
             this.MenuHelpLicense = new System.Windows.Forms.ToolStripMenuItem();
             this.MenuHelpMetaPackages = new System.Windows.Forms.ToolStripMenuItem();
+            this.MenuExtrasOpenCandyShopConfig = new System.Windows.Forms.ToolStripMenuItem();
             this.MainPanel.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.TabUpgrade.SuspendLayout();
@@ -88,6 +93,7 @@
             // 
             // UpgradePage
             // 
+            this.UpgradePage.CleanShortcuts = false;
             this.UpgradePage.Dock = System.Windows.Forms.DockStyle.Fill;
             this.UpgradePage.Location = new System.Drawing.Point(3, 3);
             this.UpgradePage.Name = "UpgradePage";
@@ -161,7 +167,10 @@
             // MenuExtras
             // 
             this.MenuExtras.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.MenuExtrasCreateTask});
+            this.MenuExtrasCreateTask,
+            this.toolStripSeparator1,
+            this.MenuExtrasOpenLogs,
+            this.MenuExtrasOpenCandyShopConfig});
             this.MenuExtras.Name = "MenuExtras";
             this.MenuExtras.Size = new System.Drawing.Size(50, 20);
             this.MenuExtras.Text = "&Extras";
@@ -172,7 +181,19 @@
             this.MenuExtrasCreateTask.Name = "MenuExtrasCreateTask";
             this.MenuExtrasCreateTask.Size = new System.Drawing.Size(344, 22);
             this.MenuExtrasCreateTask.Text = "&Display notification for outdated packages on login";
-            this.MenuExtrasCreateTask.Click += new System.EventHandler(this.MenuExtrasCreateTask_Click);
+            this.MenuExtrasCreateTask.CheckedChanged += new System.EventHandler(this.MenuExtrasCreateTask_CheckedChanged);
+            // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(341, 6);
+            // 
+            // MenuExtrasOpenLogs
+            // 
+            this.MenuExtrasOpenLogs.Name = "MenuExtrasOpenLogs";
+            this.MenuExtrasOpenLogs.Size = new System.Drawing.Size(344, 22);
+            this.MenuExtrasOpenLogs.Text = "Open &Chocolatey logs";
+            this.MenuExtrasOpenLogs.Click += new System.EventHandler(this.MenuExtrasOpenLogs_Click);
             // 
             // MenuHelp
             // 
@@ -205,7 +226,14 @@
             this.MenuHelpMetaPackages.Text = "&Meta packages";
             this.MenuHelpMetaPackages.Click += new System.EventHandler(this.MenuHelpMetaPackages_Click);
             // 
-            // CandyShopForm
+            // MenuExtrasOpenCandyShopConfig
+            // 
+            this.MenuExtrasOpenCandyShopConfig.Name = "MenuExtrasOpenCandyShopConfig";
+            this.MenuExtrasOpenCandyShopConfig.Size = new System.Drawing.Size(344, 22);
+            this.MenuExtrasOpenCandyShopConfig.Text = "Open Candy&Shop configuration folder";
+            this.MenuExtrasOpenCandyShopConfig.Click += new System.EventHandler(this.MenuExtrasOpenCandyShopConfig_Click);
+            // 
+            // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -214,7 +242,7 @@
             this.Controls.Add(this.CandyShopMenu);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.CandyShopMenu;
-            this.Name = "CandyShopForm";
+            this.Name = "MainWindow";
             this.Text = "ChocoAutoUpdateForm";
             this.Load += new System.EventHandler(this.ChocoAutoUpdateForm_Load);
             this.MainPanel.ResumeLayout(false);
@@ -247,5 +275,8 @@
         private System.Windows.Forms.ToolStripMenuItem MenuEditDeselectAll;
         private System.Windows.Forms.ToolStripMenuItem MenuEditSelectRelevant;
         private System.Windows.Forms.ToolStripMenuItem MenuHelpMetaPackages;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+        private System.Windows.Forms.ToolStripMenuItem MenuExtrasOpenLogs;
+        private System.Windows.Forms.ToolStripMenuItem MenuExtrasOpenCandyShopConfig;
     }
 }
