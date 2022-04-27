@@ -21,25 +21,14 @@ namespace CandyShop
         [STAThread]
         static void Main(string[] args)
         {
-            // TODO create logfile with suffix if cant get access to log file
-
             // configure logger
-            var logToFileConfig = new LoggerConfiguration().WriteTo.File(context.LogFilepath);
-            if (context.DebugEnabled)
-            {
-                logToFileConfig.MinimumLevel.Debug();
-            }
-            else
-            {
-                logToFileConfig.MinimumLevel.Information();
-            }
-
-            var logToDebugConsoleConfig = new LoggerConfiguration().WriteTo.Debug().MinimumLevel.Debug();
+            var fileLogger = GetFileLoggerConfiguration().CreateLogger();
+            var debugLogger = new LoggerConfiguration().WriteTo.Debug().MinimumLevel.Debug().CreateLogger();
 
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Debug()
-                .WriteTo.Logger(logToDebugConsoleConfig.CreateLogger())
-                .WriteTo.Logger(logToFileConfig.CreateLogger())
+                .WriteTo.Logger(debugLogger)
+                .WriteTo.Logger(fileLogger)
                 .CreateLogger();
 
             // check if Chocolatey is in path
@@ -71,6 +60,20 @@ namespace CandyShop
 
             CandyShopApplicationContext appContext = new CandyShopApplicationContext(context);
             Application.Run(appContext);
+        }
+
+        private static LoggerConfiguration GetFileLoggerConfiguration()
+        {
+            // TODO create logfile with suffix if cant get access to log file
+
+            LoggerConfiguration config = new LoggerConfiguration()
+                .WriteTo.File(
+                    context.LogFilepath,
+                    Serilog.Events.LogEventLevel.Debug,
+                    "[{Timestamp:yyyy-MM-dd HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}"
+            );
+
+            return context.DebugEnabled ? config.MinimumLevel.Debug() : config.MinimumLevel.Information();
         }
     }
 }
