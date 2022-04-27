@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using CandyShop.View;
 using CandyShop.Properties;
 using CandyShop.Services;
+using Serilog;
 
 namespace CandyShop.Controller
 {
@@ -38,9 +39,9 @@ namespace CandyShop.Controller
             {
                 packages = await ChocolateyService.GetInstalledPackagesAsync();
             }
-            catch (ChocolateyException)
+            catch (ChocolateyException e)
             {
-                throw;
+                Log.Error($"An error occurred while retrieving installed packages: {e.Message}");
             }
 
             packages.ForEach(p => View.AppendItem(p.Name, p.CurrVer));
@@ -67,9 +68,9 @@ namespace CandyShop.Controller
             {
                 details = await ChocolateyService.GetPackageDetails(packageMock);
             }
-            catch (ChocolateyException)
+            catch (ChocolateyException exception)
             {
-                throw;
+                details = String.Format(LocaleEN.ERROR_RETRIEVING_PACKAGE_DETAILS, exception.Message);
             }
 
             if (!String.IsNullOrEmpty(details) && packageMock.Name.Equals(View.SelectedItem))

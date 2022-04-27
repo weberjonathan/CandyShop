@@ -16,6 +16,8 @@ namespace CandyShop.Chocolatey
         /// <exception cref="ChocolateyException"></exception>
         public static List<ChocolateyPackage> FetchInstalled()
         {
+            Log.Debug("Fetching installed packages from Chocolatey...");
+
             List<ChocolateyPackage> packages = new List<ChocolateyPackage>();
 
             // launch process TODO try catch
@@ -76,6 +78,8 @@ namespace CandyShop.Chocolatey
         /// <exception cref="ChocolateyException"></exception>
         public static List<ChocolateyPackage> FetchOutdated()
         {
+            Log.Debug("Fetching outdated packages from Chocolatey...");
+            
             List<ChocolateyPackage> packages = new List<ChocolateyPackage>();
 
             // launch process

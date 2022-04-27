@@ -79,6 +79,15 @@ namespace CandyShop.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Failed to retrieve package details: {0}.
+        /// </summary>
+        internal static string ERROR_RETRIEVING_PACKAGE_DETAILS {
+            get {
+                return ResourceManager.GetString("ERROR_RETRIEVING_PACKAGE_DETAILS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Error upgrading outdated packages: {0}.
         /// </summary>
         internal static string ERROR_UPGRADING_OUTDATED_PACKAGES {

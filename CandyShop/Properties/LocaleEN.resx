@@ -123,6 +123,9 @@
   <data name="ERROR_RETRIEVING_OUTDATED_PACKAGES" xml:space="preserve">
     <value>Failed to retrieve outdated packages: {0}</value>
   </data>
+  <data name="ERROR_RETRIEVING_PACKAGE_DETAILS" xml:space="preserve">
+    <value>Failed to retrieve package details: {0}</value>
+  </data>
   <data name="ERROR_UPGRADING_OUTDATED_PACKAGES" xml:space="preserve">
     <value>Error upgrading outdated packages: {0}</value>
   </data>

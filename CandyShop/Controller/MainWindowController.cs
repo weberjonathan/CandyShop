@@ -40,7 +40,7 @@ namespace CandyShop.Controller
         {
             if (MainView == null) throw new InvalidOperationException("Set a view before intialising it!");
 
-            RequestOutdatedPackagesAsync();
+            UpdateOutdatedPackageListAsync();
 
             if (CandyShopContext.HasAdminPrivileges) MainView.ClearAdminHints();
             else MainView.ShowAdminHints();
@@ -214,16 +214,16 @@ namespace CandyShop.Controller
             Program.Exit();
         }
 
-        private async void RequestOutdatedPackagesAsync()
+        private async void UpdateOutdatedPackageListAsync()
         {
             List<ChocolateyPackage> packages = new List<ChocolateyPackage>();
             try
             {
                 packages = await ChocolateyService.GetOutdatedPackagesAsync();
             }
-            catch (ChocolateyException)
+            catch (ChocolateyException e)
             {
-                MainView?.DisplayError("Failed to retrieve outdated packages: {}");
+                MainView?.DisplayError(LocaleEN.ERROR_RETRIEVING_OUTDATED_PACKAGES, e.Message);
             }
 
             if (packages.Count == 0)

@@ -19,6 +19,7 @@ namespace CandyShop.Services
         private readonly Dictionary<string, ChocolateyPackage> InstalledPckgCache = new Dictionary<string, ChocolateyPackage>();
         private readonly Dictionary<string, ChocolateyPackage> OutdatedPckgCache = new Dictionary<string, ChocolateyPackage>();
 
+        /// <exception cref="ChocolateyException"></exception>
         public async Task<List<ChocolateyPackage>> GetOutdatedPackagesAsync()
         {
             await OutdatedPckgLock.WaitAsync().ConfigureAwait(false);
@@ -31,6 +32,10 @@ namespace CandyShop.Services
                     outdatedPckgs.ForEach(p => OutdatedPckgCache[p.Name] = p);
                 }
             }
+            catch (ChocolateyException)
+            {
+                throw;
+            }
             finally
             {
                 OutdatedPckgLock.Release();
@@ -40,6 +45,7 @@ namespace CandyShop.Services
             return OutdatedPckgCache.Values.ToList();
         }
 
+        /// <exception cref="ChocolateyException"></exception>
         public async Task<List<ChocolateyPackage>> GetInstalledPackagesAsync()
         {
             await InstalledPckgLock.WaitAsync().ConfigureAwait(false);
@@ -52,6 +58,10 @@ namespace CandyShop.Services
                     installedPckgs.ForEach(p => InstalledPckgCache[p.Name] = p);
                 }
             }
+            catch (ChocolateyException)
+            {
+                throw;
+            }
             finally
             {
                 InstalledPckgLock.Release();
@@ -60,6 +70,7 @@ namespace CandyShop.Services
             return InstalledPckgCache.Values.ToList();
         }
 
+        /// <exception cref="ChocolateyException"></exception>
         public async Task<string> GetPackageDetails(ChocolateyPackage package)
         {
             if (!PckgDetailsCache.TryGetValue(package.Name, out string details))

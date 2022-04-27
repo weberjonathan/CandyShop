@@ -51,7 +51,14 @@ namespace CandyShop
 
         private async void LoadOutdatedPackagesAsync(ChocolateyService service)
         {
-            await service.GetOutdatedPackagesAsync();
+            try
+            {
+                await service.GetOutdatedPackagesAsync();
+            }
+            catch (ChocolateyException e)
+            {
+                Log.Error(LocaleEN.ERROR_RETRIEVING_OUTDATED_PACKAGES, e.Message);
+            }
         }
 
         private async void RunInBackground(MainWindowController controller, ChocolateyService service)
