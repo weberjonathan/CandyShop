@@ -14,6 +14,7 @@ namespace CandyShop.View
         string[] SelectedItems { get; }
         bool ShowAdminWarning { get; set; }
         bool CleanShortcuts { get; set; }
+        bool Loading { get; set; }
 
         void AddItem(string[] data);
         void CheckAllItems();

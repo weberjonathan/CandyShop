@@ -185,7 +185,7 @@ namespace CandyShop.Controller
             catch (ChocolateyException e)
             {
                 MainView.DisplayError(LocaleEN.ERROR_UPGRADING_OUTDATED_PACKAGES, e.Message);
-                return;
+                return; // TODO why return? shortcuts should be deleted even if chocolatey fails to upgrade some packages (others may have been upgraded and added a shortcut)
             }
 
             // display results
@@ -224,6 +224,11 @@ namespace CandyShop.Controller
             catch (ChocolateyException)
             {
                 MainView?.DisplayError("Failed to retrieve outdated packages: {}");
+            }
+
+            if (packages.Count == 0)
+            {
+                MainView.UpgradePackagesPage.Loading = false;
             }
 
             packages.ForEach(p => MainView.UpgradePackagesPage.AddItem(new string[]

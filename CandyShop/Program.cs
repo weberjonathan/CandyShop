@@ -21,16 +21,25 @@ namespace CandyShop
         [STAThread]
         static void Main(string[] args)
         {
+            // TODO create logfile with suffix if cant get access to log file
+
             // configure logger
+            var logToFileConfig = new LoggerConfiguration().WriteTo.File(context.LogFilepath);
+            if (context.DebugEnabled)
+            {
+                logToFileConfig.MinimumLevel.Debug();
+            }
+            else
+            {
+                logToFileConfig.MinimumLevel.Information();
+            }
+
+            var logToDebugConsoleConfig = new LoggerConfiguration().WriteTo.Debug().MinimumLevel.Debug();
+
             Log.Logger = new LoggerConfiguration()
-                .WriteTo.Debug(Serilog.Events.LogEventLevel.Debug)
-                .WriteTo.Logger(logger =>
-                {
-                    logger
-                    .MinimumLevel.Information()
-                    .WriteTo.File(context.LogFilepath);
-                })
                 .MinimumLevel.Debug()
+                .WriteTo.Logger(logToDebugConsoleConfig.CreateLogger())
+                .WriteTo.Logger(logToFileConfig.CreateLogger())
                 .CreateLogger();
 
             // check if Chocolatey is in path

@@ -20,6 +20,7 @@ namespace CandyShop
 
         private const string OPTION_BACKGROUND = "--background";
         private const string OPTION_BACKGROUND_SHORT = "-b";
+        private const string OPTION_DEBUG = "--debug";
         private static readonly string _AppDataDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "CandyShop");
         private static readonly string _ConfigFilepath = Path.Combine(_AppDataDir, "CandyShop.config");
         private static readonly string _LogFilepath = Path.Combine(_AppDataDir, "CandyShop.log");
@@ -49,6 +50,8 @@ namespace CandyShop
 
         public string CholoateyLogFolder => _Properties.ChocolateyLogs;
 
+        public bool DebugEnabled { get; private set; } = false;
+
         public bool CleanShortcuts
         {
             get
@@ -76,6 +79,9 @@ namespace CandyShop
                         break;
                     case OPTION_BACKGROUND_SHORT:
                         LaunchedMinimized = true;
+                        break;
+                    case OPTION_DEBUG:
+                        DebugEnabled = true;
                         break;
                     default:
                         break;

@@ -86,14 +86,26 @@ namespace CandyShop.View
             }
         }
 
+        public bool Loading
+        {
+            get
+            {
+                return LblLoading.Visible;
+            }
+            set
+            {
+                LblLoading.Visible = value;
+                BtnUpgradeSelected.Enabled = !value;
+                BtnUpgradeAll.Enabled = !value;
+            }
+        }
+
         public void AddItem(string[] data)
         {
             ListViewItem item = new ListViewItem(data);
             LstPackages.Items.Add(item);
             
-            LblLoading.Visible = false;
-            BtnUpgradeSelected.Enabled = true;
-            BtnUpgradeAll.Enabled = true;
+            if (Loading) Loading = false;
         }
 
         public void CheckAllItems()

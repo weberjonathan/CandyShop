@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
 using System.Threading;
+using Serilog;
 
 namespace CandyShop.Services
 {
@@ -33,6 +34,7 @@ namespace CandyShop.Services
             finally
             {
                 OutdatedPckgLock.Release();
+                Log.Debug("Released lock for outdated packages.");
             }
 
             return OutdatedPckgCache.Values.ToList();

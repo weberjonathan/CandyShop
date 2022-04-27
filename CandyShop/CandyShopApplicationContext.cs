@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Windows.Forms;
 using CandyShop.Controller;
 using CandyShop.Services;
+using Serilog;
 
 namespace CandyShop
 {
@@ -13,6 +14,8 @@ namespace CandyShop
     {
         public CandyShopApplicationContext(CandyShopContext context)
         {
+            Log.Information("Launched CandyShop.");
+
             // init services
             ChocolateyService chocolateyService = new ChocolateyService();
             WindowsTaskService windowsTaskService = new WindowsTaskService();
