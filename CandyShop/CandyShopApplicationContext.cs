@@ -14,7 +14,7 @@ namespace CandyShop
     {
         public CandyShopApplicationContext(CandyShopContext context)
         {
-            Log.Information("Launched CandyShop.");
+            Log.Debug("Launched CandyShop.");
 
             // init services
             ChocolateyService chocolateyService = new ChocolateyService();

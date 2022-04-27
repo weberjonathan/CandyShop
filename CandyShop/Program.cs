@@ -65,15 +65,57 @@ namespace CandyShop
         private static LoggerConfiguration GetFileLoggerConfiguration()
         {
             // TODO create logfile with suffix if cant get access to log file
+            string filepath = GetLogFilename();
 
             LoggerConfiguration config = new LoggerConfiguration()
                 .WriteTo.File(
-                    context.LogFilepath,
+                    filepath,
                     Serilog.Events.LogEventLevel.Debug,
                     "[{Timestamp:yyyy-MM-dd HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}"
             );
 
             return context.DebugEnabled ? config.MinimumLevel.Debug() : config.MinimumLevel.Information();
+        }
+
+        private static string GetLogFilename()
+        {
+            string path = context.LogFilepath;
+
+            int i = 1;
+            while (true)
+            {
+                if (File.Exists(path) && IsFileLocked(path))
+                {
+                    // logfile is in use, so try next
+                    string dir = Path.GetDirectoryName(Path.GetFullPath(path));
+                    string filename = Path.GetFileNameWithoutExtension(context.LogFilepath) + (i++) + Path.GetExtension(context.LogFilepath);
+                    path = Path.Combine(dir, filename);
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            return path;
+            
+        }
+
+        private static bool IsFileLocked(string path)
+        {
+            try
+            {
+                using (FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Write, FileShare.None))
+                {
+                    fs.Close();
+                }
+            }
+            catch (IOException)
+            {
+                return true;
+            }
+
+            return false;
         }
     }
 }
