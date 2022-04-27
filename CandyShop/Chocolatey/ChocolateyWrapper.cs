@@ -82,6 +82,10 @@ namespace CandyShop.Chocolatey
             ChocolateyProcess p = new ChocolateyProcess("outdated");
             p.ExecuteHidden();
 
+            // TODO throw exceptions for parsing errors
+            // account for optional extra sections at the start
+            // and end of sections header, package list and summary
+
             // parse (find header section, followed by package section, followed by summary section)
             List<string[]> sections = p.OutputBySection;
             for (int i = 0; i < sections.Count; i++)
@@ -96,30 +100,31 @@ namespace CandyShop.Chocolatey
                     string[] summary = sections[i + 2];
 
                     // check summary
-                    if (summary.Length == 1 &&
+                    if (summary.Length > 0 &&
                         summary[0].StartsWith("Chocolatey has determined ") &&
-                        summary[0].EndsWith(" package(s) are outdated. ") &&
-                        summary[0].Length > 51 &&
-                        int.TryParse(summary[0].Substring(26, summary[0].Length - 51), out int outdatedCount))
+                        summary[0].EndsWith(" package(s) are outdated. "))
                     {
-                        if (outdatedCount == packageList.Length)
+                        /* Do NOT check if count of outdated packages in summary
+                         * equals package list size, because they are not equal
+                         * in case of faulty Chocolatey packages (which are not
+                         * counted towards outdated packages)!
+                         * Thanks to Valentin for helping with this issue. */
+                        
+                        // check packages
+                        foreach (string line in packageList)
                         {
-                            // check packages
-                            foreach (string line in packageList)
+                            // retrieve package
+                            string[] entry = line.Split('|');
+                            if (entry.Length == 4)
                             {
-                                // retrieve package
-                                string[] entry = line.Split('|');
-                                if (entry.Length == 4)
+                                ChocolateyPackage pckg = new ChocolateyPackage
                                 {
-                                    ChocolateyPackage pckg = new ChocolateyPackage
-                                    {
-                                        Name = entry[0],
-                                        CurrVer = entry[1],
-                                        AvailVer = entry[2],
-                                        Pinned = entry[3].Equals("true")
-                                    };
-                                    packages.Add(pckg);
-                                }
+                                    Name = entry[0],
+                                    CurrVer = entry[1],
+                                    AvailVer = entry[2],
+                                    Pinned = entry[3].Equals("true")
+                                };
+                                packages.Add(pckg);
                             }
                         }
                     }
