@@ -170,7 +170,7 @@ namespace CandyShop.Chocolatey
         }
 
         /// <exception cref="ChocolateyException"></exception>
-        public static void Upgrade(List<ChocolateyPackage> packages)
+        public static int Upgrade(List<ChocolateyPackage> packages)
         {
             string argument = "";
             foreach (ChocolateyPackage pckg in packages)
@@ -183,14 +183,7 @@ namespace CandyShop.Chocolatey
             p.FailOnNonZeroExitCode = false;
             p.Execute();
 
-            // check exit
-            // TODO send appropriate messages for non-zero valid exit codes
-            // no priority because console is displayed and choco displays that information in console
-            var validExitCodes = new List<int> { 0, 1641, 3010, 350, 1604 };
-            if (!validExitCodes.Contains(p.ExitCode))
-            {
-                throw new ChocolateyException($"choco did not exit cleanly. Returned {p.ExitCode}.");
-            }
+            return p.ExitCode;
         }
 
         /// <summary>

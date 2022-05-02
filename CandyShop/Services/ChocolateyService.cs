@@ -109,10 +109,25 @@ namespace CandyShop.Services
             return rtn;
         }
 
+        /// <summary>
+        /// Upgrades a collection of Chocolatey packages. If the <c>validExitCodes</c> parameter
+        /// is not present, only zero is considered valid. When specified, the array should
+        /// include zero.
+        /// If the upgrade process exited with a non-valid code, a <see cref="ChocolateyException"/>
+        /// is thrown. 
+        /// </summary>
+        /// <param name="packages"></param>
+        /// <param name="validExitCodes">test</param>
         /// <exception cref="ChocolateyException"></exception>
-        public void Upgrade(List<ChocolateyPackage> packages)
+        public void Upgrade(List<ChocolateyPackage> packages, int[] validExitCodes = null)
         {
-            ChocolateyWrapper.Upgrade(packages);
+            int exitCode = ChocolateyWrapper.Upgrade(packages);
+            
+            if (validExitCodes == null) validExitCodes = new int[] { 0 };
+            if (!validExitCodes.Contains(exitCode))
+            {
+                throw new ChocolateyException($"choco did not exit cleanly. Returned {exitCode}.");
+            }
         }
     }
 }

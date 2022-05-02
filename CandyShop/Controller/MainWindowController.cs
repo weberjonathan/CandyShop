@@ -8,7 +8,6 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -179,7 +178,7 @@ namespace CandyShop.Controller
                 List<ChocolateyPackage> chocoPackages = ChocolateyService.GetPackageByName(packages.ToList());
                 if (chocoPackages.Count > 0)
                 {
-                    ChocolateyService.Upgrade(chocoPackages);
+                    ChocolateyService.Upgrade(chocoPackages, CandyShopContext.ValidExitCodes.ToArray());
                 }
             }
             catch (ChocolateyException e)

@@ -8,27 +8,28 @@ using System.Text.Json;
 namespace CandyShop
 {
     /// <summary>
-    /// Determines and contains relevant information for the execution of CandyShop, such as command-line options
+    /// Determines and contains relevant information for the execution of CandyShop, such as command-line options and settings
     /// </summary>
     internal class CandyShopContext
     {
-        private class CandyShopProperties
+        private class PropertiesFileContent
         {
             public string ChocolateyLogs { get; set; } = "C:\\ProgramData\\chocolatey\\logs";
             public bool CleanShortcuts { get; set; } = false;
+            public List<int> ValidExitCodes { get; set; } = new List<int> { 0, 1641, 3010, 350, 1604 };
         }
 
         private const string OPTION_BACKGROUND = "--background";
         private const string OPTION_BACKGROUND_SHORT = "-b";
         private const string OPTION_DEBUG = "--debug";
+
         private static readonly string _AppDataDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "CandyShop");
         private static readonly string _ConfigFilepath = Path.Combine(_AppDataDir, "CandyShop.config");
         private static readonly string _LogFilepath = Path.Combine(_AppDataDir, "CandyShop.log");
-        private CandyShopProperties _Properties = new CandyShopProperties();
 
         public CandyShopContext()
         {
-            Directory.CreateDirectory(_AppDataDir);
+            if (!Directory.Exists(_AppDataDir)) Directory.CreateDirectory(_AppDataDir);
 
             using (WindowsIdentity identity = WindowsIdentity.GetCurrent())
             {
@@ -44,27 +45,35 @@ namespace CandyShop
 
         public string LogFilepath => _LogFilepath;
 
-        public bool LaunchedMinimized { get; set; } = false;
-
         public bool HasAdminPrivileges { get; set; } = false;
 
-        public string CholoateyLogFolder => _Properties.ChocolateyLogs;
+        // ----------------- set through arguments -----------------
+
+        public bool LaunchedMinimized { get; set; } = false;
 
         public bool DebugEnabled { get; private set; } = false;
 
-        public bool CleanShortcuts
-        {
-            get
-            {
-                return _Properties.CleanShortcuts;
-            }
-            set
-            {
-                _Properties.CleanShortcuts = value;
-            }
-        }
+        // -------------- set through properties file --------------
 
-        public void Save() => WriteProperties();
+        public string CholoateyLogFolder { get; private set; }
+
+        public bool CleanShortcuts { get; set; }
+
+        public List<int> ValidExitCodes { get; set; }
+
+        // ---------------------------------------------------------
+
+        public void Save()
+        {
+            PropertiesFileContent content = new PropertiesFileContent
+            {
+                ChocolateyLogs = this.CholoateyLogFolder,
+                CleanShortcuts = this.CleanShortcuts,
+                ValidExitCodes = this.ValidExitCodes
+            };
+            
+            WriteProperties(content);
+        }
 
         private void ParseArguments()
         {
@@ -91,35 +100,44 @@ namespace CandyShop
 
         private void ParseProperties()
         {
-            CandyShopProperties p;
+            // initialize with defaults
+            PropertiesFileContent content = new PropertiesFileContent();
 
-            // read properties
-            try
+            // read properties file content
+            if (File.Exists(_ConfigFilepath))
             {
-                string json = File.ReadAllText(_ConfigFilepath);
-                p = JsonSerializer.Deserialize<CandyShopProperties>(json);
+                try
+                {
+                    string json = File.ReadAllText(_ConfigFilepath);
+                    PropertiesFileContent parsedContent = JsonSerializer.Deserialize<PropertiesFileContent>(json);
+                    content = parsedContent;
+                }
+                catch (Exception e)
+                {
+                    Log.Error($"An error occurred while reading properties from {_ConfigFilepath}: {e.Message}");
+                }
             }
-            catch (Exception e)
+            else
             {
-                Log.Error($"An error occurred while reading properties from {_ConfigFilepath}: {e.Message}");
-                return;
+                WriteProperties(content);
             }
 
-            // apply valid ones
-            if (p.ChocolateyLogs != null && Directory.Exists(p.ChocolateyLogs))
-                _Properties.ChocolateyLogs = Path.GetFullPath(p.ChocolateyLogs);
-
-            _Properties.CleanShortcuts = p.CleanShortcuts;
+            // apply properties from content
+            CholoateyLogFolder = content.ChocolateyLogs;
+            CleanShortcuts = content.CleanShortcuts;
+            ValidExitCodes = content.ValidExitCodes;
         }
 
-        private void WriteProperties()
+        private void WriteProperties(PropertiesFileContent content)
         {
-            Directory.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData));
-
             try
             {
-                JsonSerializerOptions options = new JsonSerializerOptions() { WriteIndented = true };
-                string json = JsonSerializer.Serialize(_Properties, options);
+                JsonSerializerOptions options = new JsonSerializerOptions()
+                {
+                    WriteIndented = true
+                };
+
+                string json = JsonSerializer.Serialize(content, options);
                 File.WriteAllText(_ConfigFilepath, json);
             }
             catch (Exception e)
