@@ -14,7 +14,8 @@ namespace CandyShop
 
         public static void Exit(int code = 0)
         {
-            context?.Save();
+            context?.StopPropertiesFileWatcher();
+            context?.SaveProperties();
             Environment.Exit(code);
         }
 

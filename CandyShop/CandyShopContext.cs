@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Security.Principal;
 using System.Text.Json;
+using System.Threading;
 
 namespace CandyShop
 {
@@ -26,6 +27,8 @@ namespace CandyShop
         private static readonly string _AppDataDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "CandyShop");
         private static readonly string _ConfigFilepath = Path.Combine(_AppDataDir, "CandyShop.config");
         private static readonly string _LogFilepath = Path.Combine(_AppDataDir, "CandyShop.log");
+
+        private FileSystemWatcher _ConfigFileWatcher;
 
         public CandyShopContext()
         {
@@ -63,7 +66,7 @@ namespace CandyShop
 
         // ---------------------------------------------------------
 
-        public void Save()
+        public void SaveProperties()
         {
             PropertiesFileContent content = new PropertiesFileContent
             {
@@ -73,6 +76,48 @@ namespace CandyShop
             };
             
             WriteProperties(content);
+        }
+
+        /// <summary>
+        /// Executes the callback when the properties file changed on the disk.
+        /// </summary>
+        public void OnPropertiesFileChanged(Action callback)
+        {
+            // init file watcher
+            if (_ConfigFileWatcher == null)
+            {
+                _ConfigFileWatcher = new FileSystemWatcher();
+                _ConfigFileWatcher.BeginInit();
+                _ConfigFileWatcher.Path = ConfigFolder;
+                _ConfigFileWatcher.Filter = Path.GetFileName(_ConfigFilepath);
+                _ConfigFileWatcher.IncludeSubdirectories = false;
+                _ConfigFileWatcher.NotifyFilter = NotifyFilters.LastWrite;
+                _ConfigFileWatcher.EnableRaisingEvents = true;
+                _ConfigFileWatcher.EndInit();
+            }
+
+            // Changed event may be invoked twice on single save due to possibility
+            // of multiple write operations by editor used to change the file.
+            // To prevent exceptions, delay parsing of properties file
+            // also see https://failingfast.io/a-robust-solution-for-filesystemwatcher-firing-events-multiple-times/
+            Timer timer = new Timer((state) =>
+            {
+                Log.Debug("Attempt reloading properties from file.");
+                ParseProperties();
+                callback.Invoke();
+            }, null, Timeout.Infinite, Timeout.Infinite);
+
+            _ConfigFileWatcher.Changed += new FileSystemEventHandler((sender, e) =>
+            {
+                Log.Information("Invoked changed event");
+                timer.Change(500, Timeout.Infinite);
+            });
+        }
+
+        public void StopPropertiesFileWatcher()
+        {
+            _ConfigFileWatcher?.Dispose();
+            _ConfigFileWatcher = null;
         }
 
         private void ParseArguments()
@@ -108,7 +153,13 @@ namespace CandyShop
             {
                 try
                 {
-                    string json = File.ReadAllText(_ConfigFilepath);
+                    string json = "";
+                    using (FileStream fs = new FileStream(_ConfigFilepath, FileMode.Open, FileAccess.Read, FileShare.Read))
+                    {
+                        
+                        using StreamReader sr = new StreamReader(fs);
+                        json = sr.ReadToEnd();
+                    }
                     PropertiesFileContent parsedContent = JsonSerializer.Deserialize<PropertiesFileContent>(json);
                     content = parsedContent;
                 }

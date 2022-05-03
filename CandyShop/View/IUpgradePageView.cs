@@ -20,5 +20,6 @@ namespace CandyShop.View
         void CheckAllItems();
         void CheckItemsByText(List<string> names);
         void UncheckAllItems();
+        object Invoke(Delegate method, params object[] args);
     }
 }

@@ -66,9 +66,22 @@ namespace CandyShop.Controller
 
             // wire upgrade page properties
             MainView.UpgradePackagesPage.CleanShortcutsChanged += new EventHandler((sender, e) => CandyShopContext.CleanShortcuts = MainView.UpgradePackagesPage.CleanShortcuts);
-
-            MainView.CreateTaskEnabled = WindowsTaskService.LaunchTaskExists();
             MainView.UpgradePackagesPage.CleanShortcuts = CandyShopContext.CleanShortcuts;
+
+            CandyShopContext.OnPropertiesFileChanged(() =>
+            {
+                // need delegate to prevent performing cross-thread access attempts
+                Action<bool> checkDelegate = isChecked =>
+                {
+                    MainView.UpgradePackagesPage.CleanShortcuts = isChecked;
+                };
+
+                MainView.UpgradePackagesPage.Invoke(checkDelegate, CandyShopContext.CleanShortcuts);
+            });
+
+            //
+            MainView.CreateTaskEnabled = WindowsTaskService.LaunchTaskExists();
+            
 
             MainView.ToForm().Show();
         }
@@ -145,8 +158,6 @@ namespace CandyShop.Controller
         {
             if (Directory.Exists(CandyShopContext.ConfigFolder))
             {
-                CandyShopContext.Save();
-
                 try
                 {
                     Process.Start("explorer.exe", CandyShopContext.ConfigFolder);
