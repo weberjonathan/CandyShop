@@ -65,7 +65,6 @@ namespace CandyShop
 
         private static LoggerConfiguration GetFileLoggerConfiguration()
         {
-            // TODO create logfile with suffix if cant get access to log file
             string filepath = GetLogFilename();
 
             LoggerConfiguration config = new LoggerConfiguration()
