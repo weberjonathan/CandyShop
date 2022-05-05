@@ -187,6 +187,15 @@ namespace CandyShop.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Selected packages: {0}.
+        /// </summary>
+        internal static string TEXT_SELECTED_PACKAGE_COUNT {
+            get {
+                return ResourceManager.GetString("TEXT_SELECTED_PACKAGE_COUNT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Upgrade &amp;All.
         /// </summary>
         internal static string TEXT_UPGRADE_ALL {
@@ -196,7 +205,7 @@ namespace CandyShop.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to &amp;Upgrade ({0}).
+        ///   Looks up a localized string similar to &amp;Upgrade.
         /// </summary>
         internal static string TEXT_UPGRADE_SELECTED {
             get {

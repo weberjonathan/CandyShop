@@ -15,10 +15,11 @@ namespace CandyShop.View
 
             // labels
             BtnCancel.Text = LocaleEN.TEXT_CANCEL;
-            BtnUpgradeSelected.Text = String.Format(LocaleEN.TEXT_UPGRADE_SELECTED, 0);
+            BtnUpgradeSelected.Text = LocaleEN.TEXT_UPGRADE_SELECTED;
             BtnUpgradeAll.Text = LocaleEN.TEXT_UPGRADE_ALL;
             LblAdmin.Text = LocaleEN.TEXT_NO_ADMIN_HINT;
             LblLoading.Text = LocaleEN.TEXT_LOADING;
+            LblSelected.Text = String.Empty;
             LstPackages.Columns[0].Text = LocaleEN.TEXT_COL_NAME;
             LstPackages.Columns[1].Text = LocaleEN.TEXT_COL_CURRENT;
             LstPackages.Columns[2].Text = LocaleEN.TEXT_COL_AVAILABLE;
@@ -138,7 +139,7 @@ namespace CandyShop.View
 
         private void LstPackages_ItemChecked(object sender, ItemCheckedEventArgs e)
         {
-            BtnUpgradeSelected.Text = String.Format(LocaleEN.TEXT_UPGRADE_SELECTED, LstPackages.CheckedItems.Count);
+            LblSelected.Text = String.Format(LocaleEN.TEXT_SELECTED_PACKAGE_COUNT, LstPackages.CheckedItems.Count);
         }
 
         private void LstPackages_Resize(object sender, EventArgs e)

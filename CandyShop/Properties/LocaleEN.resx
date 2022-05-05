@@ -159,11 +159,14 @@
   <data name="TEXT_NO_ADMIN_HINT_SHORT" xml:space="preserve">
     <value> (no administrator privileges)</value>
   </data>
+  <data name="TEXT_SELECTED_PACKAGE_COUNT" xml:space="preserve">
+    <value>Selected packages: {0}</value>
+  </data>
   <data name="TEXT_UPGRADE_ALL" xml:space="preserve">
     <value>Upgrade &amp;All</value>
   </data>
   <data name="TEXT_UPGRADE_SELECTED" xml:space="preserve">
-    <value>&amp;Upgrade ({0})</value>
+    <value>&amp;Upgrade</value>
   </data>
   <data name="URL_GITHUB" xml:space="preserve">
     <value>https://github.com/weberjonathan/CandyShop</value>

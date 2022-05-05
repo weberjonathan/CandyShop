@@ -236,10 +236,7 @@ namespace CandyShop.Controller
                 MainView?.DisplayError(LocaleEN.ERROR_RETRIEVING_OUTDATED_PACKAGES, e.Message);
             }
 
-            if (packages.Count == 0)
-            {
-                MainView.UpgradePackagesPage.Loading = false;
-            }
+            MainView.UpgradePackagesPage.Loading = false;
 
             packages.ForEach(p => MainView.UpgradePackagesPage.AddItem(new string[]
             {
