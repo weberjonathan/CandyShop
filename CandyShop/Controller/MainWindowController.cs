@@ -44,6 +44,10 @@ namespace CandyShop.Controller
             if (CandyShopContext.HasAdminPrivileges) MainView.ClearAdminHints();
             else MainView.ShowAdminHints();
 
+            // wire events
+            // TODO this should be consistent with event handlers for other upgrade page events; which are currently handlded in view
+            MainView.UpgradePackagesPage.TogglePinnedClicked += new EventHandler<string>((sender, name) => TogglePin(name));
+
             // exit application on 'X'
             MainView.ToForm().FormClosed += new FormClosedEventHandler((sender, e) =>
             {
@@ -89,15 +93,11 @@ namespace CandyShop.Controller
         public void SmartSelectPackages()
         {
             string[] displayedItemNames = MainView.UpgradePackagesPage.Items;
-            List<ChocolateyPackage> packages = ChocolateyService.GetPackageByName(displayedItemNames.ToList());
-
-            List<string> smartSelected = packages
-                .Where(p => !(p.HasMetaPackage && p.HasSuffix))
-                .Select(p => p.Name)
-                .ToList();
+            List<ChocolateyPackage> packages = ChocolateyService.GetPackagesByName(displayedItemNames.ToList());
 
             List<string> newSelection = packages
                 .Where(p => !(p.HasMetaPackage && p.HasSuffix))
+                .Where(p => p.Pinned.HasValue && !p.Pinned.Value)
                 .Select(p => p.Name)
                 .ToList();
 
@@ -186,7 +186,7 @@ namespace CandyShop.Controller
 
             try
             {
-                List<ChocolateyPackage> chocoPackages = ChocolateyService.GetPackageByName(packages.ToList());
+                List<ChocolateyPackage> chocoPackages = ChocolateyService.GetPackagesByName(packages.ToList());
                 if (chocoPackages.Count > 0)
                 {
                     ChocolateyService.Upgrade(chocoPackages, CandyShopContext.ValidExitCodes.ToArray());
@@ -222,6 +222,43 @@ namespace CandyShop.Controller
             // TODO if there was an error, offer to open log folder? go back to application?
             MainView?.ToForm().Dispose();
             Program.Exit();
+        }
+
+        public void TogglePin(string name)
+        {
+            try
+            {
+                var packages = ChocolateyService.GetPackagesByName(new List<string>() { name });
+                if (packages.Count != 1)
+                {
+                    MainView?.DisplayError($"Could not find package '{name}'");
+                    return;
+                }
+
+                var package = packages[0];
+                if (package.Pinned.HasValue)
+                {
+                    if (package.Pinned.Value)
+                    {
+                        ChocolateyService.Unpin(package);
+                    }
+                    else
+                    {
+                        ChocolateyService.Pin(package);
+                    }
+
+                    var packages2 = ChocolateyService.GetPackagesByName(new List<string>() { name });
+                    MainView?.UpgradePackagesPage.SetPinned(name, package.Pinned.Value);
+                }
+                else
+                {
+                    // TODO error
+                }
+            }
+            catch (ChocolateyException e)
+            {
+                MainView.DisplayError("An unknown error occurred: {0}", e.Message);
+            }
         }
 
         private async void UpdateOutdatedPackageListAsync()

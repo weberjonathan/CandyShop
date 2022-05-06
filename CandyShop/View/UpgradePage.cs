@@ -1,6 +1,7 @@
 ﻿using CandyShop.Properties;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Windows.Forms;
 
 namespace CandyShop.View
@@ -25,17 +26,38 @@ namespace CandyShop.View
             LstPackages.Columns[2].Text = LocaleEN.TEXT_COL_AVAILABLE;
             LstPackages.Columns[3].Text = LocaleEN.TEXT_COL_PINNED;
 
+            // event handlers
             LstPackages.ItemChecked += LstPackages_ItemChecked;
             LstPackages.Resize += LstPackages_Resize;
             BtnUpgradeAll.Click += new EventHandler((sender, e) => { UpgradeAllClick?.Invoke(this, e); });
             BtnUpgradeSelected.Click += new EventHandler((sender, e) => { UpgradeSelectedClick?.Invoke(this, e); });
             BtnCancel.Click += new EventHandler((sender, e) => { CancelClick?.Invoke(this, e); });
+
+            // context menu
+            var itemPin = new ToolStripMenuItem("&Pin package");
+            itemPin.Click += new EventHandler((sender, e) =>
+            {
+                if (LstPackages.SelectedItems.Count > 0)
+                {
+                    TogglePinnedClicked?.Invoke(this, LstPackages.SelectedItems[0].Text);
+                }
+            });
+
+            var contextMenu = new ContextMenuStrip();
+            contextMenu.Opening += new System.ComponentModel.CancelEventHandler((sender, e) =>
+            {
+                itemPin.Checked = Boolean.Parse(LstPackages.SelectedItems[0].SubItems[3].Text);
+            });
+
+            contextMenu.Items.Add(itemPin);
+            LstPackages.ContextMenuStrip = contextMenu;
         }
 
         public event EventHandler UpgradeAllClick;
         public event EventHandler UpgradeSelectedClick;
         public event EventHandler CancelClick;
         public event EventHandler CleanShortcutsChanged;
+        public event EventHandler<string> TogglePinnedClicked;
 
         public string[] Items
         {
@@ -105,7 +127,8 @@ namespace CandyShop.View
         {
             ListViewItem item = new ListViewItem(data);
             LstPackages.Items.Add(item);
-            
+            SetItemStyle(item, Boolean.Parse(data[3]));
+
             if (Loading) Loading = false;
         }
 
@@ -113,6 +136,7 @@ namespace CandyShop.View
         {
             foreach (ListViewItem item in LstPackages.Items)
             {
+                // TODO dont check pinned items
                 item.Checked = true;
             }
         }
@@ -137,8 +161,18 @@ namespace CandyShop.View
             }
         }
 
+        public void SetPinned(string name, bool pinned)
+        {
+            var item = LstPackages.FindItemWithText(name);
+            item.SubItems[3].Text = pinned.ToString();
+            SetItemStyle(item, pinned);
+        }
+
         private void LstPackages_ItemChecked(object sender, ItemCheckedEventArgs e)
         {
+            bool pinned = Boolean.Parse(e.Item.SubItems[3].Text);
+            if (pinned) e.Item.Checked = false;
+            
             LblSelected.Text = String.Format(LocaleEN.TEXT_SELECTED_PACKAGE_COUNT, LstPackages.CheckedItems.Count);
         }
 
@@ -156,6 +190,22 @@ namespace CandyShop.View
         private void CheckDeleteShortcuts_CheckedChanged(object sender, EventArgs e)
         {
             CleanShortcutsChanged?.Invoke(sender, e);
+        }
+
+        private void SetItemStyle(ListViewItem item, bool pinned)
+        {
+            if (pinned)
+            {
+                item.ForeColor = SystemColors.GrayText;
+                item.Font = new Font(item.Font, FontStyle.Italic);
+                item.Checked = false;
+            }
+            else
+            {
+                item.ForeColor = SystemColors.ControlText;
+                item.Font = new Font(item.Font, FontStyle.Regular);
+                item.Checked = true;
+            }
         }
     }
 }

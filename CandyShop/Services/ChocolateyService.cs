@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using System.Linq;
 using System.Threading;
 using Serilog;
+using System;
 
 namespace CandyShop.Services
 {
@@ -15,6 +16,7 @@ namespace CandyShop.Services
         private readonly SemaphoreSlim OutdatedPckgLock = new SemaphoreSlim(1);
         private readonly SemaphoreSlim InstalledPckgLock = new SemaphoreSlim(1);
 
+        // TODO use proper package repository instead
         private readonly Dictionary<string, string> PckgDetailsCache = new Dictionary<string, string>();
         private readonly Dictionary<string, ChocolateyPackage> InstalledPckgCache = new Dictionary<string, ChocolateyPackage>();
         private readonly Dictionary<string, ChocolateyPackage> OutdatedPckgCache = new Dictionary<string, ChocolateyPackage>();
@@ -90,22 +92,29 @@ namespace CandyShop.Services
                 .ToList();
         }
 
-        public List<ChocolateyPackage> GetPackageByName(List<string> names)
+        /// <returns>The package with the specified name, or null</returns>
+        public ChocolateyPackage GetPackageByName(string name)
         {
-            List<ChocolateyPackage> rtn = new List<ChocolateyPackage>();
-
-            foreach (string name in names)
+            // prefer outdated packages as they contain more information, even though hit rate may be less
+            if (OutdatedPckgCache.ContainsKey(name))
             {
-                if (InstalledPckgCache.ContainsKey(name))
-                {
-                    rtn.Add(InstalledPckgCache[name]);
-                }
-                else if (OutdatedPckgCache.ContainsKey(name))
-                {
-                    rtn.Add(OutdatedPckgCache[name]);
-                }
+                return OutdatedPckgCache[name];
+            }
+            else if (InstalledPckgCache.ContainsKey(name))
+            {
+                return InstalledPckgCache[name];
             }
 
+            return null;
+        }
+
+        public List<ChocolateyPackage> GetPackagesByName(List<string> names)
+        {
+            var rtn = names
+                .Select(name => GetPackageByName(name))
+                .Where(package => package != null)
+                .ToList();
+            
             return rtn;
         }
 
@@ -128,6 +137,32 @@ namespace CandyShop.Services
             {
                 throw new ChocolateyException($"choco did not exit cleanly. Returned {exitCode}.");
             }
+        }
+
+        /// <exception cref="ChocolateyException"></exception>
+        public void Pin(ChocolateyPackage package)
+        {
+            int exitCode = ChocolateyWrapper.Pin(package.Name, package.CurrVer);
+            Log.Debug($"choco add pin operation for {package.Name} returned with {exitCode}.");
+            if (exitCode != 0)
+            {
+                throw new ChocolateyException($"choco did not exit cleanly. Returned {exitCode}.");
+            }
+
+            package.Pinned = true;
+        }
+
+        /// <exception cref="ChocolateyException"></exception>
+        public void Unpin(ChocolateyPackage package)
+        {
+            int exitCode = ChocolateyWrapper.Unpin(package.Name);
+            Log.Debug($"choco pin remove operation for {package.Name} returned with {exitCode}.");
+            if (exitCode != 0)
+            {
+                throw new ChocolateyException($"choco did not exit cleanly. Returned {exitCode}.");
+            }
+
+            package.Pinned = false;
         }
     }
 }

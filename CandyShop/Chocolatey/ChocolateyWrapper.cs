@@ -7,6 +7,8 @@ namespace CandyShop.Chocolatey
 {
     public class ChocolateyWrapper
     {
+        // TODO test --limitoutput
+
         /// <exception cref="ChocolateyException"></exception>
         public static async Task<List<ChocolateyPackage>> FetchInstalledAsync()
         {
@@ -183,6 +185,23 @@ namespace CandyShop.Chocolatey
             p.FailOnNonZeroExitCode = false;
             p.Execute();
 
+            return p.ExitCode;
+        }
+
+        /// <exception cref="ChocolateyException"></exception>
+        public static int Pin(string name, string version)
+        {
+            // choco pin add --name="'git'" --version="'1.2.3'"
+            ChocolateyProcess p = new ChocolateyProcess($"pin add --name=\"{name}\" --version=\"{version}\"");
+            p.ExecuteHidden();
+            return p.ExitCode;
+        }
+
+        /// <exception cref="ChocolateyException"></exception>
+        public static int Unpin(string name)
+        {
+            ChocolateyProcess p = new ChocolateyProcess($"pin remove --name=\"{name}\"");
+            p.ExecuteHidden();
             return p.ExitCode;
         }
 

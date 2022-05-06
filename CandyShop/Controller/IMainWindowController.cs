@@ -14,5 +14,6 @@ namespace CandyShop.Controller
         void ShowChocoLogFolder();
         void ShowCandyShopConfigFolder();
         void PerformUpgrade(string[] packages);
+        void TogglePin(string name);
     }
 }

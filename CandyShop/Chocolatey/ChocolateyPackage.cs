@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace CandyShop.Chocolatey
 {
@@ -18,7 +19,7 @@ namespace CandyShop.Chocolatey
         
         public string AvailVer { get; set; }
         
-        public bool Pinned { get; set; }
+        public bool? Pinned { get; set; }
 
         /* Note that the installation of suffixed packages which have a meta package
          * does not require the installation of said meta package;
@@ -53,6 +54,22 @@ namespace CandyShop.Chocolatey
                 int i = Name.LastIndexOf('.');
                 return i > 0 ? Name.Substring(0, i) : Name;
             }
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj == null || GetType() != obj.GetType())
+            {
+                return false;
+            }
+
+            var other = (ChocolateyPackage) obj;
+            return String.Equals(Name, other.Name);
+        }
+
+        public override int GetHashCode()
+        {
+            return Name != null ? Name.GetHashCode() : base.GetHashCode();
         }
     }
 }
