@@ -1,4 +1,5 @@
-﻿using CandyShop.Properties;
+﻿using CandyShop.Controller;
+using CandyShop.Properties;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -8,6 +9,8 @@ namespace CandyShop.View
 {
     partial class UpgradePage : UserControl, IUpgradePageView
     {
+        private IUpgradePageController Controller;
+
         public UpgradePage()
         {
             InitializeComponent();
@@ -32,32 +35,12 @@ namespace CandyShop.View
             BtnUpgradeAll.Click += new EventHandler((sender, e) => { UpgradeAllClick?.Invoke(this, e); });
             BtnUpgradeSelected.Click += new EventHandler((sender, e) => { UpgradeSelectedClick?.Invoke(this, e); });
             BtnCancel.Click += new EventHandler((sender, e) => { CancelClick?.Invoke(this, e); });
-
-            // context menu
-            var itemPin = new ToolStripMenuItem("&Pin package");
-            itemPin.Click += new EventHandler((sender, e) =>
-            {
-                if (LstPackages.SelectedItems.Count > 0)
-                {
-                    TogglePinnedClicked?.Invoke(this, LstPackages.SelectedItems[0].Text);
-                }
-            });
-
-            var contextMenu = new ContextMenuStrip();
-            contextMenu.Opening += new System.ComponentModel.CancelEventHandler((sender, e) =>
-            {
-                itemPin.Checked = Boolean.Parse(LstPackages.SelectedItems[0].SubItems[3].Text);
-            });
-
-            contextMenu.Items.Add(itemPin);
-            LstPackages.ContextMenuStrip = contextMenu;
         }
 
         public event EventHandler UpgradeAllClick;
         public event EventHandler UpgradeSelectedClick;
         public event EventHandler CancelClick;
         public event EventHandler CleanShortcutsChanged;
-        public event EventHandler<string> TogglePinnedClicked;
 
         public string[] Items
         {
@@ -121,6 +104,36 @@ namespace CandyShop.View
                 BtnUpgradeSelected.Enabled = !value;
                 BtnUpgradeAll.Enabled = !value;
             }
+        }
+
+        public void InjectController(IUpgradePageController controller)
+        {
+            Controller = controller;
+
+            // context menu
+            var itemPin = new ToolStripMenuItem("&Pin package");
+            itemPin.Click += new EventHandler((sender, e) =>
+            {
+                if (LstPackages.SelectedItems.Count > 0)
+                {
+                    var name = LstPackages.SelectedItems[0].Text;
+                    Controller.TogglePin(name, pinned =>
+                    {
+                        var item = LstPackages.FindItemWithText(name);
+                        item.SubItems[3].Text = pinned.ToString();
+                        SetItemStyle(item, pinned);
+                    });
+                }
+            });
+
+            var contextMenu = new ContextMenuStrip();
+            contextMenu.Opening += new System.ComponentModel.CancelEventHandler((sender, e) =>
+            {
+                itemPin.Checked = Boolean.Parse(LstPackages.SelectedItems[0].SubItems[3].Text);
+            });
+
+            contextMenu.Items.Add(itemPin);
+            LstPackages.ContextMenuStrip = contextMenu;
         }
 
         public void AddItem(string[] data)

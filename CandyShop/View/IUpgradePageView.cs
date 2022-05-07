@@ -9,7 +9,6 @@ namespace CandyShop.View
         event EventHandler UpgradeSelectedClick;
         event EventHandler CancelClick;
         event EventHandler CleanShortcutsChanged;
-        event EventHandler<string> TogglePinnedClicked;
 
         string[] Items { get; }
         string[] SelectedItems { get; }
@@ -21,7 +20,6 @@ namespace CandyShop.View
         void CheckAllItems();
         void CheckItemsByText(List<string> names);
         void UncheckAllItems();
-        void SetPinned(string name, bool pinned);
         object Invoke(Delegate method, params object[] args);
     }
 }
