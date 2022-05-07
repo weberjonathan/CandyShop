@@ -35,19 +35,16 @@ namespace CandyShop.Services
 
         public bool LaunchTaskExists()
         {
-            using TaskService ts = new TaskService();
-            return ts.GetTask(LAUNCH_TASK_NAME) != null;
+            var task = TaskService.Instance.GetTask(LAUNCH_TASK_NAME);
+            return task != null;
         }
 
         private void RemoveTask(string name)
         {
-            using (TaskService ts = new TaskService())
+            Task task = TaskService.Instance.GetTask(name);
+            if (task != null)
             {
-                Task task = ts.GetTask(name);
-                if (task != null)
-                {
-                    ts.RootFolder.DeleteTask(name);
-                }
+                TaskService.Instance.RootFolder.DeleteTask(name, true);
             }
         }
     }

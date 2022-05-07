@@ -181,7 +181,7 @@ namespace CandyShop.View
             this.MenuExtrasCreateTask.Name = "MenuExtrasCreateTask";
             this.MenuExtrasCreateTask.Size = new System.Drawing.Size(344, 22);
             this.MenuExtrasCreateTask.Text = "&Display notification for outdated packages on login";
-            this.MenuExtrasCreateTask.CheckedChanged += new System.EventHandler(this.MenuExtrasCreateTask_CheckedChanged);
+            this.MenuExtrasCreateTask.Click += new System.EventHandler(this.MenuExtrasCreateTask_Click);
             // 
             // toolStripSeparator1
             // 

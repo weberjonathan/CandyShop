@@ -30,7 +30,7 @@ namespace CandyShop.View
             }
             set
             {
-                MenuExtrasCreateTask.Checked = true;
+                MenuExtrasCreateTask.Checked = value;
             }
         }
 
@@ -92,7 +92,7 @@ namespace CandyShop.View
             Controller.ShowMetaPackageHelp();
         }
 
-        private void MenuExtrasCreateTask_CheckedChanged(object sender, EventArgs e)
+        private void MenuExtrasCreateTask_Click(object sender, EventArgs e)
         {
             Controller.ToggleCreateTask();
         }
