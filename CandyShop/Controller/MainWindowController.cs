@@ -41,6 +41,8 @@ namespace CandyShop.Controller
 
             UpdateOutdatedPackageListAsync();
 
+            MainView.CreateTaskEnabled = WindowsTaskService.LaunchTaskExists();
+
             if (CandyShopContext.HasAdminPrivileges) MainView.ClearAdminHints();
             else MainView.ShowAdminHints();
 
@@ -79,9 +81,6 @@ namespace CandyShop.Controller
                 MainView.UpgradePackagesPage.Invoke(checkDelegate, CandyShopContext.CleanShortcuts);
             });
 
-            // TODO this toggles the task bullshit !!! cant happen
-            MainView.CreateTaskEnabled = WindowsTaskService.LaunchTaskExists();
-
             MainView.ToForm().Show();
         }
 
@@ -117,15 +116,24 @@ namespace CandyShop.Controller
 
         public void ToggleCreateTask()
         {
-            if (MainView.CreateTaskEnabled && !WindowsTaskService.LaunchTaskExists())
+            if (!MainView.CreateTaskEnabled && !WindowsTaskService.LaunchTaskExists())
             {
                 WindowsTaskService.CreateLaunchTask();
+                MainView.CreateTaskEnabled = true;
+            }
+            else if (MainView.CreateTaskEnabled && WindowsTaskService.LaunchTaskExists())
+            {
+                try
+                {
+                    WindowsTaskService.RemoveLaunchTask();
+                }
+                catch (CandyShopException)
+                {
+                    MainView?.DisplayError("An error occurred while trying to delete the Windows task.");
+                }
             }
 
-            if (!MainView.CreateTaskEnabled && WindowsTaskService.LaunchTaskExists())
-            {
-                WindowsTaskService.RemoveLaunchTask();
-            }
+            MainView.CreateTaskEnabled = WindowsTaskService.LaunchTaskExists();
         }
 
         public void ShowChocoLogFolder()
