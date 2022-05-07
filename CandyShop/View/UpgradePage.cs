@@ -34,23 +34,24 @@ namespace CandyShop.View
             BtnCancel.Click += new EventHandler((sender, e) => { CancelClick?.Invoke(this, e); });
 
             // context menu
-            var itemPin = new ToolStripMenuItem("&Pin package");
-            itemPin.Click += new EventHandler((sender, e) =>
-            {
-                if (LstPackages.SelectedItems.Count > 0)
-                {
-                    TogglePinnedClicked?.Invoke(this, LstPackages.SelectedItems[0].Text);
-                }
-            });
+            // deactivate in release build until refactor
+            //var itemPin = new ToolStripMenuItem("&Pin package");
+            //itemPin.Click += new EventHandler((sender, e) =>
+            //{
+            //    if (LstPackages.SelectedItems.Count > 0)
+            //    {
+            //        TogglePinnedClicked?.Invoke(this, LstPackages.SelectedItems[0].Text);
+            //    }
+            //});
 
-            var contextMenu = new ContextMenuStrip();
-            contextMenu.Opening += new System.ComponentModel.CancelEventHandler((sender, e) =>
-            {
-                itemPin.Checked = Boolean.Parse(LstPackages.SelectedItems[0].SubItems[3].Text);
-            });
+            //var contextMenu = new ContextMenuStrip();
+            //contextMenu.Opening += new System.ComponentModel.CancelEventHandler((sender, e) =>
+            //{
+            //    itemPin.Checked = Boolean.Parse(LstPackages.SelectedItems[0].SubItems[3].Text);
+            //});
 
-            contextMenu.Items.Add(itemPin);
-            LstPackages.ContextMenuStrip = contextMenu;
+            //contextMenu.Items.Add(itemPin); 
+            //LstPackages.ContextMenuStrip = contextMenu;
         }
 
         public event EventHandler UpgradeAllClick;
