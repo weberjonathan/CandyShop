@@ -207,22 +207,24 @@ namespace CandyShop.Chocolatey
 
         /// <summary>
         /// Guess meta packages based on package names.
-        /// A package is considered a meta package, if there are other
-        /// packages of the same name  (ignoring case) with a suffix (like *.install).
-        /// (These should be dependencies of the meta package.)
+        /// For every suffixed package (child) where
+        /// a meta package (non-suffixed parent) exists 
+        /// the property IsTopLevelPackage is set to false.
+        /// Children reference their parent.
         /// </summary>
         private static List<ChocolateyPackage> GuessMetaPackages(List<ChocolateyPackage> packages)
         {
-            foreach (ChocolateyPackage childPackageCandidate in packages)
+            foreach (ChocolateyPackage child in packages)
             {
-                if (childPackageCandidate.HasSuffix)
+                if (child.HasSuffix)
                 {
-                    foreach (ChocolateyPackage metaPackageCandidate in packages)
+                    foreach (ChocolateyPackage parent in packages)
                     {
-                        if (childPackageCandidate.ClearName.ToLower().Equals(
-                            metaPackageCandidate.Name.ToLower()))
+                        if (child.ClearName.ToLower().Equals(
+                            parent.Name.ToLower()))
                         {
-                            childPackageCandidate.MetaPackage = metaPackageCandidate;
+                            child.Parent = parent;
+                            child.IsTopLevelPackage = false;
                         }
                     }
                 }

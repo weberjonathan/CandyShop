@@ -60,13 +60,11 @@ namespace CandyShop.Controller
             string[] displayedItemNames = MainView.UpgradePackagesPage.Items;
             List<ChocolateyPackage> packages = ChocolateyService.GetPackagesByName(displayedItemNames.ToList());
 
-            List<string> newSelection = packages
-                .Where(p => !(p.HasMetaPackage && p.HasSuffix))
-                .Where(p => p.Pinned.HasValue && !p.Pinned.Value)
-                .Select(p => p.Name)
-                .ToList();
-
-            MainView.UpgradePackagesPage.CheckItemsByText(newSelection);
+            foreach (var p in packages)
+            {
+                bool check = p.IsTopLevelPackage && !p.Pinned.GetValueOrDefault(false);
+                MainView.UpgradePackagesPage.SetItemCheckState(p.Name, check);
+            }
         }
 
         public void ShowGithub()

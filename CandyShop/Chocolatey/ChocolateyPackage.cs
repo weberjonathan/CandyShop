@@ -21,20 +21,9 @@ namespace CandyShop.Chocolatey
         
         public bool? Pinned { get; set; }
 
-        /* Note that the installation of suffixed packages which have a meta package
-         * does not require the installation of said meta package;
-         * this means it is possible for a package to have a valid suffix but not have
-         * a meta package in the scope of this application, if that meta package
-         * was not installed on the system.
-         * If both meta package and the suffixed package (like *.install) are installed
-         * HasMetaPackage and HasSuffix should always match. This is the expected behavior
-         * for most users. (Also note that the meta package has to be supplied manually
-         * and is not determined by other properties, unlike HasSuffix.)
-         */
-        public ChocolateyPackage MetaPackage { get; set; }
+        public bool IsTopLevelPackage { get; set; } = true;
 
-        public bool HasMetaPackage => MetaPackage != null;
-        
+        public ChocolateyPackage Parent { get; set; }
         
         public bool HasSuffix
         {

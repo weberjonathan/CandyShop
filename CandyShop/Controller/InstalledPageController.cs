@@ -5,6 +5,7 @@ using CandyShop.View;
 using CandyShop.Properties;
 using CandyShop.Services;
 using Serilog;
+using System.Threading.Tasks;
 
 namespace CandyShop.Controller
 {
@@ -79,19 +80,19 @@ namespace CandyShop.Controller
             }
         }
 
-        private void SyncListView()
+        private async void SyncListView()
         {
             string filterName = View.FilterText;
             bool hideSuffixed = View.HideDependencies;
 
-            List<ChocolateyPackage> packages = ChocolateyService.GetInstalledPackagesByName(View.Items);
+            List<ChocolateyPackage> packages = await ChocolateyService.GetInstalledPackagesAsync();
 
             foreach (ChocolateyPackage package in packages)
             {
                 bool packageAllowed = true;
 
                 // determine whether package should be displayed
-                if (hideSuffixed && package.HasSuffix)
+                if (hideSuffixed && !package.IsTopLevelPackage)
                 {
                     packageAllowed = false;
                 }
@@ -101,21 +102,11 @@ namespace CandyShop.Controller
                     packageAllowed = false;
                 }
 
-                // determine whether it is displayed
-                if (!View.Items.Contains(package.Name))
-                {
-                    if (packageAllowed)
-                    {
-                        InsertItem(package, packages);
-                    }
-                }
-                else
-                {
-                    if (!packageAllowed)
-                    {
-                        View.RemoveItem(package.Name);
-                    }
-                }
+                bool isDisplayed = View.Items.Contains(package.Name);
+
+                // act
+                if (isDisplayed && !packageAllowed) View.RemoveItem(package.Name);
+                else if (!isDisplayed && packageAllowed) InsertItem(package, packages);
             }
         }
 

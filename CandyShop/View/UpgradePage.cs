@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace CandyShop.View
 {
@@ -143,23 +144,20 @@ namespace CandyShop.View
             }
         }
 
-        public void CheckItemsByText(List<string> texts)
-        {
-            foreach (string text in texts)
-            {
-                ListViewItem item = LstPackages.FindItemWithText(text);
-                if (item != null)
-                {
-                    item.Checked = true;
-                }
-            }
-        }
-
         public void UncheckAllItems()
         {
             foreach (ListViewItem item in LstPackages.Items)
             {
                 item.Checked = false;
+            }
+        }
+
+        public void SetItemCheckState(string name, bool state)
+        {
+            ListViewItem item = LstPackages.FindItemWithText(name);
+            if (item != null)
+            {
+                item.Checked = state;
             }
         }
 

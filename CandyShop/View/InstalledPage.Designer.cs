@@ -83,7 +83,7 @@
             this.TextSearch.Location = new System.Drawing.Point(0, 13);
             this.TextSearch.Name = "TextSearch";
             this.TextSearch.PlaceholderText = "Search";
-            this.TextSearch.Size = new System.Drawing.Size(406, 23);
+            this.TextSearch.Size = new System.Drawing.Size(430, 23);
             this.TextSearch.TabIndex = 1;
             this.TextSearch.TextChanged += new System.EventHandler(this.TextSearch_TextChanged);
             this.TextSearch.KeyDown += new System.Windows.Forms.KeyEventHandler(this.TextSearch_KeyDown);
@@ -94,11 +94,11 @@
             this.CheckHideSuffixed.AutoSize = true;
             this.CheckHideSuffixed.Checked = true;
             this.CheckHideSuffixed.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.CheckHideSuffixed.Location = new System.Drawing.Point(431, 15);
+            this.CheckHideSuffixed.Location = new System.Drawing.Point(452, 15);
             this.CheckHideSuffixed.Name = "CheckHideSuffixed";
-            this.CheckHideSuffixed.Size = new System.Drawing.Size(157, 19);
+            this.CheckHideSuffixed.Size = new System.Drawing.Size(136, 19);
             this.CheckHideSuffixed.TabIndex = 0;
-            this.CheckHideSuffixed.Text = "&Hide meta dependencies";
+            this.CheckHideSuffixed.Text = "&Show top plevel only";
             this.CheckHideSuffixed.UseVisualStyleBackColor = true;
             this.CheckHideSuffixed.CheckedChanged += new System.EventHandler(this.CheckHideSuffixed_CheckedChanged);
             // 

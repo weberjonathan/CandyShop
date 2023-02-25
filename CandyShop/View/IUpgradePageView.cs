@@ -26,7 +26,7 @@ namespace CandyShop.View
 
         void AddItem(string[] data);
         void CheckAllItems();
-        void CheckItemsByText(List<string> names);
+        void SetItemCheckState(string name, bool state);
         void UncheckAllItems();
         void SetPinned(string name, bool pinned);
     }
