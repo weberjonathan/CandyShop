@@ -1,4 +1,5 @@
 ﻿using CandyShop.Chocolatey;
+using CandyShop.Winget;
 using System;
 
 namespace CandyShop
@@ -14,7 +15,22 @@ namespace CandyShop
             IsTopLevelPackage = package.IsTopLevelPackage;
         }
 
+        public GenericPackage(WingetPackage package)
+        {
+            Name = package.Name;
+            Id = package.Id;
+            Source = package.Source;
+            CurrVer = package.Version;
+            AvailVer = package.AvailableVersion;
+            Pinned = false;
+            IsTopLevelPackage = true;
+        }
+
         public string Name { get; set; }
+
+        public string Id { get; set; }
+
+        public string Source { get; set; }
 
         public string CurrVer { get; set; }
 
