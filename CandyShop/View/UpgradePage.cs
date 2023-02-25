@@ -9,8 +9,6 @@ namespace CandyShop.View
 {
     partial class UpgradePage : UserControl, IUpgradePageView
     {
-        private IUpgradePageController Controller;
-
         public UpgradePage()
         {
             InitializeComponent();
@@ -35,8 +33,30 @@ namespace CandyShop.View
             BtnUpgradeAll.Click += new EventHandler((sender, e) => { UpgradeAllClick?.Invoke(this, e); });
             BtnUpgradeSelected.Click += new EventHandler((sender, e) => { UpgradeSelectedClick?.Invoke(this, e); });
             BtnCancel.Click += new EventHandler((sender, e) => { CancelClick?.Invoke(this, e); });
+
+            // context menu
+            var itemPin = new ToolStripMenuItem("&Pin package");
+            itemPin.Click += new EventHandler((sender, e) =>
+            {
+                if (LstPackages.SelectedItems.Count > 0)
+                {
+                    var name = LstPackages.SelectedItems[0].Text;
+                    PinnedChanged?.Invoke(this, new PinnedChangedArgs() { Name = name });
+                }
+            });
+
+            var contextMenu = new ContextMenuStrip();
+            contextMenu.Opening += new System.ComponentModel.CancelEventHandler((sender, e) =>
+            {
+                itemPin.Checked = Boolean.Parse(LstPackages.SelectedItems[0].SubItems[3].Text);
+            });
+
+            contextMenu.Items.Add(itemPin);
+            LstPackages.ContextMenuStrip = contextMenu;
         }
 
+        public event EventHandler<PinnedChangedArgs> PinnedChanged;
+        // TODO these are handled via main windows controller, right? no need for that, since we have upgrade page controller
         public event EventHandler UpgradeAllClick;
         public event EventHandler UpgradeSelectedClick;
         public event EventHandler CancelClick;
@@ -106,41 +126,11 @@ namespace CandyShop.View
             }
         }
 
-        public void InjectController(IUpgradePageController controller)
-        {
-            Controller = controller;
-
-            // context menu
-            var itemPin = new ToolStripMenuItem("&Pin package");
-            itemPin.Click += new EventHandler((sender, e) =>
-            {
-                if (LstPackages.SelectedItems.Count > 0)
-                {
-                    var name = LstPackages.SelectedItems[0].Text;
-                    Controller.TogglePin(name, pinned =>
-                    {
-                        var item = LstPackages.FindItemWithText(name);
-                        item.SubItems[3].Text = pinned.ToString();
-                        SetItemStyle(item, pinned);
-                    });
-                }
-            });
-
-            var contextMenu = new ContextMenuStrip();
-            contextMenu.Opening += new System.ComponentModel.CancelEventHandler((sender, e) =>
-            {
-                itemPin.Checked = Boolean.Parse(LstPackages.SelectedItems[0].SubItems[3].Text);
-            });
-
-            contextMenu.Items.Add(itemPin);
-            LstPackages.ContextMenuStrip = contextMenu;
-        }
-
         public void AddItem(string[] data)
         {
             ListViewItem item = new ListViewItem(data);
             LstPackages.Items.Add(item);
-            SetItemStyle(item, Boolean.Parse(data[3]));
+            ApplyPinnedStyle(item, Boolean.Parse(data[3]));
 
             if (Loading) Loading = false;
         }
@@ -149,7 +139,6 @@ namespace CandyShop.View
         {
             foreach (ListViewItem item in LstPackages.Items)
             {
-                // TODO dont check pinned items
                 item.Checked = true;
             }
         }
@@ -178,7 +167,7 @@ namespace CandyShop.View
         {
             var item = LstPackages.FindItemWithText(name);
             item.SubItems[3].Text = pinned.ToString();
-            SetItemStyle(item, pinned);
+            ApplyPinnedStyle(item, pinned);
         }
 
         private void LstPackages_ItemChecked(object sender, ItemCheckedEventArgs e)
@@ -205,7 +194,7 @@ namespace CandyShop.View
             CleanShortcutsChanged?.Invoke(sender, e);
         }
 
-        private void SetItemStyle(ListViewItem item, bool pinned)
+        private void ApplyPinnedStyle(ListViewItem item, bool pinned)
         {
             if (pinned)
             {

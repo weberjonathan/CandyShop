@@ -3,12 +3,20 @@ using System.Collections.Generic;
 
 namespace CandyShop.View
 {
+    internal class PinnedChangedArgs : EventArgs
+    {
+        public string Name;
+        public bool Pinned;
+    }
+
     interface IUpgradePageView
     {
         event EventHandler UpgradeAllClick;
         event EventHandler UpgradeSelectedClick;
         event EventHandler CancelClick;
         event EventHandler CleanShortcutsChanged;
+
+        public event EventHandler<PinnedChangedArgs> PinnedChanged;
 
         string[] Items { get; }
         string[] SelectedItems { get; }
@@ -20,6 +28,7 @@ namespace CandyShop.View
         void CheckAllItems();
         void CheckItemsByText(List<string> names);
         void UncheckAllItems();
+        void SetPinned(string name, bool pinned);
         object Invoke(Delegate method, params object[] args);
     }
 }

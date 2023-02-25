@@ -1,5 +1,6 @@
 ﻿using CandyShop.Chocolatey;
 using CandyShop.Services;
+using CandyShop.View;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -9,13 +10,20 @@ namespace CandyShop.Controller
     class UpgradePageController : IUpgradePageController
     {
         private readonly ChocolateyService ChocolateyService;
+        private IUpgradePageView View;
 
         public UpgradePageController(ChocolateyService chocolateyService)
         {
             ChocolateyService = chocolateyService;
         }
 
-        public void TogglePin(string packageName, Action<bool> onSuccess)
+        public void InjectView(IUpgradePageView view)
+        {
+            View = view;
+            View.PinnedChanged += new EventHandler<PinnedChangedArgs>((sender, e) => TogglePin(e.Name));
+        }
+
+        public void TogglePin(string packageName)
         {
             try
             {
@@ -37,7 +45,7 @@ namespace CandyShop.Controller
                         ChocolateyService.Pin(package);
                     }
 
-                    onSuccess.Invoke(package.Pinned.Value);
+                    View.SetPinned(package.Name, package.Pinned.Value);
                 }
                 else
                 {
