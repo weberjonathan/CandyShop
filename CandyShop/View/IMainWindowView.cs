@@ -5,8 +5,6 @@ namespace CandyShop.View
 {
     interface IMainWindowView
     {
-        event EventHandler CancelPressed;
-
         IInstalledPageView InstalledPackagesPage { get; }
         IUpgradePageView UpgradePackagesPage { get; }
         bool CreateTaskEnabled { get; set; }

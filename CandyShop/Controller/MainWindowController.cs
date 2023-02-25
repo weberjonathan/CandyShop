@@ -52,35 +52,6 @@ namespace CandyShop.Controller
                 Program.Exit();
             });
 
-            // exit or hide application on 'Cancel', depending on how it was created
-            MainView.CancelPressed += new EventHandler((sender, e) =>
-            {
-                if (CandyShopContext.LaunchedMinimized)
-                {
-                    MainView.ToForm().Hide();
-                }
-                else
-                {
-                    MainView.ToForm().Dispose();
-                    Program.Exit();
-                }
-            });
-
-            // wire upgrade page properties
-            MainView.UpgradePackagesPage.CleanShortcutsChanged += new EventHandler((sender, e) => CandyShopContext.CleanShortcuts = MainView.UpgradePackagesPage.CleanShortcuts);
-            MainView.UpgradePackagesPage.CleanShortcuts = CandyShopContext.CleanShortcuts;
-
-            CandyShopContext.OnPropertiesFileChanged(() =>
-            {
-                // need delegate to prevent performing cross-thread access attempts
-                Action<bool> checkDelegate = isChecked =>
-                {
-                    MainView.UpgradePackagesPage.CleanShortcuts = isChecked;
-                };
-
-                MainView.UpgradePackagesPage.Invoke(checkDelegate, CandyShopContext.CleanShortcuts);
-            });
-
             MainView.ToForm().Show();
         }
 
@@ -174,57 +145,6 @@ namespace CandyShop.Controller
             {
                 MainView.DisplayError("Cannot find CandyShop configuration directory at '{0}'", CandyShopContext.ConfigFolder);
             }
-        }
-
-        public async void PerformUpgrade(string[] packages)
-        {
-            MainView?.ToForm().Hide();
-
-            List<string> shortcuts = new List<string>();
-            ShortcutService?.WatchDesktops(shortcut => shortcuts.Add(shortcut));
-
-            // upgrade
-            WindowsConsole.AllocConsole();
-            Console.CursorVisible = false;
-
-            try
-            {
-                List<ChocolateyPackage> chocoPackages = ChocolateyService.GetPackagesByName(packages.ToList());
-                if (chocoPackages.Count > 0)
-                {
-                    ChocolateyService.Upgrade(chocoPackages, CandyShopContext.ValidExitCodes.ToArray());
-                }
-            }
-            catch (ChocolateyException e)
-            {
-                MainView.DisplayError(LocaleEN.ERROR_UPGRADING_OUTDATED_PACKAGES, e.Message);
-                return; // TODO why return? shortcuts should be deleted even if chocolatey fails to upgrade some packages (others may have been upgraded and added a shortcut)
-            }
-
-            // display results
-            Task minDelay = Task.Run(() => Thread.Sleep(3 * 1000));
-
-            IntPtr handle = WindowsConsole.GetConsoleWindow();
-            if (!IntPtr.Zero.Equals(handle))
-            {
-                WindowsConsole.SetForegroundWindow(handle);
-            }
-            Console.CursorVisible = false;
-            Console.Write("\nPress any key to continue... ");
-            Console.ReadKey();
-
-            // delete shortcuts
-            ShortcutService?.DisposeWatchers();
-            if (MainView.UpgradePackagesPage.CleanShortcuts)
-            {
-                await minDelay; // wait for shortcuts to be created
-                ShortcutService?.DeleteShortcuts(shortcuts);
-            }
-
-            // TODO if there still are outdated packages, return to MainView
-            // TODO if there was an error, offer to open log folder? go back to application?
-            MainView?.ToForm().Dispose();
-            Program.Exit();
         }
 
         private async void UpdateOutdatedPackageListAsync()

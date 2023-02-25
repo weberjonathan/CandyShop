@@ -17,8 +17,6 @@ namespace CandyShop.View
             Text = String.Format(LocaleEN.TEXT_APP_TITLE, Application.ProductName, Application.ProductVersion);
         }
 
-        public event EventHandler CancelPressed;
-
         public IInstalledPageView InstalledPackagesPage => InstalledPage;
         public IUpgradePageView UpgradePackagesPage => UpgradePage;
 
@@ -54,11 +52,6 @@ namespace CandyShop.View
 
         private void ChocoAutoUpdateForm_Load(object sender, EventArgs e)
         {
-            // register upgrade page handlers
-            UpgradePage.UpgradeAllClick += UpgradePage_UpgradeAllClick;
-            UpgradePage.UpgradeSelectedClick += UpgradePage_UpgradeSelectedClick;
-            UpgradePage.CancelClick += UpgradePage_CancelClick;
-
             this.Activate();
         }
 
@@ -105,24 +98,6 @@ namespace CandyShop.View
         private void MenuExtrasOpenCandyShopConfig_Click(object sender, EventArgs e)
         {
             Controller.ShowCandyShopConfigFolder();
-        }
-
-        private void UpgradePage_UpgradeAllClick(object sender, EventArgs e)
-        {
-
-            Controller.PerformUpgrade(UpgradePage.Items);
-        }
-
-        private void UpgradePage_UpgradeSelectedClick(object sender, EventArgs e)
-        {
-            var packages = UpgradePage.SelectedItems;
-
-            if (packages.Length > 0) Controller.PerformUpgrade(packages);
-        }
-
-        private void UpgradePage_CancelClick(object sender, EventArgs e)
-        {
-            CancelPressed?.Invoke(sender, e);
         }
     }
 }

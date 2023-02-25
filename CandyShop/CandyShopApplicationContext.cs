@@ -27,14 +27,14 @@ namespace CandyShop
             // init controller
             MainWindowController candyShopController = new MainWindowController(chocolateyService, windowsTaskService, shortcutService, context);
             InstalledPageController installedPageController = new InstalledPageController(chocolateyService);
-            UpgradePageController upgradePageController = new UpgradePageController(chocolateyService);
+            UpgradePageController upgradePageController = new UpgradePageController(context, chocolateyService, shortcutService);
 
             // init views
             IMainWindowView mainPage = new MainWindow(candyShopController);
             IInstalledPageView installedPage = mainPage.InstalledPackagesPage;
             IUpgradePageView upgradePage = mainPage.UpgradePackagesPage;
             installedPageController.InjectView(installedPage);
-            upgradePageController.InjectView(upgradePage);
+            upgradePageController.InjectViews(mainPage, upgradePage);
             candyShopController.InjectView(mainPage);
 
             // launch with form or in tray

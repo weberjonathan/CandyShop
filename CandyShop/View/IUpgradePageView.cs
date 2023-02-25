@@ -29,6 +29,5 @@ namespace CandyShop.View
         void CheckItemsByText(List<string> names);
         void UncheckAllItems();
         void SetPinned(string name, bool pinned);
-        object Invoke(Delegate method, params object[] args);
     }
 }
