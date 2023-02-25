@@ -143,8 +143,7 @@ namespace CandyShop
         private void ShowNotification(int packageCount, NotifyIcon icon)
         {
             icon.BalloonTipIcon = ToolTipIcon.Info;
-            icon.Text = Application.ProductName;
-            icon.BalloonTipTitle = $"{packageCount} package{(packageCount == 1 ? " is" : "s are")} outdated.";
+            icon.BalloonTipTitle = $"{packageCount} {(ContextSingleton.Get.WingetMode ? "Winget" : "Chocolatey")} package{(packageCount == 1 ? " is" : "s are")} outdated.";
             icon.BalloonTipText = $"To upgrade click here or the tray icon later.";
             icon.ShowBalloonTip(2000);
         }

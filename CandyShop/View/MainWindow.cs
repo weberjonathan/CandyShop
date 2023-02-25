@@ -5,16 +5,23 @@ using CandyShop.Properties;
 
 namespace CandyShop.View
 {
+    // TODO remove "select top level"-menu item in winget mode
+    // TODO add menu item -> Restart in other mode
+
     partial class MainWindow : Form, IMainWindowView
     {
         private MainWindowController Controller;
+        private readonly string AppTitle = String.Format(LocaleEN.TEXT_APP_TITLE,
+                                                         Application.ProductName,
+                                                         ContextSingleton.Get.WingetMode ? "Winget" : "Chocolatey",
+                                                         Application.ProductVersion);
 
         public MainWindow(MainWindowController candyShopController)
         {
             Controller = candyShopController;
             InitializeComponent();
 
-            Text = String.Format(LocaleEN.TEXT_APP_TITLE, Application.ProductName, Application.ProductVersion);
+            Text = AppTitle;
         }
 
         public IInstalledPageView InstalledPackagesPage => InstalledPage;
@@ -41,13 +48,13 @@ namespace CandyShop.View
         public void ShowAdminHints()
         {
             UpgradePage.ShowAdminWarning = true;
-            this.Text = String.Format(LocaleEN.TEXT_APP_TITLE, Application.ProductName, Application.ProductVersion) + LocaleEN.TEXT_NO_ADMIN_HINT_SHORT;
+            this.Text = AppTitle + LocaleEN.TEXT_NO_ADMIN_HINT_SHORT;
         }
 
         public void ClearAdminHints()
         {
             UpgradePage.ShowAdminWarning = false;
-            this.Text = String.Format(LocaleEN.TEXT_APP_TITLE, Application.ProductName, Application.ProductVersion);
+            this.Text = AppTitle;
         }
 
         private void ChocoAutoUpdateForm_Load(object sender, EventArgs e)
