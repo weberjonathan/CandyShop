@@ -17,17 +17,18 @@ namespace CandyShop
             Log.Debug("Launched CandyShop.");
 
             // init services
-            ChocolateyService chocolateyService = new ChocolateyService();
+            IPackageService packageService = new WingetService();
+            //IPackageService packageService = new ChocolateyService();
             WindowsTaskService windowsTaskService = new WindowsTaskService();
             ShortcutService shortcutService = new ShortcutService();
 
             //
-            LoadOutdatedPackagesAsync(chocolateyService);
+            LoadOutdatedPackagesAsync(packageService);
 
             // init controller
-            MainWindowController candyShopController = new MainWindowController(chocolateyService, windowsTaskService, shortcutService, context);
-            InstalledPageController installedPageController = new InstalledPageController(chocolateyService);
-            UpgradePageController upgradePageController = new UpgradePageController(context, chocolateyService, shortcutService);
+            MainWindowController candyShopController = new MainWindowController(windowsTaskService, context);
+            InstalledPageController installedPageController = new InstalledPageController(packageService);
+            UpgradePageController upgradePageController = new UpgradePageController(context, packageService, shortcutService);
 
             // init views
             IMainWindowView mainPage = new MainWindow(candyShopController);
@@ -42,7 +43,7 @@ namespace CandyShop
             {
                 // creates a tray icon, displays a notification if outdated packages
                 // are found and opens the upgrade UI on click
-                RunInBackground(candyShopController, chocolateyService);
+                RunInBackground(candyShopController, packageService);
             }
             else
             {
@@ -52,11 +53,11 @@ namespace CandyShop
             }
         }
 
-        private async void LoadOutdatedPackagesAsync(ChocolateyService service)
+        private async void LoadOutdatedPackagesAsync(IPackageService service)
         {
             try
             {
-                await service.GetOutdatedChocoPackagesAsync();
+                await service.GetOutdatedPackagesAsync();
             }
             catch (ChocolateyException e)
             {
@@ -64,9 +65,9 @@ namespace CandyShop
             }
         }
 
-        private async void RunInBackground(MainWindowController controller, ChocolateyService service)
+        private async void RunInBackground(MainWindowController controller, IPackageService service)
         {
-            List<ChocolateyPackage> packages = null;
+            List<GenericPackage> packages = null;
 
             // create tray icon
             NotifyIcon icon = InitTrayIcon();
@@ -74,7 +75,7 @@ namespace CandyShop
             // obtain outdated packages
             try
             {
-                packages = await service.GetOutdatedChocoPackagesAsync();
+                packages = await service.GetOutdatedPackagesAsync();
             }
             catch (ChocolateyException e)
             {

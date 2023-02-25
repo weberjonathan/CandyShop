@@ -16,17 +16,13 @@ namespace CandyShop.Controller
 {
     internal class MainWindowController
     {
-        private readonly ChocolateyService ChocolateyService;
         private readonly WindowsTaskService WindowsTaskService;
-        private readonly ShortcutService ShortcutService;
         private readonly CandyShopContext CandyShopContext;
         private IMainWindowView MainView;
 
-        public MainWindowController(ChocolateyService chocolateyService, WindowsTaskService windowsTaskService, ShortcutService shortcutService, CandyShopContext candyShopContext)
+        public MainWindowController(WindowsTaskService windowsTaskService, CandyShopContext candyShopContext)
         {
-            ChocolateyService = chocolateyService;
             WindowsTaskService = windowsTaskService;
-            ShortcutService = shortcutService;
             CandyShopContext = candyShopContext;
         }
 
