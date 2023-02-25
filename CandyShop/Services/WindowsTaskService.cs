@@ -1,4 +1,5 @@
 ﻿using Microsoft.Win32.TaskScheduler;
+using Serilog;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -39,12 +40,17 @@ namespace CandyShop.Services
             return task != null;
         }
 
+        /// <exception cref="CandyShopException"></exception>
         private void RemoveTask(string name)
         {
-            Task task = TaskService.Instance.GetTask(name);
-            if (task != null)
+            try
             {
                 TaskService.Instance.RootFolder.DeleteTask(name, true);
+            }
+            catch (Exception e)
+            {
+                Log.Error("Failed to delete task: {0}", e.Message);
+                throw new CandyShopException($"Could not delete Windows task with name '{name}'.", e);
             }
         }
     }

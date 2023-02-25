@@ -47,11 +47,11 @@ namespace CandyShop.View
             this.MenuExtrasCreateTask = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.MenuExtrasOpenLogs = new System.Windows.Forms.ToolStripMenuItem();
+            this.MenuExtrasOpenCandyShopConfig = new System.Windows.Forms.ToolStripMenuItem();
             this.MenuHelp = new System.Windows.Forms.ToolStripMenuItem();
             this.MenuHelpGithub = new System.Windows.Forms.ToolStripMenuItem();
             this.MenuHelpLicense = new System.Windows.Forms.ToolStripMenuItem();
             this.MenuHelpMetaPackages = new System.Windows.Forms.ToolStripMenuItem();
-            this.MenuExtrasOpenCandyShopConfig = new System.Windows.Forms.ToolStripMenuItem();
             this.MainPanel.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.TabUpgrade.SuspendLayout();
@@ -95,6 +95,7 @@ namespace CandyShop.View
             // 
             this.UpgradePage.CleanShortcuts = false;
             this.UpgradePage.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.UpgradePage.Loading = true;
             this.UpgradePage.Location = new System.Drawing.Point(3, 3);
             this.UpgradePage.Name = "UpgradePage";
             this.UpgradePage.ShowAdminWarning = true;
@@ -177,7 +178,6 @@ namespace CandyShop.View
             // 
             // MenuExtrasCreateTask
             // 
-            this.MenuExtrasCreateTask.CheckOnClick = true;
             this.MenuExtrasCreateTask.Name = "MenuExtrasCreateTask";
             this.MenuExtrasCreateTask.Size = new System.Drawing.Size(344, 22);
             this.MenuExtrasCreateTask.Text = "&Display notification for outdated packages on login";
@@ -194,6 +194,13 @@ namespace CandyShop.View
             this.MenuExtrasOpenLogs.Size = new System.Drawing.Size(344, 22);
             this.MenuExtrasOpenLogs.Text = "Open &Chocolatey logs";
             this.MenuExtrasOpenLogs.Click += new System.EventHandler(this.MenuExtrasOpenLogs_Click);
+            // 
+            // MenuExtrasOpenCandyShopConfig
+            // 
+            this.MenuExtrasOpenCandyShopConfig.Name = "MenuExtrasOpenCandyShopConfig";
+            this.MenuExtrasOpenCandyShopConfig.Size = new System.Drawing.Size(344, 22);
+            this.MenuExtrasOpenCandyShopConfig.Text = "Open Candy&Shop configuration folder";
+            this.MenuExtrasOpenCandyShopConfig.Click += new System.EventHandler(this.MenuExtrasOpenCandyShopConfig_Click);
             // 
             // MenuHelp
             // 
@@ -225,13 +232,6 @@ namespace CandyShop.View
             this.MenuHelpMetaPackages.Size = new System.Drawing.Size(153, 22);
             this.MenuHelpMetaPackages.Text = "&Meta packages";
             this.MenuHelpMetaPackages.Click += new System.EventHandler(this.MenuHelpMetaPackages_Click);
-            // 
-            // MenuExtrasOpenCandyShopConfig
-            // 
-            this.MenuExtrasOpenCandyShopConfig.Name = "MenuExtrasOpenCandyShopConfig";
-            this.MenuExtrasOpenCandyShopConfig.Size = new System.Drawing.Size(344, 22);
-            this.MenuExtrasOpenCandyShopConfig.Text = "Open Candy&Shop configuration folder";
-            this.MenuExtrasOpenCandyShopConfig.Click += new System.EventHandler(this.MenuExtrasOpenCandyShopConfig_Click);
             // 
             // MainWindow
             // 
