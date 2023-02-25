@@ -23,6 +23,7 @@ namespace CandyShop
         private class PropertiesFileContent
         {
             public string ChocolateyLogs { get; set; } = "C:\\ProgramData\\chocolatey\\logs";
+            public bool WingetMode { get; set; } = false;
             public bool CleanShortcuts { get; set; } = false;
             public List<int> ValidExitCodes { get; set; } = new List<int> { 0, 1641, 3010, 350, 1604 };
         }
@@ -68,6 +69,8 @@ namespace CandyShop
         public string CholoateyLogFolder { get; private set; }
 
         public bool CleanShortcuts { get; set; }
+        
+        public bool WingetMode { get; private set; }
 
         public List<int> ValidExitCodes { get; set; }
 
@@ -79,6 +82,7 @@ namespace CandyShop
             {
                 ChocolateyLogs = this.CholoateyLogFolder,
                 CleanShortcuts = this.CleanShortcuts,
+                WingetMode = this.WingetMode,
                 ValidExitCodes = this.ValidExitCodes
             };
             
@@ -183,6 +187,7 @@ namespace CandyShop
             // apply properties from content
             CholoateyLogFolder = content.ChocolateyLogs;
             CleanShortcuts = content.CleanShortcuts;
+            WingetMode = content.WingetMode;
             ValidExitCodes = content.ValidExitCodes;
         }
 

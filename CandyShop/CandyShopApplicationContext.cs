@@ -17,10 +17,11 @@ namespace CandyShop
             Log.Debug("Launched CandyShop.");
 
             // init services
-            IPackageService packageService = new WingetService();
-            //IPackageService packageService = new ChocolateyService();
+            IPackageService packageService;
             WindowsTaskService windowsTaskService = new WindowsTaskService();
             ShortcutService shortcutService = new ShortcutService();
+            if (context.WingetMode) packageService = new WingetService();
+            else packageService = new ChocolateyService();
 
             //
             LoadOutdatedPackagesAsync(packageService);
