@@ -5,13 +5,14 @@ using System.Linq;
 using System.Threading;
 using Serilog;
 using System;
+using System.IO.Packaging;
 
 namespace CandyShop.Services
 {
     /// <summary>
     /// This service class allows asynchronous, non-blocking access to Chocolatey and implements a cache.
     /// </summary>
-    internal class ChocolateyService
+    internal class ChocolateyService : IPackageService
     {
         private readonly SemaphoreSlim OutdatedPckgLock = new SemaphoreSlim(1);
         private readonly SemaphoreSlim InstalledPckgLock = new SemaphoreSlim(1);
@@ -21,8 +22,66 @@ namespace CandyShop.Services
         private readonly Dictionary<string, ChocolateyPackage> InstalledPckgCache = new Dictionary<string, ChocolateyPackage>();
         private readonly Dictionary<string, ChocolateyPackage> OutdatedPckgCache = new Dictionary<string, ChocolateyPackage>();
 
+        // ------------- GENERIC PACKAGE METHODS ------------------------------
+
         /// <exception cref="ChocolateyException"></exception>
-        public async Task<List<ChocolateyPackage>> GetOutdatedPackagesAsync()
+        public async Task<List<GenericPackage>> GetOutdatedPackagesAsync()
+        {
+            var chocoPackages = await GetOutdatedChocoPackagesAsync();
+            return chocoPackages.Select(p => new GenericPackage(p)).ToList();
+        }
+
+        public GenericPackage GetPackageByName(string name)
+        {
+            var chocoPackage = GetChocoPackageByName(name);
+            return new GenericPackage(chocoPackage);
+        }
+
+        public List<GenericPackage> GetPackagesByName(List<string> names)
+        {
+            var chocoPackages = GetChocoPackagesByName(names);
+            return chocoPackages.Select(p => new GenericPackage(p)).ToList();
+        }
+
+        /// <exception cref="ChocolateyException"></exception>
+        public void Pin(GenericPackage package)
+        {
+            int exitCode = ChocolateyWrapper.Pin(package.Name, package.CurrVer);
+            Log.Debug($"choco add pin operation for {package.Name} returned with {exitCode}.");
+            if (exitCode != 0)
+            {
+                throw new ChocolateyException($"choco did not exit cleanly. Returned {exitCode}.");
+            }
+
+            package.Pinned = true;
+        }
+
+        /// <exception cref="ChocolateyException"></exception>
+        public void Unpin(GenericPackage package)
+        {
+            int exitCode = ChocolateyWrapper.Unpin(package.Name);
+            Log.Debug($"choco pin remove operation for {package.Name} returned with {exitCode}.");
+            if (exitCode != 0)
+            {
+                throw new ChocolateyException($"choco did not exit cleanly. Returned {exitCode}.");
+            }
+
+            package.Pinned = false;
+        }
+
+        public void Upgrade(string[] names)
+        {
+            List<ChocolateyPackage> chocoPackages = GetChocoPackagesByName(names.ToList());
+            if (chocoPackages.Count > 0)
+            {
+                Upgrade(chocoPackages, ContextSingleton.Get.ValidExitCodes.ToArray());
+            }
+        }
+
+        // --------------------------------------------------------------------
+
+        /// <exception cref="ChocolateyException"></exception>
+        public async Task<List<ChocolateyPackage>> GetOutdatedChocoPackagesAsync()
         {
             await OutdatedPckgLock.WaitAsync().ConfigureAwait(false);
 
@@ -93,7 +152,7 @@ namespace CandyShop.Services
         }
 
         /// <returns>The package with the specified name, or null</returns>
-        public ChocolateyPackage GetPackageByName(string name)
+        public ChocolateyPackage GetChocoPackageByName(string name)
         {
             // prefer outdated packages as they contain more information, even though hit rate may be less
             if (OutdatedPckgCache.ContainsKey(name))
@@ -108,10 +167,10 @@ namespace CandyShop.Services
             return null;
         }
 
-        public List<ChocolateyPackage> GetPackagesByName(List<string> names)
+        public List<ChocolateyPackage> GetChocoPackagesByName(List<string> names)
         {
             var rtn = names
-                .Select(name => GetPackageByName(name))
+                .Select(name => GetChocoPackageByName(name))
                 .Where(package => package != null)
                 .ToList();
             
@@ -137,32 +196,6 @@ namespace CandyShop.Services
             {
                 throw new ChocolateyException($"choco did not exit cleanly. Returned {exitCode}.");
             }
-        }
-
-        /// <exception cref="ChocolateyException"></exception>
-        public void Pin(ChocolateyPackage package)
-        {
-            int exitCode = ChocolateyWrapper.Pin(package.Name, package.CurrVer);
-            Log.Debug($"choco add pin operation for {package.Name} returned with {exitCode}.");
-            if (exitCode != 0)
-            {
-                throw new ChocolateyException($"choco did not exit cleanly. Returned {exitCode}.");
-            }
-
-            package.Pinned = true;
-        }
-
-        /// <exception cref="ChocolateyException"></exception>
-        public void Unpin(ChocolateyPackage package)
-        {
-            int exitCode = ChocolateyWrapper.Unpin(package.Name);
-            Log.Debug($"choco pin remove operation for {package.Name} returned with {exitCode}.");
-            if (exitCode != 0)
-            {
-                throw new ChocolateyException($"choco did not exit cleanly. Returned {exitCode}.");
-            }
-
-            package.Pinned = false;
         }
     }
 }

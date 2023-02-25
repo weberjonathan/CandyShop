@@ -5,7 +5,6 @@ using CandyShop.View;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -14,15 +13,15 @@ namespace CandyShop.Controller
     class UpgradePageController
     {
         private readonly CandyShopContext Context;
-        private readonly ChocolateyService ChocolateyService;
+        private readonly IPackageService PackageService;
         private readonly ShortcutService ShortcutService;
         private IMainWindowView MainWindow;
         private IUpgradePageView View;
 
-        public UpgradePageController(CandyShopContext context, ChocolateyService chocolateyService, ShortcutService shortcutService)
+        public UpgradePageController(CandyShopContext context, IPackageService packageService, ShortcutService shortcutService)
         {
             Context = context;
-            ChocolateyService = chocolateyService;
+            PackageService = packageService;
             ShortcutService = shortcutService;
         }
 
@@ -80,10 +79,10 @@ namespace CandyShop.Controller
 
         private async void UpdateOutdatedPackageListAsync()
         {
-            List<ChocolateyPackage> packages = new List<ChocolateyPackage>();
+            List<GenericPackage> packages = new List<GenericPackage>();
             try
             {
-                packages = await ChocolateyService.GetOutdatedPackagesAsync();
+                packages = await PackageService.GetOutdatedPackagesAsync();
             }
             catch (ChocolateyException e)
             {
@@ -106,7 +105,7 @@ namespace CandyShop.Controller
         private void CheckTopLevelPackages()
         {
             string[] displayedItemNames = View.Items;
-            List<ChocolateyPackage> packages = ChocolateyService.GetPackagesByName(displayedItemNames.ToList());
+            List<GenericPackage> packages = PackageService.GetPackagesByName(displayedItemNames.ToList());
 
             foreach (var p in packages)
             {
@@ -128,11 +127,7 @@ namespace CandyShop.Controller
 
             try
             {
-                List<ChocolateyPackage> chocoPackages = ChocolateyService.GetPackagesByName(packages.ToList());
-                if (chocoPackages.Count > 0)
-                {
-                    ChocolateyService.Upgrade(chocoPackages, Context.ValidExitCodes.ToArray());
-                }
+                PackageService.Upgrade(packages);
             }
             catch (ChocolateyException e)
             {
@@ -170,7 +165,7 @@ namespace CandyShop.Controller
         {
             try
             {
-                ChocolateyPackage package = ChocolateyService.GetPackageByName(packageName);
+                GenericPackage package = PackageService.GetPackageByName(packageName);
                 if (package == null)
                 {
                     ErrorHandler.ShowError($"Could not find package '{packageName}'");
@@ -181,11 +176,11 @@ namespace CandyShop.Controller
                 {
                     if (package.Pinned.Value)
                     {
-                        ChocolateyService.Unpin(package);
+                        PackageService.Unpin(package);
                     }
                     else
                     {
-                        ChocolateyService.Pin(package);
+                        PackageService.Pin(package);
                     }
 
                     View.SetPinned(package.Name, package.Pinned.Value);

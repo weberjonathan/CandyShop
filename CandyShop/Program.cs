@@ -10,7 +10,7 @@ namespace CandyShop
 {
     static class Program
     {
-        private static readonly CandyShopContext context = new CandyShopContext();
+        private static readonly CandyShopContext context = ContextSingleton.Get;
 
         public static void Exit(int code = 0)
         {

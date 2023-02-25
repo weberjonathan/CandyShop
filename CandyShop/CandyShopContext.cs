@@ -8,6 +8,13 @@ using System.Threading;
 
 namespace CandyShop
 {
+    // TODO either inject context or use singleton; not both
+    internal class ContextSingleton
+    {
+        private static CandyShopContext Instance = new CandyShopContext();
+        public static CandyShopContext Get => Instance;
+    }
+
     /// <summary>
     /// Determines and contains relevant information for the execution of CandyShop, such as command-line options and settings
     /// </summary>

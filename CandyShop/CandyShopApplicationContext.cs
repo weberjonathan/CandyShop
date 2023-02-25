@@ -56,7 +56,7 @@ namespace CandyShop
         {
             try
             {
-                await service.GetOutdatedPackagesAsync();
+                await service.GetOutdatedChocoPackagesAsync();
             }
             catch (ChocolateyException e)
             {
@@ -74,7 +74,7 @@ namespace CandyShop
             // obtain outdated packages
             try
             {
-                packages = await service.GetOutdatedPackagesAsync();
+                packages = await service.GetOutdatedChocoPackagesAsync();
             }
             catch (ChocolateyException e)
             {
