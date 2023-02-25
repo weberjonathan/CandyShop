@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace CandyShop.Controller
 {
-    class InstalledPageController : IInstalledPageController
+    class InstalledPageController
     {
         private readonly ChocolateyService ChocolateyService;
         private IInstalledPageView View;

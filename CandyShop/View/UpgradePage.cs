@@ -57,11 +57,11 @@ namespace CandyShop.View
         }
 
         public event EventHandler<PinnedChangedArgs> PinnedChanged;
-        // TODO these are handled via main windows controller, right? no need for that, since we have upgrade page controller
         public event EventHandler UpgradeAllClick;
         public event EventHandler UpgradeSelectedClick;
         public event EventHandler CancelClick;
         public event EventHandler CleanShortcutsChanged;
+        public event EventHandler CheckTopLevelClicked;
 
         public string[] Items
         {
@@ -150,6 +150,11 @@ namespace CandyShop.View
             {
                 item.Checked = false;
             }
+        }
+
+        public void CheckTopLevelItems()
+        {
+            CheckTopLevelClicked?.Invoke(this, EventArgs.Empty);
         }
 
         public void SetItemCheckState(string name, bool state)

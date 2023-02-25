@@ -147,21 +147,21 @@ namespace CandyShop.View
             // MenuEditSelectAll
             // 
             this.MenuEditSelectAll.Name = "MenuEditSelectAll";
-            this.MenuEditSelectAll.Size = new System.Drawing.Size(251, 22);
+            this.MenuEditSelectAll.Size = new System.Drawing.Size(205, 22);
             this.MenuEditSelectAll.Text = "&Select all";
             this.MenuEditSelectAll.Click += new System.EventHandler(this.MenuEditSelectAll_Click);
             // 
             // MenuEditSelectRelevant
             // 
             this.MenuEditSelectRelevant.Name = "MenuEditSelectRelevant";
-            this.MenuEditSelectRelevant.Size = new System.Drawing.Size(251, 22);
-            this.MenuEditSelectRelevant.Text = "Select &normal and meta packages";
+            this.MenuEditSelectRelevant.Size = new System.Drawing.Size(205, 22);
+            this.MenuEditSelectRelevant.Text = "Select &top level packages";
             this.MenuEditSelectRelevant.Click += new System.EventHandler(this.MenuEditSelectRelevant_Click);
             // 
             // MenuEditDeselectAll
             // 
             this.MenuEditDeselectAll.Name = "MenuEditDeselectAll";
-            this.MenuEditDeselectAll.Size = new System.Drawing.Size(251, 22);
+            this.MenuEditDeselectAll.Size = new System.Drawing.Size(205, 22);
             this.MenuEditDeselectAll.Text = "&Deselect all";
             this.MenuEditDeselectAll.Click += new System.EventHandler(this.MenuEditDeselectAll_Click);
             // 

@@ -14,7 +14,7 @@ using System.Windows.Forms;
 
 namespace CandyShop.Controller
 {
-    internal class MainWindowController : IMainWindowController
+    internal class MainWindowController
     {
         private readonly ChocolateyService ChocolateyService;
         private readonly WindowsTaskService WindowsTaskService;
@@ -39,8 +39,6 @@ namespace CandyShop.Controller
         {
             if (MainView == null) throw new InvalidOperationException("Set a view before intialising it!");
 
-            UpdateOutdatedPackageListAsync();
-
             MainView.CreateTaskEnabled = WindowsTaskService.LaunchTaskExists();
 
             if (CandyShopContext.HasAdminPrivileges) MainView.ClearAdminHints();
@@ -53,18 +51,6 @@ namespace CandyShop.Controller
             });
 
             MainView.ToForm().Show();
-        }
-
-        public void SmartSelectPackages()
-        {
-            string[] displayedItemNames = MainView.UpgradePackagesPage.Items;
-            List<ChocolateyPackage> packages = ChocolateyService.GetPackagesByName(displayedItemNames.ToList());
-
-            foreach (var p in packages)
-            {
-                bool check = p.IsTopLevelPackage && !p.Pinned.GetValueOrDefault(false);
-                MainView.UpgradePackagesPage.SetItemCheckState(p.Name, check);
-            }
         }
 
         public void ShowGithub()
@@ -143,31 +129,6 @@ namespace CandyShop.Controller
             {
                 MainView.DisplayError("Cannot find CandyShop configuration directory at '{0}'", CandyShopContext.ConfigFolder);
             }
-        }
-
-        private async void UpdateOutdatedPackageListAsync()
-        {
-            List<ChocolateyPackage> packages = new List<ChocolateyPackage>();
-            try
-            {
-                packages = await ChocolateyService.GetOutdatedPackagesAsync();
-            }
-            catch (ChocolateyException e)
-            {
-                MainView?.DisplayError(LocaleEN.ERROR_RETRIEVING_OUTDATED_PACKAGES, e.Message);
-            }
-
-            MainView.UpgradePackagesPage.Loading = false;
-
-            packages.ForEach(p => MainView.UpgradePackagesPage.AddItem(new string[]
-            {
-                p.Name,
-                p.CurrVer,
-                p.AvailVer,
-                p.Pinned.ToString()
-            }));
-
-            SmartSelectPackages();
         }
 
         private void OpenUrl(string url)

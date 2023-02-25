@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace CandyShop.Controller
 {
-    class UpgradePageController : IUpgradePageController
+    class UpgradePageController
     {
         private readonly CandyShopContext Context;
         private readonly ChocolateyService ChocolateyService;
@@ -59,6 +59,11 @@ namespace CandyShop.Controller
                 }
             });
 
+            View.CheckTopLevelClicked += new EventHandler((sender, e) =>
+            {
+                CheckTopLevelPackages();
+            });
+
             // update UI if is properties file is updated
             Context.OnPropertiesFileChanged(() =>
             {
@@ -69,9 +74,48 @@ namespace CandyShop.Controller
                 var ctrl = (System.Windows.Forms.Control)View;
                 ctrl.Invoke(checkDelegate, Context.CleanShortcuts);
             });
+
+            UpdateOutdatedPackageListAsync();
         }
 
-        public async void PerformUpgrade(string[] packages)
+        private async void UpdateOutdatedPackageListAsync()
+        {
+            List<ChocolateyPackage> packages = new List<ChocolateyPackage>();
+            try
+            {
+                packages = await ChocolateyService.GetOutdatedPackagesAsync();
+            }
+            catch (ChocolateyException e)
+            {
+                MainWindow?.DisplayError(LocaleEN.ERROR_RETRIEVING_OUTDATED_PACKAGES, e.Message);
+            }
+
+            View.Loading = false;
+
+            packages.ForEach(p => View.AddItem(new string[]
+            {
+                p.Name,
+                p.CurrVer,
+                p.AvailVer,
+                p.Pinned.ToString()
+            }));
+
+            CheckTopLevelPackages();
+        }
+
+        private void CheckTopLevelPackages()
+        {
+            string[] displayedItemNames = View.Items;
+            List<ChocolateyPackage> packages = ChocolateyService.GetPackagesByName(displayedItemNames.ToList());
+
+            foreach (var p in packages)
+            {
+                bool check = p.IsTopLevelPackage && !p.Pinned.GetValueOrDefault(false);
+                View.SetItemCheckState(p.Name, check);
+            }
+        }
+
+        private async void PerformUpgrade(string[] packages)
         {
             MainWindow?.ToForm().Hide();
 
@@ -122,7 +166,7 @@ namespace CandyShop.Controller
             Program.Exit();
         }
 
-        public void TogglePin(string packageName)
+        private void TogglePin(string packageName)
         {
             try
             {

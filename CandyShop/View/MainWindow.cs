@@ -7,9 +7,9 @@ namespace CandyShop.View
 {
     partial class MainWindow : Form, IMainWindowView
     {
-        private IMainWindowController Controller;
+        private MainWindowController Controller;
 
-        public MainWindow(IMainWindowController candyShopController)
+        public MainWindow(MainWindowController candyShopController)
         {
             Controller = candyShopController;
             InitializeComponent();
@@ -62,7 +62,7 @@ namespace CandyShop.View
 
         private void MenuEditSelectRelevant_Click(object sender, EventArgs e)
         {
-            Controller.SmartSelectPackages();
+            UpgradePage.CheckTopLevelItems();
         }
 
         private void MenuEditDeselectAll_Click(object sender, EventArgs e)
