@@ -11,11 +11,6 @@ namespace CandyShop.View
         {
             InitializeComponent();
 
-            this.Resize += new EventHandler((sender, e) =>
-            {
-                TextSearch.Size = new System.Drawing.Size(CheckHideSuffixed.Location.X - 20, TextSearch.Height);
-            });
-
             LstPackages.Resize += new EventHandler((sender, e) =>
             {
                 int availWidth = LstPackages.Width - LstPackages.Margin.Left - LstPackages.Margin.Right - SystemInformation.VerticalScrollBarWidth;
@@ -26,11 +21,24 @@ namespace CandyShop.View
                     LstPackages.Columns[1].Width = (int)Math.Floor(availWidth * .4);
                 }
             });
+
+            this.Resize += new EventHandler((sender, e) => ResizeSearchbar());
         }
 
-        public event EventHandler HideDependenciesChanged;
+        public event EventHandler ShowTopLevelOnlyChanged;
         public event EventHandler FilterTextChanged;
         public event EventHandler SelectedItemChanged;
+
+        private bool _EnableTopLevelToggle = true;
+        public bool EnableTopLevelToggle
+        {
+            get { return _EnableTopLevelToggle; }
+            set {
+                CheckHideSuffixed.Visible = value;
+                _EnableTopLevelToggle = value;
+                ResizeSearchbar();
+            }
+        }
 
         public string SelectedItem
         {
@@ -43,7 +51,7 @@ namespace CandyShop.View
             }
         }
 
-        public bool HideDependencies => CheckHideSuffixed.Checked;
+        public bool ShowTopLevelOnly => CheckHideSuffixed.Checked;
 
         public List<string> Items => LstPackages.Items
             .Cast<ListViewItem>()
@@ -79,7 +87,7 @@ namespace CandyShop.View
 
         private void CheckHideSuffixed_CheckedChanged(object sender, EventArgs e)
         {
-            HideDependenciesChanged?.Invoke(this, EventArgs.Empty);
+            ShowTopLevelOnlyChanged?.Invoke(this, EventArgs.Empty);
         }
 
         private void TextSearch_TextChanged(object sender, EventArgs e)
@@ -93,6 +101,12 @@ namespace CandyShop.View
             {
                 LstPackages.Items[0].Selected = true;
             }
+        }
+
+        private void ResizeSearchbar()
+        {
+            int width = EnableTopLevelToggle ? CheckHideSuffixed.Location.X - 20 : LstPackages.Width;
+            TextSearch.Size = new System.Drawing.Size(width, TextSearch.Height);
         }
     }
 }

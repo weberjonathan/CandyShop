@@ -21,9 +21,10 @@ namespace CandyShop.Controller
         public void InjectView(IInstalledPageView view)
         {
             View = view;
+            View.EnableTopLevelToggle = !ContextSingleton.Get.WingetMode;
 
             View.FilterTextChanged += new EventHandler((sender, e) => SyncListView());
-            View.HideDependenciesChanged += new EventHandler((sender, e) => SyncListView());
+            View.ShowTopLevelOnlyChanged += new EventHandler((sender, e) => SyncListView());
             View.SelectedItemChanged += OnSelectedItemChanged;
         }
 
@@ -78,7 +79,7 @@ namespace CandyShop.Controller
         private async void SyncListView()
         {
             string filterName = View.FilterText;
-            bool hideSuffixed = View.HideDependencies;
+            bool hideSuffixed = View.ShowTopLevelOnly;
 
             List<GenericPackage> packages = await PackageService.GetInstalledPackagesAsync();
 
