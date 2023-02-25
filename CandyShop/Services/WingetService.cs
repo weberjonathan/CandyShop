@@ -8,34 +8,32 @@ using System;
 
 namespace CandyShop.Services
 
-    // TODO remove leftover choco mentions
     // TODO use IDs instead of names for dictionaries
+    // TODO use exit codes in ugprade procedure (see ChocolateyService)
 {
     /// <summary>
     /// This service class allows asynchronous, non-blocking access to Chocolatey and implements a cache.
     /// </summary>
     internal class WingetService : IPackageService
     {
-        private readonly SemaphoreSlim OutdatedPckgLock = new SemaphoreSlim(1);
         private readonly SemaphoreSlim InstalledPckgLock = new SemaphoreSlim(1);
 
         // TODO use proper package repository instead
         private readonly Dictionary<string, string> PckgDetailsCache = new Dictionary<string, string>();
         private readonly Dictionary<string, WingetPackage> InstalledPckgCache = new Dictionary<string, WingetPackage>();
-        private readonly Dictionary<string, WingetPackage> OutdatedPckgCache = new Dictionary<string, WingetPackage>();
 
         // ------------- GENERIC PACKAGE METHODS ------------------------------
 
         public async Task<List<GenericPackage>> GetInstalledPackagesAsync()
         {
-            var chocoPackages = await GetInstalledChocoPackagesAsync();
+            var chocoPackages = await GetInstalledWingetPackagesAsync();
             return chocoPackages.Select(p => new GenericPackage(p)).ToList();
         }
 
         /// <exception cref="WingetException"></exception>
         public async Task<List<GenericPackage>> GetOutdatedPackagesAsync()
         {
-            var chocoPackages = await GetOutdatedChocoPackagesAsync();
+            var chocoPackages = await GetOutdatedWingetPackagesAsync();
             return chocoPackages.Select(p => new GenericPackage(p)).ToList();
         }
 
@@ -52,13 +50,13 @@ namespace CandyShop.Services
 
         public GenericPackage GetPackageByName(string name)
         {
-            var chocoPackage = GetChocoPackageByName(name);
+            var chocoPackage = GetWingetPackageByName(name);
             return new GenericPackage(chocoPackage);
         }
 
         public List<GenericPackage> GetPackagesByName(List<string> names)
         {
-            var chocoPackages = GetChocoPackagesByName(names);
+            var chocoPackages = GetWingetPackagesByName(names);
             return chocoPackages.Select(p => new GenericPackage(p)).ToList();
         }
 
@@ -92,7 +90,7 @@ namespace CandyShop.Services
 
         public void Upgrade(string[] names)
         {
-            List<WingetPackage> chocoPackages = GetChocoPackagesByName(names.ToList());
+            List<WingetPackage> chocoPackages = GetWingetPackagesByName(names.ToList());
             if (chocoPackages.Count > 0)
             {
                 Upgrade(chocoPackages);
@@ -102,41 +100,15 @@ namespace CandyShop.Services
         // --------------------------------------------------------------------
 
         /// <exception cref="WingetException"></exception>
-        //public async Task<List<WingetPackage>> GetOutdatedChocoPackagesAsync()
-        //{
-        //    await OutdatedPckgLock.WaitAsync().ConfigureAwait(false);
-
-        //    try
-        //    {
-        //        if (OutdatedPckgCache.Count <= 0)
-        //        {
-        //            List<WingetPackage> outdatedPckgs = await WingetWrapper.FetchOutdatedAsync();
-        //            outdatedPckgs.ForEach(p => OutdatedPckgCache[p.Name] = p);
-        //        }
-        //    }
-        //    catch (WingetException)
-        //    {
-        //        throw;
-        //    }
-        //    finally
-        //    {
-        //        OutdatedPckgLock.Release();
-        //        Log.Debug("Released lock for outdated packages.");
-        //    }
-
-        //    return OutdatedPckgCache.Values.ToList();
-        //}
-
-        /// <exception cref="WingetException"></exception>
-        public async Task<List<WingetPackage>> GetOutdatedChocoPackagesAsync()
+        public async Task<List<WingetPackage>> GetOutdatedWingetPackagesAsync()
         {
-            var packages = await GetInstalledChocoPackagesAsync();
+            var packages = await GetInstalledWingetPackagesAsync();
             return packages.Where(p => !String.IsNullOrEmpty(p.AvailableVersion) &&
                                        !p.Version.Equals(p.AvailableVersion)).ToList();
         }
 
         /// <exception cref="WingetException"></exception>
-        public async Task<List<WingetPackage>> GetInstalledChocoPackagesAsync()
+        public async Task<List<WingetPackage>> GetInstalledWingetPackagesAsync()
         {
             await InstalledPckgLock.WaitAsync().ConfigureAwait(false);
 
@@ -181,14 +153,9 @@ namespace CandyShop.Services
         }
 
         /// <returns>The package with the specified name, or null</returns>
-        public WingetPackage GetChocoPackageByName(string name)
+        public WingetPackage GetWingetPackageByName(string name)
         {
-            // prefer outdated packages as they contain more information, even though hit rate may be less
-            if (OutdatedPckgCache.ContainsKey(name))
-            {
-                return OutdatedPckgCache[name];
-            }
-            else if (InstalledPckgCache.ContainsKey(name))
+            if (InstalledPckgCache.ContainsKey(name))
             {
                 return InstalledPckgCache[name];
             }
@@ -196,10 +163,10 @@ namespace CandyShop.Services
             return null;
         }
 
-        public List<WingetPackage> GetChocoPackagesByName(List<string> names)
+        public List<WingetPackage> GetWingetPackagesByName(List<string> names)
         {
             var rtn = names
-                .Select(name => GetChocoPackageByName(name))
+                .Select(name => GetWingetPackageByName(name))
                 .Where(package => package != null)
                 .ToList();
             
@@ -207,11 +174,7 @@ namespace CandyShop.Services
         }
 
         /// <summary>
-        /// Upgrades a collection of Chocolatey packages. If the <c>validExitCodes</c> parameter
-        /// is not present, only zero is considered valid. When specified, the array should
-        /// include zero.
-        /// If the upgrade process exited with a non-valid code, a <see cref="WingetException"/>
-        /// is thrown. 
+        /// Upgrades a collection of packages.
         /// </summary>
         /// <param name="packages"></param>
         /// <param name="validExitCodes">test</param>
