@@ -5,7 +5,6 @@ using System.Linq;
 using System.Threading;
 using Serilog;
 using System;
-using System.IO.Packaging;
 
 namespace CandyShop.Services
 {
