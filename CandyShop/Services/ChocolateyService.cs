@@ -24,11 +24,22 @@ namespace CandyShop.Services
 
         // ------------- GENERIC PACKAGE METHODS ------------------------------
 
+        public async Task<List<GenericPackage>> GetInstalledPackagesAsync()
+        {
+            var chocoPackages = await GetInstalledChocoPackagesAsync();
+            return chocoPackages.Select(p => new GenericPackage(p)).ToList();
+        }
+
         /// <exception cref="ChocolateyException"></exception>
         public async Task<List<GenericPackage>> GetOutdatedPackagesAsync()
         {
             var chocoPackages = await GetOutdatedChocoPackagesAsync();
             return chocoPackages.Select(p => new GenericPackage(p)).ToList();
+        }
+
+        public async Task<string> GetPackageDetailsAsync(string name)
+        {
+            return await GetChocoPackageDetails(new ChocolateyPackage() { Name = name });
         }
 
         public GenericPackage GetPackageByName(string name)
@@ -107,7 +118,7 @@ namespace CandyShop.Services
         }
 
         /// <exception cref="ChocolateyException"></exception>
-        public async Task<List<ChocolateyPackage>> GetInstalledPackagesAsync()
+        public async Task<List<ChocolateyPackage>> GetInstalledChocoPackagesAsync()
         {
             await InstalledPckgLock.WaitAsync().ConfigureAwait(false);
 
@@ -132,7 +143,7 @@ namespace CandyShop.Services
         }
 
         /// <exception cref="ChocolateyException"></exception>
-        public async Task<string> GetPackageDetails(ChocolateyPackage package)
+        public async Task<string> GetChocoPackageDetails(ChocolateyPackage package)
         {
             if (!PckgDetailsCache.TryGetValue(package.Name, out string details))
             {

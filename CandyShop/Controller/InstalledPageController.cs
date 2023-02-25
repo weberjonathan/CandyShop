@@ -5,18 +5,17 @@ using CandyShop.View;
 using CandyShop.Properties;
 using CandyShop.Services;
 using Serilog;
-using System.Threading.Tasks;
 
 namespace CandyShop.Controller
 {
     class InstalledPageController
     {
-        private readonly ChocolateyService ChocolateyService;
+        private readonly IPackageService PackageService;
         private IInstalledPageView View;
 
-        public InstalledPageController(ChocolateyService chocolateyService)
+        public InstalledPageController(IPackageService service)
         {
-            ChocolateyService = chocolateyService;
+            PackageService = service;
         }
 
         public void InjectView(IInstalledPageView view)
@@ -35,10 +34,10 @@ namespace CandyShop.Controller
 
         private async void RequestInstalledPackagesAsync()
         {
-            List<ChocolateyPackage> packages = new List<ChocolateyPackage>();
+            List<GenericPackage> packages = new List<GenericPackage>();
             try
             {
-                packages = await ChocolateyService.GetInstalledPackagesAsync();
+                packages = await PackageService.GetInstalledPackagesAsync();
             }
             catch (ChocolateyException e)
             {
@@ -59,22 +58,18 @@ namespace CandyShop.Controller
 
             View.UpdateDetails(LocaleEN.TEXT_LOADING);
 
-            ChocolateyPackage packageMock = new ChocolateyPackage()
-            {
-                Name = View.SelectedItem
-            };
-
+            string name = View.SelectedItem;
             string details;
             try
             {
-                details = await ChocolateyService.GetPackageDetails(packageMock);
+                details = await PackageService.GetPackageDetailsAsync(name);
             }
             catch (ChocolateyException exception)
             {
                 details = String.Format(LocaleEN.ERROR_RETRIEVING_PACKAGE_DETAILS, exception.Message);
             }
 
-            if (!String.IsNullOrEmpty(details) && packageMock.Name.Equals(View.SelectedItem))
+            if (!String.IsNullOrEmpty(details) && name.Equals(View.SelectedItem))
             {
                 View.UpdateDetails(details);
             }
@@ -85,9 +80,9 @@ namespace CandyShop.Controller
             string filterName = View.FilterText;
             bool hideSuffixed = View.HideDependencies;
 
-            List<ChocolateyPackage> packages = await ChocolateyService.GetInstalledPackagesAsync();
+            List<GenericPackage> packages = await PackageService.GetInstalledPackagesAsync();
 
-            foreach (ChocolateyPackage package in packages)
+            foreach (var package in packages)
             {
                 bool packageAllowed = true;
 
@@ -110,7 +105,7 @@ namespace CandyShop.Controller
             }
         }
 
-        public void InsertItem(ChocolateyPackage package, List<ChocolateyPackage> referenceList)
+        public void InsertItem(GenericPackage package, List<GenericPackage> referenceList)
         {
             int latestPossibleIndex = referenceList.IndexOf(package);
             string lastVisibilePackage = null;
