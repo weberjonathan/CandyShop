@@ -22,8 +22,10 @@ __[Visit the gallery.](/docs/gallery.md)__
 Configuration and log files are placed in `%localappdata%\CandyShop`. The configuration file `CandyShop.config` contains the following properties with their respective defaults:
 ```json
 {
-  "ChocolateyLogs": "C:\\ProgramData\\chocolatey\\logs",
-  "CleanShortcuts": true,
+  "ChocolateyBinary": "C:/ProgramData/chocolatey/bin/choco.exe",
+  "ChocolateyLogs": "C:/ProgramData/chocolatey/logs",
+  "WingetMode": false,
+  "CleanShortcuts": false,
   "ValidExitCodes": [ 0, 1641, 3010, 350, 1604 ]
 }
 ```

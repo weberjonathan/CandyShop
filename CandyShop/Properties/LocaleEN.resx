@@ -130,7 +130,7 @@
     <value>Error upgrading outdated packages: {0}</value>
   </data>
   <data name="TEXT_APP_TITLE" xml:space="preserve">
-    <value>{0} (for {1}) v{2}</value>
+    <value>{0} ({1}) v{2}</value>
   </data>
   <data name="TEXT_CANCEL" xml:space="preserve">
     <value>&amp;Cancel</value>
