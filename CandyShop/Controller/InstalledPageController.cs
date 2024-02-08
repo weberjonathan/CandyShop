@@ -81,7 +81,15 @@ namespace CandyShop.Controller
             string filterName = View.FilterText;
             bool hideSuffixed = View.ShowTopLevelOnly;
 
-            List<GenericPackage> packages = await PackageService.GetInstalledPackagesAsync();
+            List<GenericPackage> packages = new List<GenericPackage>();
+            try
+            {
+                packages = await PackageService.GetInstalledPackagesAsync();
+            }
+            catch (ChocolateyException e)
+            {
+                Log.Error(e.Message);
+            }
 
             foreach (var package in packages)
             {

@@ -2,6 +2,7 @@
 using CandyShop.Properties;
 using CandyShop.Services;
 using CandyShop.View;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -88,7 +89,7 @@ namespace CandyShop.Controller
             }
             catch (ChocolateyException e)
             {
-                MainWindow?.DisplayError(LocaleEN.ERROR_RETRIEVING_OUTDATED_PACKAGES, e.Message);
+                Log.Error(LocaleEN.ERROR_RETRIEVING_OUTDATED_PACKAGES, e.Message);
             }
 
             View.Loading = false;

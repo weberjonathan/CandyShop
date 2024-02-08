@@ -19,7 +19,7 @@ namespace CandyShop.Properties {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class LocaleEN {
@@ -61,7 +61,7 @@ namespace CandyShop.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to An error occurred while starting the Chocolatey. Please make sure it is installed and in PATH and relaunch this application..
+        ///   Looks up a localized string similar to Failed to locate Chocolatey binary. Please set the full path in the configuration file and restart the application. Check the &apos;Extras&apos; menu to quickly navigate to the config file. If this is the first time launching the application or the config file does not exist, it will be created on application exit..
         /// </summary>
         internal static string ERROR_CHOCO_PATH {
             get {

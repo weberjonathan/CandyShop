@@ -7,7 +7,7 @@ namespace CandyShop.Chocolatey
 {
     public class ChocolateyProcess
     {
-        private const string CHOCO_BIN = "choco";
+        private readonly string CHOCO_BIN = ContextSingleton.Get.ChocolateyBinary;
 
         public ChocolateyProcess(string args)
         {

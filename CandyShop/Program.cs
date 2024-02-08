@@ -35,7 +35,7 @@ namespace CandyShop
             // check if Chocolatey is in path
             try
             {
-                ProcessStartInfo pi = new ProcessStartInfo("choco", "--version")
+                ProcessStartInfo pi = new ProcessStartInfo(context.ChocolateyBinary, "--version")
                 {
                     UseShellExecute = false,
                     CreateNoWindow = true
@@ -46,12 +46,11 @@ namespace CandyShop
             catch (Win32Exception)
             {
                 MessageBox.Show(
-                    LocaleEN.ERROR_CHOCO_PATH,
+                    LocaleEN.ERROR_CHOCO_PATH, // TODO adjust message
                     Application.ProductName,
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Error
                 );
-                return;
             }
 
             // launch application

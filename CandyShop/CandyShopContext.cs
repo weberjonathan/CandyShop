@@ -22,7 +22,8 @@ namespace CandyShop
     {
         private class PropertiesFileContent
         {
-            public string ChocolateyLogs { get; set; } = "C:\\ProgramData\\chocolatey\\logs";
+            public string ChocolateyBinary { get; set; } = "C:/ProgramData/chocolatey/bin/choco.exe";
+            public string ChocolateyLogs { get; set; } = "C:/ProgramData/chocolatey/logs";
             public bool WingetMode { get; set; } = false;
             public bool CleanShortcuts { get; set; } = false;
             public List<int> ValidExitCodes { get; set; } = new List<int> { 0, 1641, 3010, 350, 1604 };
@@ -66,6 +67,8 @@ namespace CandyShop
 
         // -------------- set through properties file --------------
 
+        public string ChocolateyBinary { get; private set; }
+
         public string CholoateyLogFolder { get; private set; }
 
         public bool CleanShortcuts { get; set; }
@@ -80,12 +83,13 @@ namespace CandyShop
         {
             PropertiesFileContent content = new PropertiesFileContent
             {
+                ChocolateyBinary = this.ChocolateyBinary,
                 ChocolateyLogs = this.CholoateyLogFolder,
                 CleanShortcuts = this.CleanShortcuts,
                 WingetMode = this.WingetMode,
                 ValidExitCodes = this.ValidExitCodes
             };
-            
+
             WriteProperties(content);
         }
 
@@ -185,6 +189,7 @@ namespace CandyShop
             }
 
             // apply properties from content
+            ChocolateyBinary = content.ChocolateyBinary;
             CholoateyLogFolder = content.ChocolateyLogs;
             CleanShortcuts = content.CleanShortcuts;
             WingetMode = content.WingetMode;
@@ -193,6 +198,10 @@ namespace CandyShop
 
         private void WriteProperties(PropertiesFileContent content)
         {
+            // use forward-slash as path separator
+            content.ChocolateyLogs = content.ChocolateyLogs.Replace('\\', '/');
+            content.ChocolateyBinary = content.ChocolateyBinary.Replace('\\', '/');
+
             try
             {
                 JsonSerializerOptions options = new JsonSerializerOptions()

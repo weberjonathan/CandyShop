@@ -23,7 +23,6 @@ namespace CandyShop
             if (context.WingetMode) packageService = new WingetService();
             else packageService = new ChocolateyService();
 
-            //
             LoadOutdatedPackagesAsync(packageService);
 
             // init controller
