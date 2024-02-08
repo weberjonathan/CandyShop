@@ -13,8 +13,8 @@ namespace CandyShop.Services
         public Task<string> GetPackageDetailsAsync(string name);
         public GenericPackage GetPackageByName(string name);
         public List<GenericPackage> GetPackagesByName(List<string> names);
-        void Pin(GenericPackage package);
-        void Unpin(GenericPackage package);
+        Task PinAsync(GenericPackage package);
+        Task UnpinAsync(GenericPackage package);
         void Upgrade(string[] names);
     }
 }

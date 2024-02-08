@@ -25,7 +25,8 @@ namespace CandyShop.Controller
             ShortcutService = shortcutService;
         }
 
-        public void InjectViews(IMainWindowView mainWindow, IUpgradePageView upgradePage)        {
+        public void InjectViews(IMainWindowView mainWindow, IUpgradePageView upgradePage)
+        {
             MainWindow = mainWindow;
             View = upgradePage;
             
@@ -72,6 +73,7 @@ namespace CandyShop.Controller
                 };
                 var ctrl = (System.Windows.Forms.Control)View;
                 ctrl.Invoke(checkDelegate, Context.CleanShortcuts);
+                // TODO message with require restart depending on the property
             });
 
             UpdateOutdatedPackageListAsync();
@@ -161,7 +163,7 @@ namespace CandyShop.Controller
             Program.Exit();
         }
 
-        private void TogglePin(string packageName)
+        private async void TogglePin(string packageName)
         {
             try
             {
@@ -176,11 +178,11 @@ namespace CandyShop.Controller
                 {
                     if (package.Pinned.Value)
                     {
-                        PackageService.Unpin(package);
+                        await PackageService.UnpinAsync(package);
                     }
                     else
                     {
-                        PackageService.Pin(package);
+                        await PackageService.PinAsync(package);
                     }
 
                     View.SetPinned(package.Name, package.Pinned.Value);

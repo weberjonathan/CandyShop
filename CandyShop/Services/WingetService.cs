@@ -61,7 +61,7 @@ namespace CandyShop.Services
         }
 
         /// <exception cref="WingetException"></exception>
-        public void Pin(GenericPackage package)
+        public async Task PinAsync(GenericPackage package)
         {
             // TODO
             //int exitCode = ChocolateyWrapper.Pin(package.Name, package.CurrVer);
@@ -75,7 +75,7 @@ namespace CandyShop.Services
         }
 
         /// <exception cref="WingetException"></exception>
-        public void Unpin(GenericPackage package)
+        public async Task UnpinAsync(GenericPackage package)
         {
             // TODO
             //int exitCode = ChocolateyWrapper.Unpin(package.Name);

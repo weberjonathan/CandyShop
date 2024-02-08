@@ -54,9 +54,9 @@ namespace CandyShop.Services
         }
 
         /// <exception cref="ChocolateyException"></exception>
-        public void Pin(GenericPackage package)
+        public async Task PinAsync(GenericPackage package)
         {
-            int exitCode = ChocolateyWrapper.Pin(package.Name, package.CurrVer);
+            int exitCode = await Task.Run(() => ChocolateyWrapper.Pin(package.Name, package.CurrVer));
             Log.Debug($"choco add pin operation for {package.Name} returned with {exitCode}.");
             if (exitCode != 0)
             {
@@ -64,13 +64,13 @@ namespace CandyShop.Services
             }
 
             package.Pinned = true;
-            OutdatedPckgCache[package.Name].Pinned = package.Pinned;
+            await UpdateCachedItem(package);
         }
 
         /// <exception cref="ChocolateyException"></exception>
-        public void Unpin(GenericPackage package)
+        public async Task UnpinAsync(GenericPackage package)
         {
-            int exitCode = ChocolateyWrapper.Unpin(package.Name);
+            int exitCode = await Task.Run(() => ChocolateyWrapper.Unpin(package.Name));
             Log.Debug($"choco pin remove operation for {package.Name} returned with {exitCode}.");
             if (exitCode != 0)
             {
@@ -78,7 +78,7 @@ namespace CandyShop.Services
             }
 
             package.Pinned = false;
-            OutdatedPckgCache[package.Name].Pinned = package.Pinned;
+            await UpdateCachedItem(package);
         }
 
         public void Upgrade(string[] names)
@@ -208,6 +208,18 @@ namespace CandyShop.Services
             {
                 throw new ChocolateyException($"choco did not exit cleanly. Returned {exitCode}.");
             }
+        }
+
+        private async Task UpdateCachedItem(GenericPackage package)
+        {
+            await OutdatedPckgLock.WaitAsync().ConfigureAwait(false);
+            var chocoPackage = OutdatedPckgCache[package.Name];
+            chocoPackage.AvailVer = package.AvailVer;
+            chocoPackage.CurrVer = package.CurrVer;
+            chocoPackage.IsTopLevelPackage = package.IsTopLevelPackage;
+            chocoPackage.Name = package.Name;
+            chocoPackage.Pinned = package.Pinned;
+            OutdatedPckgLock.Release();
         }
     }
 }
