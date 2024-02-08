@@ -12,11 +12,11 @@ __[Visit the gallery.](/docs/gallery.md)__
 * Requires administrator privileges. Refer to build instructions if this is not desired.
 
 ## Features
-* Displays outdated packages on launch and allows the user to upgrade any number of them.
-* Displays installed packages in a separate tab and loads package details when needed.
-* Can silently check for outdated packages on login and inform user of available upgrades. (Launch silently at any time by using the `--background` or `-b` option.)
-* Automatically remove unwanted shortcuts from your desktop that are created during the Chocolatey upgrade process. (See notes section.)
-* Open the Candy Shop configuration directory `%localappdata%\CandyShop` through the menu and edit your settings.
+* Show outdated packages and update some or all of them with the click of a button
+* Browse installed packages in a separate tab
+* Launch minimized and check for outdated packages on login
+* Pin or unpin packages from the Upgrade-tab
+* Automatically remove shortcuts from your desktop that are created during the Chocolatey upgrade process (see notes)
 
 ## Settings
 Configuration and log files are placed in `%localappdata%\CandyShop`. The configuration file `CandyShop.config` contains the following properties with their respective defaults:
@@ -52,8 +52,6 @@ You may need to adjust your PowerShell execution policies in order to run the bu
 
 Learn about the [dotnet publish](https://docs.microsoft.com/en-us/dotnet/core/tools/dotnet-publish) command for further build instructions.
 
-(Note, that by default CandyShop requires adminstrator privileges, which depending on your setup may not always be necessary for your Chocolatey installation. To build CandyShop without this requirement, simply swap the [`app.manifest`](CandyShop/app.manifest)-file with [`app.manifest.noadmin`](CandyShop/app.manifest.admin).)
-
 ## Notes
 * When the "Clean shortcuts" option is selected, any desktop shortcuts that are created between the start and the end of the upgrade process will be deleted. A record of any such operation is logged.
 * Open the Chocolatey log folder by clicking the respective menu item. If this differs from the default installation directory, please change this value in the CandyShop settings file.
@@ -66,5 +64,4 @@ Learn about the [dotnet publish](https://docs.microsoft.com/en-us/dotnet/core/to
 * Evaluate modern Win10 notifications and WinUI 3
 * Target latest LTS .NET Core Runtime
 * Add support for winget
-* Support marking packages as pinned
 * Allow user to specify Chocolatey binary
