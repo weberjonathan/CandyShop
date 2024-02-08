@@ -64,6 +64,7 @@ namespace CandyShop.Services
             }
 
             package.Pinned = true;
+            OutdatedPckgCache[package.Name].Pinned = package.Pinned;
         }
 
         /// <exception cref="ChocolateyException"></exception>
@@ -77,6 +78,7 @@ namespace CandyShop.Services
             }
 
             package.Pinned = false;
+            OutdatedPckgCache[package.Name].Pinned = package.Pinned;
         }
 
         public void Upgrade(string[] names)
