@@ -17,7 +17,7 @@ namespace CandyShop.Winget
             // TODO make sure dequeues do not throw bc of missing elements
             
             // launch process
-            WingetProcess p = new WingetProcess($"list");
+            WingetProcess p = ProcessFactory.Winget($"list");
             p.ExecuteHidden();
 
             // remove download indicators from output by skipping to first mention of "Name"
@@ -100,7 +100,7 @@ namespace CandyShop.Winget
                 return "No sources available for the selected package.";
             }
 
-            WingetProcess p = new WingetProcess($"show --id \"{package.Id}\" --exact");
+            WingetProcess p = ProcessFactory.Winget($"show --id \"{package.Id}\" --exact");
             p.ExecuteHidden();
             
             int start = p.Output.IndexOf("Gefunden ") + "Gefunden ".Length;
@@ -114,7 +114,7 @@ namespace CandyShop.Winget
                 // launch process
                 string command = $"upgrade --id \"{pckg.Id}\" --silent --exact";
                 Console.WriteLine($"> {command}");
-                WingetProcess p = new WingetProcess(command); // TODO make silent an option for user
+                WingetProcess p = ProcessFactory.Winget(command); // TODO make silent an option for user
                 p.Execute();
             }
         }

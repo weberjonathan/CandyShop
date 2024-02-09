@@ -7,15 +7,16 @@ namespace CandyShop.Chocolatey
 {
     public class ChocolateyProcess
     {
-        private readonly string CHOCO_BIN = ContextSingleton.Get.ChocolateyBinary;
-
-        public ChocolateyProcess(string args)
+        public ChocolateyProcess(string binary, string args)
         {
+            Binary = binary;
             Arguments = args;
         }
 
+        public string Binary { get; private set; }
+
         public string Arguments { get; private set; }
-        
+
         public string Output { get; private set; } = "";
 
         public List<string[]> OutputBySection { get; private set; } = new List<string[]>();
@@ -27,7 +28,7 @@ namespace CandyShop.Chocolatey
         /// <exception cref="ChocolateyException"></exception>
         public void ExecuteHidden()
         {
-            ProcessStartInfo procInfo = new ProcessStartInfo(CHOCO_BIN, Arguments)
+            ProcessStartInfo procInfo = new ProcessStartInfo(Binary, Arguments)
             {
                 RedirectStandardOutput = true,
                 UseShellExecute = false,
@@ -61,7 +62,7 @@ namespace CandyShop.Chocolatey
         {
             // TODO potentially redirect output and expose events
 
-            ProcessStartInfo procInfo = new ProcessStartInfo(CHOCO_BIN, Arguments)
+            ProcessStartInfo procInfo = new ProcessStartInfo(Binary, Arguments)
             {
                 UseShellExecute = false,
             };

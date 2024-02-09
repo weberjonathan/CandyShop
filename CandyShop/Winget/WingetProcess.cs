@@ -6,17 +6,18 @@ namespace CandyShop.Winget
 {
     public class WingetProcess
     {
-        private const string BIN = "winget";
-
-        public WingetProcess(string args)
+        public WingetProcess(string binary, string args)
         {
+            Binary = binary;
             Args = args;
         }
 
         public string Output { get; private set; } = "";
 
+        public string Binary { get; private set; }
+
         public string Args { get; private set; } = "";
-        
+
         public int ExitCode { get; private set; }
 
         /// <summary>
@@ -26,7 +27,7 @@ namespace CandyShop.Winget
         /// <exception cref="PackageManagerException"></exception>
         public void ExecuteHidden()
         {
-            ProcessStartInfo procInfo = new ProcessStartInfo(BIN, Args)
+            ProcessStartInfo procInfo = new ProcessStartInfo(Binary, Args)
             {
                 RedirectStandardOutput = true,
                 UseShellExecute = false,
@@ -63,7 +64,7 @@ namespace CandyShop.Winget
         {
             // TODO potentially redirect output and expose events
 
-            ProcessStartInfo procInfo = new ProcessStartInfo(BIN, Args)
+            ProcessStartInfo procInfo = new ProcessStartInfo(Binary, Args)
             {
                 UseShellExecute = false,
             };

@@ -23,7 +23,7 @@ namespace CandyShop.Chocolatey
             List<ChocolateyPackage> packages = new List<ChocolateyPackage>();
 
             // launch process TODO try catch
-            ChocolateyProcess p = new ChocolateyProcess("list --local-only");
+            ChocolateyProcess p = ProcessFactory.Choco("list --local-only");
             p.ExecuteHidden();
 
             // parse output (get sections, all wanted info is in single section)
@@ -85,7 +85,7 @@ namespace CandyShop.Chocolatey
             List<ChocolateyPackage> packages = new List<ChocolateyPackage>();
 
             // launch process
-            ChocolateyProcess p = new ChocolateyProcess("outdated");
+            ChocolateyProcess p = ProcessFactory.Choco("outdated");
             p.ExecuteHidden();
 
             // TODO throw exceptions for parsing errors
@@ -152,7 +152,7 @@ namespace CandyShop.Chocolatey
             StringBuilder rtn = new StringBuilder();
 
             // launch process
-            ChocolateyProcess p = new ChocolateyProcess($"info {package.Name}");
+            ChocolateyProcess p = ProcessFactory.Choco($"info {package.Name}");
             p.ExecuteHidden();
 
             // parse
@@ -181,7 +181,7 @@ namespace CandyShop.Chocolatey
             }
 
             // launch process
-            ChocolateyProcess p = new ChocolateyProcess($"upgrade {argument} -y");
+            ChocolateyProcess p = ProcessFactory.Choco($"upgrade {argument} -y");
             p.FailOnNonZeroExitCode = false;
             p.Execute();
 
@@ -192,7 +192,7 @@ namespace CandyShop.Chocolatey
         public static int Pin(string name, string version)
         {
             // choco pin add --name="'git'" --version="'1.2.3'"
-            ChocolateyProcess p = new ChocolateyProcess($"pin add --name=\"{name}\" --version=\"{version}\"");
+            ChocolateyProcess p = ProcessFactory.Choco($"pin add --name=\"{name}\" --version=\"{version}\"");
             p.ExecuteHidden();
             return p.ExitCode;
         }
@@ -200,7 +200,7 @@ namespace CandyShop.Chocolatey
         /// <exception cref="ChocolateyException"></exception>
         public static int Unpin(string name)
         {
-            ChocolateyProcess p = new ChocolateyProcess($"pin remove --name=\"{name}\"");
+            ChocolateyProcess p = ProcessFactory.Choco($"pin remove --name=\"{name}\"");
             p.ExecuteHidden();
             return p.ExitCode;
         }
