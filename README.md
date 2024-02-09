@@ -8,7 +8,7 @@ __[Visit the gallery.](/docs/gallery.md)__
 
 * Tested on Windows 10
 * Requires .NET Core 3.1
-* Requires `choco` to be in PATH.
+* Requires _Chocolatey_ to be installed, supports versions 1.x and 2.x
 * Requires administrator privileges. Refer to build instructions if this is not desired.
 
 ## Features
