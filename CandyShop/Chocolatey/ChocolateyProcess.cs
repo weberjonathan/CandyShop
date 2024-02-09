@@ -7,6 +7,8 @@ namespace CandyShop.Chocolatey
 {
     public class ChocolateyProcess
     {
+        public static int MajorVersion { get; set; }
+
         public ChocolateyProcess(string binary, string args)
         {
             Binary = binary;

@@ -23,7 +23,8 @@ namespace CandyShop.Chocolatey
             List<ChocolateyPackage> packages = new List<ChocolateyPackage>();
 
             // launch process TODO try catch
-            ChocolateyProcess p = ProcessFactory.Choco("list --local-only");
+            var args = ChocolateyProcess.MajorVersion < 2 ? "list --local-only" : "list";
+            ChocolateyProcess p = ProcessFactory.Choco(args);
             p.ExecuteHidden();
 
             // parse output (get sections, all wanted info is in single section)

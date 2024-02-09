@@ -1,3 +1,4 @@
+using CandyShop.Chocolatey;
 using CandyShop.Properties;
 using Serilog;
 using System;
@@ -35,18 +36,18 @@ namespace CandyShop
             // check if Chocolatey is in path
             try
             {
-                ProcessStartInfo pi = new ProcessStartInfo(context.ChocolateyBinary, "--version")
-                {
-                    UseShellExecute = false,
-                    CreateNoWindow = true
-                };
-                Process p = Process.Start(pi);
-                p.WaitForExit();
+                var p = ProcessFactory.Choco("--version");
+                p.ExecuteHidden();
+                string majorString = p.Output.Trim().Split('.')[0];
+                int major = 0;
+                if (!int.TryParse(majorString, out major))
+                    ErrorHandler.ShowError("Failed to determine chocolatey version. This may cause issues because of breaking changes in major Chocolatey versions.");
+                ChocolateyProcess.MajorVersion = major;
             }
-            catch (Win32Exception)
+            catch (ChocolateyException)
             {
                 MessageBox.Show(
-                    LocaleEN.ERROR_CHOCO_PATH, // TODO adjust message
+                    LocaleEN.ERROR_CHOCO_PATH,
                     Application.ProductName,
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Error
