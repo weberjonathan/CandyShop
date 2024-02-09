@@ -7,6 +7,8 @@ namespace CandyShop.Chocolatey
 {
     public class ChocolateyProcess
     {
+        public static int MajorVersion { get; set; }
+
         private readonly string CHOCO_BIN = ContextSingleton.Get.ChocolateyBinary;
 
         public ChocolateyProcess(string args)
