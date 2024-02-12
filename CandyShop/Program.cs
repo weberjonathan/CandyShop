@@ -2,8 +2,6 @@ using CandyShop.Chocolatey;
 using CandyShop.Properties;
 using Serilog;
 using System;
-using System.ComponentModel;
-using System.Diagnostics;
 using System.IO;
 using System.Windows.Forms;
 
@@ -32,6 +30,9 @@ namespace CandyShop
                 .WriteTo.Logger(debugLogger)
                 .WriteTo.Logger(fileLogger)
                 .CreateLogger();
+
+            // configure process factory
+            ProcessFactory.Config(context);
 
             // check if Chocolatey is in path
             try

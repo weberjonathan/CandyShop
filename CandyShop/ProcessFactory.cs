@@ -5,11 +5,21 @@ namespace CandyShop
 {
     internal class ProcessFactory
     {
-        private static readonly ProcessFactory Instance = new ProcessFactory();
+        private static ProcessFactory Instance = new ProcessFactory();
+
+        public static void Config(CandyShopContext context)
+        {
+            Instance = new ProcessFactory(context);
+        }
 
         public static ChocolateyProcess Choco(string args)
         {
-            return Instance.CreateChocoProcess(args);
+            return Instance.CreateChocoProcess(args, false);
+        }
+
+        public static ChocolateyProcess ChocoPrivileged(string args)
+        {
+            return Instance.CreateChocoProcess(args, true);
         }
 
         public static WingetProcess Winget(string args)
@@ -21,25 +31,32 @@ namespace CandyShop
         
         public string WingetBinary { get; set; }
 
-        public bool RequireSudo { get; set; }
+        public bool ElevateOnDemand { get; set; }
 
-        public ProcessFactory()
+        private ProcessFactory()
         {
             ChocoBinary = "choco";
             WingetBinary = "winget";
-            RequireSudo = true;
+            ElevateOnDemand = true;
         }
 
-        public ProcessFactory(CandyShopContext context)
+        private ProcessFactory(CandyShopContext context)
         {
             ChocoBinary = context.ChocolateyBinary;
             WingetBinary = "winget";
-            RequireSudo = true;
+            ElevateOnDemand = context.ElevateOnDemand && !context.HasAdminPrivileges;
         }
 
-        private ChocolateyProcess CreateChocoProcess(string args)
+        private ChocolateyProcess CreateChocoProcess(string args, bool elevate)
         {
-            return new ChocolateyProcess(ChocoBinary, args);
+            if (elevate && ElevateOnDemand)
+            {
+                return new ChocolateyProcess("powershell.exe", "gsudo {" + ChocoBinary + " " + args + "}");
+            }
+            else
+            {
+                return new ChocolateyProcess(ChocoBinary, args);
+            }
         }
 
         private WingetProcess CreateWingetProcess(string args)

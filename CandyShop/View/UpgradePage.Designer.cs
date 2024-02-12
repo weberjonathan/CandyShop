@@ -52,10 +52,9 @@ namespace CandyShop.View
             // 
             // LblAdmin
             // 
-            this.LblAdmin.AutoSize = true;
-            this.LblAdmin.Location = new System.Drawing.Point(38, 17);
+            this.LblAdmin.Location = new System.Drawing.Point(47, 7);
             this.LblAdmin.Name = "LblAdmin";
-            this.LblAdmin.Size = new System.Drawing.Size(396, 15);
+            this.LblAdmin.Size = new System.Drawing.Size(571, 53);
             this.LblAdmin.TabIndex = 0;
             this.LblAdmin.Text = "Candy Shop does not have administrator privileges. Proceed with caution!";
             // 
@@ -67,7 +66,7 @@ namespace CandyShop.View
             this.PanelTop.Dock = System.Windows.Forms.DockStyle.Top;
             this.PanelTop.Location = new System.Drawing.Point(0, 0);
             this.PanelTop.Name = "PanelTop";
-            this.PanelTop.Size = new System.Drawing.Size(637, 47);
+            this.PanelTop.Size = new System.Drawing.Size(637, 68);
             this.PanelTop.TabIndex = 2;
             this.PanelTop.Visible = false;
             // 
@@ -76,7 +75,7 @@ namespace CandyShop.View
             this.panel1.BackColor = System.Drawing.SystemColors.Info;
             this.panel1.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("panel1.BackgroundImage")));
             this.panel1.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-            this.panel1.Location = new System.Drawing.Point(16, 16);
+            this.panel1.Location = new System.Drawing.Point(22, 28);
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(16, 16);
             this.panel1.TabIndex = 1;
@@ -160,11 +159,11 @@ namespace CandyShop.View
             this.LstPackages.FullRowSelect = true;
             this.LstPackages.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
             this.LstPackages.HideSelection = false;
-            this.LstPackages.Location = new System.Drawing.Point(0, 47);
+            this.LstPackages.Location = new System.Drawing.Point(0, 68);
             this.LstPackages.MultiSelect = false;
             this.LstPackages.Name = "LstPackages";
             this.LstPackages.ShowItemToolTips = true;
-            this.LstPackages.Size = new System.Drawing.Size(637, 407);
+            this.LstPackages.Size = new System.Drawing.Size(637, 386);
             this.LstPackages.TabIndex = 3;
             this.LstPackages.UseCompatibleStateImageBehavior = false;
             this.LstPackages.View = System.Windows.Forms.View.Details;
@@ -189,9 +188,9 @@ namespace CandyShop.View
             // 
             this.LblLoading.BackColor = System.Drawing.Color.Transparent;
             this.LblLoading.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.LblLoading.Location = new System.Drawing.Point(0, 47);
+            this.LblLoading.Location = new System.Drawing.Point(0, 68);
             this.LblLoading.Name = "LblLoading";
-            this.LblLoading.Size = new System.Drawing.Size(637, 407);
+            this.LblLoading.Size = new System.Drawing.Size(637, 386);
             this.LblLoading.TabIndex = 1;
             this.LblLoading.Text = "Loading ...";
             this.LblLoading.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -207,7 +206,6 @@ namespace CandyShop.View
             this.Name = "UpgradePage";
             this.Size = new System.Drawing.Size(637, 533);
             this.PanelTop.ResumeLayout(false);
-            this.PanelTop.PerformLayout();
             this.panel2.ResumeLayout(false);
             this.panel2.PerformLayout();
             this.ResumeLayout(false);

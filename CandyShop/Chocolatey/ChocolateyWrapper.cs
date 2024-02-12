@@ -182,7 +182,7 @@ namespace CandyShop.Chocolatey
             }
 
             // launch process
-            ChocolateyProcess p = ProcessFactory.Choco($"upgrade {argument} -y");
+            ChocolateyProcess p = ProcessFactory.ChocoPrivileged($"upgrade {argument} -y");
             p.FailOnNonZeroExitCode = false;
             p.Execute();
 

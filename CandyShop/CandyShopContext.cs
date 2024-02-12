@@ -26,6 +26,8 @@ namespace CandyShop
             public string ChocolateyLogs { get; set; } = "C:/ProgramData/chocolatey/logs";
             public bool WingetMode { get; set; } = false;
             public bool CleanShortcuts { get; set; } = false;
+            public bool ElevateOnDemand { get; set; } = true;
+            public bool SupressAdminWarning { get; set; } = false;
             public List<int> ValidExitCodes { get; set; } = new List<int> { 0, 1641, 3010, 350, 1604 };
         }
 
@@ -73,6 +75,10 @@ namespace CandyShop
 
         public bool CleanShortcuts { get; set; }
         
+        public bool ElevateOnDemand { get; set; }
+
+        public bool SupressAdminWarning { get; set; }
+
         public bool WingetMode { get; private set; }
 
         public List<int> ValidExitCodes { get; set; }
@@ -86,6 +92,8 @@ namespace CandyShop
                 ChocolateyBinary = this.ChocolateyBinary,
                 ChocolateyLogs = this.CholoateyLogFolder,
                 CleanShortcuts = this.CleanShortcuts,
+                ElevateOnDemand = this.ElevateOnDemand,
+                SupressAdminWarning = this.SupressAdminWarning,
                 WingetMode = this.WingetMode,
                 ValidExitCodes = this.ValidExitCodes
             };
@@ -192,6 +200,8 @@ namespace CandyShop
             ChocolateyBinary = content.ChocolateyBinary;
             CholoateyLogFolder = content.ChocolateyLogs;
             CleanShortcuts = content.CleanShortcuts;
+            ElevateOnDemand = content.ElevateOnDemand;
+            SupressAdminWarning = content.SupressAdminWarning;
             WingetMode = content.WingetMode;
             ValidExitCodes = content.ValidExitCodes;
         }

@@ -48,13 +48,11 @@ namespace CandyShop.View
         public void ShowAdminHints()
         {
             UpgradePage.ShowAdminWarning = true;
-            this.Text = AppTitle + LocaleEN.TEXT_NO_ADMIN_HINT_SHORT;
         }
 
         public void ClearAdminHints()
         {
             UpgradePage.ShowAdminWarning = false;
-            this.Text = AppTitle;
         }
 
         private void ChocoAutoUpdateForm_Load(object sender, EventArgs e)

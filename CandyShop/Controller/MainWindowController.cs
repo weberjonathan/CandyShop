@@ -37,8 +37,10 @@ namespace CandyShop.Controller
 
             MainView.CreateTaskEnabled = WindowsTaskService.LaunchTaskExists();
 
-            if (CandyShopContext.HasAdminPrivileges) MainView.ClearAdminHints();
-            else MainView.ShowAdminHints();
+            if (!CandyShopContext.HasAdminPrivileges && !CandyShopContext.ElevateOnDemand && !CandyShopContext.SupressAdminWarning)
+                MainView.ShowAdminHints();
+            else
+                MainView.ClearAdminHints();
 
             // exit application on 'X'
             MainView.ToForm().FormClosed += new FormClosedEventHandler((sender, e) =>

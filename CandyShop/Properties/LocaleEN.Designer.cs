@@ -169,7 +169,7 @@ namespace CandyShop.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Candy Shop does not have administrator privileges. Proceed with caution!.
+        ///   Looks up a localized string similar to Chocolatey will be executed without administrator privileges. To hide this warning, enable the property &apos;SuppressAdminWarning&apos;. If elevated privileges are required, launch CandyShop as administrator or enable the property &apos;ElevateOnDemand&apos;..
         /// </summary>
         internal static string TEXT_NO_ADMIN_HINT {
             get {
