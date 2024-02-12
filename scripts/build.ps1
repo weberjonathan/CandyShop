@@ -60,25 +60,25 @@ Write-Host
 
 # admin / no admin
 Write-Host "Always require admin privileges on launch?"
-Write-Host "[1] Yes. (Default)"
-Write-Host "[2] No."
+Write-Host "[1] Yes."
+Write-Host "[2] No. (Default)"
 $option_NoAdmin = $null
 while ($option_NoAdmin -ne "13" -and $option_NoAdmin -ne "49" -and $option_NoAdmin -ne "50") {
     $option_NoAdmin = $Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown').VirtualKeyCode
     # VirtualKeyCodes: 13 => Enter, 49 => 1, 50 => 2
 }
 
-if ($option_NoAdmin -eq "50")
+if ($option_NoAdmin -eq "49")
 {
-    Write-Host "Your selection: 2"
-    Move-Item "$PROJECT_DIR/CandyShop/app.manifest" "$PROJECT_DIR/CandyShop/app.manifest.admin"
-    Move-Item "$PROJECT_DIR/CandyShop/app.manifest.noadmin" "$PROJECT_DIR/CandyShop/app.manifest"
-    $option_NoAdmin = $true;
+    Write-Host "Your selection: 1"
+	Move-Item "$PROJECT_DIR/CandyShop/app.manifest" "$PROJECT_DIR/CandyShop/app.manifest.noadmin"
+    Move-Item "$PROJECT_DIR/CandyShop/app.manifest.admin" "$PROJECT_DIR/CandyShop/app.manifest"
+    $option_NoAdmin = $false;
 }
 else
 {
-    Write-Host "Your selection: 1 (Default)"
-    $option_NoAdmin = $false;
+    Write-Host "Your selection: 2 (Default)"
+    $option_NoAdmin = $true;
 }
 
 # clean old files
@@ -100,9 +100,9 @@ if (Test-Path "$PROJECT_DIR/build/CandyShop.pdb")
 {
     Remove-Item "$PROJECT_DIR/build/CandyShop.pdb"
 }
-if ($option_NoAdmin) {
-    Move-Item "$PROJECT_DIR/CandyShop/app.manifest" "$PROJECT_DIR/CandyShop/app.manifest.noadmin"
-    Move-Item "$PROJECT_DIR/CandyShop/app.manifest.admin" "$PROJECT_DIR/CandyShop/app.manifest"
+if (-Not ($option_NoAdmin)) {
+    Move-Item "$PROJECT_DIR/CandyShop/app.manifest" "$PROJECT_DIR/CandyShop/app.manifest.admin"
+    Move-Item "$PROJECT_DIR/CandyShop/app.manifest.noadmin" "$PROJECT_DIR/CandyShop/app.manifest"
 }
 Write-Host "Done."
 
