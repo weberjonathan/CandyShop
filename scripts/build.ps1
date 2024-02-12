@@ -81,6 +81,9 @@ else
     $option_NoAdmin = $true;
 }
 
+Write-Host -NoNewLine 'Press any key to continue...';
+$key = $Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown');
+
 # clean old files
 if (Test-Path "$PROJECT_DIR/build")
 {
