@@ -31,6 +31,27 @@ namespace CandyShop.View
             BtnUpgradeAll.Click += new EventHandler((sender, e) => { UpgradeAllClick?.Invoke(this, e); });
             BtnUpgradeSelected.Click += new EventHandler((sender, e) => { UpgradeSelectedClick?.Invoke(this, e); });
             BtnCancel.Click += new EventHandler((sender, e) => { CancelClick?.Invoke(this, e); });
+            BtnHideWarning.Click += new EventHandler((sender, e) =>
+            {
+                var result = MessageBox.Show("Always hide this warning?",
+                    Application.ProductName,
+                    MessageBoxButtons.YesNoCancel,
+                    MessageBoxIcon.Question,
+                    MessageBoxDefaultButton.Button2);
+
+                switch (result)
+                {
+                    case DialogResult.Yes:
+                        ShowAdminWarning = false;
+                        AlwaysHideAdminWarningClicked?.Invoke(this, e);
+                        break;
+                    case DialogResult.No:
+                        ShowAdminWarning = false;
+                        break;
+                    default:
+                        break;
+                }
+            });
 
             // context menu
             if (!ContextSingleton.Get.WingetMode)
@@ -62,6 +83,7 @@ namespace CandyShop.View
         public event EventHandler CancelClick;
         public event EventHandler CleanShortcutsChanged;
         public event EventHandler CheckTopLevelClicked;
+        public event EventHandler AlwaysHideAdminWarningClicked;
 
         public string[] Items
         {

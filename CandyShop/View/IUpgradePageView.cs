@@ -16,6 +16,7 @@ namespace CandyShop.View
         event EventHandler CancelClick;
         event EventHandler CleanShortcutsChanged;
         public event EventHandler CheckTopLevelClicked;
+        public event EventHandler AlwaysHideAdminWarningClicked;
 
         public event EventHandler<PinnedChangedArgs> PinnedChanged;
 

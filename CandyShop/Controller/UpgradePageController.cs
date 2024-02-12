@@ -65,6 +65,11 @@ namespace CandyShop.Controller
                 CheckTopLevelPackages();
             });
 
+            View.AlwaysHideAdminWarningClicked += new EventHandler((sender, e) =>
+            {
+                Context.SupressAdminWarning = true;
+            });
+
             // update UI if is properties file is updated
             Context.OnPropertiesFileChanged(() =>
             {

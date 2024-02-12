@@ -33,7 +33,9 @@ namespace CandyShop.View
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(UpgradePage));
             this.LblAdmin = new System.Windows.Forms.Label();
             this.PanelTop = new System.Windows.Forms.Panel();
+            this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.BtnHideWarning = new System.Windows.Forms.LinkLabel();
             this.BtnUpgradeSelected = new System.Windows.Forms.Button();
             this.BtnUpgradeAll = new System.Windows.Forms.Button();
             this.BtnCancel = new System.Windows.Forms.Button();
@@ -47,22 +49,25 @@ namespace CandyShop.View
             this.colPinned = new System.Windows.Forms.ColumnHeader();
             this.LblLoading = new System.Windows.Forms.Label();
             this.PanelTop.SuspendLayout();
+            this.tableLayoutPanel1.SuspendLayout();
             this.panel2.SuspendLayout();
             this.SuspendLayout();
             // 
             // LblAdmin
             // 
-            this.LblAdmin.Location = new System.Drawing.Point(47, 7);
+            this.LblAdmin.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.LblAdmin.Location = new System.Drawing.Point(19, 0);
             this.LblAdmin.Name = "LblAdmin";
-            this.LblAdmin.Size = new System.Drawing.Size(571, 53);
+            this.LblAdmin.Padding = new System.Windows.Forms.Padding(5, 0, 0, 0);
+            this.LblAdmin.Size = new System.Drawing.Size(575, 68);
             this.LblAdmin.TabIndex = 0;
             this.LblAdmin.Text = "Candy Shop does not have administrator privileges. Proceed with caution!";
+            this.LblAdmin.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // PanelTop
             // 
             this.PanelTop.BackColor = System.Drawing.SystemColors.Info;
-            this.PanelTop.Controls.Add(this.panel1);
-            this.PanelTop.Controls.Add(this.LblAdmin);
+            this.PanelTop.Controls.Add(this.tableLayoutPanel1);
             this.PanelTop.Dock = System.Windows.Forms.DockStyle.Top;
             this.PanelTop.Location = new System.Drawing.Point(0, 0);
             this.PanelTop.Name = "PanelTop";
@@ -70,15 +75,46 @@ namespace CandyShop.View
             this.PanelTop.TabIndex = 2;
             this.PanelTop.Visible = false;
             // 
+            // tableLayoutPanel1
+            // 
+            this.tableLayoutPanel1.ColumnCount = 3;
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 16F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 40F));
+            this.tableLayoutPanel1.Controls.Add(this.panel1, 0, 0);
+            this.tableLayoutPanel1.Controls.Add(this.BtnHideWarning, 2, 0);
+            this.tableLayoutPanel1.Controls.Add(this.LblAdmin, 1, 0);
+            this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
+            this.tableLayoutPanel1.Name = "tableLayoutPanel1";
+            this.tableLayoutPanel1.RowCount = 1;
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(637, 68);
+            this.tableLayoutPanel1.TabIndex = 3;
+            // 
             // panel1
             // 
             this.panel1.BackColor = System.Drawing.SystemColors.Info;
             this.panel1.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("panel1.BackgroundImage")));
-            this.panel1.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-            this.panel1.Location = new System.Drawing.Point(22, 28);
+            this.panel1.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
+            this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panel1.Location = new System.Drawing.Point(0, 0);
+            this.panel1.Margin = new System.Windows.Forms.Padding(0);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(16, 16);
+            this.panel1.Size = new System.Drawing.Size(16, 68);
             this.panel1.TabIndex = 1;
+            // 
+            // BtnHideWarning
+            // 
+            this.BtnHideWarning.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            this.BtnHideWarning.AutoSize = true;
+            this.BtnHideWarning.Location = new System.Drawing.Point(602, 26);
+            this.BtnHideWarning.Name = "BtnHideWarning";
+            this.BtnHideWarning.Size = new System.Drawing.Size(32, 15);
+            this.BtnHideWarning.TabIndex = 2;
+            this.BtnHideWarning.TabStop = true;
+            this.BtnHideWarning.Text = "&Hide";
+            this.BtnHideWarning.TextAlign = System.Drawing.ContentAlignment.TopRight;
             // 
             // BtnUpgradeSelected
             // 
@@ -206,6 +242,8 @@ namespace CandyShop.View
             this.Name = "UpgradePage";
             this.Size = new System.Drawing.Size(637, 533);
             this.PanelTop.ResumeLayout(false);
+            this.tableLayoutPanel1.ResumeLayout(false);
+            this.tableLayoutPanel1.PerformLayout();
             this.panel2.ResumeLayout(false);
             this.panel2.PerformLayout();
             this.ResumeLayout(false);
@@ -229,5 +267,7 @@ namespace CandyShop.View
         private System.Windows.Forms.Label LblLoading;
         private System.Windows.Forms.CheckBox CheckDeleteShortcuts;
         private System.Windows.Forms.Label LblSelected;
+        private System.Windows.Forms.LinkLabel BtnHideWarning;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
     }
 }
