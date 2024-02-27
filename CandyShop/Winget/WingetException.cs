@@ -9,8 +9,5 @@
         public WingetException() { }
         public WingetException(string message) : base(message) { }
         public WingetException(string message, System.Exception inner) : base(message, inner) { }
-        protected WingetException(
-          System.Runtime.Serialization.SerializationInfo info,
-          System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
     }
 }
