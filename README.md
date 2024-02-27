@@ -14,11 +14,14 @@ __[Visit the gallery.](/docs/gallery.md)__
 * Automatically remove shortcuts from your desktop that are created during the Chocolatey upgrade process
 
 ## Prerequisites
-- .NET Core 3.1 runtime
-- Chocolatey installation (supports versions 1.x and 2.x)
-- gsudo (recommended)
+- Windows 10 or later
+- [.NET 8 runtime](https://dotnet.microsoft.com/en-us/download/dotnet/8.0)
+- [Chocolatey](https://chocolatey.org/) (versions 1.x and 2.x)
+- [gsudo](https://github.com/gerardog/gsudo) (recommended)
 
-The current build was tested on Windows 10 Version 22H2 and with Chocolatey version 2.2.2. Note that gsudo in an optional dependency, but strongly recommended in order for the Chocolatey upgrade process to run with elevated privileges without Candy Shop being elevated itself. It may be installed by running `choco install gsudo`.
+Note that gsudo in an optional dependency, but strongly recommended in order for the Chocolatey upgrade process to run with elevated privileges without Candy Shop being elevated itself. It may be installed by running `choco install gsudo`.
+
+The current build was tested on Windows 10 Version 22H2 and with Chocolatey version 2.2.2. 
 
 ## Settings
 Configuration and log files are placed in `%localappdata%\CandyShop`. The configuration file `CandyShop.config` contains the following properties with their respective defaults:
@@ -59,11 +62,26 @@ You may need to adjust your PowerShell execution policies in order to run the bu
 
 Learn about the [dotnet publish](https://docs.microsoft.com/en-us/dotnet/core/tools/dotnet-publish) command for further build instructions.
 
-### Issues
+## Changelog
+
+### 0.7.0 (planned)
+
+- Replaced old notifications with modern, interactive notifications
+
+### 0.6.0
+
+- Moved to latest .NET LTS release (.NET 8)
+- This changes the requirements of the runtime version
+- Windows 10 is now considered the latest supported version
+
+### 0.5.0
+
+- Candy Shop no longer requires admin privileges by default, instead it prompts for elevated rights using `gsudo`
+
+## Issues
 * Once the notification is moved to the Windows 10 Action center it can no longer be clicked. Still, Candy Shop may be opened via the tray icon.
 
-### TODO
+## TODO
 * Search for and install new software
 * Evaluate modern Win10 notifications and WinUI 3
-* Target latest LTS .NET Core Runtime
 * Add support for winget
