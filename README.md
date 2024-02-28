@@ -1,6 +1,6 @@
 # Candy Shop
 ![CandyShop Example](/docs/example.jpg)
-<img src="/docs/upgrade.jpg" alt="upgrade view" height="184px"/>
+<img src="/docs/upgrade.jpg" alt="upgrade view" height="233px"/>
 
 _Candy Shop_ offers a lightweight user interface to manage installed _[Chocolatey](https://chocolatey.org/)_ packages, including alerts for outdated packages.
 
