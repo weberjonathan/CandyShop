@@ -68,6 +68,11 @@ Configuration and log files are placed in `%localappdata%\CandyShop`. The config
 
 - Candy Shop no longer requires admin privileges by default, instead it prompts for elevated rights using `gsudo`
 
+## Similar projects
+
+- [Chocolatey GUI](https://github.com/chocolatey/ChocolateyGUI)
+- [WingetUI](https://github.com/marticliment/WingetUI)
+
 ## TODO
 * Search for and install new software
 * Add support for winget
