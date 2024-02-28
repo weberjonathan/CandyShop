@@ -48,19 +48,8 @@ Configuration and log files are placed in `%localappdata%\CandyShop`. The config
 `--debug` is used to print debug level log messages to your log file.
 
 ## Build Instructions
-A build script is available at `.\CandyShop\scripts\build.ps1`.
 
-1. Make sure the .NET Core SDK 3.1 or higher is installed on your system or find and download it [here](https://dotnet.microsoft.com/download/dotnet/3.1). Launch a powershell console.
-1. Clone the repo: `git clone https://github.com/weberjonathan/CandyShop.git`
-2. Navigate to project root: `cd .\CandyShop\`
-3. Execute build script: `.\scripts\build.ps1`
-4. Locate executable in `\CandyShop\build\`
-
-The build script is interactive and asks, whether the runtime should be included in the build and whether launching CandyShop should always require administrator privileges, or not. Defaults are provided.
-
-You may need to adjust your PowerShell execution policies in order to run the build script. Learn more about this topic [here](https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_execution_policies?view=powershell-7.2).
-
-Learn about the [dotnet publish](https://docs.microsoft.com/en-us/dotnet/core/tools/dotnet-publish) command for further build instructions.
+- [dotnet publish](https://docs.microsoft.com/en-us/dotnet/core/tools/dotnet-publish)
 
 ## Changelog
 
