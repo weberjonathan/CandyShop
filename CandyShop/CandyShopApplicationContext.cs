@@ -41,12 +41,16 @@ namespace CandyShop
             upgradePageController.InjectViews(mainPage, upgradePage);
             candyShopController.InjectView(mainPage);
 
+            // declare notification handler, so if needed, it lives during the entire lifecycle
+            NotificationShowHandler notifificationHandler;
+
             // launch with form or in tray
             if (context.LaunchedMinimized)
             {
+                notifificationHandler = new();
                 // creates a tray icon, displays a notification if outdated packages
                 // are found and opens the upgrade UI on click
-                RunInBackground(candyShopController, packageService);
+                RunInBackground(candyShopController, packageService, notifificationHandler);
             }
             else
             {
@@ -68,7 +72,7 @@ namespace CandyShop
             }
         }
 
-        private async void RunInBackground(MainWindowController controller, IPackageService service)
+        private async void RunInBackground(MainWindowController controller, IPackageService service, NotificationShowHandler notifificationHandler)
         {
             List<GenericPackage> packages = null;
 
@@ -108,7 +112,6 @@ namespace CandyShop
                 Program.Exit();
             }
 
-            NotificationShowHandler notifificationHandler = new();
             var result = await notifificationHandler.AwaitResult();
             if (result.Equals(NotificationResult.Show))
             {
