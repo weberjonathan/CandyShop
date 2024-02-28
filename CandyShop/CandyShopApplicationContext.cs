@@ -50,7 +50,7 @@ namespace CandyShop
                 notifificationHandler = new();
                 // creates a tray icon, displays a notification if outdated packages
                 // are found and opens the upgrade UI on click
-                RunInBackground(candyShopController, packageService, notifificationHandler);
+                RunInBackground(candyShopController, packageService, context, notifificationHandler);
             }
             else
             {
@@ -72,7 +72,7 @@ namespace CandyShop
             }
         }
 
-        private async void RunInBackground(MainWindowController controller, IPackageService service, NotificationShowHandler notifificationHandler)
+        private async void RunInBackground(MainWindowController controller, IPackageService service, CandyShopContext context, NotificationShowHandler notifificationHandler)
         {
             List<GenericPackage> packages = null;
 
@@ -91,7 +91,7 @@ namespace CandyShop
             {
                 icon.BalloonTipIcon = ToolTipIcon.Error;
                 icon.Text = Application.ProductName;
-                icon.BalloonTipTitle = String.Format(LocaleEN.TEXT_APP_TITLE, Application.ProductName, Application.ProductVersion);
+                icon.BalloonTipTitle = String.Format(LocaleEN.TEXT_APP_TITLE, Application.ProductName, context.ApplicationVersion);
                 icon.BalloonTipText = String.Format(LocaleEN.ERROR_RETRIEVING_OUTDATED_PACKAGES, e.Message);
                 icon.ShowBalloonTip(2000);
                 Program.Exit();

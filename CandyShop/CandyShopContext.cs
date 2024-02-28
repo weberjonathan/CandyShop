@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using System.Security.Principal;
 using System.Text.Json;
 using System.Threading;
@@ -43,6 +44,10 @@ namespace CandyShop
 
         public CandyShopContext()
         {
+            var v = Assembly.GetExecutingAssembly().GetName().Version;
+            ApplicationVersion = $"{v.Major}.{v.Minor}.{v.Build}";
+
+
             if (!Directory.Exists(_AppDataDir)) Directory.CreateDirectory(_AppDataDir);
 
             using (WindowsIdentity identity = WindowsIdentity.GetCurrent())
@@ -60,6 +65,8 @@ namespace CandyShop
         public string LogFilepath => _LogFilepath;
 
         public bool HasAdminPrivileges { get; set; } = false;
+
+        public string ApplicationVersion { get; private set; }
 
         // ----------------- set through arguments -----------------
 

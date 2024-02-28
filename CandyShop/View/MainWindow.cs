@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using System.Windows.Forms;
 using CandyShop.Controller;
 using CandyShop.Properties;
@@ -11,17 +12,11 @@ namespace CandyShop.View
     partial class MainWindow : Form, IMainWindowView
     {
         private MainWindowController Controller;
-        private readonly string AppTitle = String.Format(LocaleEN.TEXT_APP_TITLE,
-                                                         Application.ProductName,
-                                                         ContextSingleton.Get.WingetMode ? "Winget" : "Chocolatey",
-                                                         Application.ProductVersion);
 
         public MainWindow(MainWindowController candyShopController)
         {
             Controller = candyShopController;
             InitializeComponent();
-
-            Text = AppTitle;
         }
 
         public IInstalledPageView InstalledPackagesPage => InstalledPage;

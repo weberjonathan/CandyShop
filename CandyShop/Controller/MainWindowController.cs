@@ -1,15 +1,10 @@
-﻿using CandyShop.Chocolatey;
-using CandyShop.Properties;
+﻿using CandyShop.Properties;
 using CandyShop.Services;
 using CandyShop.View;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace CandyShop.Controller
@@ -47,6 +42,11 @@ namespace CandyShop.Controller
             {
                 Program.Exit();
             });
+
+            // set app title
+            string provider = ContextSingleton.Get.WingetMode ? "Winget" : "Chocolatey";
+            string title = String.Format(LocaleEN.TEXT_APP_TITLE, Application.ProductName, provider, CandyShopContext.ApplicationVersion);
+            MainView.ToForm().Text = title;
 
             MainView.ToForm().Show();
         }
