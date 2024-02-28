@@ -18,7 +18,7 @@ namespace CandyShop
     {
         public CandyShopApplicationContext(CandyShopContext context)
         {
-            Log.Debug("--- Launching CandyShop ---");
+            Log.Information("--- Launching CandyShop ---");
 
             //
             string cwd = Directory.GetParent(Process.GetCurrentProcess().MainModule.FileName).FullName;

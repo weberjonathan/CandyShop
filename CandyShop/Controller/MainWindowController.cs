@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Windows.Forms;
+using Serilog;
 
 namespace CandyShop.Controller
 {
@@ -28,6 +29,8 @@ namespace CandyShop.Controller
 
         public void InitView()
         {
+            Log.Information("Initializing UI");
+
             if (MainView == null) throw new InvalidOperationException("Set a view before intialising it!");
 
             MainView.CreateTaskEnabled = WindowsTaskService.IsLaunchOnStartup();

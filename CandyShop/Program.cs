@@ -15,7 +15,7 @@ namespace CandyShop
         {
             context?.StopPropertiesFileWatcher();
             context?.SaveProperties();
-            Log.Debug("--- Shutting down ---");
+            Log.Information("Shutting down");
             Environment.Exit(code);
         }
 

@@ -139,7 +139,7 @@ namespace CandyShop
 
             _ConfigFileWatcher.Changed += new FileSystemEventHandler((sender, e) =>
             {
-                Log.Information("Invoked changed event");
+                Log.Information("Changes in config file detected.");
                 timer.Change(500, Timeout.Infinite);
             });
         }
