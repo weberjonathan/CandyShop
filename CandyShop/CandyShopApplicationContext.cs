@@ -160,16 +160,39 @@ namespace CandyShop
             var uri = new Uri("file:///%localappdata%/CandyShop/CandyShop.png");
 
             var builder = new AppNotificationBuilder()
+                // TODO locale
                 .AddText($"{packageCount} {(ContextSingleton.Get.WingetMode ? "Winget" : "Chocolatey")} package{(packageCount == 1 ? " is" : "s are")} outdated.") // TODO locale
                 .AddButton(new AppNotificationButton("More details")
                     .AddArgument("action", "show"))
                 .AddButton(new AppNotificationButton("Ignore")
                     .AddArgument("action", "ignore"));
 
-            // TODO extract from resources if it does not
             var p = uri.LocalPath[1..];
             p = Environment.ExpandEnvironmentVariables(p);
             p = Path.GetFullPath(p);
+            if (!File.Exists(p))
+            {
+                FileStream fs = null;
+                try
+                {
+                    fs = new(p, FileMode.OpenOrCreate, FileAccess.Write, FileShare.Read);
+                    Resources.CandyShop.Save(fs, System.Drawing.Imaging.ImageFormat.Png);
+                    fs.Close();
+                }
+                catch (Exception e)
+                {
+                    Log.Error($"Failed to store notification thumbnail at \"{p}\": {e.Message}");
+                }
+                finally
+                {
+                    if (fs != null)
+                    {
+                        fs.Close();
+                        fs.Dispose();
+                    }
+                }
+            }
+
             if (File.Exists(p))
                 builder.SetAppLogoOverride(uri, AppNotificationImageCrop.Default, "CandyShop");
 
