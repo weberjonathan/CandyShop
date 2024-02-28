@@ -53,10 +53,11 @@ Configuration and log files are placed in `%localappdata%\CandyShop`. The config
 
 ## Changelog
 
-### 0.7.0
+### 0.8.0
 
-- Replaced old notifications with modern, interactive notifications
-- Requires Windows App SDK, which comes preinstalled with Windows 10 version 1809
+- Replaced old notifications with modern, interactive notifications using Windows App SDK
+- 'start with system' now uses a shortcut in the startup folder instead of Windows task scheduler
+- The legacy task can be removed through the prompt at program launch
 
 ### 0.6.0
 
