@@ -18,9 +18,14 @@
     <Copyright>(c) 2020-2024 Jonathan Weber</Copyright>
     <TargetPlatformVersion>10.0.17763.0</TargetPlatformVersion>
     <SupportedOSPlatformVersion>10.0.17763.0</SupportedOSPlatformVersion>
+    <!-- requirements for notifications -->
+    <RuntimeIdentifiers>win-x86;win-x64;win-arm64</RuntimeIdentifiers>
+    <WindowsPackageType>None</WindowsPackageType>
+    <!-- / -->
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.4.240211001" />
     <PackageReference Include="Serilog" Version="2.10.0" />
     <PackageReference Include="Serilog.Sinks.Console" Version="4.0.1" />
     <PackageReference Include="Serilog.Sinks.Debug" Version="2.0.0" />
