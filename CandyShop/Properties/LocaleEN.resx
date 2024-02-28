@@ -129,6 +129,18 @@
   <data name="ERROR_UPGRADING_OUTDATED_PACKAGES" xml:space="preserve">
     <value>Error upgrading outdated packages: {0}</value>
   </data>
+  <data name="NOT_IGNORE" xml:space="preserve">
+    <value>Ignore</value>
+  </data>
+  <data name="NOT_SHOW" xml:space="preserve">
+    <value>Show more</value>
+  </data>
+  <data name="NOT_TEXT_MULTI" xml:space="preserve">
+    <value>{0} {1} packages are outdated.</value>
+  </data>
+  <data name="NOT_TEXT_SINGLE" xml:space="preserve">
+    <value>{0} {1} package is outdated.</value>
+  </data>
   <data name="TEXT_APP_TITLE" xml:space="preserve">
     <value>{0} ({1}) v{2}</value>
   </data>

@@ -159,12 +159,13 @@ namespace CandyShop
 
             var uri = new Uri("file:///%localappdata%/CandyShop/CandyShop.png");
 
+            string text = packageCount == 1 ? LocaleEN.NOT_TEXT_SINGLE : LocaleEN.NOT_TEXT_MULTI;
+            string provider = ContextSingleton.Get.WingetMode ? "Winget" : "Chocolatey";
             var builder = new AppNotificationBuilder()
-                // TODO locale
-                .AddText($"{packageCount} {(ContextSingleton.Get.WingetMode ? "Winget" : "Chocolatey")} package{(packageCount == 1 ? " is" : "s are")} outdated.") // TODO locale
-                .AddButton(new AppNotificationButton("More details")
+                .AddText(string.Format(text, packageCount, provider))
+                .AddButton(new AppNotificationButton(LocaleEN.NOT_SHOW)
                     .AddArgument("action", "show"))
-                .AddButton(new AppNotificationButton("Ignore")
+                .AddButton(new AppNotificationButton(LocaleEN.NOT_IGNORE)
                     .AddArgument("action", "ignore"));
 
             var p = uri.LocalPath[1..];

@@ -19,7 +19,7 @@ namespace CandyShop.Properties {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class LocaleEN {
@@ -93,6 +93,42 @@ namespace CandyShop.Properties {
         internal static string ERROR_UPGRADING_OUTDATED_PACKAGES {
             get {
                 return ResourceManager.GetString("ERROR_UPGRADING_OUTDATED_PACKAGES", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ignore.
+        /// </summary>
+        internal static string NOT_IGNORE {
+            get {
+                return ResourceManager.GetString("NOT_IGNORE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Show more.
+        /// </summary>
+        internal static string NOT_SHOW {
+            get {
+                return ResourceManager.GetString("NOT_SHOW", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} {1} packages are outdated..
+        /// </summary>
+        internal static string NOT_TEXT_MULTI {
+            get {
+                return ResourceManager.GetString("NOT_TEXT_MULTI", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} {1} package is outdated..
+        /// </summary>
+        internal static string NOT_TEXT_SINGLE {
+            get {
+                return ResourceManager.GetString("NOT_TEXT_SINGLE", resourceCulture);
             }
         }
         
