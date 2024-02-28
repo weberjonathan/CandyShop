@@ -1,6 +1,6 @@
 # Candy Shop
 ![CandyShop Example](/docs/example.jpg)
-<img src="/docs/upgrade.jpg" alt="upgrade view" height="184px"/>
+<img src="/docs/upgrade.jpg" alt="upgrade view" height="233px"/>
 
 _Candy Shop_ offers a lightweight user interface to manage installed _[Chocolatey](https://chocolatey.org/)_ packages, including alerts for outdated packages.
 
@@ -67,6 +67,11 @@ Configuration and log files are placed in `%localappdata%\CandyShop`. The config
 ### 0.5.0
 
 - Candy Shop no longer requires admin privileges by default, instead it prompts for elevated rights using `gsudo`
+
+## Similar projects
+
+- [Chocolatey GUI](https://github.com/chocolatey/ChocolateyGUI)
+- [WingetUI](https://github.com/marticliment/WingetUI)
 
 ## TODO
 * Search for and install new software
