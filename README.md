@@ -14,7 +14,7 @@ __[Visit the gallery.](/docs/gallery.md)__
 * Automatically remove shortcuts from your desktop that are created during the Chocolatey upgrade process
 
 ## Prerequisites
-- Windows 10 or later
+- Windows 10, version 1809 or later
 - [.NET 8 runtime](https://dotnet.microsoft.com/en-us/download/dotnet/8.0)
 - [Chocolatey](https://chocolatey.org/) (versions 1.x and 2.x)
 - [gsudo](https://github.com/gerardog/gsudo) (recommended)
@@ -40,7 +40,7 @@ Configuration and log files are placed in `%localappdata%\CandyShop`. The config
 - `ElevateOnDemand`: When activated, `gsudo` is used to attempt to elevate the Chocolatey upgrade process. Note that running Candy Shop with administrator privileges renders this setting obsolete.
 - `ValidExitCodes`: Depending on the configuration of Chocolatey and the package in question, some non-zero exit codes when upgrading packages should be considered valid. This setting provides sensible defaults and allows further customization.
 - `CleanShortcuts`: If this setting is enabled, Candy Shops watches the Desktop for new shortcuts, that are created during an active upgrade process, and attempts to delete them.
-- `WingetMode`: Experimental.
+- `WingetMode`: Experimental and non-functional.
 
 ## Command line arguments
 `--background`, `-b` is used to launch silently and notify when outdated packages are available.
@@ -53,9 +53,10 @@ Configuration and log files are placed in `%localappdata%\CandyShop`. The config
 
 ## Changelog
 
-### 0.7.0 (planned)
+### 0.7.0
 
 - Replaced old notifications with modern, interactive notifications
+- Requires Windows App SDK, which comes preinstalled with Windows 10 version 1809
 
 ### 0.6.0
 
@@ -67,10 +68,6 @@ Configuration and log files are placed in `%localappdata%\CandyShop`. The config
 
 - Candy Shop no longer requires admin privileges by default, instead it prompts for elevated rights using `gsudo`
 
-## Issues
-* Once the notification is moved to the Windows 10 Action center it can no longer be clicked. Still, Candy Shop may be opened via the tray icon.
-
 ## TODO
 * Search for and install new software
-* Evaluate modern Win10 notifications and WinUI 3
 * Add support for winget
