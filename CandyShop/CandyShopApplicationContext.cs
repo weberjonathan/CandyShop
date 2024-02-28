@@ -7,6 +7,9 @@ using System.Windows.Forms;
 using CandyShop.Controller;
 using CandyShop.Services;
 using Serilog;
+using Microsoft.Windows.AppNotifications.Builder;
+using Microsoft.Windows.AppNotifications;
+using System.IO;
 
 namespace CandyShop
 {
@@ -76,6 +79,9 @@ namespace CandyShop
             try
             {
                 packages = await service.GetOutdatedPackagesAsync();
+                // dummy for testing
+                //packages = new List<GenericPackage>();
+                //packages.Add(new GenericPackage(new ChocolateyPackage()));
             }
             catch (ChocolateyException e)
             {
@@ -88,20 +94,25 @@ namespace CandyShop
             }
 
             // create click handlers
-            icon.BalloonTipClicked += new EventHandler((sender, e) =>
-            {
-                controller.InitView();
-            });
-
             icon.MouseClick += new MouseEventHandler((sender, e) =>
             {
                 controller.InitView();
             });
 
-
             if (packages.Count > 0)
             {
                 ShowNotification(packages.Count, icon);
+            }
+            else
+            {
+                Program.Exit();
+            }
+
+            NotificationShowHandler notifificationHandler = new();
+            var result = await notifificationHandler.AwaitResult();
+            if (result.Equals(NotificationResult.Show))
+            {
+                controller.InitView();
             }
             else
             {
@@ -124,7 +135,6 @@ namespace CandyShop
             // Initialize Tray Icon
             NotifyIcon rtn = new NotifyIcon()
             {
-                // Icon = Resources.AppIcon,
                 Icon = Resources.IconNew,
                 Visible = true,
                 ContextMenuStrip = contextMenu
@@ -141,10 +151,31 @@ namespace CandyShop
 
         private void ShowNotification(int packageCount, NotifyIcon icon)
         {
-            icon.BalloonTipIcon = ToolTipIcon.Info;
-            icon.BalloonTipTitle = $"{packageCount} {(ContextSingleton.Get.WingetMode ? "Winget" : "Chocolatey")} package{(packageCount == 1 ? " is" : "s are")} outdated.";
-            icon.BalloonTipText = $"To upgrade click here or the tray icon later.";
-            icon.ShowBalloonTip(2000);
+            if (!AppNotificationManager.IsSupported())
+            {
+                Log.Warning("AppNotificationManager is not supported. Is the Windows App SDK runtime available?");
+                return;
+            }
+
+            var uri = new Uri("file:///%localappdata%/CandyShop/CandyShop.png");
+
+            var builder = new AppNotificationBuilder()
+                .AddText($"{packageCount} {(ContextSingleton.Get.WingetMode ? "Winget" : "Chocolatey")} package{(packageCount == 1 ? " is" : "s are")} outdated.") // TODO locale
+                .AddButton(new AppNotificationButton("More details")
+                    .AddArgument("action", "show"))
+                .AddButton(new AppNotificationButton("Ignore")
+                    .AddArgument("action", "ignore"));
+
+            // TODO extract from resources if it does not
+            var p = uri.LocalPath[1..];
+            p = Environment.ExpandEnvironmentVariables(p);
+            p = Path.GetFullPath(p);
+            if (File.Exists(p))
+                builder.SetAppLogoOverride(uri, AppNotificationImageCrop.Default, "CandyShop");
+
+            var notific = builder.BuildNotification();
+            notific.ExpiresOnReboot = true;
+            AppNotificationManager.Default.Show(notific);
         }
     }
 }
