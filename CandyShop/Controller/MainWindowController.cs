@@ -11,11 +11,11 @@ namespace CandyShop.Controller
 {
     internal class MainWindowController
     {
-        private readonly WindowsTaskService WindowsTaskService;
+        private readonly SystemStartService WindowsTaskService;
         private readonly CandyShopContext CandyShopContext;
         private IMainWindowView MainView;
 
-        public MainWindowController(WindowsTaskService windowsTaskService, CandyShopContext candyShopContext)
+        public MainWindowController(SystemStartService windowsTaskService, CandyShopContext candyShopContext)
         {
             WindowsTaskService = windowsTaskService;
             CandyShopContext = candyShopContext;
@@ -30,7 +30,7 @@ namespace CandyShop.Controller
         {
             if (MainView == null) throw new InvalidOperationException("Set a view before intialising it!");
 
-            MainView.CreateTaskEnabled = WindowsTaskService.LaunchTaskExists();
+            MainView.CreateTaskEnabled = WindowsTaskService.IsLaunchOnStartup();
 
             if (!CandyShopContext.HasAdminPrivileges && !CandyShopContext.ElevateOnDemand && !CandyShopContext.SupressAdminWarning)
                 MainView.ShowAdminHints();
@@ -69,16 +69,16 @@ namespace CandyShop.Controller
 
         public void ToggleCreateTask()
         {
-            if (!MainView.CreateTaskEnabled && !WindowsTaskService.LaunchTaskExists())
+            if (!MainView.CreateTaskEnabled && !WindowsTaskService.IsLaunchOnStartup())
             {
-                WindowsTaskService.CreateLaunchTask();
+                WindowsTaskService.RegisterOnStartup();
                 MainView.CreateTaskEnabled = true;
             }
-            else if (MainView.CreateTaskEnabled && WindowsTaskService.LaunchTaskExists())
+            else if (MainView.CreateTaskEnabled && WindowsTaskService.IsLaunchOnStartup())
             {
                 try
                 {
-                    WindowsTaskService.RemoveLaunchTask();
+                    WindowsTaskService.UnregisterOnStartup();
                 }
                 catch (CandyShopException)
                 {
@@ -86,7 +86,7 @@ namespace CandyShop.Controller
                 }
             }
 
-            MainView.CreateTaskEnabled = WindowsTaskService.LaunchTaskExists();
+            MainView.CreateTaskEnabled = WindowsTaskService.IsLaunchOnStartup();
         }
 
         public void ShowChocoLogFolder()

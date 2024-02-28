@@ -8,22 +8,33 @@
     <UseWindowsForms>true</UseWindowsForms>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <PackageId>Candy Shop</PackageId>
-    <Version>0.7.2</Version>
+    <Version>0.8.0</Version>
     <Authors>Jonathan Weber</Authors>
     <Product>Candy Shop</Product>
     <AssemblyName>CandyShop</AssemblyName>
     <RootNamespace>CandyShop</RootNamespace>
     <StartupObject>CandyShop.Program</StartupObject>
     <ApplicationIcon>Resources\IconNew.ico</ApplicationIcon>
-    <AssemblyVersion>0.7.2.0</AssemblyVersion>
-    <FileVersion>0.7.2.0</FileVersion>
+    <AssemblyVersion>0.8.0.0</AssemblyVersion>
+    <FileVersion>0.8.0.0</FileVersion>
     <Copyright>(c) 2020-2024 Jonathan Weber</Copyright>
     <SupportedOSPlatformVersion>10.0.18362.0</SupportedOSPlatformVersion>
     <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
     <WindowsPackageType>None</WindowsPackageType>
-    <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
     <Platforms>x64</Platforms>
   </PropertyGroup>
+
+  <ItemGroup>
+    <COMReference Include="IWshRuntimeLibrary">
+      <WrapperTool>tlbimp</WrapperTool>
+      <VersionMinor>0</VersionMinor>
+      <VersionMajor>1</VersionMajor>
+      <Guid>f935dc20-1cf0-11d0-adb9-00c04fd58a0b</Guid>
+      <Lcid>0</Lcid>
+      <Isolated>false</Isolated>
+      <EmbedInteropTypes>true</EmbedInteropTypes>
+    </COMReference>
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.4.240211001" />
