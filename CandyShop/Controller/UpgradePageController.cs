@@ -33,7 +33,9 @@ namespace CandyShop.Controller
             
             View.PinnedChanged += new EventHandler<PinnedChangedArgs>((sender, e) => TogglePin(e.Name));
             View.CleanShortcutsChanged += new EventHandler((sender, e) => Context.CleanShortcuts = View.CleanShortcuts);
+            View.CloseAfterUpgradeChanged += new EventHandler((sender, e) => Context.CloseAfterUpgrade = View.CloseAfterUpgrade);
             View.CleanShortcuts = Context.CleanShortcuts;
+            View.CloseAfterUpgrade = Context.CloseAfterUpgrade;
 
             View.UpgradeAllClick += new EventHandler((sender, e) =>
             {
@@ -77,8 +79,13 @@ namespace CandyShop.Controller
                 {
                     View.CleanShortcuts = isChecked;
                 };
+                Action<bool> closeAfterDelegate = isChecked =>
+                {
+                    View.CloseAfterUpgrade = isChecked;
+                };
                 var ctrl = (System.Windows.Forms.Control)View;
                 ctrl.Invoke(checkDelegate, Context.CleanShortcuts);
+                ctrl.Invoke(closeAfterDelegate, Context.CloseAfterUpgrade);
                 // TODO message with require restart depending on the property
             });
 
@@ -165,9 +172,7 @@ namespace CandyShop.Controller
                 ShortcutService?.DeleteShortcuts(shortcuts);
             }
 
-            // close application if no outdated packages remain
-            var remainingPackages = await PackageService.GetOutdatedPackagesAsync();
-            if (remainingPackages.Count == 0)
+            if (Context.CloseAfterUpgrade)
             {
                 MainWindow?.ToForm().Dispose();
                 Program.Exit();

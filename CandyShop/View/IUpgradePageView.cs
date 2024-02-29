@@ -15,6 +15,7 @@ namespace CandyShop.View
         event EventHandler UpgradeSelectedClick;
         event EventHandler CancelClick;
         event EventHandler CleanShortcutsChanged;
+        event EventHandler CloseAfterUpgradeChanged;
         public event EventHandler CheckTopLevelClicked;
         public event EventHandler AlwaysHideAdminWarningClicked;
 
@@ -24,6 +25,7 @@ namespace CandyShop.View
         string[] SelectedItems { get; }
         bool ShowAdminWarning { get; set; }
         bool CleanShortcuts { get; set; }
+        bool CloseAfterUpgrade { get; set; }
         bool Loading { get; set; }
 
         void AddItem(string[] data);

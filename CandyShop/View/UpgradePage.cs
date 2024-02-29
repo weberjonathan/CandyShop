@@ -82,6 +82,7 @@ namespace CandyShop.View
         public event EventHandler UpgradeSelectedClick;
         public event EventHandler CancelClick;
         public event EventHandler CleanShortcutsChanged;
+        public event EventHandler CloseAfterUpgradeChanged;
         public event EventHandler CheckTopLevelClicked;
         public event EventHandler AlwaysHideAdminWarningClicked;
 
@@ -98,9 +99,11 @@ namespace CandyShop.View
                 return rtn;
             }
         }
-        
-        public string[] SelectedItems {
-            get {
+
+        public string[] SelectedItems
+        {
+            get
+            {
                 string[] rtn = new string[LstPackages.CheckedItems.Count];
                 for (int i = 0; i < rtn.Length; i++)
                 {
@@ -132,6 +135,18 @@ namespace CandyShop.View
             set
             {
                 CheckDeleteShortcuts.Checked = value;
+            }
+        }
+
+        public bool CloseAfterUpgrade
+        {
+            get
+            {
+                return CheckCloseAfterUpgrade.Checked;
+            }
+            set
+            {
+                CheckCloseAfterUpgrade.Checked = value;
             }
         }
 
@@ -199,7 +214,7 @@ namespace CandyShop.View
         {
             bool pinned = Boolean.Parse(e.Item.SubItems[3].Text);
             if (pinned) e.Item.Checked = false;
-            
+
             LblSelected.Text = String.Format(LocaleEN.TEXT_SELECTED_PACKAGE_COUNT, LstPackages.CheckedItems.Count);
         }
 
@@ -217,6 +232,11 @@ namespace CandyShop.View
         private void CheckDeleteShortcuts_CheckedChanged(object sender, EventArgs e)
         {
             CleanShortcutsChanged?.Invoke(sender, e);
+        }
+
+        private void CheckCloseAfterUpgrade_CheckedChanged(object sender, EventArgs e)
+        {
+            CloseAfterUpgradeChanged?.Invoke(sender, e);
         }
 
         private void ApplyPinnedStyle(ListViewItem item, bool pinned)
