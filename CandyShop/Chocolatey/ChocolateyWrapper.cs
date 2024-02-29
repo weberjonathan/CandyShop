@@ -193,7 +193,7 @@ namespace CandyShop.Chocolatey
         public static int Pin(string name, string version)
         {
             // choco pin add --name="'git'" --version="'1.2.3'"
-            ChocolateyProcess p = ProcessFactory.Choco($"pin add --name=\"{name}\" --version=\"{version}\"");
+            ChocolateyProcess p = ProcessFactory.ChocoPrivileged($"pin add --name=\"{name}\" --version=\"{version}\"");
             p.ExecuteHidden();
             return p.ExitCode;
         }
@@ -201,7 +201,7 @@ namespace CandyShop.Chocolatey
         /// <exception cref="ChocolateyException"></exception>
         public static int Unpin(string name)
         {
-            ChocolateyProcess p = ProcessFactory.Choco($"pin remove --name=\"{name}\"");
+            ChocolateyProcess p = ProcessFactory.ChocoPrivileged($"pin remove --name=\"{name}\"");
             p.ExecuteHidden();
             return p.ExitCode;
         }

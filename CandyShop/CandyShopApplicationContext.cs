@@ -22,7 +22,7 @@ namespace CandyShop
 
             //
             string cwd = Directory.GetParent(Process.GetCurrentProcess().MainModule.FileName).FullName;
-            Log.Debug($"Current working directory: {cwd}");
+            Log.Debug($"cwd: {cwd}; elevated: {context.HasAdminPrivileges}; elevateOnDemand: {context.ElevateOnDemand}; debug: {context.DebugEnabled}");
 
             // init services
             IPackageService packageService;

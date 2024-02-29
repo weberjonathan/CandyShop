@@ -56,6 +56,7 @@ namespace CandyShop.Services
         /// <exception cref="ChocolateyException"></exception>
         public async Task PinAsync(GenericPackage package)
         {
+            Log.Information($"Attempting to pin package {package.Name}.");
             int exitCode = await Task.Run(() => ChocolateyWrapper.Pin(package.Name, package.CurrVer));
             Log.Debug($"choco add pin operation for {package.Name} returned with {exitCode}.");
             if (exitCode != 0)
@@ -70,6 +71,7 @@ namespace CandyShop.Services
         /// <exception cref="ChocolateyException"></exception>
         public async Task UnpinAsync(GenericPackage package)
         {
+            Log.Information($"Attempting to unpin package {package.Name}.");
             int exitCode = await Task.Run(() => ChocolateyWrapper.Unpin(package.Name));
             Log.Debug($"choco pin remove operation for {package.Name} returned with {exitCode}.");
             if (exitCode != 0)
