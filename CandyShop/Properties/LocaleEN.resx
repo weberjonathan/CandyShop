@@ -130,7 +130,9 @@
     <value>Failed to retrieve package details: {0}</value>
   </data>
   <data name="ERROR_UPGRADING_OUTDATED_PACKAGES" xml:space="preserve">
-    <value>Error upgrading outdated packages: {0}</value>
+    <value>Error upgrading outdated packages: {0}.
+
+Hint: Check the output in the Candy Shop console window before continuing, or see the Chocolatey logs. (The log folder is available through the Extras menu.)</value>
   </data>
   <data name="NOT_IGNORE" xml:space="preserve">
     <value>Ignore</value>

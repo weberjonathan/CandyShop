@@ -83,6 +83,7 @@ namespace CandyShop.Services
             await UpdateCachedItem(package);
         }
 
+        /// <exception cref="ChocolateyException"></exception>
         public void Upgrade(string[] names)
         {
             List<ChocolateyPackage> chocoPackages = GetChocoPackagesByName(names.ToList());
@@ -90,6 +91,9 @@ namespace CandyShop.Services
             {
                 Upgrade(chocoPackages, ContextSingleton.Get.ValidExitCodes.ToArray());
             }
+
+            // TODO consider proper validation phase; -> running choco outdated again
+            names.ToList().ForEach(name => OutdatedPckgCache.Remove(name));
         }
 
         // --------------------------------------------------------------------
