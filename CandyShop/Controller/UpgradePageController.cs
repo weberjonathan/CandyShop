@@ -81,11 +81,9 @@ namespace CandyShop.Controller
                 ctrl.Invoke(checkDelegate, Context.CleanShortcuts);
                 // TODO message with require restart depending on the property
             });
-
-            UpdateOutdatedPackageListAsync();
         }
 
-        private async void UpdateOutdatedPackageListAsync()
+        public async void UpdateOutdatedPackageDisplayAsync()
         {
             List<GenericPackage> packages = new List<GenericPackage>();
             try

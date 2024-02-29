@@ -28,12 +28,7 @@ namespace CandyShop.Controller
             View.SelectedItemChanged += OnSelectedItemChanged;
         }
 
-        public void InitView()
-        {
-            RequestInstalledPackagesAsync();
-        }
-
-        private async void RequestInstalledPackagesAsync()
+        public async void UpdateInstalledPackagesDisplayAsync()
         {
             List<GenericPackage> packages = new List<GenericPackage>();
             try

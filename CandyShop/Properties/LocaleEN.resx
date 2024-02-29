@@ -123,6 +123,9 @@
   <data name="ERROR_DISABLED_START_WITH_SYSTEM" xml:space="preserve">
     <value>Failed to disable Candy Shop launch with system start.</value>
   </data>
+  <data name="ERROR_RETRIEVING_INSTALLED_PACKAGES" xml:space="preserve">
+    <value>Failed to retrieve installed packages: {0}</value>
+  </data>
   <data name="ERROR_RETRIEVING_OUTDATED_PACKAGES" xml:space="preserve">
     <value>Failed to retrieve outdated packages: {0}</value>
   </data>

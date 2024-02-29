@@ -79,6 +79,15 @@ namespace CandyShop.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Failed to retrieve installed packages: {0}.
+        /// </summary>
+        internal static string ERROR_RETRIEVING_INSTALLED_PACKAGES {
+            get {
+                return ResourceManager.GetString("ERROR_RETRIEVING_INSTALLED_PACKAGES", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Failed to retrieve outdated packages: {0}.
         /// </summary>
         internal static string ERROR_RETRIEVING_OUTDATED_PACKAGES {
