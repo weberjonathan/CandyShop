@@ -2,7 +2,7 @@
 ![CandyShop Example](/docs/example.jpg)
 <img src="/docs/upgrade.jpg" alt="upgrade view" height="233px"/>
 
-_Candy Shop_ offers a lightweight user interface to manage installed _[Chocolatey](https://chocolatey.org/)_ packages, including alerts for outdated packages.
+_Candy Shop_ offers a simple user interface to manage installed _[Chocolatey](https://chocolatey.org/)_ packages and notifies about outdated packages, if desired.
 
 __[Visit the gallery.](/docs/gallery.md)__
 
@@ -33,11 +33,13 @@ Configuration and log files are placed in `%localappdata%\CandyShop`. The config
   "CleanShortcuts": false,
   "ElevateOnDemand": true,
   "SupressAdminWarning": false,
+  "CloseAfterUpgrade": false,
   "ValidExitCodes": [ 0, 1641, 3010, 350, 1604 ]
 }
 ```
 
 - `ElevateOnDemand`: When activated, `gsudo` is used to attempt to elevate the Chocolatey upgrade process. Note that running Candy Shop with administrator privileges renders this setting obsolete.
+- `CloseAfterUpgrade`: If this is `true`, Candy Shop will terminate after upgrading packages, as long as the operation was successful. Otherwise, the main window will be shown again.
 - `ValidExitCodes`: Depending on the configuration of Chocolatey and the package in question, some non-zero exit codes when upgrading packages should be considered valid. This setting provides sensible defaults and allows further customization.
 - `CleanShortcuts`: If this setting is enabled, Candy Shops watches the Desktop for new shortcuts, that are created during an active upgrade process, and attempts to delete them.
 - `WingetMode`: Experimental and non-functional.
@@ -52,6 +54,13 @@ Configuration and log files are placed in `%localappdata%\CandyShop`. The config
 - [dotnet publish](https://docs.microsoft.com/en-us/dotnet/core/tools/dotnet-publish)
 
 ## Changelog
+
+### 0.9.0
+
+- Introduced property and UI element to customize shutdown behavior
+- The application no longer terminates after failed upgrades and instead redirects to the main window.
+- Fixed an error, where pinning was impossible because of missing admin privileges
+- Fixed an error, where installed packages were not loaded if Candy Shop was launched in the background
 
 ### 0.8.0
 

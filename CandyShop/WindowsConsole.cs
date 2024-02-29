@@ -9,6 +9,10 @@ namespace CandyShop
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool AllocConsole();
 
+        [DllImport("kernel32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool FreeConsole();
+
         [DllImport("kernel32.dll", ExactSpelling = true)]
         public static extern IntPtr GetConsoleWindow();
 
