@@ -70,6 +70,15 @@ namespace CandyShop.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Failed to disable Candy Shop launch with system start..
+        /// </summary>
+        internal static string ERROR_DISABLED_START_WITH_SYSTEM {
+            get {
+                return ResourceManager.GetString("ERROR_DISABLED_START_WITH_SYSTEM", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Failed to retrieve outdated packages: {0}.
         /// </summary>
         internal static string ERROR_RETRIEVING_OUTDATED_PACKAGES {

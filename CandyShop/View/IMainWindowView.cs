@@ -7,7 +7,7 @@ namespace CandyShop.View
     {
         IInstalledPageView InstalledPackagesPage { get; }
         IUpgradePageView UpgradePackagesPage { get; }
-        bool CreateTaskEnabled { get; set; }
+        bool LaunchOnSystemStartEnabled { get; set; }
 
         void DisplayError(string msg, params string[] args);
         void ClearAdminHints();

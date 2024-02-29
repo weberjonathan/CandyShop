@@ -28,11 +28,19 @@ namespace CandyShop.Services
             shortcut.Save();
         }
 
+        /// <exception cref="CandyShopException"></exception>
         public void UnregisterOnStartup()
         {
-            if (System.IO.File.Exists(SHORTCUT_PATH))
+            try
             {
-                System.IO.File.Delete(SHORTCUT_PATH);
+                if (System.IO.File.Exists(SHORTCUT_PATH))
+                {
+                    System.IO.File.Delete(SHORTCUT_PATH);
+                }
+            }
+            catch (Exception e)
+            {
+                throw new CandyShopException("Failed to remove startup shortcut.", e);
             }
         }
 

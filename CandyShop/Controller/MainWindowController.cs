@@ -33,7 +33,7 @@ namespace CandyShop.Controller
 
             if (MainView == null) throw new InvalidOperationException("Set a view before intialising it!");
 
-            MainView.CreateTaskEnabled = WindowsTaskService.IsLaunchOnStartup();
+            MainView.LaunchOnSystemStartEnabled = WindowsTaskService.IsLaunchOnStartup();
 
             if (!CandyShopContext.HasAdminPrivileges && !CandyShopContext.ElevateOnDemand && !CandyShopContext.SupressAdminWarning)
                 MainView.ShowAdminHints();
@@ -70,26 +70,27 @@ namespace CandyShop.Controller
             form.ShowDialog();
         }
 
-        public void ToggleCreateTask()
+        public void ToggleLaunchOnSystemStart()
         {
-            if (!MainView.CreateTaskEnabled && !WindowsTaskService.IsLaunchOnStartup())
+            if (!MainView.LaunchOnSystemStartEnabled && !WindowsTaskService.IsLaunchOnStartup())
             {
                 WindowsTaskService.RegisterOnStartup();
-                MainView.CreateTaskEnabled = true;
+                MainView.LaunchOnSystemStartEnabled = true;
             }
-            else if (MainView.CreateTaskEnabled && WindowsTaskService.IsLaunchOnStartup())
+            else if (MainView.LaunchOnSystemStartEnabled && WindowsTaskService.IsLaunchOnStartup())
             {
                 try
                 {
                     WindowsTaskService.UnregisterOnStartup();
                 }
-                catch (CandyShopException)
+                catch (CandyShopException e)
                 {
-                    MainView?.DisplayError("An error occurred while trying to delete the Windows task.");
+                    Log.Error($"Failed to disabled Candy Shop launch with system start: {e.Message}");
+                    MainView?.DisplayError(LocaleEN.ERROR_DISABLED_START_WITH_SYSTEM);
                 }
             }
 
-            MainView.CreateTaskEnabled = WindowsTaskService.IsLaunchOnStartup();
+            MainView.LaunchOnSystemStartEnabled = WindowsTaskService.IsLaunchOnStartup();
         }
 
         public void ShowChocoLogFolder()

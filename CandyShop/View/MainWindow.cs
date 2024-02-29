@@ -22,7 +22,7 @@ namespace CandyShop.View
         public IInstalledPageView InstalledPackagesPage => InstalledPage;
         public IUpgradePageView UpgradePackagesPage => UpgradePage;
 
-        public bool CreateTaskEnabled
+        public bool LaunchOnSystemStartEnabled
         {
             get
             {
@@ -87,7 +87,7 @@ namespace CandyShop.View
 
         private void MenuExtrasCreateTask_Click(object sender, EventArgs e)
         {
-            Controller.ToggleCreateTask();
+            Controller.ToggleLaunchOnSystemStart();
         }
 
         private void MenuExtrasOpenLogs_Click(object sender, EventArgs e)
