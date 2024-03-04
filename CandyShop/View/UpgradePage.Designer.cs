@@ -30,7 +30,6 @@ namespace CandyShop.View
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(UpgradePage));
             LblAdmin = new System.Windows.Forms.Label();
             PanelTop = new System.Windows.Forms.Panel();
             tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
@@ -96,7 +95,7 @@ namespace CandyShop.View
             // panel1
             // 
             panel1.BackColor = System.Drawing.SystemColors.Info;
-            panel1.BackgroundImage = (System.Drawing.Image)resources.GetObject("panel1.BackgroundImage");
+            panel1.BackgroundImage = Resources.ic_warn;
             panel1.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
             panel1.Dock = System.Windows.Forms.DockStyle.Fill;
             panel1.Location = new System.Drawing.Point(0, 0);

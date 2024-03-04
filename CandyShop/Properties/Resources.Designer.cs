@@ -131,6 +131,16 @@ namespace CandyShop.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap ic_warn {
+            get {
+                object obj = ResourceManager.GetObject("ic_warn", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
         internal static System.Drawing.Icon Icon {
@@ -147,16 +157,6 @@ namespace CandyShop.Properties {
             get {
                 object obj = ResourceManager.GetObject("IconNew", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap warn {
-            get {
-                object obj = ResourceManager.GetObject("warn", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
             }
         }
     }
