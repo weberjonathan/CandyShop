@@ -29,6 +29,7 @@ namespace CandyShop.View
         bool Loading { get; set; }
 
         void AddItem(string[] data);
+        void ClearItems();
         void CheckAllItems();
         void SetItemCheckState(string name, bool state);
         void UncheckAllItems();

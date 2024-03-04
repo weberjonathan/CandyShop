@@ -92,6 +92,9 @@ namespace CandyShop.Controller
 
         public async void UpdateOutdatedPackageDisplayAsync()
         {
+            View.Loading = true;
+            View.ClearItems();
+
             List<GenericPackage> packages = new List<GenericPackage>();
             try
             {
@@ -160,7 +163,10 @@ namespace CandyShop.Controller
             }
             Console.CursorVisible = false;
             Console.Write("\nPress any key to continue... ");
+            Console.CursorVisible = true;
             Console.ReadKey();
+            Log.Debug("Read key press after upgrading");
+            Console.Write("Closing terminal...");
 
             // delete shortcuts
             ShortcutService?.DisposeWatchers();
@@ -177,7 +183,10 @@ namespace CandyShop.Controller
             }
             else
             {
+                Log.Debug("Attempt to free console");
                 WindowsConsole.FreeConsole();
+                Log.Debug("Console freed successfully.");
+                UpdateOutdatedPackageDisplayAsync();
                 MainWindow?.ToForm().Show();
             }
         }

@@ -87,13 +87,23 @@ namespace CandyShop.Services
         public void Upgrade(string[] names)
         {
             List<ChocolateyPackage> chocoPackages = GetChocoPackagesByName(names.ToList());
-            if (chocoPackages.Count > 0)
+            if (chocoPackages.Count <= 0)
+            {
+                return;
+            }
+
+            try
             {
                 Upgrade(chocoPackages, ContextSingleton.Get.ValidExitCodes.ToArray());
             }
-
-            // TODO consider proper validation phase; -> running choco outdated again
-            names.ToList().ForEach(name => OutdatedPckgCache.Remove(name));
+            catch (ChocolateyException e)
+            {
+                throw new ChocolateyException(e.Message, e);
+            }
+            finally
+            {
+                OutdatedPckgCache.Clear();
+            }
         }
 
         // --------------------------------------------------------------------

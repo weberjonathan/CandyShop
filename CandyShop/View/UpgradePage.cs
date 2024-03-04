@@ -173,6 +173,11 @@ namespace CandyShop.View
             if (Loading) Loading = false;
         }
 
+        public void ClearItems()
+        {
+            LstPackages.Items.Clear();
+        }
+
         public void CheckAllItems()
         {
             foreach (ListViewItem item in LstPackages.Items)
