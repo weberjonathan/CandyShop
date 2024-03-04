@@ -182,6 +182,18 @@ Hint: Check the output in the Candy Shop console window before continuing, or se
   <data name="TEXT_SELECTED_PACKAGE_COUNT" xml:space="preserve">
     <value>Selected packages: {0}</value>
   </data>
+  <data name="TEXT_TS_DESELECT" xml:space="preserve">
+    <value>&amp;Deselect all</value>
+  </data>
+  <data name="TEXT_TS_REFRESH" xml:space="preserve">
+    <value>&amp;Refresh</value>
+  </data>
+  <data name="TEXT_TS_SELECT_ALL" xml:space="preserve">
+    <value>&amp;Select all</value>
+  </data>
+  <data name="TEXT_TS_SELECT_SMART" xml:space="preserve">
+    <value>Select &amp;top level packages</value>
+  </data>
   <data name="TEXT_UPGRADE_ALL" xml:space="preserve">
     <value>Upgrade &amp;All</value>
   </data>

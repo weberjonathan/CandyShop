@@ -36,6 +36,13 @@ namespace CandyShop.Services
             return chocoPackages.Select(p => new GenericPackage(p)).ToList();
         }
 
+        public async Task ClearOutdatedPackages()
+        {
+            await OutdatedPckgLock.WaitAsync().ConfigureAwait(false);
+            OutdatedPckgCache.Clear();
+            OutdatedPckgLock.Release();
+        }
+
         public async Task<string> GetPackageDetailsAsync(string name)
         {
             return await GetChocoPackageDetails(new ChocolateyPackage() { Name = name });
@@ -102,7 +109,7 @@ namespace CandyShop.Services
             }
             finally
             {
-                OutdatedPckgCache.Clear();
+                ClearOutdatedPackages(); // TODO this should be moved into async method
             }
         }
 

@@ -17,6 +17,15 @@ namespace CandyShop.View
         {
             Controller = candyShopController;
             InitializeComponent();
+            MenuEdit.Visible = false;
+            MenuEditSelectRelevant.Text = LocaleEN.TEXT_TS_SELECT_SMART;
+            MenuEditSelectAll.Text = LocaleEN.TEXT_TS_SELECT_ALL;
+            MenuEditDeselectAll.Text = LocaleEN.TEXT_TS_DESELECT;
+            MenuEditSelectRelevant.Visible = false;
+            MenuEditSelectAll.Visible = false;
+            MenuEditDeselectAll.Visible = false;
+
+            // TODO restore Edit menu and add refresh item
         }
 
         public IInstalledPageView InstalledPackagesPage => InstalledPage;

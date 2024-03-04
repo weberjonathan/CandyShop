@@ -13,6 +13,51 @@ namespace CandyShop.View
 
             PanelTop.Visible = false;
 
+            var tsRefresh = new ToolStripButton
+            {
+                Text = LocaleEN.TEXT_TS_REFRESH,
+                Image = Resources.ic_refresh,
+                DisplayStyle = ToolStripItemDisplayStyle.Image
+            };
+            tsRefresh.Click += new EventHandler((sender, e) => RefreshClicked?.Invoke(sender, e));
+
+            var tsSelectAll = new ToolStripButton
+            {
+                Text = LocaleEN.TEXT_TS_SELECT_ALL,
+                Image = Resources.ic_check_all,
+                DisplayStyle = ToolStripItemDisplayStyle.Image
+            };
+            tsSelectAll.Click += new EventHandler((sender, e) => CheckAllItems());
+
+            var tsSelectSmart = new ToolStripButton
+            {
+                Text = LocaleEN.TEXT_TS_SELECT_SMART,
+                Image = Resources.ic_check_smart,
+                DisplayStyle = ToolStripItemDisplayStyle.Image
+            };
+            tsSelectSmart.Click += new EventHandler((sender, e) => CheckTopLevelItems());
+
+            var tsDeselect = new ToolStripButton
+            {
+                Text = LocaleEN.TEXT_TS_DESELECT,
+                Image = Resources.ic_check_none,
+                DisplayStyle = ToolStripItemDisplayStyle.Image
+            };
+            tsDeselect.Click += new EventHandler((sender, e) => UncheckAllItems());
+
+            ToolStrip ts = new()
+            {
+                BackColor = SystemColors.Window,
+                GripStyle = ToolStripGripStyle.Hidden
+            };
+            ts.Items.Add(tsRefresh);
+            ts.Items.Add(new ToolStripSeparator());
+            ts.Items.Add(new ToolStripLabel("Select:"));
+            ts.Items.Add(tsSelectAll);
+            ts.Items.Add(tsSelectSmart);
+            ts.Items.Add(tsDeselect);
+            this.Controls.Add(ts);
+
             // labels
             BtnCancel.Text = LocaleEN.TEXT_CANCEL;
             BtnUpgradeSelected.Text = LocaleEN.TEXT_UPGRADE_SELECTED;
@@ -85,6 +130,7 @@ namespace CandyShop.View
         public event EventHandler CloseAfterUpgradeChanged;
         public event EventHandler CheckTopLevelClicked;
         public event EventHandler AlwaysHideAdminWarningClicked;
+        public event EventHandler RefreshClicked;
 
         public string[] Items
         {
@@ -161,6 +207,7 @@ namespace CandyShop.View
                 LblLoading.Visible = value;
                 BtnUpgradeSelected.Enabled = !value;
                 BtnUpgradeAll.Enabled = !value;
+                LblSelected.Visible = !value;
             }
         }
 

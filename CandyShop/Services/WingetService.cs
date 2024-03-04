@@ -37,6 +37,13 @@ namespace CandyShop.Services
             return chocoPackages.Select(p => new GenericPackage(p)).ToList();
         }
 
+        public async Task ClearOutdatedPackages()
+        {
+            await InstalledPckgLock.WaitAsync().ConfigureAwait(false);
+            InstalledPckgCache.Clear();
+            InstalledPckgLock.Release();
+        }
+
         public async Task<string> GetPackageDetailsAsync(string name)
         {
             var package = GetPackageByName(name);

@@ -252,6 +252,42 @@ namespace CandyShop.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &amp;Deselect all.
+        /// </summary>
+        internal static string TEXT_TS_DESELECT {
+            get {
+                return ResourceManager.GetString("TEXT_TS_DESELECT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &amp;Refresh.
+        /// </summary>
+        internal static string TEXT_TS_REFRESH {
+            get {
+                return ResourceManager.GetString("TEXT_TS_REFRESH", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &amp;Select all.
+        /// </summary>
+        internal static string TEXT_TS_SELECT_ALL {
+            get {
+                return ResourceManager.GetString("TEXT_TS_SELECT_ALL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select &amp;top level packages.
+        /// </summary>
+        internal static string TEXT_TS_SELECT_SMART {
+            get {
+                return ResourceManager.GetString("TEXT_TS_SELECT_SMART", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Upgrade &amp;All.
         /// </summary>
         internal static string TEXT_UPGRADE_ALL {

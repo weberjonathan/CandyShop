@@ -36,6 +36,7 @@ namespace CandyShop.Controller
             View.CloseAfterUpgradeChanged += new EventHandler((sender, e) => Context.CloseAfterUpgrade = View.CloseAfterUpgrade);
             View.CleanShortcuts = Context.CleanShortcuts;
             View.CloseAfterUpgrade = Context.CloseAfterUpgrade;
+            View.RefreshClicked += new EventHandler((sender, e) => UpdateOutdatedPackageDisplayAsync(forceFetch: true));
 
             View.UpgradeAllClick += new EventHandler((sender, e) =>
             {
@@ -90,10 +91,10 @@ namespace CandyShop.Controller
             });
         }
 
-        public async void UpdateOutdatedPackageDisplayAsync()
+        public async void UpdateOutdatedPackageDisplayAsync(bool forceFetch = false)
         {
             View.Loading = true;
-            View.ClearItems();
+            if (forceFetch) await PackageService.ClearOutdatedPackages();
 
             List<GenericPackage> packages = new List<GenericPackage>();
             try
@@ -105,8 +106,7 @@ namespace CandyShop.Controller
                 Log.Error(LocaleEN.ERROR_RETRIEVING_OUTDATED_PACKAGES, e.Message);
             }
 
-            View.Loading = false;
-
+            View.ClearItems();
             packages.ForEach(p => View.AddItem(new string[]
             {
                 p.Name,
