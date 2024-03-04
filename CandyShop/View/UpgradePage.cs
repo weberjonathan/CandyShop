@@ -102,6 +102,7 @@ namespace CandyShop.View
             if (!ContextSingleton.Get.WingetMode)
             {
                 var itemPin = new ToolStripMenuItem("&Pin package");
+                itemPin.Name = "Pin";
                 itemPin.Click += new EventHandler((sender, e) =>
                 {
                     if (LstPackages.SelectedItems.Count > 0)
@@ -208,6 +209,31 @@ namespace CandyShop.View
                 BtnUpgradeSelected.Enabled = !value;
                 BtnUpgradeAll.Enabled = !value;
                 LblSelected.Visible = !value;
+            }
+        }
+
+        public bool ShowUacIcons
+        {
+            get
+            {
+                return BtnUpgradeSelected.Image != null;
+            }
+            set
+            {
+                if (value)
+                {
+                    BtnUpgradeSelected.Image = Resources.ic_uac;
+                    BtnUpgradeAll.Image = Resources.ic_uac;
+                    var item = LstPackages.ContextMenuStrip.Items["Pin"];
+                    item.Image = Resources.ic_uac;
+                }
+                else
+                {
+                    BtnUpgradeSelected.Image = null;
+                    BtnUpgradeAll.Image = null;
+                    var item = LstPackages.ContextMenuStrip.Items["Pin"];
+                    item.Image = null;
+                }
             }
         }
 

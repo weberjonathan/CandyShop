@@ -28,6 +28,7 @@ namespace CandyShop.View
         bool CleanShortcuts { get; set; }
         bool CloseAfterUpgrade { get; set; }
         bool Loading { get; set; }
+        bool ShowUacIcons { get; set; }
 
         void AddItem(string[] data);
         void ClearItems();

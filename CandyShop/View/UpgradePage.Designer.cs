@@ -126,6 +126,7 @@ namespace CandyShop.View
             BtnUpgradeSelected.Size = new System.Drawing.Size(91, 23);
             BtnUpgradeSelected.TabIndex = 3;
             BtnUpgradeSelected.Text = "&Upgrade";
+            BtnUpgradeSelected.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             BtnUpgradeSelected.UseVisualStyleBackColor = true;
             // 
             // BtnUpgradeAll
@@ -137,6 +138,7 @@ namespace CandyShop.View
             BtnUpgradeAll.Size = new System.Drawing.Size(104, 23);
             BtnUpgradeAll.TabIndex = 2;
             BtnUpgradeAll.Text = "Upgrade &All";
+            BtnUpgradeAll.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             BtnUpgradeAll.UseVisualStyleBackColor = true;
             // 
             // BtnCancel
