@@ -279,6 +279,15 @@ namespace CandyShop.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Refresh &amp;installed only.
+        /// </summary>
+        internal static string TEXT_TS_REFRESH_INSTALLED {
+            get {
+                return ResourceManager.GetString("TEXT_TS_REFRESH_INSTALLED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to &amp;Select all.
         /// </summary>
         internal static string TEXT_TS_SELECT_ALL {

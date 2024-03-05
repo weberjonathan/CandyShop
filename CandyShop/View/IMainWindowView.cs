@@ -9,6 +9,8 @@ namespace CandyShop.View
         IUpgradePageView UpgradePackagesPage { get; }
         bool LaunchOnSystemStartEnabled { get; set; }
 
+        event EventHandler RefreshClicked;
+
         void DisplayError(string msg, params string[] args);
         void ClearAdminHints();
         void ShowAdminHints();

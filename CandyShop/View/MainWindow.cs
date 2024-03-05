@@ -17,16 +17,16 @@ namespace CandyShop.View
         {
             Controller = candyShopController;
             InitializeComponent();
-            MenuEdit.Visible = false;
             MenuEditSelectRelevant.Text = LocaleEN.TEXT_TS_SELECT_SMART;
             MenuEditSelectAll.Text = LocaleEN.TEXT_TS_SELECT_ALL;
             MenuEditDeselectAll.Text = LocaleEN.TEXT_TS_DESELECT;
-            MenuEditSelectRelevant.Visible = false;
-            MenuEditSelectAll.Visible = false;
-            MenuEditDeselectAll.Visible = false;
-
-            // TODO restore Edit menu and add refresh item
+            MenuEditRefresh.Text = LocaleEN.TEXT_TS_REFRESH;
+            MenuEditRefresh.Click += new EventHandler((sender, e) => RefreshClicked?.Invoke(sender, e));
+            MenuEditRefreshInstalled.Text = LocaleEN.TEXT_TS_REFRESH_INSTALLED;
+            MenuEditRefreshInstalled.Visible = false;
         }
+
+        public event EventHandler RefreshClicked;
 
         public IInstalledPageView InstalledPackagesPage => InstalledPage;
         public IUpgradePageView UpgradePackagesPage => UpgradePage;

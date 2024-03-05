@@ -37,6 +37,7 @@ namespace CandyShop.Controller
             View.CleanShortcuts = Context.CleanShortcuts;
             View.CloseAfterUpgrade = Context.CloseAfterUpgrade;
             View.RefreshClicked += new EventHandler((sender, e) => UpdateOutdatedPackageDisplayAsync(forceFetch: true));
+            MainWindow.RefreshClicked += new EventHandler((sender, e) => UpdateOutdatedPackageDisplayAsync(forceFetch: true));
 
             View.UpgradeAllClick += new EventHandler((sender, e) =>
             {

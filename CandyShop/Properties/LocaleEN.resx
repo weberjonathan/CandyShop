@@ -191,6 +191,9 @@ Hint: Check the output in the Candy Shop console window before continuing, or se
   <data name="TEXT_TS_REFRESH" xml:space="preserve">
     <value>&amp;Refresh</value>
   </data>
+  <data name="TEXT_TS_REFRESH_INSTALLED" xml:space="preserve">
+    <value>Refresh &amp;installed only</value>
+  </data>
   <data name="TEXT_TS_SELECT_ALL" xml:space="preserve">
     <value>&amp;Select all</value>
   </data>
