@@ -67,6 +67,7 @@ namespace CandyShop.Controller
         public void ShowLicenses()
         {
             using LicenseForm form = new LicenseForm();
+            form.LinkClicked += new LinkClickedEventHandler((sender, e) => OpenUrl(e.LinkText));
             form.ShowDialog();
         }
 

@@ -12,6 +12,13 @@ namespace CandyShop.View
             this.Text = String.Format(LocaleEN.TEXT_LICENSE_TITLE, Application.ProductName);
             RtfLicense.SelectedRtf = Resources.AllLicenses;
             RtfLicense.DeselectAll();
+
+            RtfLicense.LinkClicked += new LinkClickedEventHandler((sender, e) =>
+            {
+                LinkClicked?.Invoke(sender, e);
+            });
         }
+
+        public event LinkClickedEventHandler LinkClicked;
     }
 }
