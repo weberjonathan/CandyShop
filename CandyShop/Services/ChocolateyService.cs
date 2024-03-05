@@ -102,6 +102,7 @@ namespace CandyShop.Services
         public void Upgrade(string[] names)
         {
             List<ChocolateyPackage> chocoPackages = GetChocoPackagesByName(names.ToList());
+            chocoPackages = chocoPackages.Where(p => !p.Pinned.GetValueOrDefault(false)).ToList();
             if (chocoPackages.Count <= 0)
             {
                 return;
