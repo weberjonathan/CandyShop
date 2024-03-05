@@ -1,4 +1,4 @@
-﻿namespace CandyShop.View
+﻿namespace CandyShop.Controls
 {
     partial class Spinner
     {

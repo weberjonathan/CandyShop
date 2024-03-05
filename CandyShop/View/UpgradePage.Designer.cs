@@ -46,7 +46,7 @@ namespace CandyShop.View
             colCurrent = new System.Windows.Forms.ColumnHeader();
             colAvail = new System.Windows.Forms.ColumnHeader();
             colPinned = new System.Windows.Forms.ColumnHeader();
-            SpinnerCtl = new Spinner();
+            SpinnerCtl = new CandyShop.Controls.Spinner();
             PanelTop.SuspendLayout();
             tableLayoutPanel1.SuspendLayout();
             panel2.SuspendLayout();
@@ -262,6 +262,6 @@ namespace CandyShop.View
         private System.Windows.Forms.LinkLabel BtnHideWarning;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
         private System.Windows.Forms.CheckBox CheckCloseAfterUpgrade;
-        private Spinner SpinnerCtl;
+        private CandyShop.Controls.Spinner SpinnerCtl;
     }
 }

@@ -1,6 +1,6 @@
 ﻿using System.Windows.Forms;
 
-namespace CandyShop.View
+namespace CandyShop.Controls
 {
     public partial class Spinner : UserControl
     {
