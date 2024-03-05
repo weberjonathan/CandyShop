@@ -55,6 +55,12 @@ Configuration and log files are placed in `%localappdata%\CandyShop`. The config
 
 ## Changelog
 
+### 0.10.0
+
+- various UI improvements
+- added refresh functionality
+- returning to the main window after the upgrade no longer shows outdated states
+
 ### 0.9.0
 
 - Introduced property and UI element to customize shutdown behavior
