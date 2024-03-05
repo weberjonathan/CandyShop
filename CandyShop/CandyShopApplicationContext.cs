@@ -42,7 +42,7 @@ namespace CandyShop
             IMainWindowView mainPage = new MainWindow(candyShopController);
             IInstalledPageView installedPage = mainPage.InstalledPackagesPage;
             IUpgradePageView upgradePage = mainPage.UpgradePackagesPage;
-            installedPageController.InjectView(installedPage);
+            installedPageController.InjectView(mainPage, installedPage);
             upgradePageController.InjectViews(mainPage, upgradePage);
             candyShopController.InjectView(mainPage);
 

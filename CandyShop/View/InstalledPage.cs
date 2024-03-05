@@ -28,13 +28,6 @@ namespace CandyShop.View
                 CheckHideSuffixed.Visible = value;
                 _EnableTopLevelToggle = value;
                 ResizeSearchbar();
-
-                TextSearch.Click += new EventHandler((sender, e) =>
-                {
-                    var tset = LstPackages.Other.Items;
-                    var asdf = LstPackages.Other.Columns;
-                    Log.Information("test");
-                });
             }
         }
 
@@ -60,6 +53,8 @@ namespace CandyShop.View
             set
             {
                 LstPackages.Loading = value;
+                SplitContainer.Panel2Collapsed = true;
+                packageInfoBox1.Text = string.Empty;
             }
         }
 

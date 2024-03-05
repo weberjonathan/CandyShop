@@ -17,7 +17,7 @@ namespace CandyShop.Services
         private readonly SemaphoreSlim InstalledPckgLock = new SemaphoreSlim(1);
 
         // TODO use proper package repository instead
-        private readonly Dictionary<string, string> PckgDetailsCache = new Dictionary<string, string>();
+        private readonly Dictionary<string, string> PckgDetailsCache = new Dictionary<string, string>(); // TODO make thread-safe
         private readonly Dictionary<string, ChocolateyPackage> InstalledPckgCache = new Dictionary<string, ChocolateyPackage>();
         private readonly Dictionary<string, ChocolateyPackage> OutdatedPckgCache = new Dictionary<string, ChocolateyPackage>();
 
@@ -48,6 +48,7 @@ namespace CandyShop.Services
             await InstalledPckgLock.WaitAsync().ConfigureAwait(false);
             InstalledPckgCache.Clear();
             InstalledPckgLock.Release();
+            PckgDetailsCache.Clear();
         }
 
         public async Task<string> GetPackageDetailsAsync(string name)
@@ -117,6 +118,7 @@ namespace CandyShop.Services
             finally
             {
                 ClearOutdatedPackages(); // TODO this should be moved into async method
+                names.ToList().ForEach(name => PckgDetailsCache.Remove(name));
             }
         }
 

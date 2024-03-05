@@ -11,6 +11,7 @@ namespace CandyShop.Controller
     class InstalledPageController
     {
         private readonly IPackageService PackageService;
+        private IMainWindowView MainWindow;
         private IInstalledPageView View;
 
         public InstalledPageController(IPackageService service)
@@ -18,14 +19,16 @@ namespace CandyShop.Controller
             PackageService = service;
         }
 
-        public void InjectView(IInstalledPageView view)
+        public void InjectView(IMainWindowView mainWindow, IInstalledPageView view)
         {
+            MainWindow = mainWindow;
             View = view;
             View.EnableTopLevelToggle = !ContextSingleton.Get.WingetMode;
 
             View.FilterTextChanged += new EventHandler((sender, e) => SyncListView());
             View.ShowTopLevelOnlyChanged += new EventHandler((sender, e) => SyncListView());
             View.SelectedItemChanged += OnSelectedItemChanged;
+            MainWindow.RefreshClicked += new EventHandler((sender, e) => UpdateInstalledPackagesDisplayAsync(forceFetch: true));
         }
 
         public async void UpdateInstalledPackagesDisplayAsync(bool forceFetch = false)
