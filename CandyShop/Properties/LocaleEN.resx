@@ -173,6 +173,9 @@ Hint: Check the output in the Candy Shop console window before continuing, or se
   <data name="TEXT_LOADING" xml:space="preserve">
     <value>Loading ...</value>
   </data>
+  <data name="TEXT_LOADING_OUTDATED" xml:space="preserve">
+    <value>Searching for outdated packages</value>
+  </data>
   <data name="TEXT_NO_ADMIN_HINT" xml:space="preserve">
     <value>Chocolatey will be executed without administrator privileges. To hide this warning, enable the property 'SuppressAdminWarning'. If elevated privileges are required, launch CandyShop as administrator or enable the property 'ElevateOnDemand'.</value>
   </data>

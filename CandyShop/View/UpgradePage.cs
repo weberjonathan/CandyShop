@@ -10,9 +10,9 @@ namespace CandyShop.View
         public UpgradePage()
         {
             InitializeComponent();
-
             PanelTop.Visible = false;
 
+            // tool bar
             var tsRefresh = new ToolStripButton
             {
                 Text = LocaleEN.TEXT_TS_REFRESH,
@@ -63,7 +63,7 @@ namespace CandyShop.View
             BtnUpgradeSelected.Text = LocaleEN.TEXT_UPGRADE_SELECTED;
             BtnUpgradeAll.Text = LocaleEN.TEXT_UPGRADE_ALL;
             LblAdmin.Text = LocaleEN.TEXT_NO_ADMIN_HINT;
-            LblLoading.Text = LocaleEN.TEXT_LOADING;
+            SpinnerCtl.Text = LocaleEN.TEXT_LOADING_OUTDATED;
             LblSelected.Text = String.Empty;
             LstPackages.Columns[0].Text = LocaleEN.TEXT_COL_NAME;
             LstPackages.Columns[1].Text = LocaleEN.TEXT_COL_CURRENT;
@@ -201,11 +201,11 @@ namespace CandyShop.View
         {
             get
             {
-                return LblLoading.Visible;
+                return SpinnerCtl.Visible;
             }
             set
             {
-                LblLoading.Visible = value;
+                SpinnerCtl.Visible = value;
                 BtnUpgradeSelected.Enabled = !value;
                 BtnUpgradeAll.Enabled = !value;
                 LblSelected.Visible = !value;

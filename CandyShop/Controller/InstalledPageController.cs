@@ -52,7 +52,7 @@ namespace CandyShop.Controller
                 return;
             }
 
-            View.UpdateDetails(LocaleEN.TEXT_LOADING);
+            View.Loading = true;
 
             string name = View.SelectedItem;
             string details;

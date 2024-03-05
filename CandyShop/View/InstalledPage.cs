@@ -23,6 +23,8 @@ namespace CandyShop.View
             });
 
             this.Resize += new EventHandler((sender, e) => ResizeSearchbar());
+
+            SplitContainer.Panel2Collapsed = true;
         }
 
         public event EventHandler ShowTopLevelOnlyChanged;
@@ -53,6 +55,19 @@ namespace CandyShop.View
 
         public bool ShowTopLevelOnly => CheckHideSuffixed.Checked;
 
+        public bool Loading
+        {
+            get
+            {
+                return SpinnerDetails.Visible;
+            }
+            set
+            {
+                SpinnerDetails.Visible = value;
+                SplitContainer.Panel2Collapsed = false;
+            }
+        }
+
         public List<string> Items => LstPackages.Items
             .Cast<ListViewItem>()
             .Select(item => item.Text)
@@ -73,6 +88,7 @@ namespace CandyShop.View
         public void UpdateDetails(string details)
         {
             TxtDetails.Text = details;
+            Loading = false;
         }
 
         public void RemoveItem(string name)

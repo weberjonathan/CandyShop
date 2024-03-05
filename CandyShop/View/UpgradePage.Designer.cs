@@ -47,7 +47,7 @@ namespace CandyShop.View
             colCurrent = new System.Windows.Forms.ColumnHeader();
             colAvail = new System.Windows.Forms.ColumnHeader();
             colPinned = new System.Windows.Forms.ColumnHeader();
-            LblLoading = new System.Windows.Forms.Label();
+            SpinnerCtl = new Spinner();
             PanelTop.SuspendLayout();
             tableLayoutPanel1.SuspendLayout();
             panel2.SuspendLayout();
@@ -230,22 +230,19 @@ namespace CandyShop.View
             // 
             colPinned.Text = "Pinned";
             // 
-            // LblLoading
+            // spinner1
             // 
-            LblLoading.BackColor = System.Drawing.Color.Transparent;
-            LblLoading.Dock = System.Windows.Forms.DockStyle.Fill;
-            LblLoading.Location = new System.Drawing.Point(0, 68);
-            LblLoading.Name = "LblLoading";
-            LblLoading.Size = new System.Drawing.Size(637, 386);
-            LblLoading.TabIndex = 1;
-            LblLoading.Text = "Loading ...";
-            LblLoading.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            SpinnerCtl.Dock = System.Windows.Forms.DockStyle.Fill;
+            SpinnerCtl.Location = new System.Drawing.Point(0, 68);
+            SpinnerCtl.Name = "spinner1";
+            SpinnerCtl.Size = new System.Drawing.Size(637, 386);
+            SpinnerCtl.TabIndex = 4;
             // 
             // UpgradePage
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            Controls.Add(LblLoading);
+            Controls.Add(SpinnerCtl);
             Controls.Add(LstPackages);
             Controls.Add(PanelTop);
             Controls.Add(panel2);
@@ -273,11 +270,11 @@ namespace CandyShop.View
         private System.Windows.Forms.ColumnHeader colAvail;
         private System.Windows.Forms.ColumnHeader colPinned;
         private System.Windows.Forms.Panel panel1;
-        private System.Windows.Forms.Label LblLoading;
         private System.Windows.Forms.CheckBox CheckDeleteShortcuts;
         private System.Windows.Forms.Label LblSelected;
         private System.Windows.Forms.LinkLabel BtnHideWarning;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
         private System.Windows.Forms.CheckBox CheckCloseAfterUpgrade;
+        private Spinner SpinnerCtl;
     }
 }

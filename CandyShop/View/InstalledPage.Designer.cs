@@ -28,128 +28,135 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.LstPackages = new System.Windows.Forms.ListView();
-            this.colName = new System.Windows.Forms.ColumnHeader();
-            this.colVer = new System.Windows.Forms.ColumnHeader();
-            this.PanelTop = new System.Windows.Forms.Panel();
-            this.TextSearch = new System.Windows.Forms.TextBox();
-            this.CheckHideSuffixed = new System.Windows.Forms.CheckBox();
-            this.SplitContainer = new System.Windows.Forms.SplitContainer();
-            this.TxtDetails = new System.Windows.Forms.TextBox();
-            this.PanelTop.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.SplitContainer)).BeginInit();
-            this.SplitContainer.Panel1.SuspendLayout();
-            this.SplitContainer.Panel2.SuspendLayout();
-            this.SplitContainer.SuspendLayout();
-            this.SuspendLayout();
+            LstPackages = new System.Windows.Forms.ListView();
+            colName = new System.Windows.Forms.ColumnHeader();
+            colVer = new System.Windows.Forms.ColumnHeader();
+            PanelTop = new System.Windows.Forms.Panel();
+            TextSearch = new System.Windows.Forms.TextBox();
+            CheckHideSuffixed = new System.Windows.Forms.CheckBox();
+            SplitContainer = new System.Windows.Forms.SplitContainer();
+            TxtDetails = new System.Windows.Forms.TextBox();
+            SpinnerDetails = new Spinner();
+            PanelTop.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)SplitContainer).BeginInit();
+            SplitContainer.Panel1.SuspendLayout();
+            SplitContainer.Panel2.SuspendLayout();
+            SplitContainer.SuspendLayout();
+            SuspendLayout();
             // 
             // LstPackages
             // 
-            this.LstPackages.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.colName,
-            this.colVer});
-            this.LstPackages.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.LstPackages.FullRowSelect = true;
-            this.LstPackages.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
-            this.LstPackages.HideSelection = false;
-            this.LstPackages.Location = new System.Drawing.Point(0, 0);
-            this.LstPackages.Name = "LstPackages";
-            this.LstPackages.Size = new System.Drawing.Size(600, 250);
-            this.LstPackages.TabIndex = 0;
-            this.LstPackages.UseCompatibleStateImageBehavior = false;
-            this.LstPackages.View = System.Windows.Forms.View.Details;
-            this.LstPackages.SelectedIndexChanged += new System.EventHandler(this.LstPackages_SelectedIndexChanged);
+            LstPackages.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] { colName, colVer });
+            LstPackages.Dock = System.Windows.Forms.DockStyle.Fill;
+            LstPackages.FullRowSelect = true;
+            LstPackages.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
+            LstPackages.Location = new System.Drawing.Point(0, 0);
+            LstPackages.Name = "LstPackages";
+            LstPackages.Size = new System.Drawing.Size(600, 250);
+            LstPackages.TabIndex = 0;
+            LstPackages.UseCompatibleStateImageBehavior = false;
+            LstPackages.View = System.Windows.Forms.View.Details;
+            LstPackages.SelectedIndexChanged += LstPackages_SelectedIndexChanged;
             // 
             // colName
             // 
-            this.colName.Text = "Name";
+            colName.Text = "Name";
             // 
             // colVer
             // 
-            this.colVer.Text = "Version";
+            colVer.Text = "Version";
             // 
             // PanelTop
             // 
-            this.PanelTop.Controls.Add(this.TextSearch);
-            this.PanelTop.Controls.Add(this.CheckHideSuffixed);
-            this.PanelTop.Dock = System.Windows.Forms.DockStyle.Top;
-            this.PanelTop.Location = new System.Drawing.Point(0, 0);
-            this.PanelTop.Name = "PanelTop";
-            this.PanelTop.Size = new System.Drawing.Size(600, 44);
-            this.PanelTop.TabIndex = 1;
+            PanelTop.Controls.Add(TextSearch);
+            PanelTop.Controls.Add(CheckHideSuffixed);
+            PanelTop.Dock = System.Windows.Forms.DockStyle.Top;
+            PanelTop.Location = new System.Drawing.Point(0, 0);
+            PanelTop.Name = "PanelTop";
+            PanelTop.Size = new System.Drawing.Size(600, 44);
+            PanelTop.TabIndex = 1;
             // 
             // TextSearch
             // 
-            this.TextSearch.Location = new System.Drawing.Point(0, 13);
-            this.TextSearch.Name = "TextSearch";
-            this.TextSearch.PlaceholderText = "Search";
-            this.TextSearch.Size = new System.Drawing.Size(430, 23);
-            this.TextSearch.TabIndex = 1;
-            this.TextSearch.TextChanged += new System.EventHandler(this.TextSearch_TextChanged);
-            this.TextSearch.KeyDown += new System.Windows.Forms.KeyEventHandler(this.TextSearch_KeyDown);
+            TextSearch.Location = new System.Drawing.Point(0, 13);
+            TextSearch.Name = "TextSearch";
+            TextSearch.PlaceholderText = "Search";
+            TextSearch.Size = new System.Drawing.Size(430, 23);
+            TextSearch.TabIndex = 1;
+            TextSearch.TextChanged += TextSearch_TextChanged;
+            TextSearch.KeyDown += TextSearch_KeyDown;
             // 
             // CheckHideSuffixed
             // 
-            this.CheckHideSuffixed.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.CheckHideSuffixed.AutoSize = true;
-            this.CheckHideSuffixed.Checked = true;
-            this.CheckHideSuffixed.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.CheckHideSuffixed.Location = new System.Drawing.Point(452, 15);
-            this.CheckHideSuffixed.Name = "CheckHideSuffixed";
-            this.CheckHideSuffixed.Size = new System.Drawing.Size(136, 19);
-            this.CheckHideSuffixed.TabIndex = 0;
-            this.CheckHideSuffixed.Text = "&Show top plevel only";
-            this.CheckHideSuffixed.UseVisualStyleBackColor = true;
-            this.CheckHideSuffixed.CheckedChanged += new System.EventHandler(this.CheckHideSuffixed_CheckedChanged);
+            CheckHideSuffixed.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right;
+            CheckHideSuffixed.AutoSize = true;
+            CheckHideSuffixed.Checked = true;
+            CheckHideSuffixed.CheckState = System.Windows.Forms.CheckState.Checked;
+            CheckHideSuffixed.Location = new System.Drawing.Point(452, 15);
+            CheckHideSuffixed.Name = "CheckHideSuffixed";
+            CheckHideSuffixed.Size = new System.Drawing.Size(136, 19);
+            CheckHideSuffixed.TabIndex = 0;
+            CheckHideSuffixed.Text = "&Show top plevel only";
+            CheckHideSuffixed.UseVisualStyleBackColor = true;
+            CheckHideSuffixed.CheckedChanged += CheckHideSuffixed_CheckedChanged;
             // 
             // SplitContainer
             // 
-            this.SplitContainer.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.SplitContainer.FixedPanel = System.Windows.Forms.FixedPanel.Panel2;
-            this.SplitContainer.Location = new System.Drawing.Point(0, 44);
-            this.SplitContainer.Name = "SplitContainer";
-            this.SplitContainer.Orientation = System.Windows.Forms.Orientation.Horizontal;
+            SplitContainer.Dock = System.Windows.Forms.DockStyle.Fill;
+            SplitContainer.FixedPanel = System.Windows.Forms.FixedPanel.Panel2;
+            SplitContainer.Location = new System.Drawing.Point(0, 44);
+            SplitContainer.Name = "SplitContainer";
+            SplitContainer.Orientation = System.Windows.Forms.Orientation.Horizontal;
             // 
             // SplitContainer.Panel1
             // 
-            this.SplitContainer.Panel1.Controls.Add(this.LstPackages);
+            SplitContainer.Panel1.Controls.Add(LstPackages);
             // 
             // SplitContainer.Panel2
             // 
-            this.SplitContainer.Panel2.Controls.Add(this.TxtDetails);
-            this.SplitContainer.Size = new System.Drawing.Size(600, 408);
-            this.SplitContainer.SplitterDistance = 250;
-            this.SplitContainer.TabIndex = 2;
-            this.SplitContainer.Text = "splitContainer1";
+            SplitContainer.Panel2.Controls.Add(SpinnerDetails);
+            SplitContainer.Panel2.Controls.Add(TxtDetails);
+            SplitContainer.Size = new System.Drawing.Size(600, 408);
+            SplitContainer.SplitterDistance = 250;
+            SplitContainer.TabIndex = 2;
+            SplitContainer.Text = "splitContainer1";
             // 
             // TxtDetails
             // 
-            this.TxtDetails.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.TxtDetails.Location = new System.Drawing.Point(0, 0);
-            this.TxtDetails.Multiline = true;
-            this.TxtDetails.Name = "TxtDetails";
-            this.TxtDetails.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.TxtDetails.Size = new System.Drawing.Size(600, 154);
-            this.TxtDetails.TabIndex = 0;
-            this.TxtDetails.WordWrap = false;
+            TxtDetails.Dock = System.Windows.Forms.DockStyle.Fill;
+            TxtDetails.Location = new System.Drawing.Point(0, 0);
+            TxtDetails.Multiline = true;
+            TxtDetails.Name = "TxtDetails";
+            TxtDetails.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+            TxtDetails.Size = new System.Drawing.Size(600, 154);
+            TxtDetails.TabIndex = 0;
+            TxtDetails.WordWrap = false;
+            // 
+            // SpinnerDetails
+            // 
+            SpinnerDetails.Dock = System.Windows.Forms.DockStyle.Fill;
+            SpinnerDetails.Location = new System.Drawing.Point(0, 0);
+            SpinnerDetails.Margin = new System.Windows.Forms.Padding(20);
+            SpinnerDetails.Name = "SpinnerDetails";
+            SpinnerDetails.Size = new System.Drawing.Size(600, 154);
+            SpinnerDetails.TabIndex = 1;
             // 
             // InstalledPage
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.Controls.Add(this.SplitContainer);
-            this.Controls.Add(this.PanelTop);
-            this.Name = "InstalledPage";
-            this.Size = new System.Drawing.Size(600, 452);
-            this.PanelTop.ResumeLayout(false);
-            this.PanelTop.PerformLayout();
-            this.SplitContainer.Panel1.ResumeLayout(false);
-            this.SplitContainer.Panel2.ResumeLayout(false);
-            this.SplitContainer.Panel2.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.SplitContainer)).EndInit();
-            this.SplitContainer.ResumeLayout(false);
-            this.ResumeLayout(false);
-
+            AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
+            AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            Controls.Add(SplitContainer);
+            Controls.Add(PanelTop);
+            Name = "InstalledPage";
+            Size = new System.Drawing.Size(600, 452);
+            PanelTop.ResumeLayout(false);
+            PanelTop.PerformLayout();
+            SplitContainer.Panel1.ResumeLayout(false);
+            SplitContainer.Panel2.ResumeLayout(false);
+            SplitContainer.Panel2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)SplitContainer).EndInit();
+            SplitContainer.ResumeLayout(false);
+            ResumeLayout(false);
         }
 
         #endregion
@@ -162,5 +169,6 @@
         private System.Windows.Forms.TextBox TxtDetails;
         private System.Windows.Forms.CheckBox CheckHideSuffixed;
         private System.Windows.Forms.TextBox TextSearch;
+        private Spinner SpinnerDetails;
     }
 }

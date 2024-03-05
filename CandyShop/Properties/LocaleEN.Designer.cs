@@ -225,6 +225,15 @@ namespace CandyShop.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Searching for outdated packages.
+        /// </summary>
+        internal static string TEXT_LOADING_OUTDATED {
+            get {
+                return ResourceManager.GetString("TEXT_LOADING_OUTDATED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Chocolatey will be executed without administrator privileges. To hide this warning, enable the property &apos;SuppressAdminWarning&apos;. If elevated privileges are required, launch CandyShop as administrator or enable the property &apos;ElevateOnDemand&apos;..
         /// </summary>
         internal static string TEXT_NO_ADMIN_HINT {
