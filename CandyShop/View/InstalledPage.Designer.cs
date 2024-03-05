@@ -35,8 +35,7 @@
             TextSearch = new System.Windows.Forms.TextBox();
             CheckHideSuffixed = new System.Windows.Forms.CheckBox();
             SplitContainer = new System.Windows.Forms.SplitContainer();
-            TxtDetails = new System.Windows.Forms.TextBox();
-            SpinnerDetails = new Spinner();
+            packageInfoBox1 = new Controls.PackageInfoBox();
             PanelTop.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)SplitContainer).BeginInit();
             SplitContainer.Panel1.SuspendLayout();
@@ -52,7 +51,7 @@
             LstPackages.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
             LstPackages.Location = new System.Drawing.Point(0, 0);
             LstPackages.Name = "LstPackages";
-            LstPackages.Size = new System.Drawing.Size(600, 250);
+            LstPackages.Size = new System.Drawing.Size(600, 408);
             LstPackages.TabIndex = 0;
             LstPackages.UseCompatibleStateImageBehavior = false;
             LstPackages.View = System.Windows.Forms.View.Details;
@@ -114,32 +113,20 @@
             // 
             // SplitContainer.Panel2
             // 
-            SplitContainer.Panel2.Controls.Add(SpinnerDetails);
-            SplitContainer.Panel2.Controls.Add(TxtDetails);
+            SplitContainer.Panel2.Controls.Add(packageInfoBox1);
+            SplitContainer.Panel2Collapsed = true;
             SplitContainer.Size = new System.Drawing.Size(600, 408);
             SplitContainer.SplitterDistance = 250;
             SplitContainer.TabIndex = 2;
             SplitContainer.Text = "splitContainer1";
             // 
-            // TxtDetails
+            // packageInfoBox1
             // 
-            TxtDetails.Dock = System.Windows.Forms.DockStyle.Fill;
-            TxtDetails.Location = new System.Drawing.Point(0, 0);
-            TxtDetails.Multiline = true;
-            TxtDetails.Name = "TxtDetails";
-            TxtDetails.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            TxtDetails.Size = new System.Drawing.Size(600, 154);
-            TxtDetails.TabIndex = 0;
-            TxtDetails.WordWrap = false;
-            // 
-            // SpinnerDetails
-            // 
-            SpinnerDetails.Dock = System.Windows.Forms.DockStyle.Fill;
-            SpinnerDetails.Location = new System.Drawing.Point(0, 0);
-            SpinnerDetails.Margin = new System.Windows.Forms.Padding(20);
-            SpinnerDetails.Name = "SpinnerDetails";
-            SpinnerDetails.Size = new System.Drawing.Size(600, 154);
-            SpinnerDetails.TabIndex = 1;
+            packageInfoBox1.Dock = System.Windows.Forms.DockStyle.Fill;
+            packageInfoBox1.Location = new System.Drawing.Point(0, 0);
+            packageInfoBox1.Name = "packageInfoBox1";
+            packageInfoBox1.Size = new System.Drawing.Size(600, 154);
+            packageInfoBox1.TabIndex = 0;
             // 
             // InstalledPage
             // 
@@ -153,7 +140,6 @@
             PanelTop.PerformLayout();
             SplitContainer.Panel1.ResumeLayout(false);
             SplitContainer.Panel2.ResumeLayout(false);
-            SplitContainer.Panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)SplitContainer).EndInit();
             SplitContainer.ResumeLayout(false);
             ResumeLayout(false);
@@ -166,9 +152,8 @@
         private System.Windows.Forms.ColumnHeader colVer;
         private System.Windows.Forms.Panel PanelTop;
         private System.Windows.Forms.SplitContainer SplitContainer;
-        private System.Windows.Forms.TextBox TxtDetails;
         private System.Windows.Forms.CheckBox CheckHideSuffixed;
         private System.Windows.Forms.TextBox TextSearch;
-        private Spinner SpinnerDetails;
+        private Controls.PackageInfoBox packageInfoBox1;
     }
 }

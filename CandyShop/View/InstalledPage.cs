@@ -59,12 +59,15 @@ namespace CandyShop.View
         {
             get
             {
-                return SpinnerDetails.Visible;
+                return String.IsNullOrEmpty(packageInfoBox1.Text);
             }
             set
             {
-                SpinnerDetails.Visible = value;
-                SplitContainer.Panel2Collapsed = false;
+                packageInfoBox1.Loading = value;
+                if (value)
+                {
+                    SplitContainer.Panel2Collapsed = false;
+                }
             }
         }
 
@@ -87,7 +90,8 @@ namespace CandyShop.View
 
         public void UpdateDetails(string details)
         {
-            TxtDetails.Text = details;
+            packageInfoBox1.Text = details;
+            SplitContainer.Panel2Collapsed = false;
             Loading = false;
         }
 
