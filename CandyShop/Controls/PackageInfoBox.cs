@@ -1,60 +1,30 @@
-﻿using CandyShop.View;
-using System.Windows.Forms;
+﻿using System.Windows.Forms;
 
 namespace CandyShop.Controls
 {
-    public partial class PackageInfoBox : UserControl
+    public partial class PackageInfoBox : AbstractLoadingControl<TextBox>
     {
-        private readonly Spinner SpinnerCtl = new Spinner
-        {
-            Name = "Spinner",
-            Dock = DockStyle.Fill
-        };
-
-        private readonly TextBox TextBoxCtl = new TextBox()
-        {
-            Name = "Textbox",
-            Dock = DockStyle.Fill,
-            Multiline = true,
-            ScrollBars = ScrollBars.Both
-        };
-
         public PackageInfoBox()
         {
             InitializeComponent();
+            Other = new TextBox()
+            {
+                Name = "Textbox",
+                Dock = DockStyle.Fill,
+                Multiline = true,
+                ScrollBars = ScrollBars.Both
+            };
         }
 
         public override string Text
         {
             get
             {
-                return TextBoxCtl.Text;
+                return Other.Text;
             }
             set
             {
-                TextBoxCtl.Text = value;
-            }
-        }
-
-        public bool Loading
-        {
-            get
-            {
-                return Controls.ContainsKey(SpinnerCtl.Name);
-            }
-            set
-            {
-                if (value)
-                {
-                    Controls.Add(SpinnerCtl);
-                    Controls.Remove(TextBoxCtl);
-                    TextBoxCtl.Text = "";
-                }
-                else
-                {
-                    Controls.Add(TextBoxCtl);
-                    Controls.Remove(SpinnerCtl);
-                }
+                Other.Text = value;
             }
         }
     }

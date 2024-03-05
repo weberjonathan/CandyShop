@@ -51,7 +51,7 @@
             LstPackages.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
             LstPackages.Location = new System.Drawing.Point(0, 0);
             LstPackages.Name = "LstPackages";
-            LstPackages.Size = new System.Drawing.Size(600, 408);
+            LstPackages.Size = new System.Drawing.Size(600, 246);
             LstPackages.TabIndex = 0;
             LstPackages.UseCompatibleStateImageBehavior = false;
             LstPackages.View = System.Windows.Forms.View.Details;
@@ -114,18 +114,18 @@
             // SplitContainer.Panel2
             // 
             SplitContainer.Panel2.Controls.Add(packageInfoBox1);
-            SplitContainer.Panel2Collapsed = true;
             SplitContainer.Size = new System.Drawing.Size(600, 408);
-            SplitContainer.SplitterDistance = 250;
+            SplitContainer.SplitterDistance = 246;
             SplitContainer.TabIndex = 2;
             SplitContainer.Text = "splitContainer1";
             // 
             // packageInfoBox1
             // 
             packageInfoBox1.Dock = System.Windows.Forms.DockStyle.Fill;
+            packageInfoBox1.Loading = false;
             packageInfoBox1.Location = new System.Drawing.Point(0, 0);
             packageInfoBox1.Name = "packageInfoBox1";
-            packageInfoBox1.Size = new System.Drawing.Size(600, 154);
+            packageInfoBox1.Size = new System.Drawing.Size(600, 158);
             packageInfoBox1.TabIndex = 0;
             // 
             // InstalledPage

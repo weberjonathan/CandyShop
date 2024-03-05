@@ -1,4 +1,5 @@
-﻿using CandyShop.Properties;
+﻿using CandyShop.Controls;
+using CandyShop.Properties;
 
 namespace CandyShop.View
 {
@@ -41,12 +42,7 @@ namespace CandyShop.View
             CheckCloseAfterUpgrade = new System.Windows.Forms.CheckBox();
             LblSelected = new System.Windows.Forms.Label();
             CheckDeleteShortcuts = new System.Windows.Forms.CheckBox();
-            LstPackages = new System.Windows.Forms.ListView();
-            colName = new System.Windows.Forms.ColumnHeader();
-            colCurrent = new System.Windows.Forms.ColumnHeader();
-            colAvail = new System.Windows.Forms.ColumnHeader();
-            colPinned = new System.Windows.Forms.ColumnHeader();
-            SpinnerCtl = new CandyShop.Controls.Spinner();
+            LstPackages = new OutdatedPackageListBox();
             PanelTop.SuspendLayout();
             tableLayoutPanel1.SuspendLayout();
             panel2.SuspendLayout();
@@ -188,49 +184,13 @@ namespace CandyShop.View
             // 
             // LstPackages
             // 
-            LstPackages.CheckBoxes = true;
-            LstPackages.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] { colName, colCurrent, colAvail, colPinned });
             LstPackages.Dock = System.Windows.Forms.DockStyle.Fill;
-            LstPackages.FullRowSelect = true;
-            LstPackages.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
             LstPackages.Location = new System.Drawing.Point(0, 68);
-            LstPackages.MultiSelect = false;
             LstPackages.Name = "LstPackages";
-            LstPackages.ShowItemToolTips = true;
             LstPackages.Size = new System.Drawing.Size(637, 386);
             LstPackages.TabIndex = 3;
-            LstPackages.UseCompatibleStateImageBehavior = false;
-            LstPackages.View = System.Windows.Forms.View.Details;
-            // 
-            // colName
-            // 
-            colName.Text = "Name";
-            // 
-            // colCurrent
-            // 
-            colCurrent.Text = "Current";
-            // 
-            // colAvail
-            // 
-            colAvail.Text = "Available";
-            // 
-            // colPinned
-            // 
-            colPinned.Text = "Pinned";
-            // 
-            // SpinnerCtl
-            // 
-            SpinnerCtl.Dock = System.Windows.Forms.DockStyle.Fill;
-            SpinnerCtl.Location = new System.Drawing.Point(0, 68);
-            SpinnerCtl.Name = "SpinnerCtl";
-            SpinnerCtl.Size = new System.Drawing.Size(637, 386);
-            SpinnerCtl.TabIndex = 4;
-            // 
-            // UpgradePage
-            // 
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            Controls.Add(SpinnerCtl);
             Controls.Add(LstPackages);
             Controls.Add(PanelTop);
             Controls.Add(panel2);
@@ -251,17 +211,12 @@ namespace CandyShop.View
         private System.Windows.Forms.Button BtnUpgradeSelected;
         private System.Windows.Forms.Button BtnUpgradeAll;
         private System.Windows.Forms.Panel panel2;
-        private System.Windows.Forms.ListView LstPackages;
-        private System.Windows.Forms.ColumnHeader colName;
-        private System.Windows.Forms.ColumnHeader colCurrent;
-        private System.Windows.Forms.ColumnHeader colAvail;
-        private System.Windows.Forms.ColumnHeader colPinned;
+        private OutdatedPackageListBox LstPackages;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.CheckBox CheckDeleteShortcuts;
         private System.Windows.Forms.Label LblSelected;
         private System.Windows.Forms.LinkLabel BtnHideWarning;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
         private System.Windows.Forms.CheckBox CheckCloseAfterUpgrade;
-        private CandyShop.Controls.Spinner SpinnerCtl;
     }
 }

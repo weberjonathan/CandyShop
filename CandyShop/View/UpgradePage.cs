@@ -62,16 +62,10 @@ namespace CandyShop.View
             BtnUpgradeSelected.Text = LocaleEN.TEXT_UPGRADE_SELECTED;
             BtnUpgradeAll.Text = LocaleEN.TEXT_UPGRADE_ALL;
             LblAdmin.Text = LocaleEN.TEXT_NO_ADMIN_HINT;
-            SpinnerCtl.Text = LocaleEN.TEXT_LOADING_OUTDATED;
-            LblSelected.Text = String.Empty;
-            LstPackages.Columns[0].Text = LocaleEN.TEXT_COL_NAME;
-            LstPackages.Columns[1].Text = LocaleEN.TEXT_COL_CURRENT;
-            LstPackages.Columns[2].Text = LocaleEN.TEXT_COL_AVAILABLE;
-            LstPackages.Columns[3].Text = LocaleEN.TEXT_COL_PINNED;
+            LblSelected.Text = string.Empty;
 
             // event handlers
-            LstPackages.ItemChecked += LstPackages_ItemChecked;
-            LstPackages.Resize += LstPackages_Resize;
+            LstPackages.Other.ItemChecked += LstPackages_ItemChecked;
             BtnUpgradeAll.Click += new EventHandler((sender, e) => { UpgradeAllClick?.Invoke(this, e); });
             BtnUpgradeSelected.Click += new EventHandler((sender, e) => { UpgradeSelectedClick?.Invoke(this, e); });
             BtnHideWarning.Click += new EventHandler((sender, e) =>
@@ -103,9 +97,9 @@ namespace CandyShop.View
                 itemPin.Name = "Pin";
                 itemPin.Click += new EventHandler((sender, e) =>
                 {
-                    if (LstPackages.SelectedItems.Count > 0)
+                    if (LstPackages.Other.SelectedItems.Count > 0)
                     {
-                        var name = LstPackages.SelectedItems[0].Text;
+                        var name = LstPackages.Other.SelectedItems[0].Text;
                         PinnedChanged?.Invoke(this, new PinnedChangedArgs() { Name = name });
                     }
                 });
@@ -113,7 +107,7 @@ namespace CandyShop.View
                 var contextMenu = new ContextMenuStrip();
                 contextMenu.Opening += new System.ComponentModel.CancelEventHandler((sender, e) =>
                 {
-                    itemPin.Checked = Boolean.Parse(LstPackages.SelectedItems[0].SubItems[3].Text);
+                    itemPin.Checked = bool.Parse(LstPackages.Other.SelectedItems[0].SubItems[3].Text);
                 });
 
                 contextMenu.Items.Add(itemPin);
@@ -134,10 +128,10 @@ namespace CandyShop.View
         {
             get
             {
-                string[] rtn = new string[LstPackages.Items.Count];
+                string[] rtn = new string[LstPackages.Other.Items.Count];
                 for (int i = 0; i < rtn.Length; i++)
                 {
-                    rtn[i] = LstPackages.Items[i].Text;
+                    rtn[i] = LstPackages.Other.Items[i].Text;
                 }
 
                 return rtn;
@@ -148,10 +142,10 @@ namespace CandyShop.View
         {
             get
             {
-                string[] rtn = new string[LstPackages.CheckedItems.Count];
+                string[] rtn = new string[LstPackages.Other.CheckedItems.Count];
                 for (int i = 0; i < rtn.Length; i++)
                 {
-                    rtn[i] = LstPackages.CheckedItems[i].Text;
+                    rtn[i] = LstPackages.Other.CheckedItems[i].Text;
                 }
 
                 return rtn;
@@ -198,11 +192,11 @@ namespace CandyShop.View
         {
             get
             {
-                return SpinnerCtl.Visible;
+                return LstPackages.Loading;
             }
             set
             {
-                SpinnerCtl.Visible = value;
+                LstPackages.Loading = value;
                 BtnUpgradeSelected.Enabled = !value;
                 BtnUpgradeAll.Enabled = !value;
                 LblSelected.Visible = !value;
@@ -237,20 +231,21 @@ namespace CandyShop.View
         public void AddItem(string[] data)
         {
             ListViewItem item = new ListViewItem(data);
-            LstPackages.Items.Add(item);
-            ApplyPinnedStyle(item, Boolean.Parse(data[3]));
+            LstPackages.Other.Items.Add(item);
+            ApplyPinnedStyle(item, bool.Parse(data[3]));
 
             if (Loading) Loading = false;
         }
 
         public void ClearItems()
         {
-            LstPackages.Items.Clear();
+            LstPackages.Other.Items.Clear();
         }
 
         public void CheckAllItems()
         {
-            foreach (ListViewItem item in LstPackages.Items)
+            var items = LstPackages.Other.Items;
+            foreach (ListViewItem item in items)
             {
                 item.Checked = true;
             }
@@ -258,7 +253,8 @@ namespace CandyShop.View
 
         public void UncheckAllItems()
         {
-            foreach (ListViewItem item in LstPackages.Items)
+            var items = LstPackages.Other.Items;
+            foreach (ListViewItem item in items)
             {
                 item.Checked = false;
             }
@@ -271,7 +267,7 @@ namespace CandyShop.View
 
         public void SetItemCheckState(string name, bool state)
         {
-            ListViewItem item = LstPackages.FindItemWithText(name);
+            ListViewItem item = LstPackages.Other.FindItemWithText(name);
             if (item != null)
             {
                 item.Checked = state;
@@ -280,28 +276,17 @@ namespace CandyShop.View
 
         public void SetPinned(string name, bool pinned)
         {
-            var item = LstPackages.FindItemWithText(name);
+            var item = LstPackages.Other.FindItemWithText(name);
             item.SubItems[3].Text = pinned.ToString();
             ApplyPinnedStyle(item, pinned);
         }
 
         private void LstPackages_ItemChecked(object sender, ItemCheckedEventArgs e)
         {
-            bool pinned = Boolean.Parse(e.Item.SubItems[3].Text);
+            bool pinned = bool.Parse(e.Item.SubItems[3].Text);
             if (pinned) e.Item.Checked = false;
 
-            LblSelected.Text = String.Format(LocaleEN.TEXT_SELECTED_PACKAGE_COUNT, LstPackages.CheckedItems.Count);
-        }
-
-        private void LstPackages_Resize(object sender, EventArgs e)
-        {
-            const int pinnedWidth = 60;
-            int availWidth = LstPackages.Width - pinnedWidth - LstPackages.Margin.Left - LstPackages.Margin.Right - SystemInformation.VerticalScrollBarWidth;
-
-            LstPackages.Columns[0].Width = (int)Math.Floor(availWidth * .4);
-            LstPackages.Columns[1].Width = (int)Math.Floor(availWidth * .3);
-            LstPackages.Columns[2].Width = (int)Math.Floor(availWidth * .3);
-            LstPackages.Columns[3].Width = pinnedWidth;
+            LblSelected.Text = string.Format(LocaleEN.TEXT_SELECTED_PACKAGE_COUNT, LstPackages.Other.CheckedItems.Count);
         }
 
         private void CheckDeleteShortcuts_CheckedChanged(object sender, EventArgs e)
