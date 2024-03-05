@@ -37,7 +37,6 @@ namespace CandyShop.View
             BtnHideWarning = new System.Windows.Forms.LinkLabel();
             BtnUpgradeSelected = new System.Windows.Forms.Button();
             BtnUpgradeAll = new System.Windows.Forms.Button();
-            BtnCancel = new System.Windows.Forms.Button();
             panel2 = new System.Windows.Forms.Panel();
             CheckCloseAfterUpgrade = new System.Windows.Forms.CheckBox();
             LblSelected = new System.Windows.Forms.Label();
@@ -120,7 +119,7 @@ namespace CandyShop.View
             // 
             BtnUpgradeSelected.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right;
             BtnUpgradeSelected.Enabled = false;
-            BtnUpgradeSelected.Location = new System.Drawing.Point(446, 39);
+            BtnUpgradeSelected.Location = new System.Drawing.Point(527, 39);
             BtnUpgradeSelected.Name = "BtnUpgradeSelected";
             BtnUpgradeSelected.Size = new System.Drawing.Size(91, 23);
             BtnUpgradeSelected.TabIndex = 3;
@@ -132,23 +131,13 @@ namespace CandyShop.View
             // 
             BtnUpgradeAll.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right;
             BtnUpgradeAll.Enabled = false;
-            BtnUpgradeAll.Location = new System.Drawing.Point(336, 39);
+            BtnUpgradeAll.Location = new System.Drawing.Point(417, 39);
             BtnUpgradeAll.Name = "BtnUpgradeAll";
             BtnUpgradeAll.Size = new System.Drawing.Size(104, 23);
             BtnUpgradeAll.TabIndex = 2;
             BtnUpgradeAll.Text = "Upgrade &All";
             BtnUpgradeAll.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             BtnUpgradeAll.UseVisualStyleBackColor = true;
-            // 
-            // BtnCancel
-            // 
-            BtnCancel.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right;
-            BtnCancel.Location = new System.Drawing.Point(543, 39);
-            BtnCancel.Name = "BtnCancel";
-            BtnCancel.Size = new System.Drawing.Size(75, 23);
-            BtnCancel.TabIndex = 4;
-            BtnCancel.Text = "&Cancel";
-            BtnCancel.UseVisualStyleBackColor = true;
             // 
             // panel2
             // 
@@ -157,7 +146,6 @@ namespace CandyShop.View
             panel2.Controls.Add(CheckDeleteShortcuts);
             panel2.Controls.Add(BtnUpgradeSelected);
             panel2.Controls.Add(BtnUpgradeAll);
-            panel2.Controls.Add(BtnCancel);
             panel2.Dock = System.Windows.Forms.DockStyle.Bottom;
             panel2.Location = new System.Drawing.Point(0, 454);
             panel2.Name = "panel2";
@@ -230,11 +218,11 @@ namespace CandyShop.View
             // 
             colPinned.Text = "Pinned";
             // 
-            // spinner1
+            // SpinnerCtl
             // 
             SpinnerCtl.Dock = System.Windows.Forms.DockStyle.Fill;
             SpinnerCtl.Location = new System.Drawing.Point(0, 68);
-            SpinnerCtl.Name = "spinner1";
+            SpinnerCtl.Name = "SpinnerCtl";
             SpinnerCtl.Size = new System.Drawing.Size(637, 386);
             SpinnerCtl.TabIndex = 4;
             // 
@@ -262,7 +250,6 @@ namespace CandyShop.View
         private System.Windows.Forms.Panel PanelTop;
         private System.Windows.Forms.Button BtnUpgradeSelected;
         private System.Windows.Forms.Button BtnUpgradeAll;
-        private System.Windows.Forms.Button BtnCancel;
         private System.Windows.Forms.Panel panel2;
         private System.Windows.Forms.ListView LstPackages;
         private System.Windows.Forms.ColumnHeader colName;

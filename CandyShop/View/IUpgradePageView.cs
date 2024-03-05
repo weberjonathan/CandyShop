@@ -6,14 +6,12 @@ namespace CandyShop.View
     internal class PinnedChangedArgs : EventArgs
     {
         public string Name;
-        public bool Pinned;
     }
 
     interface IUpgradePageView
     {
         event EventHandler UpgradeAllClick;
         event EventHandler UpgradeSelectedClick;
-        event EventHandler CancelClick;
         event EventHandler CleanShortcutsChanged;
         event EventHandler CloseAfterUpgradeChanged;
         public event EventHandler CheckTopLevelClicked;

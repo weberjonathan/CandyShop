@@ -49,20 +49,6 @@ namespace CandyShop.Controller
                 if (packages.Length > 0) PerformUpgrade(packages);
             });
 
-            View.CancelClick += new EventHandler((sender, e) =>
-            {
-                // exit or hide application on 'Cancel', depending on how it was created
-                if (Context.LaunchedMinimized)
-                {
-                    MainWindow.ToForm().Hide();
-                }
-                else
-                {
-                    MainWindow.ToForm().Dispose();
-                    Program.Exit();
-                }
-            });
-
             View.CheckTopLevelClicked += new EventHandler((sender, e) =>
             {
                 CheckTopLevelPackages();

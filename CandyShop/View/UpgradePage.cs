@@ -59,7 +59,6 @@ namespace CandyShop.View
             this.Controls.Add(ts);
 
             // labels
-            BtnCancel.Text = LocaleEN.TEXT_CANCEL;
             BtnUpgradeSelected.Text = LocaleEN.TEXT_UPGRADE_SELECTED;
             BtnUpgradeAll.Text = LocaleEN.TEXT_UPGRADE_ALL;
             LblAdmin.Text = LocaleEN.TEXT_NO_ADMIN_HINT;
@@ -75,7 +74,6 @@ namespace CandyShop.View
             LstPackages.Resize += LstPackages_Resize;
             BtnUpgradeAll.Click += new EventHandler((sender, e) => { UpgradeAllClick?.Invoke(this, e); });
             BtnUpgradeSelected.Click += new EventHandler((sender, e) => { UpgradeSelectedClick?.Invoke(this, e); });
-            BtnCancel.Click += new EventHandler((sender, e) => { CancelClick?.Invoke(this, e); });
             BtnHideWarning.Click += new EventHandler((sender, e) =>
             {
                 var result = MessageBox.Show("Always hide this warning?",
@@ -126,7 +124,6 @@ namespace CandyShop.View
         public event EventHandler<PinnedChangedArgs> PinnedChanged;
         public event EventHandler UpgradeAllClick;
         public event EventHandler UpgradeSelectedClick;
-        public event EventHandler CancelClick;
         public event EventHandler CleanShortcutsChanged;
         public event EventHandler CloseAfterUpgradeChanged;
         public event EventHandler CheckTopLevelClicked;
