@@ -154,7 +154,8 @@ namespace CandyShop.Controller
             Console.CursorVisible = true;
             Console.ReadKey();
             Log.Debug("Read key press after upgrading");
-            Console.Write("Closing terminal...");
+            Console.Write("\nClosing terminal");
+            Console.CursorVisible = false;
 
             // delete shortcuts
             ShortcutService?.DisposeWatchers();
@@ -167,6 +168,7 @@ namespace CandyShop.Controller
             if (Context.CloseAfterUpgrade)
             {
                 MainWindow?.ToForm().Dispose();
+                WindowsConsole.FreeConsole();
                 Program.Exit();
             }
             else
