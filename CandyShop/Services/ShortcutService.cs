@@ -57,9 +57,10 @@ namespace CandyShop.Services
 
         public void DeleteShortcuts(List<string> filepaths)
         {
+            var files = new string(filepaths.SelectMany(p => $"{Path.GetFileNameWithoutExtension(p)}; ").ToArray());
+            Log.Information($"Attempting to delete {filepaths.Count} shortcuts: {files}".TrimEnd());
             foreach (string path in filepaths.Where(path => File.Exists(path)))
             {
-                Log.Information($"Deleted desktop shortcut {Path.GetFileNameWithoutExtension(path)}.");
                 try
                 {
                     File.Delete(path);

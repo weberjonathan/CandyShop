@@ -123,7 +123,11 @@ namespace CandyShop.Controller
             MainWindow?.ToForm().Hide();
 
             List<string> shortcuts = new List<string>();
-            ShortcutService?.WatchDesktops(shortcut => shortcuts.Add(shortcut));
+            ShortcutService?.WatchDesktops(shortcut =>
+            {
+                shortcuts.Add(shortcut);
+                Log.Information($"Detected new shortcut: {shortcut}");
+            });
 
             // upgrade
             WindowsConsole.AllocConsole();
