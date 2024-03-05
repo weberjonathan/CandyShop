@@ -59,7 +59,7 @@ namespace CandyShop.View
         {
             get
             {
-                return String.IsNullOrEmpty(packageInfoBox1.Text);
+                return packageInfoBox1.Loading;
             }
             set
             {
