@@ -46,6 +46,8 @@ namespace CandyShop.Controller
                 Log.Error($"An error occurred while retrieving installed packages: {e.Message}");
             }
 
+            if (forceFetch) await PackageService.ClearPackageDetails();
+
             View.ClearItems();
             View.LoadingPackages = false;
             packages.ForEach(p => View.AppendItem(p.Name, p.CurrVer));

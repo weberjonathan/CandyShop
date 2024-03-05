@@ -49,6 +49,13 @@ namespace CandyShop.Services
             InstalledPckgLock.Release();
         }
 
+#pragma warning disable CS1998
+        public async Task ClearPackageDetails()
+#pragma warning restore CS1998
+        {
+            PckgDetailsCache.Clear();
+        }
+
         public async Task<string> GetPackageDetailsAsync(string name)
         {
             var package = GetPackageByName(name);
@@ -75,7 +82,7 @@ namespace CandyShop.Services
         /// <exception cref="WingetException"></exception>
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
         public async Task PinAsync(GenericPackage package)
-#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
+#pragma warning restore CS1998
         {
             // TODO
             //int exitCode = ChocolateyWrapper.Pin(package.Name, package.CurrVer);
@@ -91,7 +98,7 @@ namespace CandyShop.Services
         /// <exception cref="WingetException"></exception>
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
         public async Task UnpinAsync(GenericPackage package)
-#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
+#pragma warning restore CS1998
         {
             // TODO
             //int exitCode = ChocolateyWrapper.Unpin(package.Name);

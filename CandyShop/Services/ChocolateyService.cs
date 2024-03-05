@@ -49,7 +49,10 @@ namespace CandyShop.Services
             await InstalledPckgLock.WaitAsync().ConfigureAwait(false);
             InstalledPckgCache.Clear();
             InstalledPckgLock.Release();
+        }
 
+        public async Task ClearPackageDetails()
+        {
             await PckgDetailsLock.WaitAsync().ConfigureAwait(false);
             PckgDetailsCache.Clear();
             PckgDetailsLock.Release();
