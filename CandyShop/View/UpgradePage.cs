@@ -107,7 +107,15 @@ namespace CandyShop.View
                 var contextMenu = new ContextMenuStrip();
                 contextMenu.Opening += new System.ComponentModel.CancelEventHandler((sender, e) =>
                 {
-                    itemPin.Checked = bool.Parse(LstPackages.Other.SelectedItems[0].SubItems[3].Text);
+                    string pinnedText = LstPackages.Other.SelectedItems[0].SubItems[3].Text;
+                    if (bool.TryParse(pinnedText, out bool pinned))
+                    {
+                        itemPin.Checked = pinned;
+                    }
+                    else
+                    {
+                        e.Cancel = true;
+                    }
                 });
 
                 contextMenu.Items.Add(itemPin);
@@ -232,7 +240,16 @@ namespace CandyShop.View
         {
             ListViewItem item = new ListViewItem(data);
             LstPackages.Other.Items.Add(item);
-            ApplyPinnedStyle(item, bool.Parse(data[3]));
+            if (LstPackages.NoPackages) LstPackages.NoPackages = false;
+
+            if (bool.TryParse(data[3], out bool pinned))
+            {
+                ApplyPinnedStyle(item, pinned);
+            }
+            else
+            {
+                ApplyPinnedStyle(item, true);
+            }
 
             if (Loading) Loading = false;
         }
@@ -281,12 +298,32 @@ namespace CandyShop.View
             ApplyPinnedStyle(item, pinned);
         }
 
+        public void DisplayEmpty()
+        {
+            ListViewItem item = new ListViewItem(
+                new string[] {
+                    "All packages are up to date.",
+                    "",
+                    "",
+                    ""
+                });
+            LstPackages.Other.Items.Add(item);
+            ApplyPinnedStyle(item, true);
+            LstPackages.NoPackages = true;
+            if (Loading) Loading = false;
+        }
+
         private void LstPackages_ItemChecked(object sender, ItemCheckedEventArgs e)
         {
-            bool pinned = bool.Parse(e.Item.SubItems[3].Text);
-            if (pinned) e.Item.Checked = false;
-
-            LblSelected.Text = string.Format(LocaleEN.TEXT_SELECTED_PACKAGE_COUNT, LstPackages.Other.CheckedItems.Count);
+            if (bool.TryParse(e.Item.SubItems[3].Text, out bool pinned))
+            {
+                if (pinned) e.Item.Checked = false;
+                LblSelected.Text = string.Format(LocaleEN.TEXT_SELECTED_PACKAGE_COUNT, LstPackages.Other.CheckedItems.Count);
+            }
+            else
+            {
+                e.Item.Checked = false;
+            }
         }
 
         private void CheckDeleteShortcuts_CheckedChanged(object sender, EventArgs e)

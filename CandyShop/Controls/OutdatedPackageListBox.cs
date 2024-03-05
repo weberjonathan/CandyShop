@@ -39,7 +39,35 @@ namespace CandyShop.Controls
                 Other.Columns[3].Width = pinnedWidth;
             });
 
+            Other.ItemSelectionChanged += new ListViewItemSelectionChangedEventHandler((sender, e) =>
+            {
+                if (NoPackages) e.Item.Selected = false;
+            });
+
             SpinnerCtl.Text = LocaleEN.TEXT_LOADING_OUTDATED;
+        }
+
+        private bool _NoPackages = false;
+        public bool NoPackages
+        {
+            get
+            {
+                return _NoPackages;
+            }
+            set
+            {
+                if (value)
+                {
+                    Other.CheckBoxes = false;
+                    Other.HeaderStyle = ColumnHeaderStyle.None;
+                }
+                else
+                {
+                    Other.CheckBoxes = true;
+                    Other.HeaderStyle = ColumnHeaderStyle.Nonclickable;
+                }
+                _NoPackages = value;
+            }
         }
     }
 }

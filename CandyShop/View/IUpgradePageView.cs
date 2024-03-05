@@ -34,5 +34,6 @@ namespace CandyShop.View
         void SetItemCheckState(string name, bool state);
         void UncheckAllItems();
         void SetPinned(string name, bool pinned);
+        void DisplayEmpty();
     }
 }

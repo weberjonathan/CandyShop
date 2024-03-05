@@ -104,6 +104,11 @@ namespace CandyShop.Controller
                 p.Pinned.ToString()
             }));
 
+            if (packages.Count == 0)
+            {
+                View.DisplayEmpty();
+            }
+
             CheckTopLevelPackages();
         }
 
