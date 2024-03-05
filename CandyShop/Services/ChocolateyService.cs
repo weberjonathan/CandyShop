@@ -43,6 +43,13 @@ namespace CandyShop.Services
             OutdatedPckgLock.Release();
         }
 
+        public async Task ClearInstalledPackages()
+        {
+            await InstalledPckgLock.WaitAsync().ConfigureAwait(false);
+            InstalledPckgCache.Clear();
+            InstalledPckgLock.Release();
+        }
+
         public async Task<string> GetPackageDetailsAsync(string name)
         {
             return await GetChocoPackageDetails(new ChocolateyPackage() { Name = name });

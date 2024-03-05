@@ -207,6 +207,15 @@ namespace CandyShop.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Version.
+        /// </summary>
+        internal static string TEXT_COL_VERSION {
+            get {
+                return ResourceManager.GetString("TEXT_COL_VERSION", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {0} License.
         /// </summary>
         internal static string TEXT_LICENSE_TITLE {
@@ -221,6 +230,15 @@ namespace CandyShop.Properties {
         internal static string TEXT_LOADING {
             get {
                 return ResourceManager.GetString("TEXT_LOADING", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Searching for installed packages.
+        /// </summary>
+        internal static string TEXT_LOADING_INSTALLED {
+            get {
+                return ResourceManager.GetString("TEXT_LOADING_INSTALLED", resourceCulture);
             }
         }
         

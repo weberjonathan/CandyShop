@@ -122,7 +122,7 @@ namespace CandyShop.View
             // 
             InstalledPage.Dock = System.Windows.Forms.DockStyle.Fill;
             InstalledPage.EnableTopLevelToggle = true;
-            InstalledPage.Loading = false;
+            InstalledPage.LoadingDetails = false;
             InstalledPage.Location = new System.Drawing.Point(3, 3);
             InstalledPage.Name = "InstalledPage";
             InstalledPage.Size = new System.Drawing.Size(716, 476);

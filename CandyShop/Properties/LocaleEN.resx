@@ -167,11 +167,17 @@ Hint: Check the output in the Candy Shop console window before continuing, or se
   <data name="TEXT_COL_PINNED" xml:space="preserve">
     <value>Pinned</value>
   </data>
+  <data name="TEXT_COL_VERSION" xml:space="preserve">
+    <value>Version</value>
+  </data>
   <data name="TEXT_LICENSE_TITLE" xml:space="preserve">
     <value>{0} License</value>
   </data>
   <data name="TEXT_LOADING" xml:space="preserve">
     <value>Loading ...</value>
+  </data>
+  <data name="TEXT_LOADING_INSTALLED" xml:space="preserve">
+    <value>Searching for installed packages</value>
   </data>
   <data name="TEXT_LOADING_OUTDATED" xml:space="preserve">
     <value>Searching for outdated packages</value>

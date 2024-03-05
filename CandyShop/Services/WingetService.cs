@@ -39,6 +39,11 @@ namespace CandyShop.Services
 
         public async Task ClearOutdatedPackages()
         {
+            await ClearOutdatedPackages();
+        }
+
+        public async Task ClearInstalledPackages()
+        {
             await InstalledPckgLock.WaitAsync().ConfigureAwait(false);
             InstalledPckgCache.Clear();
             InstalledPckgLock.Release();

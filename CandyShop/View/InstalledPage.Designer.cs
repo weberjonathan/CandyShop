@@ -1,4 +1,6 @@
-﻿namespace CandyShop.View
+﻿using CandyShop.Controls;
+
+namespace CandyShop.View
 {
     partial class InstalledPage
     {
@@ -28,9 +30,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            LstPackages = new System.Windows.Forms.ListView();
-            colName = new System.Windows.Forms.ColumnHeader();
-            colVer = new System.Windows.Forms.ColumnHeader();
+            LstPackages = new InstalledPackageListBox();
             PanelTop = new System.Windows.Forms.Panel();
             TextSearch = new System.Windows.Forms.TextBox();
             CheckHideSuffixed = new System.Windows.Forms.CheckBox();
@@ -45,28 +45,11 @@
             // 
             // LstPackages
             // 
-            LstPackages.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] { colName, colVer });
             LstPackages.Dock = System.Windows.Forms.DockStyle.Fill;
-            LstPackages.FullRowSelect = true;
-            LstPackages.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
             LstPackages.Location = new System.Drawing.Point(0, 0);
             LstPackages.Name = "LstPackages";
             LstPackages.Size = new System.Drawing.Size(600, 246);
             LstPackages.TabIndex = 0;
-            LstPackages.UseCompatibleStateImageBehavior = false;
-            LstPackages.View = System.Windows.Forms.View.Details;
-            LstPackages.SelectedIndexChanged += LstPackages_SelectedIndexChanged;
-            // 
-            // colName
-            // 
-            colName.Text = "Name";
-            // 
-            // colVer
-            // 
-            colVer.Text = "Version";
-            // 
-            // PanelTop
-            // 
             PanelTop.Controls.Add(TextSearch);
             PanelTop.Controls.Add(CheckHideSuffixed);
             PanelTop.Dock = System.Windows.Forms.DockStyle.Top;
@@ -147,9 +130,7 @@
 
         #endregion
 
-        private System.Windows.Forms.ListView LstPackages;
-        private System.Windows.Forms.ColumnHeader colName;
-        private System.Windows.Forms.ColumnHeader colVer;
+        private InstalledPackageListBox LstPackages;
         private System.Windows.Forms.Panel PanelTop;
         private System.Windows.Forms.SplitContainer SplitContainer;
         private System.Windows.Forms.CheckBox CheckHideSuffixed;

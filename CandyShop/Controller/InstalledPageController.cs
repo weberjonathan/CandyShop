@@ -28,8 +28,11 @@ namespace CandyShop.Controller
             View.SelectedItemChanged += OnSelectedItemChanged;
         }
 
-        public async void UpdateInstalledPackagesDisplayAsync()
+        public async void UpdateInstalledPackagesDisplayAsync(bool forceFetch = false)
         {
+            View.LoadingPackages = true;
+            if (forceFetch) await PackageService.ClearInstalledPackages();
+
             List<GenericPackage> packages = new List<GenericPackage>();
             try
             {
@@ -40,6 +43,8 @@ namespace CandyShop.Controller
                 Log.Error($"An error occurred while retrieving installed packages: {e.Message}");
             }
 
+            View.ClearItems();
+            View.LoadingPackages = false;
             packages.ForEach(p => View.AppendItem(p.Name, p.CurrVer));
             SyncListView();
         }
@@ -52,7 +57,7 @@ namespace CandyShop.Controller
                 return;
             }
 
-            View.Loading = true;
+            View.LoadingDetails = true;
 
             string name = View.SelectedItem;
             string details;

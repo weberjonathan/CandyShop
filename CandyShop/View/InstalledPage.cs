@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Windows.Forms;
 using System.Linq;
+using Serilog;
 
 namespace CandyShop.View
 {
@@ -10,20 +11,8 @@ namespace CandyShop.View
         public InstalledPage()
         {
             InitializeComponent();
-
-            LstPackages.Resize += new EventHandler((sender, e) =>
-            {
-                int availWidth = LstPackages.Width - LstPackages.Margin.Left - LstPackages.Margin.Right - SystemInformation.VerticalScrollBarWidth;
-
-                if (LstPackages.Columns.Count> 0)
-                {
-                    LstPackages.Columns[0].Width = (int)Math.Floor(availWidth * .6);
-                    LstPackages.Columns[1].Width = (int)Math.Floor(availWidth * .4);
-                }
-            });
-
-            this.Resize += new EventHandler((sender, e) => ResizeSearchbar());
-
+            Resize += new EventHandler((sender, e) => ResizeSearchbar());
+            LstPackages.Other.SelectedIndexChanged += new EventHandler((sender, e) => SelectedItemChanged?.Invoke(this, EventArgs.Empty));
             SplitContainer.Panel2Collapsed = true;
         }
 
@@ -39,6 +28,13 @@ namespace CandyShop.View
                 CheckHideSuffixed.Visible = value;
                 _EnableTopLevelToggle = value;
                 ResizeSearchbar();
+
+                TextSearch.Click += new EventHandler((sender, e) =>
+                {
+                    var tset = LstPackages.Other.Items;
+                    var asdf = LstPackages.Other.Columns;
+                    Log.Information("test");
+                });
             }
         }
 
@@ -46,8 +42,8 @@ namespace CandyShop.View
         {
             get
             {
-                if (LstPackages.SelectedItems.Count > 0)
-                    return LstPackages.SelectedItems?[0].Text;
+                if (LstPackages.Other.SelectedItems.Count > 0)
+                    return LstPackages.Other.SelectedItems?[0].Text;
                 else
                     return null;
             }
@@ -55,7 +51,19 @@ namespace CandyShop.View
 
         public bool ShowTopLevelOnly => CheckHideSuffixed.Checked;
 
-        public bool Loading
+        public bool LoadingPackages
+        {
+            get
+            {
+                return LstPackages.Loading;
+            }
+            set
+            {
+                LstPackages.Loading = value;
+            }
+        }
+
+        public bool LoadingDetails
         {
             get
             {
@@ -71,7 +79,7 @@ namespace CandyShop.View
             }
         }
 
-        public List<string> Items => LstPackages.Items
+        public List<string> Items => LstPackages.Other.Items
             .Cast<ListViewItem>()
             .Select(item => item.Text)
             .ToList();
@@ -80,29 +88,31 @@ namespace CandyShop.View
 
         public void AppendItem(string name, string version)
         {
-            LstPackages.Items.Add(new ListViewItem(new string[] { name, version }));
+            LstPackages.Other.Items.Add(new ListViewItem(new string[] { name, version }));
+            var test = LstPackages.Other.Columns;
+            LoadingPackages = false;
         }
 
         public void InsertItem(int index, string name, string version)
         {
-            LstPackages.Items.Insert(index, new ListViewItem(new string[] { name, version }));
+            LstPackages.Other.Items.Insert(index, new ListViewItem(new string[] { name, version }));
+        }
+
+        public void ClearItems()
+        {
+            LstPackages.Other.Items.Clear();
         }
 
         public void UpdateDetails(string details)
         {
             packageInfoBox1.Text = details;
             SplitContainer.Panel2Collapsed = false;
-            Loading = false;
+            LoadingDetails = false;
         }
 
         public void RemoveItem(string name)
         {
-            LstPackages.Items.Remove(LstPackages.FindItemWithText(name));
-        }
-
-        private void LstPackages_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            SelectedItemChanged?.Invoke(this, EventArgs.Empty);
+            LstPackages.Other.Items.Remove(LstPackages.Other.FindItemWithText(name));
         }
 
         private void CheckHideSuffixed_CheckedChanged(object sender, EventArgs e)
@@ -117,15 +127,15 @@ namespace CandyShop.View
 
         private void TextSearch_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.KeyCode.Equals(Keys.Enter) && LstPackages.Items.Count > 0)
+            if (e.KeyCode.Equals(Keys.Enter) && LstPackages.Other.Items.Count > 0)
             {
-                LstPackages.Items[0].Selected = true;
+                LstPackages.Other.Items[0].Selected = true;
             }
         }
 
         private void ResizeSearchbar()
         {
-            int width = EnableTopLevelToggle ? CheckHideSuffixed.Location.X - 20 : LstPackages.Width;
+            int width = EnableTopLevelToggle ? CheckHideSuffixed.Location.X - 20 : LstPackages.Other.Width;
             TextSearch.Size = new System.Drawing.Size(width, TextSearch.Height);
         }
     }
