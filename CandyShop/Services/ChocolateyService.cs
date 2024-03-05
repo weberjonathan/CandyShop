@@ -15,9 +15,10 @@ namespace CandyShop.Services
     {
         private readonly SemaphoreSlim OutdatedPckgLock = new SemaphoreSlim(1);
         private readonly SemaphoreSlim InstalledPckgLock = new SemaphoreSlim(1);
+        private readonly SemaphoreSlim PckgDetailsLock = new SemaphoreSlim(1);
 
         // TODO use proper package repository instead
-        private readonly Dictionary<string, string> PckgDetailsCache = new Dictionary<string, string>(); // TODO make thread-safe
+        private readonly Dictionary<string, string> PckgDetailsCache = new Dictionary<string, string>();
         private readonly Dictionary<string, ChocolateyPackage> InstalledPckgCache = new Dictionary<string, ChocolateyPackage>();
         private readonly Dictionary<string, ChocolateyPackage> OutdatedPckgCache = new Dictionary<string, ChocolateyPackage>();
 
@@ -48,7 +49,10 @@ namespace CandyShop.Services
             await InstalledPckgLock.WaitAsync().ConfigureAwait(false);
             InstalledPckgCache.Clear();
             InstalledPckgLock.Release();
+
+            await PckgDetailsLock.WaitAsync().ConfigureAwait(false);
             PckgDetailsCache.Clear();
+            PckgDetailsLock.Release();
         }
 
         public async Task<string> GetPackageDetailsAsync(string name)
@@ -99,7 +103,7 @@ namespace CandyShop.Services
         }
 
         /// <exception cref="ChocolateyException"></exception>
-        public void Upgrade(string[] names)
+        public async void Upgrade(string[] names)
         {
             List<ChocolateyPackage> chocoPackages = GetChocoPackagesByName(names.ToList());
             chocoPackages = chocoPackages.Where(p => !p.Pinned.GetValueOrDefault(false)).ToList();
@@ -118,8 +122,10 @@ namespace CandyShop.Services
             }
             finally
             {
-                ClearOutdatedPackages(); // TODO this should be moved into async method
+                await ClearOutdatedPackages();
+                await PckgDetailsLock.WaitAsync().ConfigureAwait(false);
                 names.ToList().ForEach(name => PckgDetailsCache.Remove(name));
+                PckgDetailsLock.Release();
             }
         }
 
@@ -145,7 +151,6 @@ namespace CandyShop.Services
             finally
             {
                 OutdatedPckgLock.Release();
-                Log.Debug("Released lock for outdated packages.");
             }
 
             return OutdatedPckgCache.Values.ToList();
@@ -179,11 +184,16 @@ namespace CandyShop.Services
         /// <exception cref="ChocolateyException"></exception>
         public async Task<string> GetChocoPackageDetails(ChocolateyPackage package)
         {
+            await PckgDetailsLock.WaitAsync().ConfigureAwait(false);
             if (!PckgDetailsCache.TryGetValue(package.Name, out string details))
             {
+                PckgDetailsLock.Release();
                 details = await ChocolateyWrapper.FetchInfoAsync(package);
+
+                await PckgDetailsLock.WaitAsync().ConfigureAwait(false);
                 PckgDetailsCache[package.Name] = details;
             }
+            PckgDetailsLock.Release();
 
             return details;
         }
