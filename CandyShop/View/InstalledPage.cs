@@ -101,8 +101,8 @@ namespace CandyShop.View
         public void UpdateDetails(string details)
         {
             packageInfoBox1.Text = details;
-            SplitContainer.Panel2Collapsed = false;
             LoadingDetails = false;
+            SplitContainer.Panel2Collapsed = false;
         }
 
         public void RemoveItem(string name)

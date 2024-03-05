@@ -73,7 +73,7 @@ namespace CandyShop.Controller
                 details = String.Format(LocaleEN.ERROR_RETRIEVING_PACKAGE_DETAILS, exception.Message);
             }
 
-            if (!String.IsNullOrEmpty(details) && name.Equals(View.SelectedItem))
+            if (!String.IsNullOrEmpty(details) && name.Equals(View.SelectedItem) && !View.LoadingPackages)
             {
                 View.UpdateDetails(details);
             }
