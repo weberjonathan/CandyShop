@@ -42,7 +42,7 @@ namespace CandyShop.View
             CheckCloseAfterUpgrade = new System.Windows.Forms.CheckBox();
             LblSelected = new System.Windows.Forms.Label();
             CheckDeleteShortcuts = new System.Windows.Forms.CheckBox();
-            LstPackages = new OutdatedPackageListBox();
+            LstPackages = new PackageListBox();
             PanelTop.SuspendLayout();
             tableLayoutPanel1.SuspendLayout();
             panel2.SuspendLayout();
@@ -211,7 +211,7 @@ namespace CandyShop.View
         private System.Windows.Forms.Button BtnUpgradeSelected;
         private System.Windows.Forms.Button BtnUpgradeAll;
         private System.Windows.Forms.Panel panel2;
-        private OutdatedPackageListBox LstPackages;
+        private PackageListBox LstPackages;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.CheckBox CheckDeleteShortcuts;
         private System.Windows.Forms.Label LblSelected;

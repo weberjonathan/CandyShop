@@ -1,4 +1,5 @@
-﻿using CandyShop.Properties;
+﻿using CandyShop.Controls;
+using CandyShop.Properties;
 using System;
 using System.Drawing;
 using System.Windows.Forms;
@@ -11,6 +12,15 @@ namespace CandyShop.View
         {
             InitializeComponent();
             PanelTop.Visible = false;
+
+            // configure PackageListBox
+            LstPackages.Hint = LocaleEN.TEXT_LOADING_OUTDATED;
+            LstPackages.Columns = [
+                new(LocaleEN.TEXT_COL_NAME, .4f, PackageListBoxSize.Percent),
+                new(LocaleEN.TEXT_COL_CURRENT, .3f, PackageListBoxSize.Percent),
+                new(LocaleEN.TEXT_COL_AVAILABLE, .3f, PackageListBoxSize.Percent),
+                new(LocaleEN.TEXT_COL_PINNED, 60f, PackageListBoxSize.Fixed)
+            ];
 
             // tool bar
             var tsRefresh = new ToolStripButton
@@ -223,15 +233,21 @@ namespace CandyShop.View
                 {
                     BtnUpgradeSelected.Image = Resources.ic_uac;
                     BtnUpgradeAll.Image = Resources.ic_uac;
-                    var item = LstPackages.ContextMenuStrip.Items["Pin"];
-                    item.Image = Resources.ic_uac;
+                    if (LstPackages.ContextMenuStrip != null)
+                        if (LstPackages.ContextMenuStrip.Items.ContainsKey("Pin"))
+                        {
+                            LstPackages.ContextMenuStrip.Items["Pin"].Image = Resources.ic_uac;
+                        }
                 }
                 else
                 {
                     BtnUpgradeSelected.Image = null;
                     BtnUpgradeAll.Image = null;
-                    var item = LstPackages.ContextMenuStrip.Items["Pin"];
-                    item.Image = null;
+                    if (LstPackages.ContextMenuStrip != null)
+                        if (LstPackages.ContextMenuStrip.Items.ContainsKey("Pin"))
+                        {
+                            LstPackages.ContextMenuStrip.Items["Pin"].Image = null;
+                        }
                 }
             }
         }

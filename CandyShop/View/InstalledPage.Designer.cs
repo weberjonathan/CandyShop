@@ -1,6 +1,4 @@
-﻿using CandyShop.Controls;
-
-namespace CandyShop.View
+﻿namespace CandyShop.View
 {
     partial class InstalledPage
     {
@@ -30,7 +28,7 @@ namespace CandyShop.View
         /// </summary>
         private void InitializeComponent()
         {
-            LstPackages = new InstalledPackageListBox();
+            LstPackages = new Controls.PackageListBox();
             PanelTop = new System.Windows.Forms.Panel();
             TextSearch = new System.Windows.Forms.TextBox();
             CheckHideSuffixed = new System.Windows.Forms.CheckBox();
@@ -130,7 +128,7 @@ namespace CandyShop.View
 
         #endregion
 
-        private InstalledPackageListBox LstPackages;
+        private Controls.PackageListBox LstPackages;
         private System.Windows.Forms.Panel PanelTop;
         private System.Windows.Forms.SplitContainer SplitContainer;
         private System.Windows.Forms.CheckBox CheckHideSuffixed;

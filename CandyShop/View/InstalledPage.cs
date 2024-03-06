@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Windows.Forms;
 using System.Linq;
 using Serilog;
+using CandyShop.Controls;
+using CandyShop.Properties;
 
 namespace CandyShop.View
 {
@@ -11,6 +13,13 @@ namespace CandyShop.View
         public InstalledPage()
         {
             InitializeComponent();
+
+            LstPackages.Hint = LocaleEN.TEXT_LOADING_INSTALLED;
+            LstPackages.Columns = [
+                new(LocaleEN.TEXT_COL_NAME, .6f, PackageListBoxSize.Percent),
+                new(LocaleEN.TEXT_COL_VERSION, .4f, PackageListBoxSize.Percent)
+            ];
+
             Resize += new EventHandler((sender, e) => ResizeSearchbar());
             LstPackages.Other.SelectedIndexChanged += new EventHandler((sender, e) => SelectedItemChanged?.Invoke(this, EventArgs.Empty));
             SplitContainer.Panel2Collapsed = true;
