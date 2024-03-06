@@ -3,7 +3,7 @@ using System.Windows.Forms;
 
 namespace CandyShop.View
 {
-    interface IMainWindowView
+    interface IMainWindowView : ITabPage
     {
         IInstalledPageView InstalledPackagesPage { get; }
         IUpgradePageView UpgradePackagesPage { get; }

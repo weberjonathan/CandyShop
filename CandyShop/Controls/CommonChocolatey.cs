@@ -45,5 +45,10 @@ namespace CandyShop.Controls
             ts.Items.Insert(index, tsSelectSmart);
             return ts;
         }
+
+        public override string GetLogsMenuItemText()
+        {
+            return string.Format(LocaleEN.TEXT_MENU_LOGS, "Chocolatey");
+        }
     }
 }

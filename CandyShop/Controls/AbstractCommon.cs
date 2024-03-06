@@ -11,6 +11,7 @@ namespace CandyShop.Controls
         abstract public PackageListBoxColumn[] GetInstalledColumns();
         abstract public CommonSearchBar GetSearchBar();
         abstract public ToolStrip GetUpgradePageToolBar();
+        abstract public string GetLogsMenuItemText();
 
         protected ToolStrip GetCommonUpgradePageToolBar()
         {

@@ -2,6 +2,7 @@
 using System.Reflection;
 using System.Windows.Forms;
 using CandyShop.Controller;
+using CandyShop.Controls;
 using CandyShop.Properties;
 
 namespace CandyShop.View
@@ -9,7 +10,7 @@ namespace CandyShop.View
     // TODO remove "select top level"-menu item in winget mode
     // TODO add menu item -> Restart in other mode
 
-    partial class MainWindow : Form, IMainWindowView
+    partial class MainWindow : Form, IMainWindowView, ITabPage
     {
         private MainWindowController Controller;
 
@@ -41,6 +42,11 @@ namespace CandyShop.View
             {
                 MenuExtrasCreateTask.Checked = value;
             }
+        }
+
+        public void BuildControls(AbstractCommon provider)
+        {
+            MenuExtrasOpenLogs.Text = provider.GetLogsMenuItemText();
         }
 
         public void DisplayError(string msg, params string[] args)
@@ -101,7 +107,7 @@ namespace CandyShop.View
 
         private void MenuExtrasOpenLogs_Click(object sender, EventArgs e)
         {
-            Controller.ShowChocoLogFolder();
+            Controller.ShowLogFolder();
         }
 
         private void MenuExtrasOpenCandyShopConfig_Click(object sender, EventArgs e)

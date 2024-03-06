@@ -34,5 +34,10 @@ namespace CandyShop.Controls
         {
             return GetCommonUpgradePageToolBar();
         }
+
+        public override string GetLogsMenuItemText()
+        {
+            return string.Format(LocaleEN.TEXT_MENU_LOGS, "Winget");
+        }
     }
 }

@@ -7,6 +7,8 @@ using System.Diagnostics;
 using System.IO;
 using System.Windows.Forms;
 using Serilog;
+using CandyShop.Winget;
+using CandyShop.Controls;
 
 namespace CandyShop.Controller
 {
@@ -25,6 +27,10 @@ namespace CandyShop.Controller
         public void InjectView(IMainWindowView mainView)
         {
             MainView = mainView;
+
+            // TODO use single provider instance accross all controllers
+            AbstractCommon provider = ContextSingleton.Get.WingetMode ? new CommonWinget() : new CommonChocolatey();
+            MainView.BuildControls(provider);
         }
 
         public void InitView()
@@ -94,24 +100,32 @@ namespace CandyShop.Controller
             MainView.LaunchOnSystemStartEnabled = WindowsTaskService.IsLaunchOnStartup();
         }
 
-        public void ShowChocoLogFolder()
+        public void ShowLogFolder()
         {
-            string path = Path.GetFullPath(CandyShopContext.CholoateyLogFolder);
-            if (Directory.Exists(path))
+            if (ContextSingleton.Get.WingetMode)
             {
-                try
-                {
-                    Process.Start("explorer.exe", path);
-                }
-                catch (Win32Exception e)
-                {
-                    MainView.DisplayError("An unknown error occurred: {0}", e.Message);
-                }
-                
+                WingetProcess proc = ProcessFactory.Winget("--logs");
+                proc.ExecuteHidden();
             }
             else
             {
-                MainView.DisplayError("Cannot find directory for Chocolatey logs: {0}", path);
+                string path = Path.GetFullPath(CandyShopContext.CholoateyLogFolder);
+                if (Directory.Exists(path))
+                {
+                    try
+                    {
+                        Process.Start("explorer.exe", path);
+                    }
+                    catch (Win32Exception e)
+                    {
+                        MainView.DisplayError("An unknown error occurred: {0}", e.Message);
+                    }
+
+                }
+                else
+                {
+                    MainView.DisplayError("Cannot find directory for Chocolatey logs: {0}", path);
+                }
             }
         }
 

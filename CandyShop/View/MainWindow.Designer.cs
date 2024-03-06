@@ -122,6 +122,7 @@ namespace CandyShop.View
             // 
             InstalledPage.Dock = System.Windows.Forms.DockStyle.Fill;
             InstalledPage.LoadingDetails = false;
+            InstalledPage.LoadingPackages = false;
             InstalledPage.Location = new System.Drawing.Point(3, 3);
             InstalledPage.Name = "InstalledPage";
             InstalledPage.Size = new System.Drawing.Size(716, 476);
@@ -187,7 +188,7 @@ namespace CandyShop.View
             // 
             // MenuExtras
             // 
-            MenuExtras.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { MenuExtrasCreateTask, toolStripSeparator1, MenuExtrasOpenLogs, MenuExtrasOpenCandyShopConfig });
+            MenuExtras.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { MenuExtrasCreateTask, MenuExtrasOpenCandyShopConfig, toolStripSeparator1, MenuExtrasOpenLogs });
             MenuExtras.Name = "MenuExtras";
             MenuExtras.Size = new System.Drawing.Size(50, 20);
             MenuExtras.Text = "&Extras";
@@ -217,7 +218,7 @@ namespace CandyShop.View
             MenuExtrasOpenCandyShopConfig.Name = "MenuExtrasOpenCandyShopConfig";
             MenuExtrasOpenCandyShopConfig.ShortcutKeys = System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.P;
             MenuExtrasOpenCandyShopConfig.Size = new System.Drawing.Size(344, 22);
-            MenuExtrasOpenCandyShopConfig.Text = "Open Candy&Shop configuration folder";
+            MenuExtrasOpenCandyShopConfig.Text = "Open &Settings directory";
             MenuExtrasOpenCandyShopConfig.Click += MenuExtrasOpenCandyShopConfig_Click;
             // 
             // MenuHelp
