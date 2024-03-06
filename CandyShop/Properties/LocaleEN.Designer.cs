@@ -207,6 +207,15 @@ namespace CandyShop.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Source.
+        /// </summary>
+        internal static string TEXT_COL_SOURCE {
+            get {
+                return ResourceManager.GetString("TEXT_COL_SOURCE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Version.
         /// </summary>
         internal static string TEXT_COL_VERSION {

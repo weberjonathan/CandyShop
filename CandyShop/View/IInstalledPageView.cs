@@ -1,22 +1,26 @@
-﻿using System;
+﻿using CandyShop.Controls;
+using System;
 using System.Collections.Generic;
 
 namespace CandyShop.View
 {
     interface IInstalledPageView : ITabPage
     {
-        event EventHandler ShowTopLevelOnlyChanged;
-        event EventHandler FilterTextChanged;
-        event EventHandler SelectedItemChanged;
+        event EventHandler FilterTopLevelOnlyChanged;
+        event EventHandler FilterRequireSourceChanged;
+        event EventHandler SearchTermChanged;
+        event EventHandler SelectedItemChanged; 
 
         List<string> Items { get; }
         string SelectedItem { get; }
-        string FilterText { get; }
-        bool ShowTopLevelOnly { get; } // a toggle that defines if only top level packages are shown in the list view
+        //CommonSearchBar SearchBar { get; }
+        string SearchTerm { get; }
+        bool FilterShowTopLevelOnly { get; }
+        bool FilterRequireSource { get; }
         public bool LoadingPackages { get; set; }
         public bool LoadingDetails { get; set; }
-        void AppendItem(string name, string version);
-        void InsertItem(int index, string name, string version);
+        void AppendItem(string[] data);
+        void InsertItem(int index, string[] data);
         void ClearItems();
         void RemoveItem(string name);
         void UpdateDetails(string details);

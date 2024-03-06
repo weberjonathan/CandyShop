@@ -6,6 +6,7 @@ using CandyShop.Properties;
 using CandyShop.Services;
 using Serilog;
 using CandyShop.Controls;
+using Windows.Services.Maps;
 
 namespace CandyShop.Controller
 {
@@ -25,10 +26,12 @@ namespace CandyShop.Controller
             MainWindow = mainWindow;
             View = view;
 
-            View.BuildControls(new CommonChocolatey());
+            ICommon provider = ContextSingleton.Get.WingetMode ? new CommonWinget() : new CommonChocolatey();
+            View.BuildControls(provider);
 
-            View.FilterTextChanged += new EventHandler((sender, e) => SyncListView());
-            View.ShowTopLevelOnlyChanged += new EventHandler((sender, e) => SyncListView());
+            View.SearchTermChanged += new EventHandler((sender, e) => SyncListView());
+            View.FilterRequireSourceChanged += new EventHandler((sender, e) => SyncListView());
+            View.FilterTopLevelOnlyChanged += new EventHandler((sender, e) => SyncListView());
             View.SelectedItemChanged += OnSelectedItemChanged;
             MainWindow.RefreshClicked += new EventHandler((sender, e) => UpdateInstalledPackagesDisplayAsync(forceFetch: true));
         }
@@ -52,7 +55,7 @@ namespace CandyShop.Controller
 
             View.ClearItems();
             View.LoadingPackages = false;
-            packages.ForEach(p => View.AppendItem(p.Name, p.CurrVer));
+            packages.ForEach(p => View.AppendItem([p.Name, p.CurrVer, p.Source]));
             SyncListView();
         }
 
@@ -85,8 +88,9 @@ namespace CandyShop.Controller
 
         private async void SyncListView()
         {
-            string filterName = View.FilterText;
-            bool hideSuffixed = View.ShowTopLevelOnly;
+            string filterName = View.SearchTerm;
+            bool hideSuffixed = View.FilterShowTopLevelOnly;
+            bool requireSource = View.FilterRequireSource;
 
             List<GenericPackage> packages = new List<GenericPackage>();
             try
@@ -108,7 +112,10 @@ namespace CandyShop.Controller
                     packageAllowed = false;
                 }
 
-                if (!String.IsNullOrEmpty(filterName) && !package.Name.Contains(filterName))
+                if (requireSource && string.IsNullOrEmpty(package.Source))
+                    packageAllowed = false;
+
+                if (!string.IsNullOrEmpty(filterName) && !package.Name.Contains(filterName))
                 {
                     packageAllowed = false;
                 }
@@ -121,7 +128,7 @@ namespace CandyShop.Controller
             }
         }
 
-        public void InsertItem(GenericPackage package, List<GenericPackage> referenceList)
+        private void InsertItem(GenericPackage package, List<GenericPackage> referenceList)
         {
             int latestPossibleIndex = referenceList.IndexOf(package);
             string lastVisibilePackage = null;
@@ -142,7 +149,11 @@ namespace CandyShop.Controller
                 index = View.Items.IndexOf(lastVisibilePackage) + 1;
             }
 
-            View.InsertItem(index, package.Name, package.CurrVer);
+            View.InsertItem(index, [
+                package.Name,
+                package.CurrVer,
+                package.Source
+            ]);
         }
     }
 }

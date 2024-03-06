@@ -1,6 +1,6 @@
 ﻿namespace CandyShop.Controls
 {
-    partial class ChocolateySearchBar
+    partial class WingetSearchBar
     {
         /// <summary> 
         /// Required designer variable.
@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             SplitContainer = new System.Windows.Forms.SplitContainer();
-            TextSearch = new System.Windows.Forms.TextBox();
+            textBox1 = new System.Windows.Forms.TextBox();
             checkBox1 = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)SplitContainer).BeginInit();
             SplitContainer.Panel1.SuspendLayout();
@@ -47,46 +47,44 @@
             // 
             // SplitContainer.Panel1
             // 
-            SplitContainer.Panel1.Controls.Add(TextSearch);
+            SplitContainer.Panel1.Controls.Add(textBox1);
             SplitContainer.Panel1.Padding = new System.Windows.Forms.Padding(0, 5, 5, 5);
             // 
             // SplitContainer.Panel2
             // 
             SplitContainer.Panel2.Controls.Add(checkBox1);
             SplitContainer.Panel2.Padding = new System.Windows.Forms.Padding(5);
-            SplitContainer.Size = new System.Drawing.Size(589, 34);
-            SplitContainer.SplitterDistance = 433;
-            SplitContainer.TabIndex = 0;
+            SplitContainer.Size = new System.Drawing.Size(897, 34);
+            SplitContainer.SplitterDistance = 767;
+            SplitContainer.TabIndex = 1;
             // 
-            // TextSearch
+            // textBox1
             // 
-            TextSearch.Dock = System.Windows.Forms.DockStyle.Fill;
-            TextSearch.Location = new System.Drawing.Point(0, 5);
-            TextSearch.Name = "TextSearch";
-            TextSearch.PlaceholderText = "Search";
-            TextSearch.Size = new System.Drawing.Size(428, 23);
-            TextSearch.TabIndex = 4;
+            textBox1.Dock = System.Windows.Forms.DockStyle.Fill;
+            textBox1.Location = new System.Drawing.Point(0, 5);
+            textBox1.Name = "textBox1";
+            textBox1.PlaceholderText = "Search";
+            textBox1.Size = new System.Drawing.Size(762, 23);
+            textBox1.TabIndex = 4;
             // 
             // checkBox1
             // 
             checkBox1.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
             checkBox1.AutoSize = true;
-            checkBox1.Checked = true;
-            checkBox1.CheckState = System.Windows.Forms.CheckState.Checked;
-            checkBox1.Location = new System.Drawing.Point(8, 7);
+            checkBox1.Location = new System.Drawing.Point(14, 7);
             checkBox1.Name = "checkBox1";
-            checkBox1.Size = new System.Drawing.Size(136, 19);
+            checkBox1.Size = new System.Drawing.Size(104, 19);
             checkBox1.TabIndex = 4;
-            checkBox1.Text = "&Show top plevel only";
+            checkBox1.Text = "&Require source";
             checkBox1.UseVisualStyleBackColor = true;
             // 
-            // ChocolateySearchBar
+            // WingetSearchBar
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             Controls.Add(SplitContainer);
-            Name = "ChocolateySearchBar";
-            Size = new System.Drawing.Size(589, 34);
+            Name = "WingetSearchBar";
+            Size = new System.Drawing.Size(897, 34);
             SplitContainer.Panel1.ResumeLayout(false);
             SplitContainer.Panel1.PerformLayout();
             SplitContainer.Panel2.ResumeLayout(false);
@@ -99,7 +97,7 @@
         #endregion
 
         private System.Windows.Forms.SplitContainer SplitContainer;
+        private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.CheckBox checkBox1;
-        private System.Windows.Forms.TextBox TextSearch;
     }
 }

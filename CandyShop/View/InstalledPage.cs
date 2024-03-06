@@ -20,8 +20,9 @@ namespace CandyShop.View
             SplitContainer.Panel2Collapsed = true;
         }
 
-        public event EventHandler ShowTopLevelOnlyChanged;
-        public event EventHandler FilterTextChanged;
+        public event EventHandler FilterTopLevelOnlyChanged;
+        public event EventHandler FilterRequireSourceChanged;
+        public event EventHandler SearchTermChanged;
         public event EventHandler SelectedItemChanged;
 
         public string SelectedItem
@@ -35,7 +36,9 @@ namespace CandyShop.View
             }
         }
 
-        public bool ShowTopLevelOnly => SearchBar.FilterTopLevelOnly;
+        public bool FilterShowTopLevelOnly => SearchBar.FilterTopLevelOnly;
+
+        public bool FilterRequireSource => SearchBar.FilterRequireSource;
 
         public bool LoadingPackages
         {
@@ -72,7 +75,7 @@ namespace CandyShop.View
             .Select(item => item.Text)
             .ToList();
 
-        public string FilterText => SearchBar.Text;
+        public string SearchTerm => SearchBar.Text;
 
         public void BuildControls(ICommon provider)
         {
@@ -81,8 +84,9 @@ namespace CandyShop.View
 
             SearchBar = provider.GetSearchBar();
             SearchBar.Dock = DockStyle.Top;
-            SearchBar.FilterTopLevelOnlyChanged += new EventHandler((sender, e) => ShowTopLevelOnlyChanged?.Invoke(sender, e));
-            SearchBar.SearchChanged += new EventHandler((sender, e) => FilterTextChanged?.Invoke(sender, e));
+            SearchBar.FilterTopLevelOnlyChanged += new EventHandler((sender, e) => FilterTopLevelOnlyChanged?.Invoke(sender, e));
+            SearchBar.FilterRequireSourceChanged += new EventHandler((sender, e) => FilterRequireSourceChanged?.Invoke(sender, e));
+            SearchBar.SearchChanged += new EventHandler((sender, e) => SearchTermChanged?.Invoke(sender, e));
             SearchBar.SearchEnterPressed += new EventHandler((sender, e) =>
             {
                 if (LstPackages.Other.Items.Count > 0)
@@ -91,16 +95,16 @@ namespace CandyShop.View
             Controls.Add(SearchBar);
         }
 
-        public void AppendItem(string name, string version)
+        public void AppendItem(string[] data)
         {
-            LstPackages.Other.Items.Add(new ListViewItem(new string[] { name, version }));
+            LstPackages.Other.Items.Add(new ListViewItem(data));
             var test = LstPackages.Other.Columns;
             LoadingPackages = false;
         }
 
-        public void InsertItem(int index, string name, string version)
+        public void InsertItem(int index, string[] data)
         {
-            LstPackages.Other.Items.Insert(index, new ListViewItem(new string[] { name, version }));
+            LstPackages.Other.Items.Insert(index, new ListViewItem(data));
         }
 
         public void ClearItems()

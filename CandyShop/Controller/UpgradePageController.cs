@@ -32,8 +32,9 @@ namespace CandyShop.Controller
             MainWindow = mainWindow;
             View = upgradePage;
 
-            View.BuildControls(new CommonChocolatey());
-            
+            ICommon provider = ContextSingleton.Get.WingetMode ? new CommonWinget() : new CommonChocolatey();
+            View.BuildControls(provider);
+
             View.PinnedChanged += new EventHandler<PinnedChangedArgs>((sender, e) => TogglePin(e.Name));
             View.CleanShortcutsChanged += new EventHandler((sender, e) => Context.CleanShortcuts = View.CleanShortcuts);
             View.CloseAfterUpgradeChanged += new EventHandler((sender, e) => Context.CloseAfterUpgrade = View.CloseAfterUpgrade);
@@ -99,13 +100,13 @@ namespace CandyShop.Controller
             }
 
             View.ClearItems();
-            packages.ForEach(p => View.AddItem(new string[]
-            {
+            packages.ForEach(p => View.AddItem([
                 p.Name,
                 p.CurrVer,
                 p.AvailVer,
-                p.Pinned.ToString()
-            }));
+                p.Pinned.ToString(),
+                p.Source
+            ]));
 
             if (packages.Count == 0)
             {

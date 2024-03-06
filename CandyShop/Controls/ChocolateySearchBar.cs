@@ -18,8 +18,8 @@ namespace CandyShop.Controls
         }
 
         public override event EventHandler SearchChanged;
-        public override event EventHandler FilterTopLevelOnlyChanged;
         public override event EventHandler SearchEnterPressed;
+        public override event EventHandler FilterTopLevelOnlyChanged;
 
         public override string Text
         {
