@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace CandyShop.View
 {
@@ -8,7 +7,7 @@ namespace CandyShop.View
         public string Name;
     }
 
-    interface IUpgradePageView
+    interface IUpgradePageView : ITabPage
     {
         event EventHandler UpgradeAllClick;
         event EventHandler UpgradeSelectedClick;
@@ -27,7 +26,6 @@ namespace CandyShop.View
         bool CloseAfterUpgrade { get; set; }
         bool Loading { get; set; }
         bool ShowUacIcons { get; set; }
-
         void AddItem(string[] data);
         void ClearItems();
         void CheckAllItems();

@@ -35,29 +35,7 @@ namespace CandyShop.Controls
                 View = System.Windows.Forms.View.Details
             };
 
-            Resize += new EventHandler((sender, e) =>
-            {
-                if (Columns != null && Columns.Length.Equals(Other.Columns.Count))
-                {
-                    int availWidth = Width - AggregatedFixedColumnWidth - AggregatedMiscWidth;
-                    for (int i = 0; i <  Columns.Length; i++)
-                    {
-                        var col = Columns[i];
-                        if (col.Unit.Equals(PackageListBoxSize.Fixed))
-                        {
-                            Other.Columns[i].Width = (int) col.Value;
-                        }
-                        else if (col.Unit.Equals(PackageListBoxSize.Percent))
-                        {
-                            Other.Columns[i].Width = (int) (availWidth * col.Value);
-                        }
-                        else
-                        {
-                            Other.Columns[i].Width = 20;
-                        }
-                    }
-                }
-            });
+            Resize += PackageListBox_Resize;
         }
 
         private bool _NoPackages = false;
@@ -103,6 +81,7 @@ namespace CandyShop.Controls
                 Other.Columns.AddRange(value
                     .Select(col => new ColumnHeader(col.Name) { Text = col.Name })
                     .ToArray());
+                PackageListBox_Resize(this, EventArgs.Empty);
             }
         }
 
@@ -110,6 +89,30 @@ namespace CandyShop.Controls
         {
             get { return SpinnerCtl.Text; }
             set { SpinnerCtl.Text = value; }
+        }
+
+        private void PackageListBox_Resize(object sender, EventArgs e)
+        {
+            if (Columns != null && Columns.Length.Equals(Other.Columns.Count))
+            {
+                int availWidth = Width - AggregatedFixedColumnWidth - AggregatedMiscWidth;
+                for (int i = 0; i < Columns.Length; i++)
+                {
+                    var col = Columns[i];
+                    if (col.Unit.Equals(PackageListBoxSize.Fixed))
+                    {
+                        Other.Columns[i].Width = (int)col.Value;
+                    }
+                    else if (col.Unit.Equals(PackageListBoxSize.Percent))
+                    {
+                        Other.Columns[i].Width = (int)(availWidth * col.Value);
+                    }
+                    else
+                    {
+                        Other.Columns[i].Width = 20;
+                    }
+                }
+            }
         }
 
         private void Other_PreventItemSelectionChange(object sender, ListViewItemSelectionChangedEventArgs e)

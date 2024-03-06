@@ -15,10 +15,6 @@ namespace CandyShop.View
             InitializeComponent();
 
             LstPackages.Hint = LocaleEN.TEXT_LOADING_INSTALLED;
-            LstPackages.Columns = [
-                new(LocaleEN.TEXT_COL_NAME, .6f, PackageListBoxSize.Percent),
-                new(LocaleEN.TEXT_COL_VERSION, .4f, PackageListBoxSize.Percent)
-            ];
 
             Resize += new EventHandler((sender, e) => ResizeSearchbar());
             LstPackages.Other.SelectedIndexChanged += new EventHandler((sender, e) => SelectedItemChanged?.Invoke(this, EventArgs.Empty));
@@ -89,6 +85,11 @@ namespace CandyShop.View
             .ToList();
 
         public string FilterText => TextSearch.Text;
+
+        public void BuildControls(ICommon provider)
+        {
+            LstPackages.Columns = provider.GetInstalledColumns();
+        }
 
         public void AppendItem(string name, string version)
         {

@@ -5,6 +5,7 @@ using CandyShop.View;
 using CandyShop.Properties;
 using CandyShop.Services;
 using Serilog;
+using CandyShop.Controls;
 
 namespace CandyShop.Controller
 {
@@ -23,6 +24,9 @@ namespace CandyShop.Controller
         {
             MainWindow = mainWindow;
             View = view;
+
+            View.BuildControls(new CommonChocolatey());
+
             View.EnableTopLevelToggle = !ContextSingleton.Get.WingetMode;
 
             View.FilterTextChanged += new EventHandler((sender, e) => SyncListView());

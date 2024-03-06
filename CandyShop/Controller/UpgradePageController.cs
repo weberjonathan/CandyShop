@@ -1,4 +1,5 @@
 ﻿using CandyShop.Chocolatey;
+using CandyShop.Controls;
 using CandyShop.Properties;
 using CandyShop.Services;
 using CandyShop.View;
@@ -30,6 +31,8 @@ namespace CandyShop.Controller
         {
             MainWindow = mainWindow;
             View = upgradePage;
+
+            View.BuildControls(new CommonChocolatey());
             
             View.PinnedChanged += new EventHandler<PinnedChangedArgs>((sender, e) => TogglePin(e.Name));
             View.CleanShortcutsChanged += new EventHandler((sender, e) => Context.CleanShortcuts = View.CleanShortcuts);

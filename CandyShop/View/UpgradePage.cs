@@ -15,12 +15,6 @@ namespace CandyShop.View
 
             // configure PackageListBox
             LstPackages.Hint = LocaleEN.TEXT_LOADING_OUTDATED;
-            LstPackages.Columns = [
-                new(LocaleEN.TEXT_COL_NAME, .4f, PackageListBoxSize.Percent),
-                new(LocaleEN.TEXT_COL_CURRENT, .3f, PackageListBoxSize.Percent),
-                new(LocaleEN.TEXT_COL_AVAILABLE, .3f, PackageListBoxSize.Percent),
-                new(LocaleEN.TEXT_COL_PINNED, 60f, PackageListBoxSize.Fixed)
-            ];
 
             // tool bar
             var tsRefresh = new ToolStripButton
@@ -250,6 +244,11 @@ namespace CandyShop.View
                         }
                 }
             }
+        }
+
+        public void BuildControls(ICommon provider)
+        {
+            LstPackages.Columns = provider.GetUpgradeColumns();
         }
 
         public void AddItem(string[] data)
