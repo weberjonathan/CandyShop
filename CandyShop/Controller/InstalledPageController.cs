@@ -26,7 +26,7 @@ namespace CandyShop.Controller
             MainWindow = mainWindow;
             View = view;
 
-            ICommon provider = ContextSingleton.Get.WingetMode ? new CommonWinget() : new CommonChocolatey();
+            AbstractCommon provider = ContextSingleton.Get.WingetMode ? new CommonWinget() : new CommonChocolatey();
             View.BuildControls(provider);
 
             View.SearchBar.SearchChanged += new EventHandler((sender, e) => SyncListView());

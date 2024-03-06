@@ -32,7 +32,7 @@ namespace CandyShop.Controller
             MainWindow = mainWindow;
             View = upgradePage;
 
-            ICommon provider = ContextSingleton.Get.WingetMode ? new CommonWinget() : new CommonChocolatey();
+            AbstractCommon provider = ContextSingleton.Get.WingetMode ? new CommonWinget() : new CommonChocolatey();
             View.BuildControls(provider);
 
             View.PinnedChanged += new EventHandler<PinnedChangedArgs>((sender, e) => TogglePin(e.Name));

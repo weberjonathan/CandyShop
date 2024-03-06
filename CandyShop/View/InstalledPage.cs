@@ -68,7 +68,7 @@ namespace CandyShop.View
             .Select(item => item.Text)
             .ToList();
 
-        public void BuildControls(ICommon provider)
+        public void BuildControls(AbstractCommon provider)
         {
             LstPackages.Columns = provider.GetInstalledColumns();
             LstPackages.CheckBoxes = false;

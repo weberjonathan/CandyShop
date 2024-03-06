@@ -16,52 +16,6 @@ namespace CandyShop.View
             // configure PackageListBox
             LstPackages.Hint = LocaleEN.TEXT_LOADING_OUTDATED;
 
-            // tool bar
-            var tsRefresh = new ToolStripButton
-            {
-                Text = LocaleEN.TEXT_TS_REFRESH,
-                Image = Resources.ic_refresh,
-                DisplayStyle = ToolStripItemDisplayStyle.Image
-            };
-            tsRefresh.Click += new EventHandler((sender, e) => RefreshClicked?.Invoke(sender, e));
-
-            var tsSelectAll = new ToolStripButton
-            {
-                Text = LocaleEN.TEXT_TS_SELECT_ALL,
-                Image = Resources.ic_check_all,
-                DisplayStyle = ToolStripItemDisplayStyle.Image
-            };
-            tsSelectAll.Click += new EventHandler((sender, e) => CheckAllItems());
-
-            var tsSelectSmart = new ToolStripButton
-            {
-                Text = LocaleEN.TEXT_TS_SELECT_SMART,
-                Image = Resources.ic_check_smart,
-                DisplayStyle = ToolStripItemDisplayStyle.Image
-            };
-            tsSelectSmart.Click += new EventHandler((sender, e) => CheckTopLevelItems());
-
-            var tsDeselect = new ToolStripButton
-            {
-                Text = LocaleEN.TEXT_TS_DESELECT,
-                Image = Resources.ic_check_none,
-                DisplayStyle = ToolStripItemDisplayStyle.Image
-            };
-            tsDeselect.Click += new EventHandler((sender, e) => UncheckAllItems());
-
-            ToolStrip ts = new()
-            {
-                BackColor = SystemColors.Window,
-                GripStyle = ToolStripGripStyle.Hidden
-            };
-            ts.Items.Add(tsRefresh);
-            ts.Items.Add(new ToolStripSeparator());
-            ts.Items.Add(new ToolStripLabel("Select:"));
-            ts.Items.Add(tsSelectAll);
-            ts.Items.Add(tsSelectSmart);
-            ts.Items.Add(tsDeselect);
-            this.Controls.Add(ts);
-
             // labels
             BtnUpgradeSelected.Text = LocaleEN.TEXT_UPGRADE_SELECTED;
             BtnUpgradeAll.Text = LocaleEN.TEXT_UPGRADE_ALL;
@@ -246,10 +200,19 @@ namespace CandyShop.View
             }
         }
 
-        public void BuildControls(ICommon provider)
+        public void BuildControls(AbstractCommon provider)
         {
             LstPackages.Columns = provider.GetUpgradeColumns();
             LstPackages.CheckBoxes = true;
+
+            var ts = provider.GetUpgradePageToolBar();
+            ts.Items["Refresh"].Click += new EventHandler((sender, e) => RefreshClicked?.Invoke(sender, e));
+            ts.Items["Select"].Click += new EventHandler((sender, e) => CheckAllItems());
+            ts.Items["Deselect"].Click += new EventHandler((sender, e) => UncheckAllItems());
+            var selectTopLevel = ts.Items["SelectTopLevel"];
+            if (selectTopLevel != null)
+                selectTopLevel.Click += new EventHandler((sender, e) => CheckTopLevelItems());
+            Controls.Add(ts);
         }
 
         public void AddItem(string[] data)

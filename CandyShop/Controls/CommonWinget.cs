@@ -1,10 +1,11 @@
 ﻿using CandyShop.Properties;
+using System.Windows.Forms;
 
 namespace CandyShop.Controls
 {
-    internal class CommonWinget: ICommon
+    internal class CommonWinget: AbstractCommon
     {
-        public PackageListBoxColumn[] GetUpgradeColumns()
+        public override PackageListBoxColumn[] GetUpgradeColumns()
         {
             return [
                 new(LocaleEN.TEXT_COL_NAME, .4f, PackageListBoxSize.Percent),
@@ -15,7 +16,7 @@ namespace CandyShop.Controls
             ];
         }
 
-        public PackageListBoxColumn[] GetInstalledColumns()
+        public override PackageListBoxColumn[] GetInstalledColumns()
         {
             return [
                 new(LocaleEN.TEXT_COL_NAME, .4f, PackageListBoxSize.Percent),
@@ -24,9 +25,14 @@ namespace CandyShop.Controls
             ];
         }
 
-        public CommonSearchBar GetSearchBar()
+        public override CommonSearchBar GetSearchBar()
         {
             return new WingetSearchBar();
+        }
+
+        public override ToolStrip GetUpgradePageToolBar()
+        {
+            return GetCommonUpgradePageToolBar();
         }
     }
 }
