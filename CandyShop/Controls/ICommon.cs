@@ -1,13 +1,11 @@
-﻿using System.Windows.Forms;
-
-namespace CandyShop.Controls
+﻿namespace CandyShop.Controls
 {
     internal interface ICommon
     {
         PackageListBoxColumn[] GetUpgradeColumns();
         PackageListBoxColumn[] GetInstalledColumns();
-        Control GetSearchBar();
-        
+        CommonSearchBar GetSearchBar();
+
         // TODO context menu, menu items
     }
 }

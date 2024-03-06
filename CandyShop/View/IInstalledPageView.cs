@@ -13,7 +13,6 @@ namespace CandyShop.View
         string SelectedItem { get; }
         string FilterText { get; }
         bool ShowTopLevelOnly { get; } // a toggle that defines if only top level packages are shown in the list view
-        public bool EnableTopLevelToggle { get; set; } // whether above mentioned toggle is displayed, or not
         public bool LoadingPackages { get; set; }
         public bool LoadingDetails { get; set; }
         void AppendItem(string name, string version);

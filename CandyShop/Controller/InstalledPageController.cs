@@ -27,8 +27,6 @@ namespace CandyShop.Controller
 
             View.BuildControls(new CommonChocolatey());
 
-            View.EnableTopLevelToggle = !ContextSingleton.Get.WingetMode;
-
             View.FilterTextChanged += new EventHandler((sender, e) => SyncListView());
             View.ShowTopLevelOnlyChanged += new EventHandler((sender, e) => SyncListView());
             View.SelectedItemChanged += OnSelectedItemChanged;

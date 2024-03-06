@@ -72,16 +72,19 @@ namespace CandyShop.Controls
             }
             set
             {
-                _Columns = value;
-                AggregatedFixedColumnWidth = _Columns
+                if (value  != null)
+                {
+                    _Columns = value;
+                    AggregatedFixedColumnWidth = _Columns
                         .Where(col => col.Unit.Equals(PackageListBoxSize.Fixed))
                         .Select(col => (int)Math.Round(col.Value))
                         .Sum();
-                Other.Columns.Clear();
-                Other.Columns.AddRange(value
-                    .Select(col => new ColumnHeader(col.Name) { Text = col.Name })
-                    .ToArray());
-                PackageListBox_Resize(this, EventArgs.Empty);
+                    Other.Columns.Clear();
+                    Other.Columns.AddRange(value
+                        .Select(col => new ColumnHeader(col.Name) { Text = col.Name })
+                        .ToArray());
+                    PackageListBox_Resize(this, EventArgs.Empty);
+                }
             }
         }
 

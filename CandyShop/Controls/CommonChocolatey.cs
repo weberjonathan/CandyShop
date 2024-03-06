@@ -1,10 +1,5 @@
 ﻿using CandyShop.Properties;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 
 namespace CandyShop.Controls
 {
@@ -28,9 +23,9 @@ namespace CandyShop.Controls
             ];
         }
 
-        public Control GetSearchBar()
+        public CommonSearchBar GetSearchBar()
         {
-            throw new NotImplementedException();
+            return new ChocolateySearchBar();
         }
     }
 }

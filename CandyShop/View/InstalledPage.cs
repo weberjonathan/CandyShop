@@ -10,13 +10,12 @@ namespace CandyShop.View
 {
     partial class InstalledPage : UserControl, IInstalledPageView
     {
+        private CommonSearchBar SearchBar;
+
         public InstalledPage()
         {
             InitializeComponent();
-
             LstPackages.Hint = LocaleEN.TEXT_LOADING_INSTALLED;
-
-            Resize += new EventHandler((sender, e) => ResizeSearchbar());
             LstPackages.Other.SelectedIndexChanged += new EventHandler((sender, e) => SelectedItemChanged?.Invoke(this, EventArgs.Empty));
             SplitContainer.Panel2Collapsed = true;
         }
@@ -24,17 +23,6 @@ namespace CandyShop.View
         public event EventHandler ShowTopLevelOnlyChanged;
         public event EventHandler FilterTextChanged;
         public event EventHandler SelectedItemChanged;
-
-        private bool _EnableTopLevelToggle = true;
-        public bool EnableTopLevelToggle
-        {
-            get { return _EnableTopLevelToggle; }
-            set {
-                CheckHideSuffixed.Visible = value;
-                _EnableTopLevelToggle = value;
-                ResizeSearchbar();
-            }
-        }
 
         public string SelectedItem
         {
@@ -47,7 +35,7 @@ namespace CandyShop.View
             }
         }
 
-        public bool ShowTopLevelOnly => CheckHideSuffixed.Checked;
+        public bool ShowTopLevelOnly => SearchBar.FilterTopLevelOnly;
 
         public bool LoadingPackages
         {
@@ -84,11 +72,22 @@ namespace CandyShop.View
             .Select(item => item.Text)
             .ToList();
 
-        public string FilterText => TextSearch.Text;
+        public string FilterText => SearchBar.Text;
 
         public void BuildControls(ICommon provider)
         {
             LstPackages.Columns = provider.GetInstalledColumns();
+
+            SearchBar = provider.GetSearchBar();
+            SearchBar.Dock = DockStyle.Top;
+            SearchBar.FilterTopLevelOnlyChanged += new EventHandler((sender, e) => ShowTopLevelOnlyChanged?.Invoke(sender, e));
+            SearchBar.SearchChanged += new EventHandler((sender, e) => FilterTextChanged?.Invoke(sender, e));
+            SearchBar.SearchEnterPressed += new EventHandler((sender, e) =>
+            {
+                if (LstPackages.Other.Items.Count > 0)
+                    LstPackages.Other.Items[0].Selected = true;
+            });
+            Controls.Add(SearchBar);
         }
 
         public void AppendItem(string name, string version)
@@ -118,30 +117,6 @@ namespace CandyShop.View
         public void RemoveItem(string name)
         {
             LstPackages.Other.Items.Remove(LstPackages.Other.FindItemWithText(name));
-        }
-
-        private void CheckHideSuffixed_CheckedChanged(object sender, EventArgs e)
-        {
-            ShowTopLevelOnlyChanged?.Invoke(this, EventArgs.Empty);
-        }
-
-        private void TextSearch_TextChanged(object sender, EventArgs e)
-        {
-            FilterTextChanged?.Invoke(this, EventArgs.Empty);
-        }
-
-        private void TextSearch_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.KeyCode.Equals(Keys.Enter) && LstPackages.Other.Items.Count > 0)
-            {
-                LstPackages.Other.Items[0].Selected = true;
-            }
-        }
-
-        private void ResizeSearchbar()
-        {
-            int width = EnableTopLevelToggle ? CheckHideSuffixed.Location.X - 20 : LstPackages.Other.Width;
-            TextSearch.Size = new System.Drawing.Size(width, TextSearch.Height);
         }
     }
 }
