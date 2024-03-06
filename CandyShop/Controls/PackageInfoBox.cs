@@ -2,11 +2,10 @@
 
 namespace CandyShop.Controls
 {
-    public partial class PackageInfoBox : AbstractLoadingControl<TextBox>
+    public class PackageInfoBox : AbstractLoadingControl<TextBox>
     {
         public PackageInfoBox()
         {
-            InitializeComponent();
             Other = new TextBox()
             {
                 Name = "Textbox",

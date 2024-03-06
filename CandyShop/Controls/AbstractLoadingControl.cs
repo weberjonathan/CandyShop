@@ -2,7 +2,7 @@
 
 namespace CandyShop.Controls
 {
-    abstract public class AbstractLoadingControl<T> : UserControl where T: Control
+    abstract public class AbstractLoadingControl<T> : Control where T: Control
     {
         internal readonly Spinner SpinnerCtl = new()
         {
