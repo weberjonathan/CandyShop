@@ -134,11 +134,12 @@ namespace CandyShop.Controller
             string lastVisibilePackage = null;
 
             // find package that is supposed to be directly above it
-            for (int j = 0; j < latestPossibleIndex; j++)
+            for (int j = latestPossibleIndex - 1; j >= 0; j--)
             {
                 if (View.Items.Contains(referenceList[j].Name))
                 {
                     lastVisibilePackage = referenceList[j].Name;
+                    break;
                 }
             }
 

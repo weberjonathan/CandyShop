@@ -71,6 +71,8 @@
             // 
             checkBox1.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
             checkBox1.AutoSize = true;
+            checkBox1.Checked = true;
+            checkBox1.CheckState = System.Windows.Forms.CheckState.Checked;
             checkBox1.Location = new System.Drawing.Point(14, 7);
             checkBox1.Name = "checkBox1";
             checkBox1.Size = new System.Drawing.Size(104, 19);
