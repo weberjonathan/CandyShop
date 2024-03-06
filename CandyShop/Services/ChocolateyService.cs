@@ -245,7 +245,7 @@ namespace CandyShop.Services
         /// <param name="packages"></param>
         /// <param name="validExitCodes">test</param>
         /// <exception cref="ChocolateyException"></exception>
-        public void Upgrade(List<ChocolateyPackage> packages, int[] validExitCodes = null)
+        private void Upgrade(List<ChocolateyPackage> packages, int[] validExitCodes = null)
         {
             int exitCode = ChocolateyWrapper.Upgrade(packages);
             

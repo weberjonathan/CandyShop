@@ -20,6 +20,8 @@ namespace CandyShop.Winget
 
         public int ExitCode { get; private set; }
 
+        public bool FailOnNonZeroExitCode { get; set; } = true;
+
         /// <summary>
         ///     Executes the winget process without creating a window
         ///     and writes stdout to the Output property after execution
@@ -43,7 +45,7 @@ namespace CandyShop.Winget
                 Output = output;
                 ExitCode = proc.ExitCode;
 
-                if (proc.ExitCode != 0)
+                if (FailOnNonZeroExitCode && proc.ExitCode != 0)
                 {
                     // TODO what's in output => add property for stderr? put stderr in output?
                     throw new WingetException($"winget did not exit cleanly ({proc.ExitCode})\n\n{Output}");
@@ -52,7 +54,7 @@ namespace CandyShop.Winget
             catch (Win32Exception e)
             {
                 // TODO what's in output => add property for stderr? put stderr in output?
-                throw new WingetException("An error occurred while running choco.", e);
+                throw new WingetException("An error occurred while running winget.", e);
             }
         }
 
@@ -75,14 +77,14 @@ namespace CandyShop.Winget
                 proc.WaitForExit();
                 ExitCode = proc.ExitCode;
 
-                if (proc.ExitCode != 0)
+                if (FailOnNonZeroExitCode && proc.ExitCode != 0)
                 {
                     throw new WingetException($"winget did not exit cleanly. Returned {proc.ExitCode}.");
                 }
             }
             catch (Win32Exception e)
             {
-                throw new WingetException("An error occurred while running choco.", e);
+                throw new WingetException("An error occurred while running winget.", e);
             }
         }
     }

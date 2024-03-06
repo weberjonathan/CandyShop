@@ -108,7 +108,7 @@ namespace CandyShop.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Error upgrading outdated packages: {0}.
         ///
-        ///Hint: Check the output in the Candy Shop console window before continuing, or see the Chocolatey logs. (The log folder is available through the Extras menu.).
+        ///Hint: Check the output in the Candy Shop console window before pressing OK, or see the logs. (The log folder of the package manager is available through the Extras menu.).
         /// </summary>
         internal static string ERROR_UPGRADING_OUTDATED_PACKAGES {
             get {

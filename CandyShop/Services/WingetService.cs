@@ -9,7 +9,6 @@ using System;
 namespace CandyShop.Services
 
     // TODO use IDs instead of names for dictionaries
-    // TODO use exit codes in ugprade procedure (see ChocolateyService)
 {
     /// <summary>
     /// This service class allows asynchronous, non-blocking access to Chocolatey and implements a cache.
@@ -39,7 +38,7 @@ namespace CandyShop.Services
 
         public async Task ClearOutdatedPackages()
         {
-            await ClearOutdatedPackages();
+            await ClearInstalledPackages();
         }
 
         public async Task ClearInstalledPackages()
@@ -118,6 +117,8 @@ namespace CandyShop.Services
             {
                 Upgrade(chocoPackages);
             }
+
+            // TODO refresh stuff; see ChocolateyService.Upgrade()
         }
 
         // --------------------------------------------------------------------
@@ -202,9 +203,14 @@ namespace CandyShop.Services
         /// <param name="packages"></param>
         /// <param name="validExitCodes">test</param>
         /// <exception cref="WingetException"></exception>
-        public void Upgrade(List<WingetPackage> packages)
+        private void Upgrade(List<WingetPackage> packages)
         {
-            WingetWrapper.Upgrade(packages);
+            int exitCode = WingetWrapper.Upgrade(packages);
+
+            if (exitCode != 0)
+            {
+                throw new WingetException($"Winget did not exit cleanly. Returned {exitCode}.");
+            }
         }
     }
 }

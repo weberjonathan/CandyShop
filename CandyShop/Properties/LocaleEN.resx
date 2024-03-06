@@ -135,7 +135,7 @@
   <data name="ERROR_UPGRADING_OUTDATED_PACKAGES" xml:space="preserve">
     <value>Error upgrading outdated packages: {0}.
 
-Hint: Check the output in the Candy Shop console window before continuing, or see the Chocolatey logs. (The log folder is available through the Extras menu.)</value>
+Hint: Check the output in the Candy Shop console window before pressing OK, or see the logs. (The log folder of the package manager is available through the Extras menu.)</value>
   </data>
   <data name="NOT_IGNORE" xml:space="preserve">
     <value>Ignore</value>

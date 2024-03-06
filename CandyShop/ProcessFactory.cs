@@ -1,5 +1,6 @@
 ﻿using CandyShop.Chocolatey;
 using CandyShop.Winget;
+using System.Collections.Generic;
 
 namespace CandyShop
 {
@@ -24,7 +25,17 @@ namespace CandyShop
 
         public static WingetProcess Winget(string args)
         {
-            return Instance.CreateWingetProcess(args);
+            return Instance.CreateWingetProcess(args, false);
+        }
+
+        public static WingetProcess WingetPrivileged(string args)
+        {
+            return Instance.CreateWingetProcess(args, true);
+        }
+
+        public static WingetProcess WingetPrivileged(List<WingetProcess> processes)
+        {
+            return Instance.CreatePrivilegedUnifiedWingetProcess(processes);
         }
 
         public string ChocoBinary { get; set; }
@@ -59,9 +70,23 @@ namespace CandyShop
             }
         }
 
-        private WingetProcess CreateWingetProcess(string args)
+        private WingetProcess CreateWingetProcess(string args, bool elevate)
         {
-            return new WingetProcess(WingetBinary, args);
+            if (elevate && ElevateOnDemand)
+                return new WingetProcess("powershell.exe", "gsudo {" + WingetBinary + " " + args + "}");
+            else
+                return new WingetProcess(WingetBinary, args);
+        }
+
+        private WingetProcess CreatePrivilegedUnifiedWingetProcess(List<WingetProcess> processes)
+        {
+            string body = "";
+            foreach (var item in processes)
+            {
+                var cmd = $"{item.Binary} {item.Args}";
+                body += $"Write-Host \"$ {cmd}`n\"; {cmd}; Write-Host \"Returned $LastExitCode`n\"; $exit = $exit -and $?;";
+            }
+            return new WingetProcess("powershell.exe", $"$exit = $true; gsudo {{ {body} }}; Exit (-Not $exit)");
         }
     }
 }

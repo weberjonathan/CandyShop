@@ -107,16 +107,22 @@ namespace CandyShop.Winget
             return start > 0 ? p.Output[start..] : p.Output;
         }
 
-        public static void Upgrade(List<WingetPackage> packages)
+        public static int Upgrade(List<WingetPackage> packages)
         {
-            foreach (WingetPackage pckg in packages) // TODO make cast safe?
+            if (packages.Count == 0) return 0;
+
+            List<WingetProcess> upgradeCommands = new();
+            foreach (WingetPackage pckg in packages)
             {
-                // launch process
                 string command = $"upgrade --id \"{pckg.Id}\" --silent --exact";
-                Console.WriteLine($"> {command}");
-                WingetProcess p = ProcessFactory.Winget(command); // TODO make silent an option for user
-                p.Execute();
+                var cmd = ProcessFactory.Winget(command);
+                upgradeCommands.Add(cmd);
             }
+
+            var p = ProcessFactory.WingetPrivileged(upgradeCommands);
+            p.FailOnNonZeroExitCode = false;
+            p.Execute();
+            return p.ExitCode;
         }
 
         private static int GetNextColumnIndex(string row, int startIndex)

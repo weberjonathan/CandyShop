@@ -3,6 +3,7 @@ using CandyShop.Controls;
 using CandyShop.Properties;
 using CandyShop.Services;
 using CandyShop.View;
+using CandyShop.Winget;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -154,7 +155,14 @@ namespace CandyShop.Controller
                 MainWindow?.ToForm().Show();
                 return; // TODO why return? shortcuts should be deleted even if chocolatey fails to upgrade some packages (others may have been upgraded and added a shortcut)
             }
-
+            catch (WingetException e)
+            {
+                // TODO unify Chocolatey, Winget to PackageManagerException
+                MainWindow?.DisplayError(LocaleEN.ERROR_UPGRADING_OUTDATED_PACKAGES, e.Message);
+                WindowsConsole.FreeConsole();
+                MainWindow?.ToForm().Show();
+                return;
+            }
             // display results
             Task minDelay = Task.Run(() => Thread.Sleep(3 * 1000));
 
