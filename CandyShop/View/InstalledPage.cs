@@ -10,8 +10,6 @@ namespace CandyShop.View
 {
     partial class InstalledPage : UserControl, IInstalledPageView
     {
-        private CommonSearchBar SearchBar;
-
         public InstalledPage()
         {
             InitializeComponent();
@@ -20,9 +18,6 @@ namespace CandyShop.View
             SplitContainer.Panel2Collapsed = true;
         }
 
-        public event EventHandler FilterTopLevelOnlyChanged;
-        public event EventHandler FilterRequireSourceChanged;
-        public event EventHandler SearchTermChanged;
         public event EventHandler SelectedItemChanged;
 
         public string SelectedItem
@@ -36,9 +31,7 @@ namespace CandyShop.View
             }
         }
 
-        public bool FilterShowTopLevelOnly => SearchBar.FilterTopLevelOnly;
-
-        public bool FilterRequireSource => SearchBar.FilterRequireSource;
+        public CommonSearchBar SearchBar { get; private set; }
 
         public bool LoadingPackages
         {
@@ -75,8 +68,6 @@ namespace CandyShop.View
             .Select(item => item.Text)
             .ToList();
 
-        public string SearchTerm => SearchBar.Text;
-
         public void BuildControls(ICommon provider)
         {
             LstPackages.Columns = provider.GetInstalledColumns();
@@ -84,9 +75,6 @@ namespace CandyShop.View
 
             SearchBar = provider.GetSearchBar();
             SearchBar.Dock = DockStyle.Top;
-            SearchBar.FilterTopLevelOnlyChanged += new EventHandler((sender, e) => FilterTopLevelOnlyChanged?.Invoke(sender, e));
-            SearchBar.FilterRequireSourceChanged += new EventHandler((sender, e) => FilterRequireSourceChanged?.Invoke(sender, e));
-            SearchBar.SearchChanged += new EventHandler((sender, e) => SearchTermChanged?.Invoke(sender, e));
             SearchBar.SearchEnterPressed += new EventHandler((sender, e) =>
             {
                 if (LstPackages.Other.Items.Count > 0)

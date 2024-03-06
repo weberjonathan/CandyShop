@@ -29,9 +29,9 @@ namespace CandyShop.Controller
             ICommon provider = ContextSingleton.Get.WingetMode ? new CommonWinget() : new CommonChocolatey();
             View.BuildControls(provider);
 
-            View.SearchTermChanged += new EventHandler((sender, e) => SyncListView());
-            View.FilterRequireSourceChanged += new EventHandler((sender, e) => SyncListView());
-            View.FilterTopLevelOnlyChanged += new EventHandler((sender, e) => SyncListView());
+            View.SearchBar.SearchChanged += new EventHandler((sender, e) => SyncListView());
+            View.SearchBar.FilterRequireSourceChanged += new EventHandler((sender, e) => SyncListView());
+            View.SearchBar.FilterTopLevelOnlyChanged += new EventHandler((sender, e) => SyncListView());
             View.SelectedItemChanged += OnSelectedItemChanged;
             MainWindow.RefreshClicked += new EventHandler((sender, e) => UpdateInstalledPackagesDisplayAsync(forceFetch: true));
         }
@@ -88,9 +88,9 @@ namespace CandyShop.Controller
 
         private async void SyncListView()
         {
-            string filterName = View.SearchTerm;
-            bool hideSuffixed = View.FilterShowTopLevelOnly;
-            bool requireSource = View.FilterRequireSource;
+            string filterName = View.SearchBar.Text;
+            bool hideSuffixed = View.SearchBar.FilterTopLevelOnly;
+            bool requireSource = View.SearchBar.FilterRequireSource;
 
             List<GenericPackage> packages = new List<GenericPackage>();
             try
