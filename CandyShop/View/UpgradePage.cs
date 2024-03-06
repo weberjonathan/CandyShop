@@ -249,6 +249,7 @@ namespace CandyShop.View
         public void BuildControls(ICommon provider)
         {
             LstPackages.Columns = provider.GetUpgradeColumns();
+            LstPackages.CheckBoxes = true;
         }
 
         public void AddItem(string[] data)

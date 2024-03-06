@@ -38,6 +38,12 @@ namespace CandyShop.Controls
             Resize += PackageListBox_Resize;
         }
 
+        public bool CheckBoxes
+        {
+            get { return Other.CheckBoxes; }
+            set { Other.CheckBoxes = value; }
+        }
+
         private bool _NoPackages = false;
         public bool NoPackages
         {
@@ -55,7 +61,7 @@ namespace CandyShop.Controls
                 }
                 else
                 {
-                    Other.CheckBoxes = true;
+                    Other.CheckBoxes = CheckBoxes;
                     Other.HeaderStyle = ColumnHeaderStyle.Nonclickable;
                     Other.ItemSelectionChanged -= Other_PreventItemSelectionChange;
                 }

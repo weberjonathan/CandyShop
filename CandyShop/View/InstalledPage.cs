@@ -77,6 +77,7 @@ namespace CandyShop.View
         public void BuildControls(ICommon provider)
         {
             LstPackages.Columns = provider.GetInstalledColumns();
+            LstPackages.CheckBoxes = false;
 
             SearchBar = provider.GetSearchBar();
             SearchBar.Dock = DockStyle.Top;
