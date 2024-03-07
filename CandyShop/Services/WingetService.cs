@@ -8,7 +8,7 @@ using System;
 
 namespace CandyShop.Services
 
-    // TODO use IDs instead of names for dictionaries
+// TODO use IDs instead of names for dictionaries
 {
     /// <summary>
     /// This service class allows asynchronous, non-blocking access to Chocolatey and implements a cache.
@@ -80,7 +80,7 @@ namespace CandyShop.Services
 
         /// <exception cref="WingetException"></exception>
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
-        public async Task PinAsync(GenericPackage package)
+        public async Task PinAsync(string name)
 #pragma warning restore CS1998
         {
             // TODO
@@ -96,7 +96,7 @@ namespace CandyShop.Services
 
         /// <exception cref="WingetException"></exception>
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
-        public async Task UnpinAsync(GenericPackage package)
+        public async Task UnpinAsync(string name)
 #pragma warning restore CS1998
         {
             // TODO
@@ -193,7 +193,7 @@ namespace CandyShop.Services
                 .Select(name => GetWingetPackageByName(name))
                 .Where(package => package != null)
                 .ToList();
-            
+
             return rtn;
         }
 

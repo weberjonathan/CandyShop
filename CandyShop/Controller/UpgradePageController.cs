@@ -105,7 +105,7 @@ namespace CandyShop.Controller
                 p.Name,
                 p.CurrVer,
                 p.AvailVer,
-                p.Pinned.ToString(),
+                p.Pinned.GetValueOrDefault(false).ToString(),
                 p.Source
             ]));
 
@@ -218,11 +218,11 @@ namespace CandyShop.Controller
                 {
                     if (package.Pinned.Value)
                     {
-                        await PackageService.UnpinAsync(package);
+                        await PackageService.UnpinAsync(package.Name);
                     }
                     else
                     {
-                        await PackageService.PinAsync(package);
+                        await PackageService.PinAsync(package.Name);
                     }
 
                     View.SetPinned(package.Name, package.Pinned.Value);

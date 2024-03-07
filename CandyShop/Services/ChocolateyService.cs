@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using Serilog;
 using System;
+using CandyShop.PackageManager;
 
 namespace CandyShop.Services
 {
@@ -13,28 +14,164 @@ namespace CandyShop.Services
     /// </summary>
     internal class ChocolateyService : IPackageService
     {
-        private readonly SemaphoreSlim OutdatedPckgLock = new SemaphoreSlim(1);
-        private readonly SemaphoreSlim InstalledPckgLock = new SemaphoreSlim(1);
-        private readonly SemaphoreSlim PckgDetailsLock = new SemaphoreSlim(1);
+        private readonly SemaphoreSlim OutdatedPckgLock = new(1);
+        private readonly SemaphoreSlim InstalledPckgLock = new(1);
+        private readonly SemaphoreSlim PckgDetailsLock = new(1);
 
-        // TODO use proper package repository instead
-        private readonly Dictionary<string, string> PckgDetailsCache = new Dictionary<string, string>();
-        private readonly Dictionary<string, ChocolateyPackage> InstalledPckgCache = new Dictionary<string, ChocolateyPackage>();
-        private readonly Dictionary<string, ChocolateyPackage> OutdatedPckgCache = new Dictionary<string, ChocolateyPackage>();
+        private readonly Dictionary<string, string> PckgDetailsCache = [];
+        private readonly Dictionary<string, GenericPackage> InstalledPckgCache = [];
+        private readonly Dictionary<string, GenericPackage> OutdatedPckgCache = [];
 
-        // ------------- GENERIC PACKAGE METHODS ------------------------------
+        private readonly AbstractPackageManager PackageManager;
 
+        public ChocolateyService(AbstractPackageManager packageManager)
+        {
+            PackageManager = packageManager;
+        }
+
+        /// <exception cref="ChocolateyException"></exception>
         public async Task<List<GenericPackage>> GetInstalledPackagesAsync()
         {
-            var chocoPackages = await GetInstalledChocoPackagesAsync();
-            return chocoPackages.Select(p => new GenericPackage(p)).ToList();
+            await InstalledPckgLock.WaitAsync().ConfigureAwait(false);
+            try
+            {
+                if (InstalledPckgCache.Count <= 0)
+                {
+                    List<GenericPackage> packages = await PackageManager.FetchInstalledAsync();
+                    packages.ForEach(p => InstalledPckgCache[p.Name] = p);
+                }
+            }
+            catch (ChocolateyException)
+            {
+                throw;
+            }
+            finally
+            {
+                InstalledPckgLock.Release();
+            }
+
+            return InstalledPckgCache.Values.ToList();
         }
 
         /// <exception cref="ChocolateyException"></exception>
         public async Task<List<GenericPackage>> GetOutdatedPackagesAsync()
         {
-            var chocoPackages = await GetOutdatedChocoPackagesAsync();
-            return chocoPackages.Select(p => new GenericPackage(p)).ToList();
+            await OutdatedPckgLock.WaitAsync().ConfigureAwait(false);
+            try
+            {
+                if (OutdatedPckgCache.Count <= 0)
+                {
+                    List<GenericPackage> packages = await PackageManager.FetchOutdatedAsync();
+                    packages.ForEach(p => OutdatedPckgCache[p.Name] = p);
+                }
+            }
+            catch (ChocolateyException)
+            {
+                throw;
+            }
+            finally
+            {
+                OutdatedPckgLock.Release();
+            }
+
+            return OutdatedPckgCache.Values.ToList();
+        }
+
+        public async Task<string> GetPackageDetailsAsync(string name)
+        {
+            var package = GetPackageByName(name);
+            if (package == null) return "";
+            
+            // TODO ensure lock release with exception handling !!!
+            await PckgDetailsLock.WaitAsync().ConfigureAwait(false);
+            if (!PckgDetailsCache.TryGetValue(name, out string details))
+            {
+                PckgDetailsLock.Release();
+                details = await PackageManager.FetchInfoAsync(package);
+
+                await PckgDetailsLock.WaitAsync().ConfigureAwait(false);
+                PckgDetailsCache[name] = details;
+            }
+            PckgDetailsLock.Release();
+
+            return details;
+        }
+
+        /// <exception cref="ChocolateyException"></exception>
+        public async Task PinAsync(string name)
+        {
+            // TODO exception handling; pinasync needs to check return code and throw; needs to be handled here
+
+            Log.Information($"Attempting to pin package {name}.");
+
+            var package = GetPackageByName(name);
+            if (package == null)
+            {
+                Log.Error($"Could not find package to pin with name: {name}");
+                return;
+            }
+
+            await PackageManager.PinAsync(package);
+
+            //Log.Debug($"choco add pin operation for {package.Name} returned with {exitCode}.");
+            //if (exitCode != 0)
+            //{
+            //    throw new ChocolateyException($"choco did not exit cleanly. Returned {exitCode}.");
+            //}
+
+            package.Pinned = true;
+            await UpdateCachedItem(package);
+        }
+
+        /// <exception cref="ChocolateyException"></exception>
+        public async Task UnpinAsync(string name)
+        {
+            // TODO exception handling; pinasync needs to check return code and throw; needs to be handled here
+
+            Log.Information($"Attempting to unpin package {name}.");
+
+            var package = GetPackageByName(name);
+            if (package == null)
+            {
+                Log.Error($"Could not find package to unpin with name: {name}");
+                return;
+            }
+
+            await PackageManager.UnpinAsync(package);
+            
+            //Log.Debug($"choco pin remove operation for {package.Name} returned with {exitCode}.");
+            //if (exitCode != 0)
+            //{
+            //    throw new ChocolateyException($"choco did not exit cleanly. Returned {exitCode}.");
+            //}
+
+            package.Pinned = false;
+            await UpdateCachedItem(package);
+        }
+
+        /// <exception cref="ChocolateyException"></exception>
+        public async void Upgrade(string[] names)
+        {
+            List<GenericPackage> packages = GetPackagesByName(names.ToList());
+            packages = packages.Where(p => !p.Pinned.GetValueOrDefault(false)).ToList();
+
+            if (packages.Count <= 0) return;
+
+            try
+            {
+                PackageManager.Upgrade(packages);
+            }
+            catch (ChocolateyException)
+            {
+                throw;
+            }
+            finally
+            {
+                await ClearOutdatedPackages();
+                await PckgDetailsLock.WaitAsync().ConfigureAwait(false);
+                names.ToList().ForEach(name => PckgDetailsCache.Remove(name));
+                PckgDetailsLock.Release();
+            }
         }
 
         public async Task ClearOutdatedPackages()
@@ -58,153 +195,8 @@ namespace CandyShop.Services
             PckgDetailsLock.Release();
         }
 
-        public async Task<string> GetPackageDetailsAsync(string name)
-        {
-            return await GetChocoPackageDetails(new ChocolateyPackage() { Name = name });
-        }
-
         public GenericPackage GetPackageByName(string name)
         {
-            var chocoPackage = GetChocoPackageByName(name);
-            return new GenericPackage(chocoPackage);
-        }
-
-        public List<GenericPackage> GetPackagesByName(List<string> names)
-        {
-            var chocoPackages = GetChocoPackagesByName(names);
-            return chocoPackages.Select(p => new GenericPackage(p)).ToList();
-        }
-
-        /// <exception cref="ChocolateyException"></exception>
-        public async Task PinAsync(GenericPackage package)
-        {
-            Log.Information($"Attempting to pin package {package.Name}.");
-            int exitCode = await Task.Run(() => ChocolateyWrapper.Pin(package.Name, package.CurrVer));
-            Log.Debug($"choco add pin operation for {package.Name} returned with {exitCode}.");
-            if (exitCode != 0)
-            {
-                throw new ChocolateyException($"choco did not exit cleanly. Returned {exitCode}.");
-            }
-
-            package.Pinned = true;
-            await UpdateCachedItem(package);
-        }
-
-        /// <exception cref="ChocolateyException"></exception>
-        public async Task UnpinAsync(GenericPackage package)
-        {
-            Log.Information($"Attempting to unpin package {package.Name}.");
-            int exitCode = await Task.Run(() => ChocolateyWrapper.Unpin(package.Name));
-            Log.Debug($"choco pin remove operation for {package.Name} returned with {exitCode}.");
-            if (exitCode != 0)
-            {
-                throw new ChocolateyException($"choco did not exit cleanly. Returned {exitCode}.");
-            }
-
-            package.Pinned = false;
-            await UpdateCachedItem(package);
-        }
-
-        /// <exception cref="ChocolateyException"></exception>
-        public async void Upgrade(string[] names)
-        {
-            List<ChocolateyPackage> chocoPackages = GetChocoPackagesByName(names.ToList());
-            chocoPackages = chocoPackages.Where(p => !p.Pinned.GetValueOrDefault(false)).ToList();
-            if (chocoPackages.Count <= 0)
-            {
-                return;
-            }
-
-            try
-            {
-                Upgrade(chocoPackages, ContextSingleton.Get.ValidExitCodes.ToArray());
-            }
-            catch (ChocolateyException e)
-            {
-                throw new ChocolateyException(e.Message, e);
-            }
-            finally
-            {
-                await ClearOutdatedPackages();
-                await PckgDetailsLock.WaitAsync().ConfigureAwait(false);
-                names.ToList().ForEach(name => PckgDetailsCache.Remove(name));
-                PckgDetailsLock.Release();
-            }
-        }
-
-        // --------------------------------------------------------------------
-
-        /// <exception cref="ChocolateyException"></exception>
-        private async Task<List<ChocolateyPackage>> GetOutdatedChocoPackagesAsync()
-        {
-            await OutdatedPckgLock.WaitAsync().ConfigureAwait(false);
-
-            try
-            {
-                if (OutdatedPckgCache.Count <= 0)
-                {
-                    List<ChocolateyPackage> outdatedPckgs = await ChocolateyWrapper.FetchOutdatedAsync();
-                    outdatedPckgs.ForEach(p => OutdatedPckgCache[p.Name] = p);
-                }
-            }
-            catch (ChocolateyException)
-            {
-                throw;
-            }
-            finally
-            {
-                OutdatedPckgLock.Release();
-            }
-
-            return OutdatedPckgCache.Values.ToList();
-        }
-
-        /// <exception cref="ChocolateyException"></exception>
-        private async Task<List<ChocolateyPackage>> GetInstalledChocoPackagesAsync()
-        {
-            await InstalledPckgLock.WaitAsync().ConfigureAwait(false);
-
-            try
-            {
-                if (InstalledPckgCache.Count <= 0)
-                {
-                    List<ChocolateyPackage> installedPckgs = await ChocolateyWrapper.FetchInstalledAsync();
-                    installedPckgs.ForEach(p => InstalledPckgCache[p.Name] = p);
-                }
-            }
-            catch (ChocolateyException)
-            {
-                throw;
-            }
-            finally
-            {
-                InstalledPckgLock.Release();
-            }
-
-            return InstalledPckgCache.Values.ToList();
-        }
-
-        /// <exception cref="ChocolateyException"></exception>
-        private async Task<string> GetChocoPackageDetails(ChocolateyPackage package)
-        {
-            await PckgDetailsLock.WaitAsync().ConfigureAwait(false);
-            if (!PckgDetailsCache.TryGetValue(package.Name, out string details))
-            {
-                PckgDetailsLock.Release();
-                details = await ChocolateyWrapper.FetchInfoAsync(package);
-
-                await PckgDetailsLock.WaitAsync().ConfigureAwait(false);
-                PckgDetailsCache[package.Name] = details;
-            }
-            PckgDetailsLock.Release();
-
-            return details;
-        }
-
-        /// <returns>The package with the specified name, or null</returns>
-        private ChocolateyPackage GetChocoPackageByName(string name)
-        {
-            // prefer outdated packages as they contain more information, even though hit rate may be less
             if (OutdatedPckgCache.ContainsKey(name))
             {
                 return OutdatedPckgCache[name];
@@ -217,46 +209,23 @@ namespace CandyShop.Services
             return null;
         }
 
-        private List<ChocolateyPackage> GetChocoPackagesByName(List<string> names)
+        public List<GenericPackage> GetPackagesByName(List<string> names)
         {
-            var rtn = names
-                .Select(name => GetChocoPackageByName(name))
+            return names
+                .Select(GetPackageByName)
                 .Where(package => package != null)
                 .ToList();
-            
-            return rtn;
-        }
-
-        /// <summary>
-        /// Upgrades a collection of Chocolatey packages. If the <c>validExitCodes</c> parameter
-        /// is not present, only zero is considered valid. When specified, the array should
-        /// include zero.
-        /// If the upgrade process exited with a non-valid code, a <see cref="ChocolateyException"/>
-        /// is thrown. 
-        /// </summary>
-        /// <param name="packages"></param>
-        /// <param name="validExitCodes">test</param>
-        /// <exception cref="ChocolateyException"></exception>
-        private void Upgrade(List<ChocolateyPackage> packages, int[] validExitCodes = null)
-        {
-            int exitCode = ChocolateyWrapper.Upgrade(packages);
-            
-            if (validExitCodes == null) validExitCodes = new int[] { 0 };
-            if (!validExitCodes.Contains(exitCode))
-            {
-                throw new ChocolateyException($"choco did not exit cleanly. Returned {exitCode}.");
-            }
         }
 
         private async Task UpdateCachedItem(GenericPackage package)
         {
             await OutdatedPckgLock.WaitAsync().ConfigureAwait(false);
-            var chocoPackage = OutdatedPckgCache[package.Name];
-            chocoPackage.AvailVer = package.AvailVer;
-            chocoPackage.CurrVer = package.CurrVer;
-            chocoPackage.IsTopLevelPackage = package.IsTopLevelPackage;
-            chocoPackage.Name = package.Name;
-            chocoPackage.Pinned = package.Pinned;
+            package = OutdatedPckgCache[package.Name];
+            package.AvailVer = package.AvailVer;
+            package.CurrVer = package.CurrVer;
+            package.Name = package.Name;
+            package.Pinned = package.Pinned;
+            // TODO rest of properties
             OutdatedPckgLock.Release();
         }
     }

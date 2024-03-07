@@ -14,20 +14,21 @@ namespace CandyShop.Chocolatey
         };
 
         public string Name { get; set; }
-        
+
         public string CurrVer { get; set; }
-        
+
         public string AvailVer { get; set; }
-        
+
         public bool? Pinned { get; set; }
 
         public bool IsTopLevelPackage { get; set; } = true;
 
         public ChocolateyPackage Parent { get; set; }
-        
+
         public bool HasSuffix
         {
-            get {
+            get
+            {
                 int i = Name.LastIndexOf('.');
                 return (i > 0) && SUFFIXES.Contains(Name.Substring(i));
             }

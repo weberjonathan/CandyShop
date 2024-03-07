@@ -11,6 +11,7 @@ using Microsoft.Windows.AppNotifications.Builder;
 using Microsoft.Windows.AppNotifications;
 using System.IO;
 using System.Diagnostics;
+using CandyShop.PackageManager;
 
 namespace CandyShop
 {
@@ -25,18 +26,17 @@ namespace CandyShop
             Log.Debug($"cwd: {cwd}; elevated: {context.HasAdminPrivileges}; elevateOnDemand: {context.ElevateOnDemand}; debug: {context.DebugEnabled}");
 
             // init services
-            IPackageService packageService;
-            SystemStartService windowsTaskService = new SystemStartService();
-            ShortcutService shortcutService = new ShortcutService();
-            if (context.WingetMode) packageService = new WingetService();
-            else packageService = new ChocolateyService();
+            AbstractPackageManager packageManager = context.WingetMode ? new WingetManager() : new ChocoManager(context.ValidExitCodes); // TODO
+            IPackageService packageService = new ChocolateyService(packageManager);
+            SystemStartService windowsTaskService = new();
+            ShortcutService shortcutService = new();
 
             LoadOutdatedPackagesAsync(packageService);
 
             // init controller
-            MainWindowController candyShopController = new MainWindowController(windowsTaskService, context);
-            InstalledPageController installedPageController = new InstalledPageController(packageService);
-            UpgradePageController upgradePageController = new UpgradePageController(context, packageService, shortcutService);
+            MainWindowController candyShopController = new(windowsTaskService, context);
+            InstalledPageController installedPageController = new(packageService);
+            UpgradePageController upgradePageController = new(context, packageService, shortcutService);
 
             // init views
             IMainWindowView mainPage = new MainWindow(candyShopController);

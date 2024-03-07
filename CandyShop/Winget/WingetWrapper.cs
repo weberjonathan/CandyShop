@@ -15,7 +15,7 @@ namespace CandyShop.Winget
         public static List<WingetPackage> FetchInstalled()
         {
             // TODO make sure dequeues do not throw bc of missing elements
-            
+
             // launch process
             WingetProcess p = ProcessFactory.Winget($"list");
             p.ExecuteHidden();
@@ -26,7 +26,7 @@ namespace CandyShop.Winget
             {
                 i++;
             }
-            
+
             Queue<string> output = new Queue<string>(p.Output[i..].Split(Environment.NewLine));
 
             string header = output.Dequeue();
@@ -41,7 +41,7 @@ namespace CandyShop.Winget
             int availableIndex = GetNextColumnIndex(header, versionIndex);
             int sourceIndex = GetNextColumnIndex(header, availableIndex);
 
-             if (idIndex == 0 || versionIndex == 0 || availableIndex == 0 || sourceIndex == 0)
+            if (idIndex == 0 || versionIndex == 0 || availableIndex == 0 || sourceIndex == 0)
             {
                 throw new WingetException(); // TODO why tf does this happen sometimes? 
             }
@@ -102,7 +102,7 @@ namespace CandyShop.Winget
 
             WingetProcess p = ProcessFactory.Winget($"show --id \"{package.Id}\" --exact");
             p.ExecuteHidden();
-            
+
             int start = p.Output.IndexOf("Gefunden ") + "Gefunden ".Length;
             return start > 0 ? p.Output[start..] : p.Output;
         }

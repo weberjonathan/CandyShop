@@ -1,7 +1,4 @@
-﻿using CandyShop.Chocolatey;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace CandyShop.Services
@@ -16,8 +13,8 @@ namespace CandyShop.Services
         public Task<string> GetPackageDetailsAsync(string name);
         public GenericPackage GetPackageByName(string name);
         public List<GenericPackage> GetPackagesByName(List<string> names);
-        Task PinAsync(GenericPackage package);
-        Task UnpinAsync(GenericPackage package);
+        Task PinAsync(string name);
+        Task UnpinAsync(string name);
         void Upgrade(string[] names);
     }
 }

@@ -1,36 +1,65 @@
-﻿using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
+﻿using CandyShop.Chocolatey;
 using Serilog;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
-namespace CandyShop.Chocolatey
+namespace CandyShop.PackageManager
 {
-    public class ChocolateyWrapper
+    internal class ChocoManager : AbstractPackageManager
     {
-        // TODO test --limitoutput
+        // TODO annoate throwing exceptions
 
-        /// <exception cref="ChocolateyException"></exception>
-        public static async Task<List<ChocolateyPackage>> FetchInstalledAsync()
+        private readonly List<int> ValidExitCodesOnUpgrade;
+
+        public ChocoManager()
         {
-            return await Task.Run(FetchInstalled);
+            ValidExitCodesOnUpgrade = [ 0 ];
+        }
+        
+        public ChocoManager(List<int> validExitCodesOnUpgrade)
+        {
+            ValidExitCodesOnUpgrade = validExitCodesOnUpgrade;
+            if (!validExitCodesOnUpgrade.Contains(0))
+                Log.Warning("List of valid exit codes does not contain '0'. This looks like a mistake in the configuration file.");
         }
 
-        /// <exception cref="ChocolateyException"></exception>
-        public static List<ChocolateyPackage> FetchInstalled()
+        public override string FetchInfo(GenericPackage package)
+        {
+            StringBuilder rtn = new();
+
+            // launch process
+            ChocolateyProcess p = ProcessFactory.Choco($"info {package.Name}");
+            p.ExecuteHidden();
+
+            // parse
+            List<string[]> sections = p.OutputBySection;
+            foreach (string[] section in sections)
+            {
+                if (section.Length > 0)
+                {
+                    for (int i = 0; i < section.Length; i++)
+                    {
+                        rtn.AppendLine(section[i].Trim());
+                    }
+                }
+            }
+
+            return rtn.ToString();
+        }
+
+        public override List<GenericPackage> FetchInstalled()
         {
             Log.Information("Fetching installed packages from Chocolatey");
 
-            List<ChocolateyPackage> packages = new List<ChocolateyPackage>();
+            List<GenericPackage> packages = new();
 
-            // launch process TODO try catch
+            // launch process
             var args = ChocolateyProcess.MajorVersion < 2 ? "list --local-only" : "list";
             ChocolateyProcess p = ProcessFactory.Choco(args);
             p.ExecuteHidden();
 
-            // parse output (get sections, all wanted info is in single section)
-            // conditions
-            // - final line looks like "54 packages included."; match count
-            // - package list entries look like "name version"
+            // parse output
             List<string[]> sections = p.OutputBySection;
             foreach (string[] section in sections)
             {
@@ -38,13 +67,11 @@ namespace CandyShop.Chocolatey
                 string summary = section[section.Length - 1];
                 if (summary.Contains(' '))
                 {
-                    int indexOf = summary.IndexOf(' ');
-                    string packageCountStr = summary.Substring(0, indexOf);
-                    int packageCount;
-
-                    if (int.TryParse(packageCountStr, out packageCount))
+                    int index = summary.IndexOf(' ');
+                    string packageCountStr = summary[..index];
+                    if (int.TryParse(packageCountStr, out int packageCount))
                     {
-                        if (packageCount == section.Length - 1 && summary.Substring(indexOf).Equals(" packages installed."))
+                        if (packageCount == section.Length - 1 && summary[index..].Equals(" packages installed."))
                         {
                             // check potential package list entries
                             for (int i = 0; i < section.Length - 1; i++)
@@ -55,7 +82,7 @@ namespace CandyShop.Chocolatey
                                     string[] entry = section[i].Split(' ');
                                     if (entry.Length == 2)
                                     {
-                                        packages.Add(new ChocolateyPackage
+                                        packages.Add(new GenericPackage()
                                         {
                                             Name = entry[0],
                                             CurrVer = entry[1]
@@ -68,22 +95,15 @@ namespace CandyShop.Chocolatey
                 }
             }
 
-            packages = GuessMetaPackages(packages);
+            packages = ResolveMetaPackages(packages);
             return packages;
         }
 
-        /// <exception cref="ChocolateyException"></exception>
-        public static async Task<List<ChocolateyPackage>> FetchOutdatedAsync()
-        {
-            return await Task.Run(FetchOutdated);
-        }
-
-        /// <exception cref="ChocolateyException"></exception>
-        public static List<ChocolateyPackage> FetchOutdated()
+        public override List<GenericPackage> FetchOutdated()
         {
             Log.Information("Fetching outdated packages from Chocolatey");
 
-            List<ChocolateyPackage> packages = new List<ChocolateyPackage>();
+            List<GenericPackage> packages = [];
 
             // launch process
             ChocolateyProcess p = ProcessFactory.Choco("outdated");
@@ -124,7 +144,7 @@ namespace CandyShop.Chocolatey
                             string[] entry = line.Split('|');
                             if (entry.Length == 4)
                             {
-                                ChocolateyPackage pckg = new ChocolateyPackage
+                                GenericPackage pckg = new()
                                 {
                                     Name = entry[0],
                                     CurrVer = entry[1],
@@ -138,94 +158,62 @@ namespace CandyShop.Chocolatey
                 }
             }
 
-            return GuessMetaPackages(packages);
+            return ResolveMetaPackages(packages);
         }
 
-        /// <exception cref="ChocolateyException"></exception>
-        public static async Task<string> FetchInfoAsync(ChocolateyPackage package)
+        // TODO this used to return exit code; now probably maybe have to catch exxception?
+        public override void Pin(GenericPackage package)
         {
-            return await Task.Run(() => FetchInfo(package));
-        }
-
-        /// <exception cref="ChocolateyException"></exception>
-        public static string FetchInfo(ChocolateyPackage package)
-        {
-            StringBuilder rtn = new StringBuilder();
-
-            // launch process
-            ChocolateyProcess p = ProcessFactory.Choco($"info {package.Name}");
+            var args = $"pin add --name=\"{package.Name}\" --version=\"{package.CurrVer}\"";
+            ChocolateyProcess p = ProcessFactory.ChocoPrivileged(args);
             p.ExecuteHidden();
-
-            // parse
-            List<string[]> sections = p.OutputBySection;
-            foreach (string[] section in sections)
-            {
-                if (section.Length > 0)
-                {
-                    for (int i = 0; i < section.Length; i++)
-                    {
-                        rtn.AppendLine(section[i].Trim());
-                    }
-                }
-            }
-
-            return rtn.ToString();
         }
 
-        /// <exception cref="ChocolateyException"></exception>
-        public static int Upgrade(List<ChocolateyPackage> packages)
+        // TODO this used to return exit code; now probably maybe have to catch exxception?
+        public override void Unpin(GenericPackage package)
+        {
+            ChocolateyProcess p = ProcessFactory.ChocoPrivileged($"pin remove --name=\"{package.Name}\"");
+            p.ExecuteHidden();
+        }
+
+        public override void Upgrade(List<GenericPackage> packages)
         {
             string argument = "";
-            foreach (ChocolateyPackage pckg in packages)
+            string arg2 = string.Join(' ', packages.Select(p => p.Name));
+            foreach (var pckg in packages)
             {
                 argument += pckg.Name + " ";
             }
+            // TODO test if argument and arg2 are the same
 
             // launch process
             ChocolateyProcess p = ProcessFactory.ChocoPrivileged($"upgrade {argument} -y");
             p.FailOnNonZeroExitCode = false;
             p.Execute();
 
-            return p.ExitCode;
-        }
-
-        /// <exception cref="ChocolateyException"></exception>
-        public static int Pin(string name, string version)
-        {
-            // choco pin add --name="'git'" --version="'1.2.3'"
-            ChocolateyProcess p = ProcessFactory.ChocoPrivileged($"pin add --name=\"{name}\" --version=\"{version}\"");
-            p.ExecuteHidden();
-            return p.ExitCode;
-        }
-
-        /// <exception cref="ChocolateyException"></exception>
-        public static int Unpin(string name)
-        {
-            ChocolateyProcess p = ProcessFactory.ChocoPrivileged($"pin remove --name=\"{name}\"");
-            p.ExecuteHidden();
-            return p.ExitCode;
+            if (!ValidExitCodesOnUpgrade.Contains(p.ExitCode))
+            {
+                throw new ChocolateyException($"choco did not exit cleanly. Returned {p.ExitCode}.");
+            }
         }
 
         /// <summary>
         /// Guess meta packages based on package names.
         /// For every suffixed package (child) where
         /// a meta package (non-suffixed parent) exists 
-        /// the property IsTopLevelPackage is set to false.
-        /// Children reference their parent.
+        /// the parent is registered with the child.
         /// </summary>
-        private static List<ChocolateyPackage> GuessMetaPackages(List<ChocolateyPackage> packages)
+        private List<GenericPackage> ResolveMetaPackages(List<GenericPackage> packages)
         {
-            foreach (ChocolateyPackage child in packages)
+            foreach (var child in packages)
             {
-                if (child.HasSuffix)
+                if (child.HasChocolateySuffix)
                 {
-                    foreach (ChocolateyPackage parent in packages)
+                    foreach (var parent in packages)
                     {
-                        if (child.ClearName.ToLower().Equals(
-                            parent.Name.ToLower()))
+                        if (child.ClearName.ToLower().Equals(parent.Name.ToLower()))
                         {
                             child.Parent = parent;
-                            child.IsTopLevelPackage = false;
                         }
                     }
                 }

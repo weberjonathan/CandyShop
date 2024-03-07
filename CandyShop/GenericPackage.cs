@@ -1,18 +1,32 @@
 ﻿using CandyShop.Chocolatey;
 using CandyShop.Winget;
-using System;
+using System.Collections.Generic;
 
 namespace CandyShop
 {
     internal class GenericPackage
     {
+        private readonly List<string> SUFFIXES = [
+            ".install",
+            ".portable",
+            ".app",
+            ".commandline",
+            ".tool"
+        ];
+
+        public GenericPackage() { }
+
+        public GenericPackage(string name)
+        {
+            Name = name;
+        }
+
         public GenericPackage(ChocolateyPackage package)
         {
             Name = package.Name;
             CurrVer = package.CurrVer;
             AvailVer = package.AvailVer;
             Pinned = package.Pinned;
-            IsTopLevelPackage = package.IsTopLevelPackage;
         }
 
         public GenericPackage(WingetPackage package)
@@ -23,7 +37,6 @@ namespace CandyShop
             CurrVer = package.Version;
             AvailVer = package.AvailableVersion;
             Pinned = false;
-            IsTopLevelPackage = true;
         }
 
         public string Name { get; set; }
@@ -32,13 +45,27 @@ namespace CandyShop
 
         public string Source { get; set; }
 
+        public bool HasSource => !string.IsNullOrEmpty(Source);
+
         public string CurrVer { get; set; }
 
         public string AvailVer { get; set; }
 
         public bool? Pinned { get; set; }
 
-        public bool IsTopLevelPackage { get; set; } = true;
+        /// <summary>Parent package (Chocolatey only)</summary>
+        public GenericPackage Parent { get; set; }
+
+        /// <summary>Whether the package has a parent (Chocolatey only)</summary>
+        public bool IsTopLevelPackage => Parent == null;
+
+        /// <summary>Whether the package has a valid suffix (Chocolatey only)</summary>
+        public bool HasChocolateySuffix
+            => Name.Contains('.') && SUFFIXES.Contains(Name[Name.LastIndexOf('.')..]);
+
+        /// <summary>Package name without suffix, if present (Chocolatey only)</summary>
+        public string ClearName
+            => HasChocolateySuffix ? Name[..Name.LastIndexOf('.')] : Name;
 
         public override bool Equals(object obj)
         {
@@ -48,7 +75,7 @@ namespace CandyShop
             }
 
             var other = (GenericPackage)obj;
-            return String.Equals(Name, other.Name);
+            return string.Equals(Name, other.Name);
         }
 
         public override int GetHashCode()
