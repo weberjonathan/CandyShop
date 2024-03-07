@@ -2,7 +2,6 @@
 using System.Windows.Forms;
 using CandyShop.Controller;
 using CandyShop.Controls;
-using CandyShop.Properties;
 
 namespace CandyShop.View
 {
@@ -13,17 +12,12 @@ namespace CandyShop.View
     {
         private MainWindowController Controller;
 
+        private ToolStripMenuItem StartWithSystemCheckBox;
+
         public MainWindow(MainWindowController candyShopController)
         {
             Controller = candyShopController;
             InitializeComponent();
-            MenuEditSelectRelevant.Text = LocaleEN.TEXT_TS_SELECT_SMART;
-            MenuEditSelectAll.Text = LocaleEN.TEXT_TS_SELECT_ALL;
-            MenuEditDeselectAll.Text = LocaleEN.TEXT_TS_DESELECT;
-            MenuEditRefresh.Text = LocaleEN.TEXT_TS_REFRESH;
-            MenuEditRefresh.Click += new EventHandler((sender, e) => RefreshClicked?.Invoke(sender, e));
-            MenuEditRefreshInstalled.Text = LocaleEN.TEXT_TS_REFRESH_INSTALLED;
-            MenuEditRefreshInstalled.Visible = false;
         }
 
         public event EventHandler RefreshClicked;
@@ -35,17 +29,35 @@ namespace CandyShop.View
         {
             get
             {
-                return MenuExtrasCreateTask.Checked;
+                return StartWithSystemCheckBox.Checked;
             }
             set
             {
-                MenuExtrasCreateTask.Checked = value;
+                StartWithSystemCheckBox.Checked = value;
             }
         }
 
         public void BuildControls(AbstractCommon provider)
         {
-            MenuExtrasOpenLogs.Text = provider.GetLogsMenuItemText();
+            MainMenuStrip = provider.GetMenuStrip();
+            Controls.Add(MainMenuStrip);
+
+            ToolStripItem item(string s, string s2) => provider.ResolveMenuItem(MainMenuStrip, s, s2);
+
+            item("Edit", "Refresh").Click     += new EventHandler((sender, e) => RefreshClicked?.Invoke(sender, e));
+            item("Edit", "SelectAll").Click   += new EventHandler((sender, e) => UpgradePage.CheckAllItems());
+            item("Edit", "SelectTop").Click   += new EventHandler((sender, e) => UpgradePage.CheckTopLevelItems());
+            item("Edit", "DeselectAll").Click += new EventHandler((sender, e) => UpgradePage.UncheckAllItems());
+
+            item("Extras", "StartWithSystem").Click += new EventHandler((sender, e) => Controller.ToggleLaunchOnSystemStart());
+            item("Extras", "Settings").Click        += new EventHandler((sender, e) => Controller.ShowCandyShopConfigFolder());
+            item("Extras", "Logs").Click            += new EventHandler((sender, e) => Controller.ShowLogFolder());
+
+            item("Help", "Github").Click  += new EventHandler((sender, e) => Controller.ShowGithub());
+            item("Help", "License").Click += new EventHandler((sender, e) => Controller.ShowLicenses());
+            item("Help", "Meta").Click    += new EventHandler((sender, e) => Controller.ShowMetaPackageHelp());
+
+            StartWithSystemCheckBox = (ToolStripMenuItem)item("Extras", "StartWithSystem");
         }
 
         public void DisplayError(string msg, params string[] args)
@@ -67,51 +79,6 @@ namespace CandyShop.View
         private void ChocoAutoUpdateForm_Load(object sender, EventArgs e)
         {
             this.Activate();
-        }
-
-        private void MenuEditSelectAll_Click(object sender, EventArgs e)
-        {
-            UpgradePage.CheckAllItems();
-        }
-
-        private void MenuEditSelectRelevant_Click(object sender, EventArgs e)
-        {
-            UpgradePage.CheckTopLevelItems();
-        }
-
-        private void MenuEditDeselectAll_Click(object sender, EventArgs e)
-        {
-            UpgradePage.UncheckAllItems();
-        }
-
-        private void MenuHelpGithub_Click(object sender, EventArgs e)
-        {
-            Controller.ShowGithub();
-        }
-
-        private void MenuHelpLicense_Click(object sender, EventArgs e)
-        {
-            Controller.ShowLicenses();
-        }
-
-        private void MenuHelpMetaPackages_Click(object sender, EventArgs e)
-        {
-            Controller.ShowMetaPackageHelp();
-        }
-
-        private void MenuExtrasCreateTask_Click(object sender, EventArgs e)
-        {
-            Controller.ToggleLaunchOnSystemStart();
-        }
-
-        private void MenuExtrasOpenLogs_Click(object sender, EventArgs e)
-        {
-            Controller.ShowLogFolder();
-        }
-
-        private void MenuExtrasOpenCandyShopConfig_Click(object sender, EventArgs e)
-        {
-            Controller.ShowCandyShopConfigFolder();
         }
     }
 }

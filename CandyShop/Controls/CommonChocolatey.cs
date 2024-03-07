@@ -46,9 +46,11 @@ namespace CandyShop.Controls
             return ts;
         }
 
-        public override string GetLogsMenuItemText()
+        public override MenuStrip GetMenuStrip()
         {
-            return string.Format(LocaleEN.TEXT_MENU_LOGS, "Chocolatey");
+            var menu = GetCommonMenuStrip();
+            ResolveMenuItem(menu, "Extras", "Logs").Text = string.Format(LocaleEN.TEXT_MENU_LOGS, "Chocolatey");
+            return menu;
         }
     }
 }

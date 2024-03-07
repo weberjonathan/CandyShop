@@ -3,7 +3,7 @@ using System.Windows.Forms;
 
 namespace CandyShop.Controls
 {
-    internal class CommonWinget: AbstractCommon
+    internal class CommonWinget : AbstractCommon
     {
         public override PackageListBoxColumn[] GetUpgradeColumns()
         {
@@ -35,9 +35,13 @@ namespace CandyShop.Controls
             return GetCommonUpgradePageToolBar();
         }
 
-        public override string GetLogsMenuItemText()
+        public override MenuStrip GetMenuStrip()
         {
-            return string.Format(LocaleEN.TEXT_MENU_LOGS, "Winget");
+            var menu = GetCommonMenuStrip();
+            ResolveMenuItem(menu, "Extras", "Logs").Text = string.Format(LocaleEN.TEXT_MENU_LOGS, "Winget");
+            ResolveMenuItem(menu, "Help", "Meta").Visible = false;
+            ResolveMenuItem(menu, "Edit", "SelectTop").Visible = false;
+            return menu;
         }
     }
 }
