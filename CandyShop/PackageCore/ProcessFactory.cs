@@ -1,8 +1,6 @@
-﻿using CandyShop.Chocolatey;
-using CandyShop.Winget;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
-namespace CandyShop
+namespace CandyShop.PackageCore
 {
     internal class ProcessFactory
     {

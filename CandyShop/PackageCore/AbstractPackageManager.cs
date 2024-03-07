@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace CandyShop.PackageManager
+namespace CandyShop.PackageCore
 {
     internal abstract class AbstractPackageManager
     {

@@ -1,10 +1,9 @@
-﻿using CandyShop.Chocolatey;
-using Serilog;
+﻿using Serilog;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace CandyShop.PackageManager
+namespace CandyShop.PackageCore
 {
     internal class ChocoManager : AbstractPackageManager
     {

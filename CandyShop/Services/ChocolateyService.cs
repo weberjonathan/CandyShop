@@ -1,11 +1,10 @@
-﻿using CandyShop.Chocolatey;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
 using System.Threading;
 using Serilog;
 using System;
-using CandyShop.PackageManager;
+using CandyShop.PackageCore;
 
 namespace CandyShop.Services
 {

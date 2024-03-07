@@ -1,4 +1,4 @@
-using CandyShop.Chocolatey;
+using CandyShop.PackageCore;
 using CandyShop.Properties;
 using Serilog;
 using System;

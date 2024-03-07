@@ -1,9 +1,10 @@
-﻿using System;
+﻿using CandyShop.PackageCore;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 
-namespace CandyShop.Chocolatey
+namespace CandyShop.PackageCore
 {
     public class ChocolateyProcess
     {

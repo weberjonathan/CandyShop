@@ -1,11 +1,11 @@
-﻿using CandyShop.Chocolatey;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using CandyShop.View;
 using CandyShop.Properties;
 using CandyShop.Services;
 using Serilog;
 using CandyShop.Controls;
+using CandyShop.PackageCore;
 
 namespace CandyShop.Controller
 {

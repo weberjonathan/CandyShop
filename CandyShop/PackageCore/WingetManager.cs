@@ -1,11 +1,9 @@
-﻿using CandyShop.Chocolatey;
-using CandyShop.Winget;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace CandyShop.PackageManager
+namespace CandyShop.PackageCore
 {
     internal class WingetManager : AbstractPackageManager
     {

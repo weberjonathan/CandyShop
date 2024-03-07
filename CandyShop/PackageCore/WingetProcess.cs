@@ -1,9 +1,9 @@
-﻿using CandyShop.Chocolatey;
+﻿using CandyShop.PackageCore;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Text;
 
-namespace CandyShop.Winget
+namespace CandyShop.PackageCore
 {
     public class WingetProcess
     {

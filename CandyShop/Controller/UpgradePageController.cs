@@ -1,5 +1,5 @@
-﻿using CandyShop.Chocolatey;
-using CandyShop.Controls;
+﻿using CandyShop.Controls;
+using CandyShop.PackageCore;
 using CandyShop.Properties;
 using CandyShop.Services;
 using CandyShop.View;

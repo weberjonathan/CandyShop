@@ -1,5 +1,4 @@
-﻿using CandyShop.Chocolatey;
-using CandyShop.View;
+﻿using CandyShop.View;
 using CandyShop.Properties;
 using System;
 using System.Collections.Generic;
@@ -11,7 +10,7 @@ using Microsoft.Windows.AppNotifications.Builder;
 using Microsoft.Windows.AppNotifications;
 using System.IO;
 using System.Diagnostics;
-using CandyShop.PackageManager;
+using CandyShop.PackageCore;
 
 namespace CandyShop
 {

@@ -1,4 +1,4 @@
-﻿namespace CandyShop.Chocolatey
+﻿namespace CandyShop.PackageCore
 {
     /// <summary>
     /// The exception that is thrown when Chocolatey returned an error or the communication with Chocolatey failed.

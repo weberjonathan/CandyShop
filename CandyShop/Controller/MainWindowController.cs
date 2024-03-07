@@ -7,8 +7,8 @@ using System.Diagnostics;
 using System.IO;
 using System.Windows.Forms;
 using Serilog;
-using CandyShop.Winget;
 using CandyShop.Controls;
+using CandyShop.PackageCore;
 
 namespace CandyShop.Controller
 {
