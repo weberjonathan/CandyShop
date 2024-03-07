@@ -21,24 +21,6 @@ namespace CandyShop
             Name = name;
         }
 
-        public GenericPackage(ChocolateyPackage package)
-        {
-            Name = package.Name;
-            CurrVer = package.CurrVer;
-            AvailVer = package.AvailVer;
-            Pinned = package.Pinned;
-        }
-
-        public GenericPackage(WingetPackage package)
-        {
-            Name = package.Name;
-            Id = package.Id;
-            Source = package.Source;
-            CurrVer = package.Version;
-            AvailVer = package.AvailableVersion;
-            Pinned = false;
-        }
-
         public string Name { get; set; }
 
         public string Id { get; set; }

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using CandyShop.Chocolatey;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Text;
 
@@ -48,13 +49,13 @@ namespace CandyShop.Winget
                 if (FailOnNonZeroExitCode && proc.ExitCode != 0)
                 {
                     // TODO what's in output => add property for stderr? put stderr in output?
-                    throw new WingetException($"winget did not exit cleanly ({proc.ExitCode})\n\n{Output}");
+                    throw new ChocolateyException($"winget did not exit cleanly ({proc.ExitCode})\n\n{Output}");
                 }
             }
             catch (Win32Exception e)
             {
                 // TODO what's in output => add property for stderr? put stderr in output?
-                throw new WingetException("An error occurred while running winget.", e);
+                throw new ChocolateyException("An error occurred while running winget.", e);
             }
         }
 
@@ -79,12 +80,12 @@ namespace CandyShop.Winget
 
                 if (FailOnNonZeroExitCode && proc.ExitCode != 0)
                 {
-                    throw new WingetException($"winget did not exit cleanly. Returned {proc.ExitCode}.");
+                    throw new ChocolateyException($"winget did not exit cleanly. Returned {proc.ExitCode}.");
                 }
             }
             catch (Win32Exception e)
             {
-                throw new WingetException("An error occurred while running winget.", e);
+                throw new ChocolateyException("An error occurred while running winget.", e);
             }
         }
     }

@@ -12,7 +12,7 @@ namespace CandyShop.Services
     /// <summary>
     /// This service class allows asynchronous, non-blocking access to Chocolatey and implements a cache.
     /// </summary>
-    internal class ChocolateyService : IPackageService
+    internal class ChocolateyService
     {
         private readonly SemaphoreSlim OutdatedPckgLock = new(1);
         private readonly SemaphoreSlim InstalledPckgLock = new(1);

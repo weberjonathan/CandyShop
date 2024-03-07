@@ -6,17 +6,16 @@ using CandyShop.Properties;
 using CandyShop.Services;
 using Serilog;
 using CandyShop.Controls;
-using Windows.Services.Maps;
 
 namespace CandyShop.Controller
 {
     class InstalledPageController
     {
-        private readonly IPackageService PackageService;
+        private readonly ChocolateyService PackageService;
         private IMainWindowView MainWindow;
         private IInstalledPageView View;
 
-        public InstalledPageController(IPackageService service)
+        public InstalledPageController(ChocolateyService service)
         {
             PackageService = service;
         }

@@ -19,13 +19,14 @@ namespace CandyShop.PackageManager
             WingetProcess p = ProcessFactory.Winget($"show --id \"{package.Id}\" --exact");
             p.ExecuteHidden();
 
-            int start = p.Output.IndexOf("Gefunden ") + "Gefunden ".Length;
+            int start = p.Output.IndexOf("Gefunden ") + "Gefunden ".Length; // TODO make locale indepdent
             return start > 0 ? p.Output[start..] : p.Output;
         }
 
         public override List<GenericPackage> FetchInstalled()
         {
             // TODO make sure dequeues do not throw bc of missing elements
+            // TODO make sure its locale indepent
 
             // launch process
             WingetProcess p = ProcessFactory.Winget($"list");
@@ -43,7 +44,7 @@ namespace CandyShop.PackageManager
             string header = output.Dequeue();
             if (!header.StartsWith("Name"))
             {
-                throw new WingetException(); // TODO invalid
+                throw new ChocolateyException("Failed to parse winget output: Could not find header.");
             }
 
             int nameIndex = 0;
@@ -54,13 +55,13 @@ namespace CandyShop.PackageManager
 
             if (idIndex == 0 || versionIndex == 0 || availableIndex == 0 || sourceIndex == 0)
             {
-                throw new WingetException(); // TODO why tf does this happen sometimes? 
+                throw new ChocolateyException("Failed to parse winget output: Could not find offsets.");
             }
 
             string divider = output.Dequeue();
             if (!divider.StartsWith('-') && sourceIndex < divider.Length)
             {
-                throw new WingetException(); // TODO
+                throw new ChocolateyException(); // TODO
             }
 
             List<GenericPackage> packages = [];
