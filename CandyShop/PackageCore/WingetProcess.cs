@@ -1,6 +1,4 @@
-﻿using CandyShop.PackageCore;
-using System.ComponentModel;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Text;
 
 namespace CandyShop.PackageCore
@@ -21,16 +19,13 @@ namespace CandyShop.PackageCore
 
         public int ExitCode { get; private set; }
 
-        public bool FailOnNonZeroExitCode { get; set; } = true;
-
         /// <summary>
         ///     Executes the winget process without creating a window
         ///     and writes stdout to the Output property after execution
         /// </summary>
-        /// <exception cref="PackageManagerException"></exception>
         public void ExecuteHidden()
         {
-            ProcessStartInfo procInfo = new ProcessStartInfo(Binary, Args)
+            ProcessStartInfo procInfo = new(Binary, Args)
             {
                 RedirectStandardOutput = true,
                 UseShellExecute = false,
@@ -38,55 +33,25 @@ namespace CandyShop.PackageCore
                 StandardOutputEncoding = Encoding.Default
             };
 
-            try
-            {
-                Process proc = Process.Start(procInfo);
-                string output = proc.StandardOutput.ReadToEnd();
-                proc.WaitForExit();
-                Output = output;
-                ExitCode = proc.ExitCode;
-
-                if (FailOnNonZeroExitCode && proc.ExitCode != 0)
-                {
-                    // TODO what's in output => add property for stderr? put stderr in output?
-                    throw new ChocolateyException($"winget did not exit cleanly ({proc.ExitCode})\n\n{Output}");
-                }
-            }
-            catch (Win32Exception e)
-            {
-                // TODO what's in output => add property for stderr? put stderr in output?
-                throw new ChocolateyException("An error occurred while running winget.", e);
-            }
+            Process proc = Process.Start(procInfo);
+            string output = proc.StandardOutput.ReadToEnd();
+            proc.WaitForExit();
+            
+            Output = output;
+            ExitCode = proc.ExitCode;
         }
 
-        /// <summary>
-        ///     Executes the winget process in a new console
-        /// </summary>
-        /// <exception cref="PackageManagerException"></exception>
+        /// <summary>Executes the winget process in a new console</summary>
         public void Execute()
         {
-            // TODO potentially redirect output and expose events
-
-            ProcessStartInfo procInfo = new ProcessStartInfo(Binary, Args)
+            ProcessStartInfo procInfo = new(Binary, Args)
             {
                 UseShellExecute = false,
             };
 
-            try
-            {
-                Process proc = Process.Start(procInfo);
-                proc.WaitForExit();
-                ExitCode = proc.ExitCode;
-
-                if (FailOnNonZeroExitCode && proc.ExitCode != 0)
-                {
-                    throw new ChocolateyException($"winget did not exit cleanly. Returned {proc.ExitCode}.");
-                }
-            }
-            catch (Win32Exception e)
-            {
-                throw new ChocolateyException("An error occurred while running winget.", e);
-            }
+            Process proc = Process.Start(procInfo);
+            proc.WaitForExit();
+            ExitCode = proc.ExitCode;
         }
     }
 }

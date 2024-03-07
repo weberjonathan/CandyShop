@@ -46,7 +46,7 @@ namespace CandyShop
                     ErrorHandler.ShowError("Failed to determine chocolatey version. This may cause issues because of breaking changes in major Chocolatey versions.");
                 ChocolateyProcess.MajorVersion = major;
             }
-            catch (ChocolateyException)
+            catch (PackageManagerException)
             {
                 MessageBox.Show(
                     LocaleEN.ERROR_CHOCO_PATH,

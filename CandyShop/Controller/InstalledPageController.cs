@@ -45,7 +45,7 @@ namespace CandyShop.Controller
             {
                 packages = await PackageService.GetInstalledPackagesAsync();
             }
-            catch (ChocolateyException e)
+            catch (PackageManagerException e)
             {
                 Log.Error($"An error occurred while retrieving installed packages: {e.Message}");
             }
@@ -74,7 +74,7 @@ namespace CandyShop.Controller
             {
                 details = await PackageService.GetPackageDetailsAsync(name);
             }
-            catch (ChocolateyException exception)
+            catch (PackageManagerException exception)
             {
                 details = String.Format(LocaleEN.ERROR_RETRIEVING_PACKAGE_DETAILS, exception.Message);
             }
@@ -96,7 +96,7 @@ namespace CandyShop.Controller
             {
                 packages = await PackageService.GetInstalledPackagesAsync();
             }
-            catch (ChocolateyException e)
+            catch (PackageManagerException e)
             {
                 Log.Error(e.Message);
             }

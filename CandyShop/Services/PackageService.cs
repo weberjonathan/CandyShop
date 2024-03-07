@@ -28,7 +28,7 @@ namespace CandyShop.Services
             PackageManager = packageManager;
         }
 
-        /// <exception cref="ChocolateyException"></exception>
+        /// <exception cref="PackageManagerException"></exception>
         public async Task<List<GenericPackage>> GetInstalledPackagesAsync()
         {
             await InstalledPckgLock.WaitAsync().ConfigureAwait(false);
@@ -40,7 +40,7 @@ namespace CandyShop.Services
                     packages.ForEach(p => InstalledPckgCache[p.Name] = p);
                 }
             }
-            catch (ChocolateyException)
+            catch (PackageManagerException)
             {
                 throw;
             }
@@ -52,7 +52,7 @@ namespace CandyShop.Services
             return InstalledPckgCache.Values.ToList();
         }
 
-        /// <exception cref="ChocolateyException"></exception>
+        /// <exception cref="PackageManagerException"></exception>
         public async Task<List<GenericPackage>> GetOutdatedPackagesAsync()
         {
             await OutdatedPckgLock.WaitAsync().ConfigureAwait(false);
@@ -64,7 +64,7 @@ namespace CandyShop.Services
                     packages.ForEach(p => OutdatedPckgCache[p.Name] = p);
                 }
             }
-            catch (ChocolateyException)
+            catch (PackageManagerException)
             {
                 throw;
             }
@@ -76,6 +76,7 @@ namespace CandyShop.Services
             return OutdatedPckgCache.Values.ToList();
         }
 
+        /// <exception cref="PackageManagerException"></exception>
         public async Task<string> GetPackageDetailsAsync(string name)
         {
             var package = GetPackageByName(name);
@@ -96,7 +97,7 @@ namespace CandyShop.Services
             return details;
         }
 
-        /// <exception cref="ChocolateyException"></exception>
+        /// <exception cref="PackageManagerException"></exception>
         public async Task PinAsync(string name)
         {
             // TODO exception handling; pinasync needs to check return code and throw; needs to be handled here
@@ -110,23 +111,22 @@ namespace CandyShop.Services
                 return;
             }
 
-            await PackageManager.PinAsync(package);
-
-            //Log.Debug($"choco add pin operation for {package.Name} returned with {exitCode}.");
-            //if (exitCode != 0)
-            //{
-            //    throw new ChocolateyException($"choco did not exit cleanly. Returned {exitCode}.");
-            //}
+            try
+            {
+                await PackageManager.PinAsync(package);
+            }
+            catch (PackageManagerException)
+            {
+                throw;
+            }
 
             package.Pinned = true;
             await UpdateCachedItem(package);
         }
 
-        /// <exception cref="ChocolateyException"></exception>
+        /// <exception cref="PackageManagerException"></exception>
         public async Task UnpinAsync(string name)
         {
-            // TODO exception handling; pinasync needs to check return code and throw; needs to be handled here
-
             Log.Information($"Attempting to unpin package {name}.");
 
             var package = GetPackageByName(name);
@@ -136,19 +136,20 @@ namespace CandyShop.Services
                 return;
             }
 
-            await PackageManager.UnpinAsync(package);
-            
-            //Log.Debug($"choco pin remove operation for {package.Name} returned with {exitCode}.");
-            //if (exitCode != 0)
-            //{
-            //    throw new ChocolateyException($"choco did not exit cleanly. Returned {exitCode}.");
-            //}
+            try
+            {
+                await PackageManager.UnpinAsync(package);
+            }
+            catch (PackageManagerException)
+            {
+                throw;
+            }
 
             package.Pinned = false;
             await UpdateCachedItem(package);
         }
 
-        /// <exception cref="ChocolateyException"></exception>
+        /// <exception cref="PackageManagerException"></exception>
         public async void Upgrade(string[] names)
         {
             List<GenericPackage> packages = GetPackagesByName(names.ToList());
@@ -160,7 +161,7 @@ namespace CandyShop.Services
             {
                 PackageManager.Upgrade(packages);
             }
-            catch (ChocolateyException)
+            catch (PackageManagerException)
             {
                 throw;
             }
@@ -196,14 +197,10 @@ namespace CandyShop.Services
 
         public GenericPackage GetPackageByName(string name)
         {
-            if (OutdatedPckgCache.ContainsKey(name))
-            {
-                return OutdatedPckgCache[name];
-            }
-            else if (InstalledPckgCache.ContainsKey(name))
-            {
-                return InstalledPckgCache[name];
-            }
+            if (OutdatedPckgCache.TryGetValue(name, out GenericPackage outdated))
+                return outdated;
+            else if (InstalledPckgCache.TryGetValue(name, out GenericPackage installed))
+                return installed;
 
             return null;
         }

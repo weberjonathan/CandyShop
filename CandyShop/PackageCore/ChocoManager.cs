@@ -7,8 +7,6 @@ namespace CandyShop.PackageCore
 {
     internal class ChocoManager : AbstractPackageManager
     {
-        // TODO annoate throwing exceptions
-
         private readonly List<int> ValidExitCodesOnUpgrade;
 
         public ChocoManager()
@@ -23,6 +21,7 @@ namespace CandyShop.PackageCore
                 Log.Warning("List of valid exit codes does not contain '0'. This looks like a mistake in the configuration file.");
         }
 
+        /// <exception cref="PackageManagerException"></exception>
         public override string FetchInfo(GenericPackage package)
         {
             StringBuilder rtn = new();
@@ -30,6 +29,8 @@ namespace CandyShop.PackageCore
             // launch process
             ChocolateyProcess p = ProcessFactory.Choco($"info {package.Name}");
             p.ExecuteHidden();
+            if (p.ExitCode != 0)
+                throw new PackageManagerException($"Chocolatey did not exit cleanly. Returned {p.ExitCode}.");
 
             // parse
             List<string[]> sections = p.OutputBySection;
@@ -47,6 +48,7 @@ namespace CandyShop.PackageCore
             return rtn.ToString();
         }
 
+        /// <exception cref="PackageManagerException"></exception>
         public override List<GenericPackage> FetchInstalled()
         {
             Log.Information("Fetching installed packages from Chocolatey");
@@ -57,6 +59,8 @@ namespace CandyShop.PackageCore
             var args = ChocolateyProcess.MajorVersion < 2 ? "list --local-only" : "list";
             ChocolateyProcess p = ProcessFactory.Choco(args);
             p.ExecuteHidden();
+            if (p.ExitCode != 0)
+                throw new PackageManagerException($"Chocolatey did not exit cleanly. Returned {p.ExitCode}.");
 
             // parse output
             List<string[]> sections = p.OutputBySection;
@@ -98,6 +102,7 @@ namespace CandyShop.PackageCore
             return packages;
         }
 
+        /// <exception cref="PackageManagerException"></exception>
         public override List<GenericPackage> FetchOutdated()
         {
             Log.Information("Fetching outdated packages from Chocolatey");
@@ -107,6 +112,9 @@ namespace CandyShop.PackageCore
             // launch process
             ChocolateyProcess p = ProcessFactory.Choco("outdated");
             p.ExecuteHidden();
+            if (p.ExitCode != 0)
+                throw new PackageManagerException($"Chocolatey did not exit cleanly. Returned {p.ExitCode}.");
+
 
             // TODO throw exceptions for parsing errors
             // account for optional extra sections at the start
@@ -160,19 +168,25 @@ namespace CandyShop.PackageCore
             return ResolveMetaPackages(packages);
         }
 
-        // TODO this used to return exit code; now probably maybe have to catch exxception?
+        /// <exception cref="PackageManagerException"></exception>
         public override void Pin(GenericPackage package)
         {
             var args = $"pin add --name=\"{package.Name}\" --version=\"{package.CurrVer}\"";
             ChocolateyProcess p = ProcessFactory.ChocoPrivileged(args);
             p.ExecuteHidden();
+
+            if (p.ExitCode != 0)
+                throw new PackageManagerException($"Chocolatey did not exit cleanly. Returned {p.ExitCode}.");
         }
 
-        // TODO this used to return exit code; now probably maybe have to catch exxception?
+        /// <exception cref="PackageManagerException"></exception>
         public override void Unpin(GenericPackage package)
         {
             ChocolateyProcess p = ProcessFactory.ChocoPrivileged($"pin remove --name=\"{package.Name}\"");
             p.ExecuteHidden();
+
+            if (p.ExitCode != 0)
+                throw new PackageManagerException($"Chocolatey did not exit cleanly. Returned {p.ExitCode}.");
         }
 
         public override void Upgrade(List<GenericPackage> packages)
@@ -187,13 +201,10 @@ namespace CandyShop.PackageCore
 
             // launch process
             ChocolateyProcess p = ProcessFactory.ChocoPrivileged($"upgrade {argument} -y");
-            p.FailOnNonZeroExitCode = false;
             p.Execute();
 
             if (!ValidExitCodesOnUpgrade.Contains(p.ExitCode))
-            {
-                throw new ChocolateyException($"choco did not exit cleanly. Returned {p.ExitCode}.");
-            }
+                throw new PackageManagerException($"Chocolatey did not exit cleanly. Returned {p.ExitCode}.");
         }
 
         /// <summary>

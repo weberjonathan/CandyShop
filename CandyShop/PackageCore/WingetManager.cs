@@ -7,6 +7,7 @@ namespace CandyShop.PackageCore
 {
     internal class WingetManager : AbstractPackageManager
     {
+        /// <exception cref="PackageManagerException"></exception>
         public override string FetchInfo(GenericPackage package)
         {
             if (!package.HasSource)
@@ -16,11 +17,15 @@ namespace CandyShop.PackageCore
 
             WingetProcess p = ProcessFactory.Winget($"show --id \"{package.Id}\" --exact");
             p.ExecuteHidden();
+            if (p.ExitCode != 0)
+                throw new PackageManagerException($"Winget did not exit cleanly. Returned {p.ExitCode}.");
+
 
             int start = p.Output.IndexOf("Gefunden ") + "Gefunden ".Length; // TODO make locale indepdent
             return start > 0 ? p.Output[start..] : p.Output;
         }
 
+        /// <exception cref="PackageManagerException"></exception>
         public override List<GenericPackage> FetchInstalled()
         {
             // TODO make sure dequeues do not throw bc of missing elements
@@ -29,6 +34,8 @@ namespace CandyShop.PackageCore
             // launch process
             WingetProcess p = ProcessFactory.Winget($"list");
             p.ExecuteHidden();
+            if (p.ExitCode != 0)
+                throw new PackageManagerException($"Winget did not exit cleanly. Returned {p.ExitCode}.");
 
             // remove download indicators from output by skipping to first mention of "Name"
             int i = 0;
@@ -42,7 +49,7 @@ namespace CandyShop.PackageCore
             string header = output.Dequeue();
             if (!header.StartsWith("Name"))
             {
-                throw new ChocolateyException("Failed to parse winget output: Could not find header.");
+                throw new PackageManagerException("Failed to parse winget output: Could not find header.");
             }
 
             int nameIndex = 0;
@@ -53,13 +60,13 @@ namespace CandyShop.PackageCore
 
             if (idIndex == 0 || versionIndex == 0 || availableIndex == 0 || sourceIndex == 0)
             {
-                throw new ChocolateyException("Failed to parse winget output: Could not find offsets.");
+                throw new PackageManagerException("Failed to parse winget output: Could not find offsets.");
             }
 
             string divider = output.Dequeue();
             if (!divider.StartsWith('-') && sourceIndex < divider.Length)
             {
-                throw new ChocolateyException(); // TODO
+                throw new PackageManagerException(); // TODO
             }
 
             List<GenericPackage> packages = [];
@@ -84,30 +91,35 @@ namespace CandyShop.PackageCore
             return packages;
         }
 
+        /// <exception cref="PackageManagerException"></exception>
         public override List<GenericPackage> FetchOutdated()
         {
             var packages = FetchInstalled();
             return packages.Where(p => !p.CurrVer.Equals(p.AvailVer)).ToList();
         }
 
+        /// <exception cref="PackageManagerException"></exception>
         public override async Task<List<GenericPackage>> FetchOutdatedAsync()
         {
             var packages = await FetchInstalledAsync();
             return packages.Where(p => !string.IsNullOrEmpty(p.AvailVer) && !p.CurrVer.Equals(p.AvailVer)).ToList();
         }
 
+        /// <exception cref="PackageManagerException"></exception>
         public override void Pin(GenericPackage package)
         {
             // TODO
-            throw new NotImplementedException();
+            throw new PackageManagerException("Pin has not been implemented yet for Winget.");
         }
 
+        /// <exception cref="PackageManagerException"></exception>
         public override void Unpin(GenericPackage package)
         {
             // TODO
-            throw new NotImplementedException();
+            throw new PackageManagerException("Pin has not been implemented yet for Winget.");
         }
 
+        /// <exception cref="PackageManagerException"></exception>
         public override void Upgrade(List<GenericPackage> packages)
         {
             if (packages.Count == 0) return;
@@ -121,11 +133,10 @@ namespace CandyShop.PackageCore
             }
 
             var p = ProcessFactory.WingetPrivileged(upgradeCommands);
-            p.FailOnNonZeroExitCode = false;
             p.Execute();
 
             if (p.ExitCode != 0)
-                throw new ChocolateyException($"Winget did not exit cleanly. Returned {p.ExitCode}.");
+                throw new PackageManagerException($"Winget did not exit cleanly. Returned {p.ExitCode}.");
         }
 
         private int GetNextColumnIndex(string row, int startIndex)

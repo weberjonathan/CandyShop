@@ -1,7 +1,5 @@
-﻿using CandyShop.PackageCore;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
 
 namespace CandyShop.PackageCore
@@ -16,75 +14,44 @@ namespace CandyShop.PackageCore
             Arguments = args;
         }
 
+        public string Output { get; private set; } = "";
+
         public string Binary { get; private set; }
 
         public string Arguments { get; private set; }
 
-        public string Output { get; private set; } = "";
-
-        public List<string[]> OutputBySection { get; private set; } = new List<string[]>();
+        public List<string[]> OutputBySection { get; private set; } = [];
 
         public int ExitCode { get; private set; }
 
-        public bool FailOnNonZeroExitCode { get; set; } = true;
-
-        /// <exception cref="ChocolateyException"></exception>
         public void ExecuteHidden()
         {
-            ProcessStartInfo procInfo = new ProcessStartInfo(Binary, Arguments)
+            ProcessStartInfo procInfo = new(Binary, Arguments)
             {
                 RedirectStandardOutput = true,
                 UseShellExecute = false,
                 CreateNoWindow = true
             };
 
-            try
-            {
-                Process proc = Process.Start(procInfo);
-                string output = proc.StandardOutput.ReadToEnd();
-
-                proc.WaitForExit();
-                Output = output;
-                ExitCode = proc.ExitCode;
-
-                if (FailOnNonZeroExitCode && proc.ExitCode != 0)
-                {
-                    throw new ChocolateyException($"Chocolatey did not exit cleanly. Returned {proc.ExitCode}.");
-                }
-            }
-            catch (Win32Exception e)
-            {
-                throw new ChocolateyException("An error occurred while running choco.", e);
-            }
-
+            Process proc = Process.Start(procInfo);
+            string output = proc.StandardOutput.ReadToEnd();
+            proc.WaitForExit();
+            
+            Output = output;
             OutputBySection = ParseSectionsFromOutput(Output);
+            ExitCode = proc.ExitCode;
         }
 
-        /// <exception cref="ChocolateyException"></exception>
         public void Execute()
         {
-            // TODO potentially redirect output and expose events
-
             ProcessStartInfo procInfo = new ProcessStartInfo(Binary, Arguments)
             {
                 UseShellExecute = false,
             };
 
-            try
-            {
-                Process proc = Process.Start(procInfo);
-                proc.WaitForExit();
-                ExitCode = proc.ExitCode;
-
-                if (FailOnNonZeroExitCode && proc.ExitCode != 0)
-                {
-                    throw new ChocolateyException($"choco did not exit cleanly. Returned {proc.ExitCode}.");
-                }
-            }
-            catch (Win32Exception e)
-            {
-                throw new ChocolateyException("An error occurred while running choco.", e);
-            }
+            Process proc = Process.Start(procInfo);
+            proc.WaitForExit();
+            ExitCode = proc.ExitCode;
         }
 
         private List<string[]> ParseSectionsFromOutput(string output)

@@ -94,7 +94,7 @@ namespace CandyShop.Controller
             {
                 packages = await PackageService.GetOutdatedPackagesAsync();
             }
-            catch (ChocolateyException e)
+            catch (PackageManagerException e)
             {
                 Log.Error(LocaleEN.ERROR_RETRIEVING_OUTDATED_PACKAGES, e.Message);
             }
@@ -147,7 +147,7 @@ namespace CandyShop.Controller
             {
                 PackageService.Upgrade(packages);
             }
-            catch (ChocolateyException e)
+            catch (PackageManagerException e)
             {
                 MainWindow?.DisplayError(LocaleEN.ERROR_UPGRADING_OUTDATED_PACKAGES, e.Message);
                 WindowsConsole.FreeConsole();
@@ -197,36 +197,32 @@ namespace CandyShop.Controller
 
         private async void TogglePin(string packageName)
         {
-            try
+            GenericPackage package = PackageService.GetPackageByName(packageName);
+            if (package == null)
             {
-                GenericPackage package = PackageService.GetPackageByName(packageName);
-                if (package == null)
-                {
-                    ErrorHandler.ShowError($"Could not find package '{packageName}'");
-                    return;
-                }
+                ErrorHandler.ShowError("Could not find package '{0}'", packageName);
+                return;
+            }
 
-                if (package.Pinned.HasValue)
+            if (package.Pinned.HasValue)
+            {
+                try
                 {
                     if (package.Pinned.Value)
-                    {
                         await PackageService.UnpinAsync(package.Name);
-                    }
                     else
-                    {
                         await PackageService.PinAsync(package.Name);
-                    }
-
-                    View.SetPinned(package.Name, package.Pinned.Value);
                 }
-                else
+                catch (PackageManagerException e)
                 {
-                    // TODO error
+                    ErrorHandler.ShowError("An unknown error occurred: {0}", e.Message);
                 }
+
+                View.SetPinned(package.Name, package.Pinned.Value);
             }
-            catch (ChocolateyException e)
+            else
             {
-                ErrorHandler.ShowError("An unknown error occurred: {0}", e.Message);
+                ErrorHandler.ShowError("Failed to determine the pinned state of package '{0}'.", package.Name);
             }
         }
     }

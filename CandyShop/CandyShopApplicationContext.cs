@@ -88,7 +88,7 @@ namespace CandyShop
             {
                 await service.GetOutdatedPackagesAsync();
             }
-            catch (ChocolateyException e)
+            catch (PackageManagerException e)
             {
                 Log.Error(LocaleEN.ERROR_RETRIEVING_OUTDATED_PACKAGES, e.Message);
             }
@@ -114,7 +114,7 @@ namespace CandyShop
                 //packages = new List<GenericPackage>();
                 //packages.Add(new GenericPackage(new ChocolateyPackage()));
             }
-            catch (ChocolateyException e)
+            catch (PackageManagerException e)
             {
                 icon.BalloonTipIcon = ToolTipIcon.Error;
                 icon.Text = Application.ProductName;
