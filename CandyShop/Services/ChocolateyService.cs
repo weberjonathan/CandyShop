@@ -135,7 +135,7 @@ namespace CandyShop.Services
         // --------------------------------------------------------------------
 
         /// <exception cref="ChocolateyException"></exception>
-        public async Task<List<ChocolateyPackage>> GetOutdatedChocoPackagesAsync()
+        private async Task<List<ChocolateyPackage>> GetOutdatedChocoPackagesAsync()
         {
             await OutdatedPckgLock.WaitAsync().ConfigureAwait(false);
 
@@ -160,7 +160,7 @@ namespace CandyShop.Services
         }
 
         /// <exception cref="ChocolateyException"></exception>
-        public async Task<List<ChocolateyPackage>> GetInstalledChocoPackagesAsync()
+        private async Task<List<ChocolateyPackage>> GetInstalledChocoPackagesAsync()
         {
             await InstalledPckgLock.WaitAsync().ConfigureAwait(false);
 
@@ -185,7 +185,7 @@ namespace CandyShop.Services
         }
 
         /// <exception cref="ChocolateyException"></exception>
-        public async Task<string> GetChocoPackageDetails(ChocolateyPackage package)
+        private async Task<string> GetChocoPackageDetails(ChocolateyPackage package)
         {
             await PckgDetailsLock.WaitAsync().ConfigureAwait(false);
             if (!PckgDetailsCache.TryGetValue(package.Name, out string details))
@@ -201,16 +201,8 @@ namespace CandyShop.Services
             return details;
         }
 
-        public List<ChocolateyPackage> GetInstalledPackagesByName(List<string> names)
-        {
-            return names
-                .Where(name => InstalledPckgCache.ContainsKey(name))
-                .Select(name => InstalledPckgCache[name])
-                .ToList();
-        }
-
         /// <returns>The package with the specified name, or null</returns>
-        public ChocolateyPackage GetChocoPackageByName(string name)
+        private ChocolateyPackage GetChocoPackageByName(string name)
         {
             // prefer outdated packages as they contain more information, even though hit rate may be less
             if (OutdatedPckgCache.ContainsKey(name))
@@ -225,7 +217,7 @@ namespace CandyShop.Services
             return null;
         }
 
-        public List<ChocolateyPackage> GetChocoPackagesByName(List<string> names)
+        private List<ChocolateyPackage> GetChocoPackagesByName(List<string> names)
         {
             var rtn = names
                 .Select(name => GetChocoPackageByName(name))
