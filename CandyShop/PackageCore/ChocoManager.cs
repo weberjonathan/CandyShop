@@ -112,11 +112,6 @@ namespace CandyShop.PackageCore
             if (p.ExitCode != 0)
                 throw new PackageManagerException($"Chocolatey did not exit cleanly. Returned {p.ExitCode}.");
 
-
-            // TODO throw exceptions for parsing errors
-            // account for optional extra sections at the start
-            // and end of sections header, package list and summary
-
             // parse (find header section, followed by package section, followed by summary section)
             List<string[]> sections = ParseSections(p.Output);
             for (int i = 0; i < sections.Count; i++)
@@ -188,16 +183,10 @@ namespace CandyShop.PackageCore
 
         public override void Upgrade(List<GenericPackage> packages)
         {
-            string argument = "";
-            string arg2 = string.Join(' ', packages.Select(p => p.Name));
-            foreach (var pckg in packages)
-            {
-                argument += pckg.Name + " ";
-            }
-            // TODO test if argument and arg2 are the same
+            string arg = string.Join(' ', packages.Select(p => p.Name));
 
             // launch process
-            PackageManagerProcess p = ProcessFactory.ChocoPrivileged($"upgrade {argument} -y");
+            PackageManagerProcess p = ProcessFactory.ChocoPrivileged($"upgrade {arg} -y");
             p.Execute();
 
             if (!ValidExitCodesOnUpgrade.Contains(p.ExitCode))

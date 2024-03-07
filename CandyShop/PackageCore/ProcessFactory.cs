@@ -81,7 +81,6 @@ namespace CandyShop.PackageCore
                 return new PackageManagerProcess(WingetBinary, args);
         }
 
-        // TODO test this method
         private PackageManagerProcess CreateWingetBatchProcess(List<string> arguments, bool elevate)
         {
             string body = "";

@@ -82,7 +82,6 @@ namespace CandyShop.Services
             var package = GetPackageByName(name);
             if (package == null) return "";
             
-            // TODO ensure lock release with exception handling !!!
             await PckgDetailsLock.WaitAsync().ConfigureAwait(false);
             if (!PckgDetailsCache.TryGetValue(name, out string details))
             {
@@ -100,8 +99,6 @@ namespace CandyShop.Services
         /// <exception cref="PackageManagerException"></exception>
         public async Task PinAsync(string name)
         {
-            // TODO exception handling; pinasync needs to check return code and throw; needs to be handled here
-
             Log.Information($"Attempting to pin package {name}.");
 
             var package = GetPackageByName(name);
@@ -216,12 +213,14 @@ namespace CandyShop.Services
         private async Task UpdateCachedItem(GenericPackage package)
         {
             await OutdatedPckgLock.WaitAsync().ConfigureAwait(false);
-            package = OutdatedPckgCache[package.Name];
-            package.AvailVer = package.AvailVer;
-            package.CurrVer = package.CurrVer;
-            package.Name = package.Name;
-            package.Pinned = package.Pinned;
-            // TODO rest of properties
+            var cachedPackage = OutdatedPckgCache[package.Name];
+            cachedPackage.Name = package.Name;
+            cachedPackage.Id = package.Id;
+            cachedPackage.Source = package.Source;
+            cachedPackage.CurrVer = package.CurrVer;
+            cachedPackage.AvailVer = package.AvailVer;
+            cachedPackage.Pinned = package.Pinned;
+            cachedPackage.Parent = package.Parent;
             OutdatedPckgLock.Release();
         }
     }

@@ -49,7 +49,7 @@ namespace CandyShop.PackageCore
             string header = output.Dequeue();
             if (!header.StartsWith("Name"))
             {
-                throw new PackageManagerException("Failed to parse winget output: Could not find header.");
+                throw new PackageManagerException("Failed to parse winget output: Could not find start of header.");
             }
 
             int nameIndex = 0;
@@ -66,7 +66,7 @@ namespace CandyShop.PackageCore
             string divider = output.Dequeue();
             if (!divider.StartsWith('-') && sourceIndex < divider.Length)
             {
-                throw new PackageManagerException(); // TODO
+                throw new PackageManagerException("Failed to parse winget output: Could not find end of header.");
             }
 
             List<GenericPackage> packages = [];
