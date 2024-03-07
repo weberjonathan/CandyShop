@@ -8,24 +8,20 @@ namespace CandyShop.PackageCore
         public WingetProcess(string binary, string args)
         {
             Binary = binary;
-            Args = args;
+            Arguments = args;
         }
 
         public string Output { get; private set; } = "";
 
         public string Binary { get; private set; }
 
-        public string Args { get; private set; } = "";
+        public string Arguments { get; private set; } = "";
 
         public int ExitCode { get; private set; }
 
-        /// <summary>
-        ///     Executes the winget process without creating a window
-        ///     and writes stdout to the Output property after execution
-        /// </summary>
         public void ExecuteHidden()
         {
-            ProcessStartInfo procInfo = new(Binary, Args)
+            ProcessStartInfo procInfo = new(Binary, Arguments)
             {
                 RedirectStandardOutput = true,
                 UseShellExecute = false,
@@ -41,10 +37,9 @@ namespace CandyShop.PackageCore
             ExitCode = proc.ExitCode;
         }
 
-        /// <summary>Executes the winget process in a new console</summary>
         public void Execute()
         {
-            ProcessStartInfo procInfo = new(Binary, Args)
+            ProcessStartInfo procInfo = new(Binary, Arguments)
             {
                 UseShellExecute = false,
             };

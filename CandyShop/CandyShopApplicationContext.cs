@@ -11,6 +11,7 @@ using Microsoft.Windows.AppNotifications;
 using System.IO;
 using System.Diagnostics;
 using CandyShop.PackageCore;
+using System.ComponentModel;
 
 namespace CandyShop
 {
@@ -24,9 +25,41 @@ namespace CandyShop
             string cwd = Directory.GetParent(Process.GetCurrentProcess().MainModule.FileName).FullName;
             Log.Debug($"cwd: {cwd}; elevated: {context.HasAdminPrivileges}; elevateOnDemand: {context.ElevateOnDemand}; debug: {context.DebugEnabled}");
 
+            // configure process factory
+            ProcessFactory.Config(context);
+
+            // determine winget or choco and test executables
+            AbstractPackageManager packageManager;
+            if (context.WingetMode)
+            {
+                packageManager = new WingetManager();
+                // TODO validate winget
+            }
+            else
+            {
+                int majorVersion = 2;
+                var p = ProcessFactory.Choco("--version");
+
+                try
+                {
+                    p.ExecuteHidden();
+                    if (p.ExitCode == 0)
+                    {
+                        string majorString = p.Output.Trim().Split('.')[0];
+                        if (!int.TryParse(majorString, out majorVersion))
+                            Log.Error($"Failed to parse the version string from Chocolatey, assume minimum version 2.x. Output was: {p.Output}");
+                    }
+                }
+                catch (Win32Exception)
+                {
+                    ErrorHandler.ShowError(LocaleEN.ERROR_CHOCO_PATH);
+                }
+
+                packageManager = new ChocoManager(majorVersion, context.ValidExitCodes);
+            }
+
             // init services
-            AbstractPackageManager packageManager = context.WingetMode ? new WingetManager() : new ChocoManager(context.ValidExitCodes); // TODO
-            PackageService packageService = new PackageService(packageManager);
+            PackageService packageService = new(packageManager);
             SystemStartService windowsTaskService = new();
             ShortcutService shortcutService = new();
 

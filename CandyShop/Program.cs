@@ -32,30 +32,6 @@ namespace CandyShop
                 .WriteTo.Logger(fileLogger)
                 .CreateLogger();
 
-            // configure process factory
-            ProcessFactory.Config(context);
-
-            // check if Chocolatey is in path
-            try
-            {
-                var p = ProcessFactory.Choco("--version");
-                p.ExecuteHidden();
-                string majorString = p.Output.Trim().Split('.')[0];
-                int major = 0;
-                if (!int.TryParse(majorString, out major))
-                    ErrorHandler.ShowError("Failed to determine chocolatey version. This may cause issues because of breaking changes in major Chocolatey versions.");
-                ChocolateyProcess.MajorVersion = major;
-            }
-            catch (PackageManagerException)
-            {
-                MessageBox.Show(
-                    LocaleEN.ERROR_CHOCO_PATH,
-                    Application.ProductName,
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Error
-                );
-            }
-
             // launch application
             Application.SetHighDpiMode(HighDpiMode.SystemAware);
             Application.EnableVisualStyles();

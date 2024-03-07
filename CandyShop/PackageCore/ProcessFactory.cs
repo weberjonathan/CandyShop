@@ -81,7 +81,7 @@ namespace CandyShop.PackageCore
             string body = "";
             foreach (var item in processes)
             {
-                var cmd = $"{item.Binary} {item.Args}";
+                var cmd = $"{item.Binary} {item.Arguments}";
                 body += $"Write-Host \"$ {cmd}`n\"; {cmd}; Write-Host \"Returned $LastExitCode`n\"; $exit = $exit -and $?;";
             }
             return new WingetProcess("powershell.exe", $"$exit = $true; gsudo {{ {body} }}; Exit (-Not $exit)");

@@ -7,15 +7,12 @@ namespace CandyShop.PackageCore
 {
     internal class ChocoManager : AbstractPackageManager
     {
+        private readonly int ChocoVersionMajor;
         private readonly List<int> ValidExitCodesOnUpgrade;
 
-        public ChocoManager()
+        public ChocoManager(int chocoVersionMajor, List<int> validExitCodesOnUpgrade)
         {
-            ValidExitCodesOnUpgrade = [ 0 ];
-        }
-        
-        public ChocoManager(List<int> validExitCodesOnUpgrade)
-        {
+            ChocoVersionMajor = chocoVersionMajor;
             ValidExitCodesOnUpgrade = validExitCodesOnUpgrade;
             if (!validExitCodesOnUpgrade.Contains(0))
                 Log.Warning("List of valid exit codes does not contain '0'. This looks like a mistake in the configuration file.");
@@ -33,7 +30,7 @@ namespace CandyShop.PackageCore
                 throw new PackageManagerException($"Chocolatey did not exit cleanly. Returned {p.ExitCode}.");
 
             // parse
-            List<string[]> sections = p.OutputBySection;
+            List<string[]> sections = ParseSections(p.Output);
             foreach (string[] section in sections)
             {
                 if (section.Length > 0)
@@ -53,17 +50,17 @@ namespace CandyShop.PackageCore
         {
             Log.Information("Fetching installed packages from Chocolatey");
 
-            List<GenericPackage> packages = new();
+            List<GenericPackage> packages = [];
 
             // launch process
-            var args = ChocolateyProcess.MajorVersion < 2 ? "list --local-only" : "list";
+            var args = ChocoVersionMajor < 2 ? "list --local-only" : "list";
             ChocolateyProcess p = ProcessFactory.Choco(args);
             p.ExecuteHidden();
             if (p.ExitCode != 0)
                 throw new PackageManagerException($"Chocolatey did not exit cleanly. Returned {p.ExitCode}.");
 
             // parse output
-            List<string[]> sections = p.OutputBySection;
+            List<string[]> sections = ParseSections(p.Output);
             foreach (string[] section in sections)
             {
                 // check final line and match count
@@ -121,7 +118,7 @@ namespace CandyShop.PackageCore
             // and end of sections header, package list and summary
 
             // parse (find header section, followed by package section, followed by summary section)
-            List<string[]> sections = p.OutputBySection;
+            List<string[]> sections = ParseSections(p.Output);
             for (int i = 0; i < sections.Count; i++)
             {
                 // find header section
@@ -230,6 +227,44 @@ namespace CandyShop.PackageCore
             }
 
             return packages;
+        }
+
+        /// <summary>
+        /// Splits the output from a Chocolatey process into sections divided by an empty line
+        /// </summary>
+        /// <param name="output"></param>
+        /// <returns></returns>
+        private List<string[]> ParseSections(string output)
+        {
+            List<string[]> rtn = [];
+
+            // parse head
+            Queue<string> outputLines = new(output.Split("\r\n"));
+            if (outputLines.Count > 0)
+            {
+                if (!outputLines.Dequeue().StartsWith("Chocolatey v"))
+                {
+                    // TOOD version checks? "Chocolatey v0.10.15"
+                }
+
+                // divide into blocks seperated by empty line
+                List<string> currentBlock = [];
+                while (outputLines.Count > 0)
+                {
+                    string line = outputLines.Dequeue();
+                    if (string.Empty.Equals(line))
+                    {
+                        rtn.Add(currentBlock.ToArray());
+                        currentBlock = [];
+                    }
+                    else
+                    {
+                        currentBlock.Add(line);
+                    }
+                }
+            }
+
+            return rtn;
         }
     }
 }
