@@ -11,27 +11,27 @@ namespace CandyShop.PackageCore
             Instance = new ProcessFactory(context);
         }
 
-        public static ChocolateyProcess Choco(string args)
+        public static PackageManagerProcess Choco(string args)
         {
             return Instance.CreateChocoProcess(args, false);
         }
 
-        public static ChocolateyProcess ChocoPrivileged(string args)
+        public static PackageManagerProcess ChocoPrivileged(string args)
         {
             return Instance.CreateChocoProcess(args, true);
         }
 
-        public static WingetProcess Winget(string args)
+        public static PackageManagerProcess Winget(string args)
         {
             return Instance.CreateWingetProcess(args, false);
         }
 
-        public static WingetProcess WingetPrivileged(string args)
+        public static PackageManagerProcess WingetPrivileged(string args)
         {
             return Instance.CreateWingetProcess(args, true);
         }
 
-        public static WingetProcess WingetPrivileged(List<WingetProcess> processes)
+        public static PackageManagerProcess WingetPrivileged(List<PackageManagerProcess> processes)
         {
             return Instance.CreatePrivilegedUnifiedWingetProcess(processes);
         }
@@ -56,27 +56,27 @@ namespace CandyShop.PackageCore
             ElevateOnDemand = context.ElevateOnDemand && !context.HasAdminPrivileges;
         }
 
-        private ChocolateyProcess CreateChocoProcess(string args, bool elevate)
+        private PackageManagerProcess CreateChocoProcess(string args, bool elevate)
         {
             if (elevate && ElevateOnDemand)
             {
-                return new ChocolateyProcess("powershell.exe", "gsudo {" + ChocoBinary + " " + args + "}");
+                return new PackageManagerProcess("powershell.exe", "gsudo {" + ChocoBinary + " " + args + "}");
             }
             else
             {
-                return new ChocolateyProcess(ChocoBinary, args);
+                return new PackageManagerProcess(ChocoBinary, args);
             }
         }
 
-        private WingetProcess CreateWingetProcess(string args, bool elevate)
+        private PackageManagerProcess CreateWingetProcess(string args, bool elevate)
         {
             if (elevate && ElevateOnDemand)
-                return new WingetProcess("powershell.exe", "gsudo {" + WingetBinary + " " + args + "}");
+                return new PackageManagerProcess("powershell.exe", "gsudo {" + WingetBinary + " " + args + "}");
             else
-                return new WingetProcess(WingetBinary, args);
+                return new PackageManagerProcess(WingetBinary, args);
         }
 
-        private WingetProcess CreatePrivilegedUnifiedWingetProcess(List<WingetProcess> processes)
+        private PackageManagerProcess CreatePrivilegedUnifiedWingetProcess(List<PackageManagerProcess> processes)
         {
             string body = "";
             foreach (var item in processes)
@@ -84,7 +84,7 @@ namespace CandyShop.PackageCore
                 var cmd = $"{item.Binary} {item.Arguments}";
                 body += $"Write-Host \"$ {cmd}`n\"; {cmd}; Write-Host \"Returned $LastExitCode`n\"; $exit = $exit -and $?;";
             }
-            return new WingetProcess("powershell.exe", $"$exit = $true; gsudo {{ {body} }}; Exit (-Not $exit)");
+            return new PackageManagerProcess("powershell.exe", $"$exit = $true; gsudo {{ {body} }}; Exit (-Not $exit)");
         }
     }
 }

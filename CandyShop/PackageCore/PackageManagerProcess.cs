@@ -3,9 +3,9 @@ using System.Text;
 
 namespace CandyShop.PackageCore
 {
-    public class WingetProcess
+    public class PackageManagerProcess
     {
-        public WingetProcess(string binary, string args)
+        public PackageManagerProcess(string binary, string args)
         {
             Binary = binary;
             Arguments = args;

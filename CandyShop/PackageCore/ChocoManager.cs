@@ -24,7 +24,7 @@ namespace CandyShop.PackageCore
             StringBuilder rtn = new();
 
             // launch process
-            ChocolateyProcess p = ProcessFactory.Choco($"info {package.Name}");
+            PackageManagerProcess p = ProcessFactory.Choco($"info {package.Name}");
             p.ExecuteHidden();
             if (p.ExitCode != 0)
                 throw new PackageManagerException($"Chocolatey did not exit cleanly. Returned {p.ExitCode}.");
@@ -54,7 +54,7 @@ namespace CandyShop.PackageCore
 
             // launch process
             var args = ChocoVersionMajor < 2 ? "list --local-only" : "list";
-            ChocolateyProcess p = ProcessFactory.Choco(args);
+            PackageManagerProcess p = ProcessFactory.Choco(args);
             p.ExecuteHidden();
             if (p.ExitCode != 0)
                 throw new PackageManagerException($"Chocolatey did not exit cleanly. Returned {p.ExitCode}.");
@@ -107,7 +107,7 @@ namespace CandyShop.PackageCore
             List<GenericPackage> packages = [];
 
             // launch process
-            ChocolateyProcess p = ProcessFactory.Choco("outdated");
+            PackageManagerProcess p = ProcessFactory.Choco("outdated");
             p.ExecuteHidden();
             if (p.ExitCode != 0)
                 throw new PackageManagerException($"Chocolatey did not exit cleanly. Returned {p.ExitCode}.");
@@ -169,7 +169,7 @@ namespace CandyShop.PackageCore
         public override void Pin(GenericPackage package)
         {
             var args = $"pin add --name=\"{package.Name}\" --version=\"{package.CurrVer}\"";
-            ChocolateyProcess p = ProcessFactory.ChocoPrivileged(args);
+            PackageManagerProcess p = ProcessFactory.ChocoPrivileged(args);
             p.ExecuteHidden();
 
             if (p.ExitCode != 0)
@@ -179,7 +179,7 @@ namespace CandyShop.PackageCore
         /// <exception cref="PackageManagerException"></exception>
         public override void Unpin(GenericPackage package)
         {
-            ChocolateyProcess p = ProcessFactory.ChocoPrivileged($"pin remove --name=\"{package.Name}\"");
+            PackageManagerProcess p = ProcessFactory.ChocoPrivileged($"pin remove --name=\"{package.Name}\"");
             p.ExecuteHidden();
 
             if (p.ExitCode != 0)
@@ -197,7 +197,7 @@ namespace CandyShop.PackageCore
             // TODO test if argument and arg2 are the same
 
             // launch process
-            ChocolateyProcess p = ProcessFactory.ChocoPrivileged($"upgrade {argument} -y");
+            PackageManagerProcess p = ProcessFactory.ChocoPrivileged($"upgrade {argument} -y");
             p.Execute();
 
             if (!ValidExitCodesOnUpgrade.Contains(p.ExitCode))

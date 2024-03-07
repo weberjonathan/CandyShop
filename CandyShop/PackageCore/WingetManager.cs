@@ -15,7 +15,7 @@ namespace CandyShop.PackageCore
                 return "No sources available for the selected package.";
             }
 
-            WingetProcess p = ProcessFactory.Winget($"show --id \"{package.Id}\" --exact");
+            PackageManagerProcess p = ProcessFactory.Winget($"show --id \"{package.Id}\" --exact");
             p.ExecuteHidden();
             if (p.ExitCode != 0)
                 throw new PackageManagerException($"Winget did not exit cleanly. Returned {p.ExitCode}.");
@@ -32,7 +32,7 @@ namespace CandyShop.PackageCore
             // TODO make sure its locale indepent
 
             // launch process
-            WingetProcess p = ProcessFactory.Winget($"list");
+            PackageManagerProcess p = ProcessFactory.Winget($"list");
             p.ExecuteHidden();
             if (p.ExitCode != 0)
                 throw new PackageManagerException($"Winget did not exit cleanly. Returned {p.ExitCode}.");
@@ -124,7 +124,7 @@ namespace CandyShop.PackageCore
         {
             if (packages.Count == 0) return;
 
-            List<WingetProcess> upgradeCommands = new();
+            List<PackageManagerProcess> upgradeCommands = new();
             foreach (var pckg in packages)
             {
                 string command = $"upgrade --id \"{pckg.Id}\" --silent --exact";

@@ -104,7 +104,7 @@ namespace CandyShop.Controller
         {
             if (ContextSingleton.Get.WingetMode)
             {
-                WingetProcess proc = ProcessFactory.Winget("--logs");
+                PackageManagerProcess proc = ProcessFactory.Winget("--logs");
                 proc.ExecuteHidden();
             }
             else
