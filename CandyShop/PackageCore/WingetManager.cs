@@ -124,15 +124,8 @@ namespace CandyShop.PackageCore
         {
             if (packages.Count == 0) return;
 
-            List<PackageManagerProcess> upgradeCommands = new();
-            foreach (var pckg in packages)
-            {
-                string command = $"upgrade --id \"{pckg.Id}\" --silent --exact";
-                var cmd = ProcessFactory.Winget(command);
-                upgradeCommands.Add(cmd);
-            }
-
-            var p = ProcessFactory.WingetPrivileged(upgradeCommands);
+            var arguments = packages.Select(p => $"upgrade --id \"{p.Id}\" --silent --exact").ToList();
+            var p = ProcessFactory.WingetBatchPrivileged(arguments);
             p.Execute();
 
             if (p.ExitCode != 0)

@@ -31,34 +31,39 @@ namespace CandyShop.PackageCore
             return Instance.CreateWingetProcess(args, true);
         }
 
-        public static PackageManagerProcess WingetPrivileged(List<PackageManagerProcess> processes)
+        /// <summary>
+        /// Combines arguments for multiple Winget launches into a 
+        /// powershell script. Returned process has binary powershell.exe
+        /// and the assembled script as argument.
+        /// </summary>
+        public static PackageManagerProcess WingetBatchPrivileged(List<string> arguments)
         {
-            return Instance.CreatePrivilegedUnifiedWingetProcess(processes);
+            return Instance.CreateWingetBatchProcess(arguments, true);
         }
 
         public string ChocoBinary { get; set; }
         
         public string WingetBinary { get; set; }
 
-        public bool ElevateOnDemand { get; set; }
+        public bool RequireManualElevation { get; set; }
 
         private ProcessFactory()
         {
             ChocoBinary = "choco";
             WingetBinary = "winget";
-            ElevateOnDemand = true;
+            RequireManualElevation = true;
         }
 
         private ProcessFactory(CandyShopContext context)
         {
             ChocoBinary = context.ChocolateyBinary;
             WingetBinary = "winget";
-            ElevateOnDemand = context.ElevateOnDemand && !context.HasAdminPrivileges;
+            RequireManualElevation = context.ElevateOnDemand && !context.HasAdminPrivileges;
         }
 
         private PackageManagerProcess CreateChocoProcess(string args, bool elevate)
         {
-            if (elevate && ElevateOnDemand)
+            if (elevate && RequireManualElevation)
             {
                 return new PackageManagerProcess("powershell.exe", "gsudo {" + ChocoBinary + " " + args + "}");
             }
@@ -70,21 +75,24 @@ namespace CandyShop.PackageCore
 
         private PackageManagerProcess CreateWingetProcess(string args, bool elevate)
         {
-            if (elevate && ElevateOnDemand)
+            if (elevate && RequireManualElevation)
                 return new PackageManagerProcess("powershell.exe", "gsudo {" + WingetBinary + " " + args + "}");
             else
                 return new PackageManagerProcess(WingetBinary, args);
         }
 
-        private PackageManagerProcess CreatePrivilegedUnifiedWingetProcess(List<PackageManagerProcess> processes)
+        // TODO test this method
+        private PackageManagerProcess CreateWingetBatchProcess(List<string> arguments, bool elevate)
         {
             string body = "";
-            foreach (var item in processes)
+            foreach (string arg in arguments)
             {
-                var cmd = $"{item.Binary} {item.Arguments}";
-                body += $"Write-Host \"$ {cmd}`n\"; {cmd}; Write-Host \"Returned $LastExitCode`n\"; $exit = $exit -and $?;";
+                var cmd = $"{WingetBinary} {arg}";
+                body += $"Write-Host \"{cmd}`n\"; {cmd}; Write-Host \"Returned $LastExitCode`n\"; $exit = $exit -and $?;";
             }
-            return new PackageManagerProcess("powershell.exe", $"$exit = $true; gsudo {{ {body} }}; Exit (-Not $exit)");
+
+            var gsudo = (elevate && RequireManualElevation) ? "gsudo" : "Invoke-Command -ScriptBlock";
+            return new PackageManagerProcess("powershell.exe", $"$exit = $true; {gsudo} {{ {body} }}; Exit (-Not $exit)");
         }
     }
 }
