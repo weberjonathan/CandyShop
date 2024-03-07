@@ -9,9 +9,9 @@ using CandyShop.PackageCore;
 namespace CandyShop.Services
 {
     /// <summary>
-    /// This service class allows asynchronous, non-blocking access to Chocolatey and implements a cache.
+    /// This service class allows asynchronous, non-blocking access to packages of any source
     /// </summary>
-    internal class ChocolateyService
+    internal class PackageService
     {
         private readonly SemaphoreSlim OutdatedPckgLock = new(1);
         private readonly SemaphoreSlim InstalledPckgLock = new(1);
@@ -23,7 +23,7 @@ namespace CandyShop.Services
 
         private readonly AbstractPackageManager PackageManager;
 
-        public ChocolateyService(AbstractPackageManager packageManager)
+        public PackageService(AbstractPackageManager packageManager)
         {
             PackageManager = packageManager;
         }

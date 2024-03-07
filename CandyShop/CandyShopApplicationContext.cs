@@ -26,7 +26,7 @@ namespace CandyShop
 
             // init services
             AbstractPackageManager packageManager = context.WingetMode ? new WingetManager() : new ChocoManager(context.ValidExitCodes); // TODO
-            ChocolateyService packageService = new ChocolateyService(packageManager);
+            PackageService packageService = new PackageService(packageManager);
             SystemStartService windowsTaskService = new();
             ShortcutService shortcutService = new();
 
@@ -82,7 +82,7 @@ namespace CandyShop
             }
         }
 
-        private async void LoadOutdatedPackagesAsync(ChocolateyService service)
+        private async void LoadOutdatedPackagesAsync(PackageService service)
         {
             try
             {
@@ -97,7 +97,7 @@ namespace CandyShop
         private async void RunInBackground(MainWindowController mainWindowController,
                                            UpgradePageController upgradePageController,
                                            InstalledPageController installedPageController,
-                                           ChocolateyService service,
+                                           PackageService service,
                                            CandyShopContext context,
                                            NotificationShowHandler notifificationHandler)
         {

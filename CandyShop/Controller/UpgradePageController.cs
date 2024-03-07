@@ -15,12 +15,12 @@ namespace CandyShop.Controller
     class UpgradePageController
     {
         private readonly CandyShopContext Context;
-        private readonly ChocolateyService PackageService;
+        private readonly PackageService PackageService;
         private readonly ShortcutService ShortcutService;
         private IMainWindowView MainWindow;
         private IUpgradePageView View;
 
-        public UpgradePageController(CandyShopContext context, ChocolateyService packageService, ShortcutService shortcutService)
+        public UpgradePageController(CandyShopContext context, PackageService packageService, ShortcutService shortcutService)
         {
             Context = context;
             PackageService = packageService;
