@@ -64,6 +64,7 @@ namespace CandyShop.Controller
                 Context.SupressAdminWarning = true;
             });
 
+            View.AllowPinnedUacIon = !Context.WingetMode;
             View.ShowUacIcons = Context.ElevateOnDemand && !Context.HasAdminPrivileges;
 
             // update UI if is properties file is updated

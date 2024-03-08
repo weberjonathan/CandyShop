@@ -80,8 +80,6 @@ namespace CandyShop.PackageCore
                 (firstColName) => HandleValidateOutputElement(firstColName, VALIDATE_FIRST_COLUMN, "Could not validate first column name of winget output for \"winget pin list\""),
                 (value)        => HandleValidateOutputElement(value,        VALIDATE_PIN_LIST,     "Could not validate empty list of winget output for \"winget pin list\""));
 
-            // TODO validate empty list
-
             List<GenericPackage> rtn = output.Select(row => new GenericPackage()
             {
                 Name = row[0],
@@ -98,15 +96,23 @@ namespace CandyShop.PackageCore
         /// <exception cref="PackageManagerException"></exception>
         public override void Pin(GenericPackage package)
         {
-            // TODO
-            throw new PackageManagerException("Pin has not been implemented yet for Winget.");
+            var args = $"pin add --id \"{package.Id}\" --exact";
+            PackageManagerProcess p = ProcessFactory.Winget(args);
+            p.ExecuteHidden();
+
+            if (p.ExitCode != 0)
+                throw new PackageManagerException($"Winget did not exit cleanly. Returned {p.ExitCode}.");
         }
 
         /// <exception cref="PackageManagerException"></exception>
         public override void Unpin(GenericPackage package)
         {
-            // TODO
-            throw new PackageManagerException("Pin has not been implemented yet for Winget.");
+            var args = $"pin remove --id \"{package.Id}\" --exact";
+            PackageManagerProcess p = ProcessFactory.Winget(args);
+            p.ExecuteHidden();
+
+            if (p.ExitCode != 0)
+                throw new PackageManagerException($"Winget did not exit cleanly. Returned {p.ExitCode}.");
         }
 
         /// <exception cref="PackageManagerException"></exception>

@@ -26,6 +26,7 @@ namespace CandyShop.View
         bool CloseAfterUpgrade { get; set; }
         bool Loading { get; set; }
         bool ShowUacIcons { get; set; }
+        bool AllowPinnedUacIon { get; set; }
         void AddItem(string[] data);
         void ClearItems();
         void CheckAllItems();

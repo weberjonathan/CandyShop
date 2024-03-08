@@ -179,7 +179,7 @@ namespace CandyShop.View
                 {
                     BtnUpgradeSelected.Image = Resources.ic_uac;
                     BtnUpgradeAll.Image = Resources.ic_uac;
-                    if (LstPackages.ContextMenuStrip != null)
+                    if (LstPackages.ContextMenuStrip != null && AllowPinnedUacIon)
                         if (LstPackages.ContextMenuStrip.Items.ContainsKey("Pin"))
                         {
                             LstPackages.ContextMenuStrip.Items["Pin"].Image = Resources.ic_uac;
@@ -197,6 +197,8 @@ namespace CandyShop.View
                 }
             }
         }
+
+        public bool AllowPinnedUacIon { get; set; }
 
         public void BuildControls(AbstractCommon provider)
         {
