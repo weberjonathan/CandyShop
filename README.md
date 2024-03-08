@@ -23,6 +23,11 @@ Note that gsudo in an optional dependency, but strongly recommended in order for
 
 The current build was tested on Windows 10 Version 22H2 and with Chocolatey version 2.2.2. 
 
+## Install
+- Make sure the prerequisites are met
+- Download and extract [latest release](https://github.com/weberjonathan/CandyShop/releases)
+- Supported languages: English, German. [More about languages.](/docs/locales.md)
+
 ## Settings
 Configuration and log files are placed in `%localappdata%\CandyShop`. The configuration file `CandyShop.config` contains the following properties with their respective defaults:
 ```json
@@ -33,6 +38,7 @@ Configuration and log files are placed in `%localappdata%\CandyShop`. The config
   "CleanShortcuts": false,
   "ElevateOnDemand": true,
   "SupressAdminWarning": false,
+  "SupressLocaleLogWarning": false,
   "CloseAfterUpgrade": false,
   "ValidExitCodes": [ 0, 1641, 3010, 350, 1604 ]
 }
@@ -43,6 +49,7 @@ Configuration and log files are placed in `%localappdata%\CandyShop`. The config
 - `ValidExitCodes`: Depending on the configuration of Chocolatey and the package in question, some non-zero exit codes when upgrading packages should be considered valid. This setting provides sensible defaults and allows further customization.
 - `CleanShortcuts`: If this setting is enabled, Candy Shops watches the Desktop for new shortcuts, that are created during an active upgrade process, and attempts to delete them.
 - `WingetMode`: Experimental and non-functional.
+- `SupressLocaleLogWarning`: Suppresses warnings about unsupported locales in the log files. [More about languages.](/docs/locales.md)
 
 ## Command line arguments
 `--background`, `-b` is used to launch silently and notify when outdated packages are available.

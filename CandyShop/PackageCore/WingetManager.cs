@@ -1,12 +1,19 @@
-﻿using System;
+﻿using Serilog;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace CandyShop.PackageCore
 {
-    internal class WingetManager : AbstractPackageManager
+    internal class WingetManager(bool suppressLogWarning) : AbstractPackageManager
     {
+        private readonly List<string> VALIDATE_SEARCHES = ["Found", "Gefunden"];
+        private readonly List<string> VALIDATE_PIN_LIST = ["There are no pins configured.", "Es sind keine Pins konfiguriert."];
+        private readonly List<string> VALIDATE_FIRST_COLUMN = ["Name"];
+
+        private readonly bool SuppressLogWarnings = suppressLogWarning;
+
         /// <exception cref="PackageManagerException"></exception>
         public override string FetchInfo(GenericPackage package)
         {
@@ -20,37 +27,50 @@ namespace CandyShop.PackageCore
             if (p.ExitCode != 0)
                 throw new PackageManagerException($"Winget did not exit cleanly. Returned {p.ExitCode}.");
 
-
-            int start = p.Output.IndexOf("Gefunden ") + "Gefunden ".Length; // TODO make locale indepdent
-            return start > 0 ? p.Output[start..] : p.Output;
+            var output = TrimProgressChars(p.Output);
+            var first_word_index = output.IndexOf(' ');
+            if (first_word_index < 0) first_word_index = 0;
+            var first_word = output[..first_word_index].Trim();
+            HandleValidateOutputElement(first_word, VALIDATE_SEARCHES, "Could not validate first word of winget output for \"winget show\"");
+            return output[(first_word_index + 1)..];
         }
 
         /// <exception cref="PackageManagerException"></exception>
         public override List<GenericPackage> FetchInstalled()
         {
-            // TODO make sure dequeues do not throw bc of missing elements
-            // TODO make sure its locale indepent
-
             // launch process
             PackageManagerProcess p = ProcessFactory.Winget($"list");
             p.ExecuteHidden();
             if (p.ExitCode != 0)
                 throw new PackageManagerException($"Winget did not exit cleanly. Returned {p.ExitCode}.");
 
-            // remove download indicators from output by skipping to first mention of "Name"
-            int i = 0;
-            while (p.Output[i] != 'N')
-            {
-                i++;
-            }
+            Queue<string> output = new Queue<string>(p.Output.Split(Environment.NewLine));
 
-            Queue<string> output = new Queue<string>(p.Output[i..].Split(Environment.NewLine));
-
+            // find header and divider; divider consists exclusively of '----' and (localized) header is previous line 
             string header = output.Dequeue();
-            if (!header.StartsWith("Name"))
+            string divider = output.Dequeue();
+            bool isDivider(string value) => ("-".Equals(new string(value.Distinct().ToArray())));
+
+            while (!isDivider(divider))
             {
-                throw new PackageManagerException("Failed to parse winget output: Could not find start of header.");
+                if (output.Count == 0)
+                {
+                    // winget shows no divider or header for empty lists, so assume the list is empty
+                    // this could be verified by parsing the output message (like "Es sind keine Pins konfiguriert." for "winget pin list"),
+                    // but that is difficult bc of various languages
+                    return [];
+                }
+
+                header = divider;
+                divider = output.Dequeue();
             }
+
+            // strip characters from header that were indicating progress in winget output and validate
+            header = header.Substring(header.Length - divider.Length);
+            var firstColNameIndex = header.IndexOf(' ');
+            if (firstColNameIndex < 0) firstColNameIndex = 0;
+            var firstColName = header[..firstColNameIndex].Trim();
+            HandleValidateOutputElement(firstColName, VALIDATE_FIRST_COLUMN, "Could not validate first column name of winget output for \"winget list\"");
 
             int nameIndex = 0;
             int idIndex = GetNextColumnIndex(header, nameIndex);
@@ -60,13 +80,7 @@ namespace CandyShop.PackageCore
 
             if (idIndex == 0 || versionIndex == 0 || availableIndex == 0 || sourceIndex == 0)
             {
-                throw new PackageManagerException("Failed to parse winget output: Could not find offsets.");
-            }
-
-            string divider = output.Dequeue();
-            if (!divider.StartsWith('-') && sourceIndex < divider.Length)
-            {
-                throw new PackageManagerException("Failed to parse winget output: Could not find end of header.");
+                throw new PackageManagerException("Failed to parse winget output: Could not find column offsets.");
             }
 
             List<GenericPackage> packages = [];
@@ -132,6 +146,21 @@ namespace CandyShop.PackageCore
                 throw new PackageManagerException($"Winget did not exit cleanly. Returned {p.ExitCode}.");
         }
 
+        private string TrimProgressChars(string output)
+        {
+            int i = 0;
+            while (!char.IsLetterOrDigit(output[i]))
+            {
+                if (i >= output.Length)
+                {
+                    Log.Debug("Winget output did not contain any letters or digits to parse.");
+                    break;
+                }
+                i++;
+            }
+            return output[i..];
+        }
+
         private int GetNextColumnIndex(string row, int startIndex)
         {
             int i = startIndex;
@@ -146,6 +175,17 @@ namespace CandyShop.PackageCore
             }
 
             return i;
+        }
+
+        private void HandleValidateOutputElement(string value, List<string> valid, string message)
+        {
+            if (!SuppressLogWarnings)
+            {
+                if (!valid.Contains(value))
+                    Log.Warning("{0}: \"{1}\". This message will be suppressed for future occurences.",
+                        message, value);
+                VALIDATE_SEARCHES.Add(value);
+            }
         }
     }
 }

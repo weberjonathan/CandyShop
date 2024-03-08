@@ -12,6 +12,7 @@ using System.IO;
 using System.Diagnostics;
 using CandyShop.PackageCore;
 using System.ComponentModel;
+using System.Globalization;
 
 namespace CandyShop
 {
@@ -32,7 +33,16 @@ namespace CandyShop
             AbstractPackageManager packageManager;
             if (context.WingetMode)
             {
-                packageManager = new WingetManager();
+                // determine locale
+                if (!context.SupressLocaleLogWarning)
+                {
+                    var ci = CultureInfo.CurrentCulture;
+                    List<string> supported = ["en", "de"];
+                    if (!supported.Contains(ci.TwoLetterISOLanguageName))
+                        Log.Warning($"Detected unsupported locale \"{ci.TwoLetterISOLanguageName}\". This may lead to parsing errors. See https://github.com/weberjonathan/CandyShop/blob/master/docs/lcoales.md for more.");
+                }
+
+                packageManager = new WingetManager(context.SupressLocaleLogWarning);
                 // TODO validate winget
             }
             else

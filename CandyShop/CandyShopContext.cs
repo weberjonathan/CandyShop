@@ -29,6 +29,7 @@ namespace CandyShop
             public bool CleanShortcuts { get; set; } = false;
             public bool ElevateOnDemand { get; set; } = true;
             public bool SupressAdminWarning { get; set; } = false;
+            public bool SupressLocaleLogWarning { get; set; } = false;
             public bool CloseAfterUpgrade { get; set; } = false;
             public List<int> ValidExitCodes { get; set; } = new List<int> { 0, 1641, 3010, 350, 1604 };
         }
@@ -87,6 +88,8 @@ namespace CandyShop
 
         public bool SupressAdminWarning { get; set; }
 
+        public bool SupressLocaleLogWarning { get; set; }
+
         public bool CloseAfterUpgrade { get; set; }
 
         public bool WingetMode { get; private set; }
@@ -104,6 +107,7 @@ namespace CandyShop
                 CleanShortcuts = this.CleanShortcuts,
                 ElevateOnDemand = this.ElevateOnDemand,
                 SupressAdminWarning = this.SupressAdminWarning,
+                SupressLocaleLogWarning = this.SupressLocaleLogWarning,
                 CloseAfterUpgrade = this.CloseAfterUpgrade,
                 WingetMode = this.WingetMode,
                 ValidExitCodes = this.ValidExitCodes
@@ -213,6 +217,7 @@ namespace CandyShop
             CleanShortcuts = content.CleanShortcuts;
             ElevateOnDemand = content.ElevateOnDemand;
             SupressAdminWarning = content.SupressAdminWarning;
+            SupressLocaleLogWarning = content.SupressLocaleLogWarning;
             CloseAfterUpgrade = content.CloseAfterUpgrade;
             WingetMode = content.WingetMode;
             ValidExitCodes = content.ValidExitCodes;
