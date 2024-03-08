@@ -16,7 +16,6 @@ namespace CandyShop.Services
         private readonly SemaphoreSlim OutdatedPckgLock = new(1);
         private readonly SemaphoreSlim InstalledPckgLock = new(1);
         private readonly SemaphoreSlim PckgDetailsLock = new(1);
-
         private readonly Dictionary<string, string> PckgDetailsCache = [];
         private readonly Dictionary<string, GenericPackage> InstalledPckgCache = [];
         private readonly Dictionary<string, GenericPackage> OutdatedPckgCache = [];
@@ -31,13 +30,27 @@ namespace CandyShop.Services
         /// <exception cref="PackageManagerException"></exception>
         public async Task<List<GenericPackage>> GetInstalledPackagesAsync()
         {
+            List<GenericPackage> installed = [];
+            List<GenericPackage> pinned = [];
+
+            var fetchInstalled = PackageManager.FetchInstalledAsync();
+            var fetchPinned = PackageManager.FetchPinListAsync();
+
+            // get installed packages
             await InstalledPckgLock.WaitAsync().ConfigureAwait(false);
             try
             {
                 if (InstalledPckgCache.Count <= 0)
                 {
-                    List<GenericPackage> packages = await PackageManager.FetchInstalledAsync();
-                    packages.ForEach(p => InstalledPckgCache[p.Name] = p);
+                    installed = await fetchInstalled;
+                    installed.ForEach(p => InstalledPckgCache[p.Name] = p);
+                    
+                    pinned = await fetchPinned;
+                    pinned.ForEach(p =>
+                    {
+                        if (InstalledPckgCache.TryGetValue(p.Name, out GenericPackage cachePackage))
+                            cachePackage.Pinned = p.Pinned;
+                    });
                 }
             }
             catch (PackageManagerException)

@@ -12,6 +12,9 @@ namespace CandyShop.PackageCore
         public abstract List<GenericPackage> FetchOutdated();
 
         /// <exception cref="PackageManagerException"></exception>
+        public abstract List<GenericPackage> FetchPinList();
+
+        /// <exception cref="PackageManagerException"></exception>
         public abstract string FetchInfo(GenericPackage package);
 
         /// <exception cref="PackageManagerException"></exception>
@@ -33,6 +36,12 @@ namespace CandyShop.PackageCore
         public virtual async Task<List<GenericPackage>> FetchOutdatedAsync()
         {
             return await Task.Run(FetchOutdated);
+        }
+
+        /// <exception cref="PackageManagerException"></exception>
+        public virtual async Task<List<GenericPackage>> FetchPinListAsync()
+        {
+            return await Task.Run(FetchPinList);
         }
 
         /// <exception cref="PackageManagerException"></exception>

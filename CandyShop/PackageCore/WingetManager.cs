@@ -44,65 +44,19 @@ namespace CandyShop.PackageCore
             if (p.ExitCode != 0)
                 throw new PackageManagerException($"Winget did not exit cleanly. Returned {p.ExitCode}.");
 
-            Queue<string> output = new Queue<string>(p.Output.Split(Environment.NewLine));
+            var output = ParseTable5Cols(p.Output, (firstColName) =>
+                HandleValidateOutputElement(firstColName, VALIDATE_FIRST_COLUMN, "Could not validate first column name of winget output for \"winget list\""));
 
-            // find header and divider; divider consists exclusively of '----' and (localized) header is previous line 
-            string header = output.Dequeue();
-            string divider = output.Dequeue();
-            bool isDivider(string value) => ("-".Equals(new string(value.Distinct().ToArray())));
-
-            while (!isDivider(divider))
+            List<GenericPackage> rtn = output.Select(row => new GenericPackage()
             {
-                if (output.Count == 0)
-                {
-                    // winget shows no divider or header for empty lists, so assume the list is empty
-                    // this could be verified by parsing the output message (like "Es sind keine Pins konfiguriert." for "winget pin list"),
-                    // but that is difficult bc of various languages
-                    return [];
-                }
+                Name     = row[0],
+                Id       = row[1],
+                CurrVer  = row[2],
+                AvailVer = row[3],
+                Source   = row[4]
+            }).ToList();
 
-                header = divider;
-                divider = output.Dequeue();
-            }
-
-            // strip characters from header that were indicating progress in winget output and validate
-            header = header.Substring(header.Length - divider.Length);
-            var firstColNameIndex = header.IndexOf(' ');
-            if (firstColNameIndex < 0) firstColNameIndex = 0;
-            var firstColName = header[..firstColNameIndex].Trim();
-            HandleValidateOutputElement(firstColName, VALIDATE_FIRST_COLUMN, "Could not validate first column name of winget output for \"winget list\"");
-
-            int nameIndex = 0;
-            int idIndex = GetNextColumnIndex(header, nameIndex);
-            int versionIndex = GetNextColumnIndex(header, idIndex);
-            int availableIndex = GetNextColumnIndex(header, versionIndex);
-            int sourceIndex = GetNextColumnIndex(header, availableIndex);
-
-            if (idIndex == 0 || versionIndex == 0 || availableIndex == 0 || sourceIndex == 0)
-            {
-                throw new PackageManagerException("Failed to parse winget output: Could not find column offsets.");
-            }
-
-            List<GenericPackage> packages = [];
-            while (output.Count > 0)
-            {
-                string row = output.Dequeue();
-                if (string.IsNullOrEmpty(row))
-                {
-                    continue;
-                }
-
-                packages.Add(new()
-                {
-                    Name = row.Substring(nameIndex, idIndex).Trim(),
-                    Id = row.Substring(idIndex, versionIndex - idIndex).Trim(),
-                    CurrVer = row.Substring(versionIndex, availableIndex - versionIndex).Trim(),
-                    AvailVer = row[availableIndex..sourceIndex].Trim(),
-                    Source = row.Substring(sourceIndex).Trim()
-                });
-            }
-
-            return packages;
+            return rtn;
         }
 
         /// <exception cref="PackageManagerException"></exception>
@@ -117,6 +71,33 @@ namespace CandyShop.PackageCore
         {
             var packages = await FetchInstalledAsync();
             return packages.Where(p => !string.IsNullOrEmpty(p.AvailVer) && !p.CurrVer.Equals(p.AvailVer)).ToList();
+        }
+
+        public override List<GenericPackage> FetchPinList()
+        {
+            // launch process
+            PackageManagerProcess p = ProcessFactory.Winget($"pin list");
+            p.ExecuteHidden();
+            if (p.ExitCode != 0)
+                throw new PackageManagerException($"Winget did not exit cleanly. Returned {p.ExitCode}.");
+
+            var output = ParseTable5Cols(p.Output,
+                (firstColName) => HandleValidateOutputElement(firstColName, VALIDATE_FIRST_COLUMN, "Could not validate first column name of winget output for \"winget pin list\""),
+                (value)        => HandleValidateOutputElement(value,        VALIDATE_PIN_LIST,     "Could not validate empty list of winget output for \"winget pin list\""));
+
+            // TODO validate empty list
+
+            List<GenericPackage> rtn = output.Select(row => new GenericPackage()
+            {
+                Name = row[0],
+                Id = row[1],
+                CurrVer = row[2],
+                Source = row[3],
+                // PinType = row[3],
+                Pinned = true
+            }).ToList();
+
+            return rtn;
         }
 
         /// <exception cref="PackageManagerException"></exception>
@@ -182,10 +163,74 @@ namespace CandyShop.PackageCore
             if (!SuppressLogWarnings)
             {
                 if (!valid.Contains(value))
-                    Log.Warning("{0}: \"{1}\". This message will be suppressed for future occurences.",
-                        message, value);
-                VALIDATE_SEARCHES.Add(value);
+                {
+                    Log.Warning("{0}: \"{1}\". This message will be suppressed for future occurences.", message, value);
+                    valid.Add(value);
+                }
             }
+        }
+
+        private List<string[]> ParseTable5Cols(string outputAsString, Action<string> validateHeader, Action<string> validateEmpty = null)
+        {
+            Queue<string> output = new(outputAsString.Split(Environment.NewLine));
+
+            // find header and divider; divider consists exclusively of '----' and (localized) header is previous line
+            string header = output.Dequeue();
+            string divider = output.Dequeue();
+            bool isDivider(string value) => ("-".Equals(new string(value.Distinct().ToArray())));
+
+            while (!isDivider(divider))
+            {
+                // if the winget list is empty, header will be a message like "no pins are configured", divider will be "" and the queue will be empty
+                // the message may be validated
+                if (output.Count == 0)
+                {
+                    validateEmpty?.Invoke(TrimProgressChars(header));
+                    return [];
+                }
+
+                header = divider;
+                divider = output.Dequeue();
+            }
+
+            // strip characters from header that were indicating progress in winget output and validate
+            header = header.Substring(header.Length - divider.Length);
+            var firstColNameIndex = header.IndexOf(' ');
+            if (firstColNameIndex < 0) firstColNameIndex = 0;
+            var firstColName = header[..firstColNameIndex].Trim();
+            validateHeader.Invoke(firstColName);
+
+            int nameIndex = 0;
+            int idIndex = GetNextColumnIndex(header, nameIndex);
+            int versionIndex = GetNextColumnIndex(header, idIndex);
+            int availableIndex = GetNextColumnIndex(header, versionIndex);
+            int sourceIndex = GetNextColumnIndex(header, availableIndex);
+
+            if (idIndex == 0 || versionIndex == 0 || availableIndex == 0 || sourceIndex == 0)
+            {
+                throw new PackageManagerException("Failed to parse winget output: Could not find column offsets.");
+            }
+
+            // parse table content
+            List<string[]> rows = [];
+            while (output.Count > 0)
+            {
+                string row = output.Dequeue();
+                if (string.IsNullOrEmpty(row))
+                {
+                    continue;
+                }
+
+                rows.Add([
+                    row.Substring(nameIndex, idIndex).Trim(),
+                    row.Substring(idIndex, versionIndex - idIndex).Trim(),
+                    row.Substring(versionIndex, availableIndex - versionIndex).Trim(),
+                    row[availableIndex..sourceIndex].Trim(),
+                    row.Substring(sourceIndex).Trim()
+                ]);
+            }
+
+            return rows;
         }
     }
 }

@@ -160,6 +160,11 @@ namespace CandyShop.PackageCore
             return ResolveMetaPackages(packages);
         }
 
+        public override List<GenericPackage> FetchPinList()
+        {
+            throw new System.NotImplementedException();
+        }
+
         /// <exception cref="PackageManagerException"></exception>
         public override void Pin(GenericPackage package)
         {
