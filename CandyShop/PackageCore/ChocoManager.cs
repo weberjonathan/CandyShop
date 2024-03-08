@@ -1,4 +1,5 @@
 ﻿using Serilog;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -164,7 +165,28 @@ namespace CandyShop.PackageCore
 
         public override List<GenericPackage> FetchPinList()
         {
-            throw new System.NotImplementedException();
+            PackageManagerProcess p = ProcessFactory.Choco("pin list --limit-output");
+            p.ExecuteHidden();
+            if (p.ExitCode != 0)
+                throw new PackageManagerException($"Chocolatey did not exit cleanly. Returned {p.ExitCode}.");
+
+            var output = p.Output.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
+
+            List<GenericPackage> packages = [];
+            foreach (var row in output)
+            {
+                var values = row.Split('|', StringSplitOptions.TrimEntries);
+                if (values.Length == 2)
+                {
+                    packages.Add(new GenericPackage()
+                    {
+                        Name = values[0],
+                        CurrVer = values[1],
+                        Pinned = true
+                    });
+                }
+            }
+            return packages;
         }
 
         /// <exception cref="PackageManagerException"></exception>
