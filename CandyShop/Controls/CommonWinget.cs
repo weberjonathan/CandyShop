@@ -21,8 +21,9 @@ namespace CandyShop.Controls
         {
             return [
                 new(null, LocaleEN.TEXT_COL_NAME,    .4f, PackageListBoxSize.Percent),
-                new(null, LocaleEN.TEXT_COL_VERSION, .3f, PackageListBoxSize.Percent),
-                new(null, LocaleEN.TEXT_COL_SOURCE,  .3f, PackageListBoxSize.Percent)
+                new(null, "ID",                      .4f, PackageListBoxSize.Percent),
+                new(null, LocaleEN.TEXT_COL_VERSION, .2f, PackageListBoxSize.Percent),
+                new(null, LocaleEN.TEXT_COL_SOURCE,  65f, PackageListBoxSize.Fixed)
             ];
         }
 

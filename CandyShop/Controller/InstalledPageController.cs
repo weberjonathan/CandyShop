@@ -54,8 +54,24 @@ namespace CandyShop.Controller
 
             View.ClearItems();
             View.LoadingPackages = false;
-            packages.ForEach(p => View.AppendItem([p.Name, p.CurrVer, p.Source]));
+            packages.ForEach(p => View.AppendItem(BuildDisplayItem(p)));
             SyncListView();
+        }
+
+        private string[] BuildDisplayItem(GenericPackage package)
+        {
+            if (ContextSingleton.Get.WingetMode)
+                return [
+                    package.Name,
+                    package.Id,
+                    package.CurrVer,
+                    string.IsNullOrEmpty(package.Source) ? "None" : package.Source
+                ];
+            else
+                return [
+                    package.Name,
+                    package.CurrVer
+                ];
         }
 
         private async void OnSelectedItemChanged(object sender, EventArgs e)
@@ -149,11 +165,7 @@ namespace CandyShop.Controller
                 index = View.Items.IndexOf(lastVisibilePackage) + 1;
             }
 
-            View.InsertItem(index, [
-                package.Name,
-                package.CurrVer,
-                package.Source
-            ]);
+            View.InsertItem(index, BuildDisplayItem(package));
         }
     }
 }
