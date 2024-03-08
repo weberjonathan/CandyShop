@@ -100,13 +100,7 @@ namespace CandyShop.Controller
             }
 
             View.ClearItems();
-            packages.ForEach(p => View.AddItem([
-                p.Name,
-                p.CurrVer,
-                p.AvailVer,
-                p.Pinned.GetValueOrDefault(false).ToString(),
-                p.Source
-            ]));
+            packages.ForEach(p => View.AddItem(BuildDisplayItem(p)));
 
             if (packages.Count == 0)
             {
@@ -114,6 +108,26 @@ namespace CandyShop.Controller
             }
 
             CheckTopLevelPackages();
+        }
+
+        private string[] BuildDisplayItem(GenericPackage package)
+        {
+            if (Context.WingetMode)
+                return [
+                    package.Name,
+                    package.Id,
+                    package.CurrVer,
+                    package.AvailVer,
+                    package.Pinned.GetValueOrDefault(false).ToString(),
+                    package.Source
+                ];
+            else
+                return [
+                    package.Name,
+                    package.CurrVer,
+                    package.AvailVer,
+                    package.Pinned.GetValueOrDefault(false).ToString(),
+                ];
         }
 
         private void CheckTopLevelPackages()

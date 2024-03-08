@@ -8,20 +8,21 @@ namespace CandyShop.Controls
         public override PackageListBoxColumn[] GetUpgradeColumns()
         {
             return [
-                new(LocaleEN.TEXT_COL_NAME, .4f, PackageListBoxSize.Percent),
-                new(LocaleEN.TEXT_COL_CURRENT, .3f, PackageListBoxSize.Percent),
-                new(LocaleEN.TEXT_COL_AVAILABLE, .3f, PackageListBoxSize.Percent),
-                new(LocaleEN.TEXT_COL_PINNED, 60f, PackageListBoxSize.Fixed),
-                new(LocaleEN.TEXT_COL_SOURCE, 65f, PackageListBoxSize.Fixed)
+                new(null,     LocaleEN.TEXT_COL_NAME,      .3f, PackageListBoxSize.Percent),
+                new(null,     "ID",                        .3f, PackageListBoxSize.Percent),
+                new(null,     LocaleEN.TEXT_COL_CURRENT,   .2f, PackageListBoxSize.Percent),
+                new(null,     LocaleEN.TEXT_COL_AVAILABLE, .2f, PackageListBoxSize.Percent),
+                new("Pinned", LocaleEN.TEXT_COL_PINNED,    60f, PackageListBoxSize.Fixed),
+                new(null,     LocaleEN.TEXT_COL_SOURCE,    65f, PackageListBoxSize.Fixed)
             ];
         }
 
         public override PackageListBoxColumn[] GetInstalledColumns()
         {
             return [
-                new(LocaleEN.TEXT_COL_NAME, .4f, PackageListBoxSize.Percent),
-                new(LocaleEN.TEXT_COL_VERSION, .3f, PackageListBoxSize.Percent),
-                new(LocaleEN.TEXT_COL_SOURCE, .3f, PackageListBoxSize.Percent)
+                new(null, LocaleEN.TEXT_COL_NAME,    .4f, PackageListBoxSize.Percent),
+                new(null, LocaleEN.TEXT_COL_VERSION, .3f, PackageListBoxSize.Percent),
+                new(null, LocaleEN.TEXT_COL_SOURCE,  .3f, PackageListBoxSize.Percent)
             ];
         }
 

@@ -65,7 +65,8 @@ namespace CandyShop.View
                 var contextMenu = new ContextMenuStrip();
                 contextMenu.Opening += new System.ComponentModel.CancelEventHandler((sender, e) =>
                 {
-                    string pinnedText = LstPackages.Other.SelectedItems[0].SubItems[3].Text;
+                    var index = LstPackages.IndexOfColumn("Pinned");
+                    string pinnedText = LstPackages.Other.SelectedItems[0].SubItems[index].Text;
                     if (bool.TryParse(pinnedText, out bool pinned))
                     {
                         itemPin.Checked = pinned;
@@ -221,7 +222,8 @@ namespace CandyShop.View
             LstPackages.Other.Items.Add(item);
             if (LstPackages.NoPackages) LstPackages.NoPackages = false;
 
-            if (bool.TryParse(data[3], out bool pinned))
+            int index = LstPackages.IndexOfColumn("Pinned");
+            if (bool.TryParse(data[index], out bool pinned))
             {
                 ApplyPinnedStyle(item, pinned);
             }
@@ -294,7 +296,8 @@ namespace CandyShop.View
 
         private void LstPackages_ItemChecked(object sender, ItemCheckedEventArgs e)
         {
-            if (bool.TryParse(e.Item.SubItems[3].Text, out bool pinned))
+            int index = LstPackages.IndexOfColumn("Pinned");
+            if (bool.TryParse(e.Item.SubItems[index].Text, out bool pinned))
             {
                 if (pinned) e.Item.Checked = false;
                 LblSelected.Text = string.Format(LocaleEN.TEXT_SELECTED_PACKAGE_COUNT, LstPackages.Other.CheckedItems.Count);

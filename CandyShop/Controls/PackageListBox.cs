@@ -4,8 +4,9 @@ using System.Windows.Forms;
 
 namespace CandyShop.Controls
 {
-    internal class PackageListBoxColumn(string name, float value, PackageListBoxSize unit)
+    internal class PackageListBoxColumn(string key, string name, float value, PackageListBoxSize unit)
     {
+        public string Key { get; set; } = key;
         public string Name { get; set; } = name;
         public float Value { get; set; } = value;
         public PackageListBoxSize Unit { get; set; } = unit;
@@ -99,6 +100,17 @@ namespace CandyShop.Controls
             get { return SpinnerCtl.Text; }
             set { SpinnerCtl.Text = value; }
         }
+
+        public int IndexOfColumn(string key)
+        {
+            return _Columns.ToList().FindIndex(p => key.Equals(p.Key));
+        }
+
+        public PackageListBoxColumn GetColumnByKey(string key)
+        {
+            return _Columns.First(c => key.Equals(c.Name));
+        }
+
 
         private void PackageListBox_Resize(object sender, EventArgs e)
         {
