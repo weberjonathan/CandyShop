@@ -14,6 +14,8 @@ namespace CandyShop.PackageCore
 
         private readonly bool SuppressLogWarnings = suppressLogWarning;
 
+        public override bool SupportsFetchingOutdated => false;
+
         /// <exception cref="PackageManagerException"></exception>
         public override string FetchInfo(GenericPackage package)
         {
@@ -62,15 +64,8 @@ namespace CandyShop.PackageCore
         /// <exception cref="PackageManagerException"></exception>
         public override List<GenericPackage> FetchOutdated()
         {
-            var packages = FetchInstalled();
-            return packages.Where(p => !p.CurrVer.Equals(p.AvailVer)).ToList();
-        }
-
-        /// <exception cref="PackageManagerException"></exception>
-        public override async Task<List<GenericPackage>> FetchOutdatedAsync()
-        {
-            var packages = await FetchInstalledAsync();
-            return packages.Where(p => !string.IsNullOrEmpty(p.AvailVer) && !p.CurrVer.Equals(p.AvailVer)).ToList();
+            Log.Error("WingetManager tried to invoke a capabality that is not implemented: Fetch outdated.");
+            throw new InvalidOperationException();
         }
 
         public override List<GenericPackage> FetchPinList()

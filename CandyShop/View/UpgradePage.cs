@@ -49,37 +49,34 @@ namespace CandyShop.View
             });
 
             // context menu
-            if (!ContextSingleton.Get.WingetMode)
+            var itemPin = new ToolStripMenuItem("&Pin package");
+            itemPin.Name = "Pin";
+            itemPin.Click += new EventHandler((sender, e) =>
             {
-                var itemPin = new ToolStripMenuItem("&Pin package");
-                itemPin.Name = "Pin";
-                itemPin.Click += new EventHandler((sender, e) =>
+                if (LstPackages.Other.SelectedItems.Count > 0)
                 {
-                    if (LstPackages.Other.SelectedItems.Count > 0)
-                    {
-                        var name = LstPackages.Other.SelectedItems[0].Text;
-                        PinnedChanged?.Invoke(this, new PinnedChangedArgs() { Name = name });
-                    }
-                });
+                    var name = LstPackages.Other.SelectedItems[0].Text;
+                    PinnedChanged?.Invoke(this, new PinnedChangedArgs() { Name = name });
+                }
+            });
 
-                var contextMenu = new ContextMenuStrip();
-                contextMenu.Opening += new System.ComponentModel.CancelEventHandler((sender, e) =>
+            var contextMenu = new ContextMenuStrip();
+            contextMenu.Opening += new System.ComponentModel.CancelEventHandler((sender, e) =>
+            {
+                var index = LstPackages.IndexOfColumn("Pinned");
+                string pinnedText = LstPackages.Other.SelectedItems[0].SubItems[index].Text;
+                if (bool.TryParse(pinnedText, out bool pinned))
                 {
-                    var index = LstPackages.IndexOfColumn("Pinned");
-                    string pinnedText = LstPackages.Other.SelectedItems[0].SubItems[index].Text;
-                    if (bool.TryParse(pinnedText, out bool pinned))
-                    {
-                        itemPin.Checked = pinned;
-                    }
-                    else
-                    {
-                        e.Cancel = true;
-                    }
-                });
+                    itemPin.Checked = pinned;
+                }
+                else
+                {
+                    e.Cancel = true;
+                }
+            });
 
-                contextMenu.Items.Add(itemPin);
-                LstPackages.ContextMenuStrip = contextMenu;
-            }
+            contextMenu.Items.Add(itemPin);
+            LstPackages.ContextMenuStrip = contextMenu;
         }
 
         public event EventHandler<PinnedChangedArgs> PinnedChanged;

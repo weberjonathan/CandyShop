@@ -43,6 +43,7 @@ namespace CandyShop.Services
                 if (InstalledPckgCache.Count <= 0)
                 {
                     installed = await fetchInstalled;
+                    installed.ForEach(p => p.Pinned = false);
                     installed.ForEach(p => InstalledPckgCache[p.Name] = p);
                     
                     pinned = await fetchPinned;
@@ -73,7 +74,20 @@ namespace CandyShop.Services
             {
                 if (OutdatedPckgCache.Count <= 0)
                 {
-                    List<GenericPackage> packages = await PackageManager.FetchOutdatedAsync();
+                    List<GenericPackage> packages = [];
+                    if (PackageManager.SupportsFetchingOutdated)
+                    {
+                        packages = await PackageManager.FetchOutdatedAsync();
+                    }
+                    else
+                    {
+                        packages = await GetInstalledPackagesAsync();
+                        packages = packages
+                            .Where(p => !string.IsNullOrEmpty(p.AvailVer))
+                            .Where(p => !p.CurrVer.Equals(p.AvailVer))
+                            //.Where(p => !p.CurrVer.Equals("Unknown"))
+                            .ToList();
+                    }
                     packages.ForEach(p => OutdatedPckgCache[p.Name] = p);
                 }
             }

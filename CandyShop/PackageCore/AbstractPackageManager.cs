@@ -5,6 +5,8 @@ namespace CandyShop.PackageCore
 {
     internal abstract class AbstractPackageManager
     {
+        public abstract bool SupportsFetchingOutdated { get; }
+
         /// <exception cref="PackageManagerException"></exception>
         public abstract List<GenericPackage> FetchInstalled();
 
@@ -33,13 +35,13 @@ namespace CandyShop.PackageCore
         }
 
         /// <exception cref="PackageManagerException"></exception>
-        public virtual async Task<List<GenericPackage>> FetchOutdatedAsync()
+        public async Task<List<GenericPackage>> FetchOutdatedAsync()
         {
             return await Task.Run(FetchOutdated);
         }
 
         /// <exception cref="PackageManagerException"></exception>
-        public virtual async Task<List<GenericPackage>> FetchPinListAsync()
+        public async Task<List<GenericPackage>> FetchPinListAsync()
         {
             return await Task.Run(FetchPinList);
         }

@@ -10,6 +10,8 @@ namespace CandyShop.PackageCore
         private readonly int ChocoVersionMajor;
         private readonly List<int> ValidExitCodesOnUpgrade;
 
+        public override bool SupportsFetchingOutdated => true;
+
         public ChocoManager(int chocoVersionMajor, List<int> validExitCodesOnUpgrade)
         {
             ChocoVersionMajor = chocoVersionMajor;
