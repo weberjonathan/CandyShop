@@ -1,4 +1,5 @@
 ﻿using CandyShop.Properties;
+using CandyShop.Util;
 using System.Drawing;
 using System.Windows.Forms;
 
@@ -47,7 +48,10 @@ namespace CandyShop.Controls
             ToolStrip ts = new()
             {
                 BackColor = SystemColors.Window,
-                GripStyle = ToolStripGripStyle.Hidden
+                GripStyle = ToolStripGripStyle.Hidden,
+                RenderMode = ToolStripRenderMode.ManagerRenderMode,
+                Renderer = new CandyShopTsRenderer()
+
             };
             ts.Items.Add(tsRefresh);
             ts.Items.Add(new ToolStripSeparator());

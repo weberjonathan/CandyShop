@@ -1,6 +1,7 @@
 ﻿using CandyShop.Controls;
 using CandyShop.Properties;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 
@@ -8,6 +9,11 @@ namespace CandyShop.View
 {
     partial class UpgradePage : UserControl, IUpgradePageView
     {
+        // TODO Checked and Name columns could be read-only properties of PackageListBox, which gives the column index as a property of the columns
+        // TODO same with pinned column
+        private const int COL_NAME_INDEX = 1;
+        private const int COL_CHECKED_INDEX = 0;
+
         public UpgradePage()
         {
             InitializeComponent();
@@ -23,7 +29,7 @@ namespace CandyShop.View
             LblSelected.Text = string.Empty;
 
             // event handlers
-            LstPackages.Other.ItemChecked += LstPackages_ItemChecked;
+            LstPackages.ItemChecked += LstPackages_ItemChecked;
             BtnUpgradeAll.Click += new EventHandler((sender, e) => { UpgradeAllClick?.Invoke(this, e); });
             BtnUpgradeSelected.Click += new EventHandler((sender, e) => { UpgradeSelectedClick?.Invoke(this, e); });
             BtnHideWarning.Click += new EventHandler((sender, e) =>
@@ -49,13 +55,15 @@ namespace CandyShop.View
             });
 
             // context menu
-            var itemPin = new ToolStripMenuItem("&Pin package");
-            itemPin.Name = "Pin";
+            var itemPin = new ToolStripMenuItem("&Pin package")
+            {
+                Name = "Pin",
+            };
             itemPin.Click += new EventHandler((sender, e) =>
             {
-                if (LstPackages.Other.SelectedItems.Count > 0)
+                if (LstPackages.TryGetSelectedItem(out var row))
                 {
-                    var name = LstPackages.Other.SelectedItems[0].Text;
+                    var name = (string)row.Cells[COL_NAME_INDEX].Value;
                     PinnedChanged?.Invoke(this, new PinnedChangedArgs() { Name = name });
                 }
             });
@@ -64,15 +72,17 @@ namespace CandyShop.View
             contextMenu.Opening += new System.ComponentModel.CancelEventHandler((sender, e) =>
             {
                 var index = LstPackages.IndexOfColumn("Pinned");
-                string pinnedText = LstPackages.Other.SelectedItems[0].SubItems[index].Text;
-                if (bool.TryParse(pinnedText, out bool pinned))
+                if (LstPackages.TryGetSelectedItem(out var row))
                 {
-                    itemPin.Checked = pinned;
+                    string pinnedText = (string)row.Cells[index].Value;
+                    if (bool.TryParse(pinnedText, out bool pinned))
+                    {
+                        itemPin.Checked = pinned;
+                        e.Cancel = false;
+                        return;
+                    }
                 }
-                else
-                {
-                    e.Cancel = true;
-                }
+                e.Cancel = true;
             });
 
             contextMenu.Items.Add(itemPin);
@@ -92,27 +102,30 @@ namespace CandyShop.View
         {
             get
             {
-                string[] rtn = new string[LstPackages.Other.Items.Count];
-                for (int i = 0; i < rtn.Length; i++)
+                List<string> items = [];
+                foreach (DataGridViewRow row in LstPackages.Other.Rows)
                 {
-                    rtn[i] = LstPackages.Other.Items[i].Text;
+                    // TODO make safe
+                    items.Add((string)row.Cells[COL_NAME_INDEX].Value);
                 }
 
-                return rtn;
+                return items.ToArray();
             }
         }
 
-        public string[] SelectedItems
+        public string[] SelectedItems // TODO rename to CheckedItems
         {
             get
             {
-                string[] rtn = new string[LstPackages.Other.CheckedItems.Count];
-                for (int i = 0; i < rtn.Length; i++)
+                List<string> checkedItems = [];
+                foreach (DataGridViewRow row in LstPackages.Other.Rows)
                 {
-                    rtn[i] = LstPackages.Other.CheckedItems[i].Text;
+                    // TODO make safe
+                    DataGridViewCell checkedCell = row.Cells[COL_CHECKED_INDEX];
+                    if ((bool)checkedCell.Value) checkedItems.Add((string)row.Cells[COL_NAME_INDEX].Value);
                 }
 
-                return rtn;
+                return checkedItems.ToArray();
             }
         }
 
@@ -202,7 +215,7 @@ namespace CandyShop.View
 
         public void BuildControls(AbstractCommon provider)
         {
-            LstPackages.Columns = provider.GetUpgradeColumns();
+            LstPackages.ColumnHeaders = provider.GetUpgradeColumns();
             LstPackages.CheckBoxes = true;
 
             var ts = provider.GetUpgradePageToolBar();
@@ -217,18 +230,17 @@ namespace CandyShop.View
 
         public void AddItem(string[] data)
         {
-            ListViewItem item = new ListViewItem(data);
-            LstPackages.Other.Items.Add(item);
+            var index = LstPackages.Other.Rows.Add(data);
             if (LstPackages.NoPackages) LstPackages.NoPackages = false;
 
-            int index = LstPackages.IndexOfColumn("Pinned");
-            if (bool.TryParse(data[index], out bool pinned))
+            int pinnedIndex = LstPackages.IndexOfColumn("Pinned");
+            if (bool.TryParse(data[pinnedIndex], out bool pinned))
             {
-                ApplyPinnedStyle(item, pinned);
+                ApplyPinnedStyle(LstPackages.Other.Rows[index], pinned);
             }
             else
             {
-                ApplyPinnedStyle(item, true);
+                ApplyPinnedStyle(LstPackages.Other.Rows[index], true);
             }
 
             if (Loading) Loading = false;
@@ -236,24 +248,24 @@ namespace CandyShop.View
 
         public void ClearItems()
         {
-            LstPackages.Other.Items.Clear();
+            LstPackages.Other.Rows.Clear();
         }
 
         public void CheckAllItems()
         {
-            var items = LstPackages.Other.Items;
-            foreach (ListViewItem item in items)
+            var rows = LstPackages.Other.Rows;
+            foreach (DataGridViewRow row in rows)
             {
-                item.Checked = true;
+                row.Cells[COL_CHECKED_INDEX].Value = true;
             }
         }
 
         public void UncheckAllItems()
         {
-            var items = LstPackages.Other.Items;
-            foreach (ListViewItem item in items)
+            var rows = LstPackages.Other.Rows;
+            foreach (DataGridViewRow row in rows)
             {
-                item.Checked = false;
+                row.Cells[COL_CHECKED_INDEX].Value = false;
             }
         }
 
@@ -264,47 +276,62 @@ namespace CandyShop.View
 
         public void SetItemCheckState(string name, bool state)
         {
-            ListViewItem item = LstPackages.Other.FindItemWithText(name);
-            if (item != null)
+            var rows = LstPackages.Other.Rows;
+            foreach (DataGridViewRow row in rows)
             {
-                item.Checked = state;
+                var cellName = (string)row.Cells[COL_NAME_INDEX].Value;
+                if (name.Equals(cellName))
+                {
+                    row.Cells[COL_CHECKED_INDEX].Value = state;
+                    return;
+                }
             }
         }
 
         public void SetPinned(string name, bool pinned)
         {
-            var item = LstPackages.Other.FindItemWithText(name);
-            item.SubItems[3].Text = pinned.ToString();
-            ApplyPinnedStyle(item, pinned);
+            var rows = LstPackages.Other.Rows;
+            foreach (DataGridViewRow row in rows)
+            {
+                var cellName = (string)row.Cells[COL_NAME_INDEX].Value;
+                if (name.Equals(cellName))
+                {
+                    int index = LstPackages.IndexOfColumn("Pinned");
+                    row.Cells[index].Value = pinned.ToString();
+                    ApplyPinnedStyle(row, pinned);
+                    return;
+                }
+            }
         }
 
         public void DisplayEmpty()
         {
-            ListViewItem item = new ListViewItem(
-                new string[] {
-                    "All packages are up to date.",
-                    "",
-                    "",
-                    ""
-                });
-            LstPackages.Other.Items.Add(item);
-            ApplyPinnedStyle(item, true);
+            string[] item = [
+                "false",
+                "All packages are up to date.",
+                "",
+                "",
+                ""
+            ];
+            var index = LstPackages.Other.Rows.Add(item);
+            ApplyPinnedStyle(LstPackages.Other.Rows[index], true);
             LstPackages.NoPackages = true;
             if (Loading) Loading = false;
         }
 
-        private void LstPackages_ItemChecked(object sender, ItemCheckedEventArgs e)
+        private void LstPackages_ItemChecked(object sender, DataGridViewCellEventArgs e)
         {
             int index = LstPackages.IndexOfColumn("Pinned");
-            if (bool.TryParse(e.Item.SubItems[index].Text, out bool pinned))
+            string pinnedText = (string)LstPackages.Other.Rows[e.RowIndex].Cells[index].Value;
+
+            // disallow checking for pinned packages
+            if (!bool.TryParse(pinnedText, out bool pinned) || pinned)
             {
-                if (pinned) e.Item.Checked = false;
-                LblSelected.Text = string.Format(LocaleEN.TEXT_SELECTED_PACKAGE_COUNT, LstPackages.Other.CheckedItems.Count);
+                LstPackages.Other.Rows[e.RowIndex].Cells[COL_CHECKED_INDEX].Value = false;
             }
-            else
-            {
-                e.Item.Checked = false;
-            }
+
+            // update package count status text
+            LblSelected.Text = string.Format(LocaleEN.TEXT_SELECTED_PACKAGE_COUNT, SelectedItems.Length);
         }
 
         private void CheckDeleteShortcuts_CheckedChanged(object sender, EventArgs e)
@@ -317,19 +344,20 @@ namespace CandyShop.View
             CloseAfterUpgradeChanged?.Invoke(sender, e);
         }
 
-        private void ApplyPinnedStyle(ListViewItem item, bool pinned)
+        private void ApplyPinnedStyle(DataGridViewRow item, bool pinned)
         {
             if (pinned)
             {
-                item.ForeColor = SystemColors.GrayText;
-                item.Font = new Font(item.Font, FontStyle.Italic);
-                item.Checked = false;
+
+                item.DefaultCellStyle.ForeColor = SystemColors.GrayText;
+                item.DefaultCellStyle.Font = new Font(LstPackages.Other.DefaultCellStyle.Font, FontStyle.Italic);
+                item.Cells[COL_CHECKED_INDEX].Value = false;
             }
             else
             {
-                item.ForeColor = SystemColors.ControlText;
-                item.Font = new Font(item.Font, FontStyle.Regular);
-                item.Checked = true;
+                item.DefaultCellStyle.ForeColor = SystemColors.ControlText;
+                item.DefaultCellStyle.Font = new Font(LstPackages.Other.DefaultCellStyle.Font, FontStyle.Regular);
+                item.Cells[COL_CHECKED_INDEX].Value = true;
             }
         }
     }

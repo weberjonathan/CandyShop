@@ -39,7 +39,7 @@
             // 
             // LstPackages
             // 
-            LstPackages.Columns = null;
+            LstPackages.ColumnHeaders = null;
             LstPackages.Dock = System.Windows.Forms.DockStyle.Fill;
             LstPackages.Hint = "";
             LstPackages.Loading = false;

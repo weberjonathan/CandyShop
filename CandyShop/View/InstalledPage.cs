@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Windows.Forms;
 using System.Linq;
-using Serilog;
 using CandyShop.Controls;
 using CandyShop.Properties;
 
@@ -10,11 +9,13 @@ namespace CandyShop.View
 {
     partial class InstalledPage : UserControl, IInstalledPageView
     {
+        private const int COL_INDEX_NAME = 1;
+
         public InstalledPage()
         {
             InitializeComponent();
             LstPackages.Hint = LocaleEN.TEXT_LOADING_INSTALLED;
-            LstPackages.Other.SelectedIndexChanged += new EventHandler((sender, e) => SelectedItemChanged?.Invoke(this, EventArgs.Empty));
+            LstPackages.Other.SelectionChanged += new EventHandler((sender, e) => SelectedItemChanged?.Invoke(this, EventArgs.Empty));
             SplitContainer.Panel2Collapsed = true;
         }
 
@@ -24,8 +25,8 @@ namespace CandyShop.View
         {
             get
             {
-                if (LstPackages.Other.SelectedItems.Count > 0)
-                    return LstPackages.Other.SelectedItems?[0].Text;
+                if (LstPackages.Other.SelectedRows.Count > 0)
+                    return LstPackages.Other.SelectedRows[0].Cells[COL_INDEX_NAME].Value.ToString();
                 else
                     return null;
             }
@@ -63,41 +64,42 @@ namespace CandyShop.View
             }
         }
 
-        public List<string> Items => LstPackages.Other.Items
-            .Cast<ListViewItem>()
-            .Select(item => item.Text)
+        public List<string> Items => LstPackages.Other.Rows
+            .Cast<DataGridViewRow>()
+            .Select(item => (string)item.Cells[COL_INDEX_NAME].Value)
             .ToList();
 
         public void BuildControls(AbstractCommon provider)
         {
-            LstPackages.Columns = provider.GetInstalledColumns();
+            LstPackages.ColumnHeaders = provider.GetInstalledColumns();
             LstPackages.CheckBoxes = false;
 
             SearchBar = provider.GetSearchBar();
             SearchBar.Dock = DockStyle.Top;
             SearchBar.SearchEnterPressed += new EventHandler((sender, e) =>
             {
-                if (LstPackages.Other.Items.Count > 0)
-                    LstPackages.Other.Items[0].Selected = true;
+                if (LstPackages.Other.RowCount > 0)
+                    LstPackages.Other.Rows[0].Selected = true;
             });
             Controls.Add(SearchBar);
         }
 
-        public void AppendItem(string[] data)
+        public void AppendItem(List<string> data)
         {
-            LstPackages.Other.Items.Add(new ListViewItem(data));
-            var test = LstPackages.Other.Columns;
+            data.Insert(0, "false");
+            LstPackages.Other.Rows.Add(data.ToArray());
             LoadingPackages = false;
         }
 
-        public void InsertItem(int index, string[] data)
+        public void InsertItem(int index, List<string> data)
         {
-            LstPackages.Other.Items.Insert(index, new ListViewItem(data));
+            data.Insert(0, "false");
+            LstPackages.Other.Rows.Insert(index, data.ToArray());
         }
 
         public void ClearItems()
         {
-            LstPackages.Other.Items.Clear();
+            LstPackages.Other.Rows.Clear();
         }
 
         public void UpdateDetails(string details)
@@ -109,7 +111,18 @@ namespace CandyShop.View
 
         public void RemoveItem(string name)
         {
-            LstPackages.Other.Items.Remove(LstPackages.Other.FindItemWithText(name));
+            DataGridViewRow item = null;
+            foreach (DataGridViewRow row in LstPackages.Other.Rows)
+            {
+                if (name.Equals(row.Cells[COL_INDEX_NAME].Value))
+                {
+                    item = row;
+                    break;
+                }
+            }
+
+            if (item != null)
+                LstPackages.Other.Rows.Remove(item);
         }
     }
 }

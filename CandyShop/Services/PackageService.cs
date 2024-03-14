@@ -203,6 +203,11 @@ namespace CandyShop.Services
             await OutdatedPckgLock.WaitAsync().ConfigureAwait(false);
             OutdatedPckgCache.Clear();
             OutdatedPckgLock.Release();
+
+            if (!PackageManager.SupportsFetchingOutdated)
+            {
+                await ClearInstalledPackages();
+            }
         }
 
         public async Task ClearInstalledPackages()

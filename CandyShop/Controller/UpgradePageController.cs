@@ -115,6 +115,7 @@ namespace CandyShop.Controller
         {
             if (Context.WingetMode)
                 return [
+                    "true",
                     package.Name,
                     package.Id,
                     package.CurrVer,
@@ -124,6 +125,7 @@ namespace CandyShop.Controller
                 ];
             else
                 return [
+                    "true",
                     package.Name,
                     package.CurrVer,
                     package.AvailVer,

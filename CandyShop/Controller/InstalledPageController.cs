@@ -6,7 +6,6 @@ using CandyShop.Services;
 using Serilog;
 using CandyShop.Controls;
 using CandyShop.PackageCore;
-using System.Linq;
 
 namespace CandyShop.Controller
 {
@@ -59,7 +58,7 @@ namespace CandyShop.Controller
             SyncListView();
         }
 
-        private string[] BuildDisplayItem(GenericPackage package)
+        private List<string> BuildDisplayItem(GenericPackage package)
         {
             if (ContextSingleton.Get.WingetMode)
                 return [

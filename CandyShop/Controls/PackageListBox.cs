@@ -1,48 +1,143 @@
-﻿using System;
+﻿using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 
 namespace CandyShop.Controls
 {
-    internal class PackageListBoxColumn(string key, string name, float value, PackageListBoxSize unit)
+    internal class PackageListBoxColumn(string key, string name, float value, PackageListBoxSize unit) // TODO rename to PackageListBoxColumnHeader
     {
         public string Key { get; set; } = key;
         public string Name { get; set; } = name;
         public float Value { get; set; } = value;
         public PackageListBoxSize Unit { get; set; } = unit;
+
+        public DataGridViewColumn ToDataGridViewColumn()
+        {
+            DataGridViewTextBoxColumn rtn = new()
+            {
+                Name = Key,
+                HeaderText = Name,
+                ReadOnly = true,
+                SortMode = DataGridViewColumnSortMode.NotSortable, // TODO allow sorting
+            };
+            if (Unit.Equals(PackageListBoxSize.Percent))
+            {
+                rtn.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+                rtn.FillWeight = (int)(Value * 100);
+            }
+            else
+            {
+                rtn.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
+                rtn.Width = (int)Value;
+            }
+            return rtn;
+        }
     }
 
     public enum PackageListBoxSize { Fixed, Percent }
 
-    internal class PackageListBox : AbstractLoadingControl<ListView>
+    internal class PackageListBox : AbstractLoadingControl<DataGridView>
     {
-        private readonly int AggregatedMiscWidth;
-        private int AggregatedFixedColumnWidth = 0;
+        // TODO on empty list, row should not be visibly selected
+
+        private readonly DataGridViewCheckBoxColumn CheckBoxColumn;
 
         public PackageListBox()
         {
-            AggregatedMiscWidth = Margin.Left + Margin.Right + SystemInformation.VerticalScrollBarWidth;
-
-            Other = new ListView()
+            Other = new DataGridView()
             {
                 Name = "ListView",
-                CheckBoxes = true,
+                AllowUserToAddRows = false,
+                AllowUserToDeleteRows = false,
+                AllowUserToOrderColumns = false,
+                AllowUserToResizeColumns = true,
+                AllowUserToResizeRows = false,
+                BackgroundColor = SystemColors.Window,
+                CellBorderStyle = DataGridViewCellBorderStyle.None,
+                ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.DisableResizing,
                 Dock = DockStyle.Fill,
-                FullRowSelect = true,
-                HeaderStyle = ColumnHeaderStyle.Nonclickable,
                 MultiSelect = false,
-                ShowItemToolTips = true,
-                UseCompatibleStateImageBehavior = false,
-                View = System.Windows.Forms.View.Details
+                RowHeadersVisible = false,
+                SelectionMode = DataGridViewSelectionMode.FullRowSelect,
+                ShowCellToolTips = true
             };
 
-            Resize += PackageListBox_Resize;
+            Other.CellMouseDown += new DataGridViewCellMouseEventHandler((sender, e) =>
+            {
+                if (e.Button == MouseButtons.Right)
+                    Other.CurrentCell = Other[e.ColumnIndex, e.RowIndex];
+            });
+
+            Other.Paint += new PaintEventHandler((sender, e) =>
+            {
+                if (e.ClipRectangle.Equals(Other.Bounds))
+                    ControlPaint.DrawBorder(e.Graphics, e.ClipRectangle, SystemColors.ControlDark, ButtonBorderStyle.Solid);
+            });
+
+            // add checkbox column; but hide it by default
+            CheckBoxColumn = new()
+            {
+                Name = "Checked",
+                AutoSizeMode = DataGridViewAutoSizeColumnMode.None,
+                HeaderText = "",
+                ReadOnly = false,
+                Visible = false,
+                Width = 30
+            };
+
+            Other.CellMouseUp += new DataGridViewCellMouseEventHandler((sender, e) =>
+            {
+                if (e.ColumnIndex == CheckBoxColumn.Index && e.RowIndex != -1)
+                    Other.EndEdit();
+            });
+
+            Other.CellDoubleClick += new DataGridViewCellEventHandler((sender, e) =>
+            {
+                if (e.ColumnIndex == CheckBoxColumn.Index && e.RowIndex != -1)
+                    Other.EndEdit();
+            });
+
+            Other.CellValueChanged += new DataGridViewCellEventHandler((sender, e) =>
+            {
+                if (e.ColumnIndex == CheckBoxColumn.Index && e.RowIndex != -1)
+                    ItemChecked?.Invoke(sender, e);
+            });
+            Other.Columns.Add(CheckBoxColumn);
+
+            // define border, grid and header styles
+            Other.EnableHeadersVisualStyles = false;
+            Other.BorderStyle = BorderStyle.FixedSingle;
+            Other.GridColor = Color.LightGray;
+            Other.ColumnHeadersDefaultCellStyle = Other.DefaultCellStyle.Clone();
+            Other.ColumnHeadersDefaultCellStyle.SelectionForeColor = Other.ColumnHeadersDefaultCellStyle.ForeColor;
+            Other.ColumnHeadersDefaultCellStyle.SelectionBackColor = Other.ColumnHeadersDefaultCellStyle.BackColor;
+            Other.AdvancedColumnHeadersBorderStyle.Top = DataGridViewAdvancedCellBorderStyle.None;
+            Other.AdvancedColumnHeadersBorderStyle.Right = DataGridViewAdvancedCellBorderStyle.Single;
+            Other.AdvancedColumnHeadersBorderStyle.Bottom = DataGridViewAdvancedCellBorderStyle.None;
+            Other.AdvancedColumnHeadersBorderStyle.Left = DataGridViewAdvancedCellBorderStyle.None;
         }
+
+        public event DataGridViewCellEventHandler ItemChecked;
 
         public bool CheckBoxes
         {
-            get { return Other.CheckBoxes; }
-            set { Other.CheckBoxes = value; }
+            get { return CheckBoxColumn.Visible; }
+            set { CheckBoxColumn.Visible = value; }
+        }
+
+        public DataGridViewRow SelectedItem => Other.SelectedRows.Count > 0 ? Other.SelectedRows[0] : null;
+        public bool TryGetSelectedItem(out DataGridViewRow value)
+        {
+            if (Other.SelectedRows.Count > 0)
+            {
+                value = Other.SelectedRows[0];
+                return true;
+            }
+            else
+            {
+                value = null;
+                return false;
+            }
         }
 
         private bool _NoPackages = false;
@@ -56,41 +151,38 @@ namespace CandyShop.Controls
             {
                 if (value)
                 {
-                    Other.CheckBoxes = false;
-                    Other.HeaderStyle = ColumnHeaderStyle.None;
-                    Other.ItemSelectionChanged += Other_PreventItemSelectionChange;
+                    CheckBoxColumn.Visible = false;
+                    Other.ColumnHeadersVisible = false;
+                    Other.Enabled = false;
                 }
                 else
                 {
-                    Other.CheckBoxes = CheckBoxes;
-                    Other.HeaderStyle = ColumnHeaderStyle.Nonclickable;
-                    Other.ItemSelectionChanged -= Other_PreventItemSelectionChange;
+                    CheckBoxColumn.Visible = true;
+                    Other.ColumnHeadersVisible = true;
+                    Other.Enabled = true;
                 }
                 _NoPackages = value;
             }
         }
 
-        private PackageListBoxColumn[] _Columns;
-        public PackageListBoxColumn[] Columns
+        private PackageListBoxColumn[] _ColumnHeaders;
+        public PackageListBoxColumn[] ColumnHeaders
         {
             get
             {
-                return _Columns;
+                return _ColumnHeaders;
             }
             set
             {
-                if (value  != null)
+                if (value != null)
                 {
-                    _Columns = value;
-                    AggregatedFixedColumnWidth = _Columns
-                        .Where(col => col.Unit.Equals(PackageListBoxSize.Fixed))
-                        .Select(col => (int)Math.Round(col.Value))
-                        .Sum();
+                    _ColumnHeaders = value;
                     Other.Columns.Clear();
-                    Other.Columns.AddRange(value
-                        .Select(col => new ColumnHeader(col.Name) { Text = col.Name })
+                    Other.Columns.Add(CheckBoxColumn);
+                    Other.Columns.AddRange(
+                        value
+                        .Select(col => col.ToDataGridViewColumn())
                         .ToArray());
-                    PackageListBox_Resize(this, EventArgs.Empty);
                 }
             }
         }
@@ -103,42 +195,14 @@ namespace CandyShop.Controls
 
         public int IndexOfColumn(string key)
         {
-            return _Columns.ToList().FindIndex(p => key.Equals(p.Key));
-        }
-
-        public PackageListBoxColumn GetColumnByKey(string key)
-        {
-            return _Columns.First(c => key.Equals(c.Name));
-        }
-
-
-        private void PackageListBox_Resize(object sender, EventArgs e)
-        {
-            if (Columns != null && Columns.Length.Equals(Other.Columns.Count))
+            foreach (DataGridViewColumn col in Other.Columns)
             {
-                int availWidth = Width - AggregatedFixedColumnWidth - AggregatedMiscWidth;
-                for (int i = 0; i < Columns.Length; i++)
+                if (col.Name.Equals(key))
                 {
-                    var col = Columns[i];
-                    if (col.Unit.Equals(PackageListBoxSize.Fixed))
-                    {
-                        Other.Columns[i].Width = (int)col.Value;
-                    }
-                    else if (col.Unit.Equals(PackageListBoxSize.Percent))
-                    {
-                        Other.Columns[i].Width = (int)(availWidth * col.Value);
-                    }
-                    else
-                    {
-                        Other.Columns[i].Width = 20;
-                    }
+                    return col.Index;
                 }
             }
-        }
-
-        private void Other_PreventItemSelectionChange(object sender, ListViewItemSelectionChangedEventArgs e)
-        {
-            e.Item.Selected = false;
+            return -1;
         }
     }
 }

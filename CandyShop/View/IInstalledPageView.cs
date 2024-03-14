@@ -13,8 +13,8 @@ namespace CandyShop.View
         CommonSearchBar SearchBar { get; }
         public bool LoadingPackages { get; set; }
         public bool LoadingDetails { get; set; }
-        void AppendItem(string[] data);
-        void InsertItem(int index, string[] data);
+        void AppendItem(List<string> data);
+        void InsertItem(int index, List<string> data);
         void ClearItems();
         void RemoveItem(string name);
         void UpdateDetails(string details);
