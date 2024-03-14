@@ -1,4 +1,5 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 
@@ -38,8 +39,6 @@ namespace CandyShop.Controls
 
     internal class PackageListBox : AbstractLoadingControl<DataGridView>
     {
-        // TODO on empty list, row should not be visibly selected
-
         private readonly DataGridViewCheckBoxColumn CheckBoxColumn;
 
         public PackageListBox()
@@ -154,12 +153,14 @@ namespace CandyShop.Controls
                     CheckBoxColumn.Visible = false;
                     Other.ColumnHeadersVisible = false;
                     Other.Enabled = false;
+                    Other.SelectionChanged += Other_SelectionChanged;
                 }
                 else
                 {
                     CheckBoxColumn.Visible = true;
                     Other.ColumnHeadersVisible = true;
                     Other.Enabled = true;
+                    Other.SelectionChanged -= Other_SelectionChanged;
                 }
                 _NoPackages = value;
             }
@@ -203,6 +204,11 @@ namespace CandyShop.Controls
                 }
             }
             return -1;
+        }
+
+        private void Other_SelectionChanged(object sender, EventArgs e)
+        {
+            Other.ClearSelection();
         }
     }
 }
