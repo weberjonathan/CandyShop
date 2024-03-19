@@ -49,14 +49,17 @@ namespace CandyShop.PackageCore
             var output = ParseTable5Cols(p.Output, (firstColName) =>
                 HandleValidateOutputElement(firstColName, VALIDATE_FIRST_COLUMN, "Could not validate first column name of winget output for \"winget list\""));
 
-            List<GenericPackage> rtn = output.Select(row => new GenericPackage()
-            {
-                Name     = row[0],
-                Id       = row[1],
-                CurrVer  = row[2],
-                AvailVer = row[3],
-                Source   = row[4]
-            }).ToList();
+            List<GenericPackage> rtn = output
+                .Select(row => new GenericPackage()
+                {
+                    Name = row[0],
+                    Id = row[1],
+                    CurrVer = row[2],
+                    AvailVer = row[3],
+                    Source = row[4]
+                })
+                .OrderBy(p => p.Name)
+                .ToList();
 
             return rtn;
         }
