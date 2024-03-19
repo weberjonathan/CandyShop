@@ -121,7 +121,6 @@ namespace CandyShop.Controller
                     package.Id,
                     package.CurrVer,
                     package.AvailVer,
-                    package.Pinned.GetValueOrDefault(false).ToString(),
                     package.Source
                 ];
             else
@@ -131,7 +130,6 @@ namespace CandyShop.Controller
                     package.Name,
                     package.CurrVer,
                     package.AvailVer,
-                    package.Pinned.GetValueOrDefault(false).ToString(),
                 ];
         }
 
