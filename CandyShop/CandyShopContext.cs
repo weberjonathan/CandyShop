@@ -1,4 +1,5 @@
-﻿using Serilog;
+﻿using CandyShop.Properties;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -9,6 +10,15 @@ using System.Threading;
 
 namespace CandyShop
 {
+    public class MetaInfo
+    {
+        private static readonly Version VersionObject = Assembly.GetExecutingAssembly().GetName().Version;
+
+        public static string Name => System.Windows.Forms.Application.ProductName;
+        public static string WindowTitle => string.Format(LocaleEN.TEXT_APP_TITLE, Name, ContextSingleton.Get.WingetMode ? "Winget" : "Chocolatey", Version);
+        public static string Version = $"{VersionObject.Major}.{VersionObject.Minor}.{VersionObject.Build}";
+    }
+
     // TODO either inject context or use singleton; not both
     internal class ContextSingleton
     {
@@ -25,6 +35,8 @@ namespace CandyShop
         {
             public string ChocolateyBinary { get; set; } = "C:/ProgramData/chocolatey/bin/choco.exe";
             public string ChocolateyLogs { get; set; } = "C:/ProgramData/chocolatey/logs";
+            public string WingetBinary { get; set; } = "winget";
+            public bool AllowGsudoCache { get; set; } = false; // TODO msgBox when needed
             public bool WingetMode { get; set; } = false;
             public bool CleanShortcuts { get; set; } = false;
             public bool ElevateOnDemand { get; set; } = true;
@@ -46,10 +58,6 @@ namespace CandyShop
 
         public CandyShopContext()
         {
-            var v = Assembly.GetExecutingAssembly().GetName().Version;
-            ApplicationVersion = $"{v.Major}.{v.Minor}.{v.Build}";
-
-
             if (!Directory.Exists(_AppDataDir)) Directory.CreateDirectory(_AppDataDir);
 
             using (WindowsIdentity identity = WindowsIdentity.GetCurrent())
@@ -68,8 +76,6 @@ namespace CandyShop
 
         public bool HasAdminPrivileges { get; set; } = false;
 
-        public string ApplicationVersion { get; private set; }
-
         // ----------------- set through arguments -----------------
 
         public bool LaunchedMinimized { get; set; } = false;
@@ -81,6 +87,10 @@ namespace CandyShop
         public string ChocolateyBinary { get; private set; }
 
         public string CholoateyLogFolder { get; private set; }
+
+        public string WingetBinary { get; private set; }
+
+        public bool AllowGsudoCache { get; private set; }
 
         public bool CleanShortcuts { get; set; }
         
@@ -104,6 +114,8 @@ namespace CandyShop
             {
                 ChocolateyBinary = this.ChocolateyBinary,
                 ChocolateyLogs = this.CholoateyLogFolder,
+                WingetBinary = this.WingetBinary,
+                AllowGsudoCache = this.AllowGsudoCache,
                 CleanShortcuts = this.CleanShortcuts,
                 ElevateOnDemand = this.ElevateOnDemand,
                 SupressAdminWarning = this.SupressAdminWarning,
@@ -214,6 +226,8 @@ namespace CandyShop
             // apply properties from content
             ChocolateyBinary = content.ChocolateyBinary;
             CholoateyLogFolder = content.ChocolateyLogs;
+            WingetBinary = content.WingetBinary;
+            AllowGsudoCache = content.AllowGsudoCache;
             CleanShortcuts = content.CleanShortcuts;
             ElevateOnDemand = content.ElevateOnDemand;
             SupressAdminWarning = content.SupressAdminWarning;
@@ -228,6 +242,7 @@ namespace CandyShop
             // use forward-slash as path separator
             content.ChocolateyLogs = content.ChocolateyLogs.Replace('\\', '/');
             content.ChocolateyBinary = content.ChocolateyBinary.Replace('\\', '/');
+            content.WingetBinary = content.WingetBinary.Replace('\\', '/');
 
             try
             {

@@ -30,7 +30,7 @@ namespace CandyShop.View
             BtnHideWarning.Click += new EventHandler((sender, e) =>
             {
                 var result = MessageBox.Show("Always hide this warning?",
-                    Application.ProductName,
+                    MetaInfo.Name,
                     MessageBoxButtons.YesNoCancel,
                     MessageBoxIcon.Question,
                     MessageBoxDefaultButton.Button2);

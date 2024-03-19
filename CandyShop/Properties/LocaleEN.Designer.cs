@@ -153,7 +153,7 @@ namespace CandyShop.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {0} ({1}) v{2}.
+        ///   Looks up a localized string similar to {0} v{2} for {1}.
         /// </summary>
         internal static string TEXT_APP_TITLE {
             get {

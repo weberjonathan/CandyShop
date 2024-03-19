@@ -53,9 +53,7 @@ namespace CandyShop.Controller
             });
 
             // set app title
-            string provider = ContextSingleton.Get.WingetMode ? "Winget" : "Chocolatey";
-            string title = String.Format(LocaleEN.TEXT_APP_TITLE, Application.ProductName, provider, CandyShopContext.ApplicationVersion);
-            MainView.ToForm().Text = title;
+            MainView.ToForm().Text = MetaInfo.WindowTitle;
 
             MainView.ToForm().Show();
         }
@@ -104,7 +102,7 @@ namespace CandyShop.Controller
         {
             if (ContextSingleton.Get.WingetMode)
             {
-                PackageManagerProcess proc = new("winget", "--logs"); // TODO
+                PackageManagerProcess proc = new(ContextSingleton.Get.WingetBinary, "--logs");
                 proc.ExecuteHidden();
             }
             else

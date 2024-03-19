@@ -9,6 +9,7 @@ namespace CandyShop.PackageCore
     {
         public required string Binary { get; set; }
         public required bool RequireManualElevation { get; set; }
+        public required bool AllowGsudoCache { get; set; }
         public abstract bool SupportsFetchingOutdated { get; }
 
         /// <exception cref="PackageManagerException"></exception>

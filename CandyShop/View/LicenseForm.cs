@@ -9,7 +9,7 @@ namespace CandyShop.View
         public LicenseForm()
         {
             InitializeComponent();
-            this.Text = String.Format(LocaleEN.TEXT_LICENSE_TITLE, Application.ProductName);
+            this.Text = String.Format(LocaleEN.TEXT_LICENSE_TITLE, MetaInfo.Name);
             RtfLicense.SelectedRtf = Resources.AllLicenses;
             RtfLicense.DeselectAll();
 

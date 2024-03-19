@@ -150,7 +150,7 @@ Hint: Check the output in the Candy Shop console window before pressing OK, or s
     <value>{0} {1} package is outdated.</value>
   </data>
   <data name="TEXT_APP_TITLE" xml:space="preserve">
-    <value>{0} ({1}) v{2}</value>
+    <value>{0} v{2} for {1}</value>
   </data>
   <data name="TEXT_CANCEL" xml:space="preserve">
     <value>&amp;Cancel</value>

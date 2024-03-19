@@ -41,7 +41,8 @@ namespace CandyShop
 
                 packageManager = new WingetManager(context.SupressLocaleLogWarning)
                 {
-                    Binary = "winget", // TODO via context
+                    AllowGsudoCache = context.AllowGsudoCache,
+                    Binary = context.WingetBinary,
                     RequireManualElevation = context.ElevateOnDemand && !context.HasAdminPrivileges
                 };
                 // TODO validate winget
@@ -68,6 +69,7 @@ namespace CandyShop
 
                 packageManager = new ChocoManager(majorVersion, context.ValidExitCodes)
                 {
+                    AllowGsudoCache = context.AllowGsudoCache,
                     Binary = context.ChocolateyBinary,
                     RequireManualElevation = context.ElevateOnDemand && !context.HasAdminPrivileges
                 };
@@ -114,7 +116,7 @@ namespace CandyShop
                 // attempt removal of legacy task
                 if (windowsTaskService.LaunchTaskExists())
                 {
-                    var result = MessageBox.Show("The launch task, that was used to execute Candy Shop on system start in earlier versions of the program, has been replaced by a shortcut. It is recommended to remove the older task to prevent redundant processes. Do you wish to remove the legacy task? If not, this prompt will appear again next time you launch the program. Please note that CandyShop requires administrator privileges to remove the legacy task.", Application.ProductName, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                    var result = MessageBox.Show("The launch task, that was used to execute Candy Shop on system start in earlier versions of the program, has been replaced by a shortcut. It is recommended to remove the older task to prevent redundant processes. Do you wish to remove the legacy task? If not, this prompt will appear again next time you launch the program. Please note that CandyShop requires administrator privileges to remove the legacy task.", MetaInfo.Name, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                     if (result == DialogResult.Yes)
                     {
                         try
@@ -165,9 +167,9 @@ namespace CandyShop
             catch (PackageManagerException e)
             {
                 icon.BalloonTipIcon = ToolTipIcon.Error;
-                icon.Text = Application.ProductName;
-                icon.BalloonTipTitle = String.Format(LocaleEN.TEXT_APP_TITLE, Application.ProductName, context.ApplicationVersion);
-                icon.BalloonTipText = String.Format(LocaleEN.ERROR_RETRIEVING_OUTDATED_PACKAGES, e.Message);
+                icon.Text = MetaInfo.Name;
+                icon.BalloonTipTitle = MetaInfo.WindowTitle;
+                icon.BalloonTipText = string.Format(LocaleEN.ERROR_RETRIEVING_OUTDATED_PACKAGES, e.Message);
                 icon.ShowBalloonTip(2000);
                 Program.Exit();
             }

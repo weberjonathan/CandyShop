@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace CandyShop.PackageCore
 {
@@ -125,7 +125,7 @@ namespace CandyShop.PackageCore
 
             // start gsudo cache session
             bool isCacheEnabled = false;
-            if (RequireManualElevation)
+            if (AllowGsudoCache && RequireManualElevation)
             {
                 EnableGsudoCache();
                 isCacheEnabled = true;
@@ -136,7 +136,7 @@ namespace CandyShop.PackageCore
             foreach (var package in  packages)
             {
                 var arguments = $"upgrade --id \"{package.Id}\" --silent --exact";
-                var p = BuildProcess(arguments);
+                var p = BuildProcess(arguments, useGsudo: !AllowGsudoCache); // if credentials are cached, gsudo must not be invoked for each process, else it does
                 try
                 {
                     p.Execute();
