@@ -147,6 +147,12 @@ namespace CandyShop.Controls
 
             Other.CellDoubleClick += new DataGridViewCellEventHandler((sender, e) =>
             {
+                if (CheckBoxes && e.RowIndex >= 0)
+                {
+                    bool previous = (bool)Other.Rows[e.RowIndex].Cells[CheckBoxColumn.Index].Value;
+                    Other.Rows[e.RowIndex].Cells[CheckBoxColumn.Index].Value = !previous;
+                }
+
                 if (e.ColumnIndex == CheckBoxColumn.Index && e.RowIndex != -1)
                     Other.EndEdit();
             });
@@ -182,9 +188,17 @@ namespace CandyShop.Controls
             // overwrite checkbox alignment
             Other.RowDefaultCellStyleChanged += new DataGridViewRowEventHandler((sender, e) =>
             {
-                if (CheckedCol.Index >= 0)
+                if (CheckedCol != null && CheckedCol.Index >= 0)
                 {
                     e.Row.Cells[CheckedCol.Index].Style = new DataGridViewCellStyle(e.Row.DefaultCellStyle)
+                    {
+                        Alignment = DataGridViewContentAlignment.MiddleCenter
+                    };
+                }
+
+                if (PinnedCol != null && PinnedCol.Index >= 0)
+                {
+                    e.Row.Cells[PinnedCol.Index].Style = new DataGridViewCellStyle(e.Row.DefaultCellStyle)
                     {
                         Alignment = DataGridViewContentAlignment.MiddleCenter
                     };
@@ -298,10 +312,12 @@ namespace CandyShop.Controls
                 if (row.Cells[PinnedCol.Index].Value == null)
                 {
                     row.DefaultCellStyle = DefaultStyle;
+                    row.Cells[CheckedCol.Index].ReadOnly = false;
                 }
                 else
                 {
                     row.DefaultCellStyle = PinnedStyle;
+                    row.Cells[CheckedCol.Index].ReadOnly = true;
                 }
             }
         }

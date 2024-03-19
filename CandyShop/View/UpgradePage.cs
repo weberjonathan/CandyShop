@@ -315,13 +315,6 @@ namespace CandyShop.View
 
         private void LstPackages_ItemChecked(object sender, DataGridViewCellEventArgs e)
         {
-            int index = LstPackages.PinnedCol.Index;
-            bool pinned = LstPackages.Other.Rows[e.RowIndex].Cells[index].Value != null;
-
-            // disallow checking for pinned packages
-            if (pinned)
-                LstPackages.Other.Rows[e.RowIndex].Cells[LstPackages.CheckedCol.Index].Value = false;
-
             // update package count status text
             LblSelected.Text = string.Format(LocaleEN.TEXT_SELECTED_PACKAGE_COUNT, SelectedItems.Length);
         }
