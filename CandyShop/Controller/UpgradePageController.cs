@@ -168,7 +168,14 @@ namespace CandyShop.Controller
             }
             catch (PackageManagerException e)
             {
-                MainWindow?.DisplayError(LocaleEN.ERROR_UPGRADING_OUTDATED_PACKAGES, e.Message);
+                MainWindow?.DisplayError(LocaleEN.ERROR_UPGRADING_OUTDATED_PACKAGES, e.Message.TrimEnd('.'));
+                WindowsConsole.FreeConsole();
+                MainWindow?.ToForm().Show();
+                return; // TODO why return? shortcuts should be deleted even if chocolatey fails to upgrade some packages (others may have been upgraded and added a shortcut)
+            }
+            catch (CandyShopException e)
+            {
+                MainWindow?.DisplayError(LocaleEN.ERROR_UPGRADING_OUTDATED_PACKAGES, e.Message.TrimEnd('.'));
                 WindowsConsole.FreeConsole();
                 MainWindow?.ToForm().Show();
                 return; // TODO why return? shortcuts should be deleted even if chocolatey fails to upgrade some packages (others may have been upgraded and added a shortcut)

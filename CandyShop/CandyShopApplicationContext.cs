@@ -26,9 +26,6 @@ namespace CandyShop
             string cwd = Directory.GetParent(Process.GetCurrentProcess().MainModule.FileName).FullName;
             Log.Debug($"cwd: {cwd}; elevated: {context.HasAdminPrivileges}; elevateOnDemand: {context.ElevateOnDemand}; debug: {context.DebugEnabled}");
 
-            // configure process factory
-            ProcessFactory.Config(context);
-
             // determine winget or choco and test executables
             AbstractPackageManager packageManager;
             if (context.WingetMode)
@@ -42,13 +39,17 @@ namespace CandyShop
                         Log.Warning($"Detected unsupported locale \"{ci.TwoLetterISOLanguageName}\". This may lead to parsing errors. See https://github.com/weberjonathan/CandyShop/blob/master/docs/lcoales.md for more.");
                 }
 
-                packageManager = new WingetManager(context.SupressLocaleLogWarning);
+                packageManager = new WingetManager(context.SupressLocaleLogWarning)
+                {
+                    Binary = "winget", // TODO via context
+                    RequireManualElevation = context.ElevateOnDemand && !context.HasAdminPrivileges
+                };
                 // TODO validate winget
             }
             else
             {
                 int majorVersion = 2;
-                var p = ProcessFactory.Choco("--version");
+                var p = new PackageManagerProcess(context.ChocolateyBinary, "--version");
 
                 try
                 {
@@ -65,7 +66,11 @@ namespace CandyShop
                     ErrorHandler.ShowError(LocaleEN.ERROR_CHOCO_PATH);
                 }
 
-                packageManager = new ChocoManager(majorVersion, context.ValidExitCodes);
+                packageManager = new ChocoManager(majorVersion, context.ValidExitCodes)
+                {
+                    Binary = context.ChocolateyBinary,
+                    RequireManualElevation = context.ElevateOnDemand && !context.HasAdminPrivileges
+                };
             }
 
             // init services

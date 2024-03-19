@@ -27,7 +27,7 @@ namespace CandyShop.PackageCore
             StringBuilder rtn = new();
 
             // launch process
-            PackageManagerProcess p = ProcessFactory.Choco($"info {package.Name}");
+            PackageManagerProcess p = BuildProcess($"info {package.Name}");
             p.ExecuteHidden();
             if (p.ExitCode != 0)
                 throw new PackageManagerException($"Chocolatey did not exit cleanly. Returned {p.ExitCode}.");
@@ -57,7 +57,7 @@ namespace CandyShop.PackageCore
 
             // launch process
             var args = ChocoVersionMajor < 2 ? "list --local-only" : "list";
-            PackageManagerProcess p = ProcessFactory.Choco(args);
+            PackageManagerProcess p = BuildProcess(args);
             p.ExecuteHidden();
             if (p.ExitCode != 0)
                 throw new PackageManagerException($"Chocolatey did not exit cleanly. Returned {p.ExitCode}.");
@@ -110,7 +110,7 @@ namespace CandyShop.PackageCore
             List<GenericPackage> packages = [];
 
             // launch process
-            PackageManagerProcess p = ProcessFactory.Choco("outdated");
+            PackageManagerProcess p = BuildProcess("outdated");
             p.ExecuteHidden();
             if (p.ExitCode != 0)
                 throw new PackageManagerException($"Chocolatey did not exit cleanly. Returned {p.ExitCode}.");
@@ -165,7 +165,7 @@ namespace CandyShop.PackageCore
 
         public override List<GenericPackage> FetchPinList()
         {
-            PackageManagerProcess p = ProcessFactory.Choco("pin list --limit-output");
+            PackageManagerProcess p = BuildProcess("pin list --limit-output");
             p.ExecuteHidden();
             if (p.ExitCode != 0)
                 throw new PackageManagerException($"Chocolatey did not exit cleanly. Returned {p.ExitCode}.");
@@ -193,7 +193,7 @@ namespace CandyShop.PackageCore
         public override void Pin(GenericPackage package)
         {
             var args = $"pin add --name=\"{package.Name}\" --version=\"{package.CurrVer}\"";
-            PackageManagerProcess p = ProcessFactory.ChocoPrivileged(args);
+            PackageManagerProcess p = BuildProcess(args, useGsudo: RequireManualElevation);
             p.ExecuteHidden();
 
             if (p.ExitCode != 0)
@@ -203,7 +203,7 @@ namespace CandyShop.PackageCore
         /// <exception cref="PackageManagerException"></exception>
         public override void Unpin(GenericPackage package)
         {
-            PackageManagerProcess p = ProcessFactory.ChocoPrivileged($"pin remove --name=\"{package.Name}\"");
+            PackageManagerProcess p = BuildProcess($"pin remove --name=\"{package.Name}\"", useGsudo: RequireManualElevation);
             p.ExecuteHidden();
 
             if (p.ExitCode != 0)
@@ -215,7 +215,7 @@ namespace CandyShop.PackageCore
             string arg = string.Join(' ', packages.Select(p => p.Name));
 
             // launch process
-            PackageManagerProcess p = ProcessFactory.ChocoPrivileged($"upgrade {arg} -y");
+            PackageManagerProcess p = BuildProcess($"upgrade {arg} -y", useGsudo: RequireManualElevation);
             p.Execute();
 
             if (!ValidExitCodesOnUpgrade.Contains(p.ExitCode))

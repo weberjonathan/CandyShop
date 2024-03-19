@@ -62,7 +62,6 @@ namespace CandyShop.View
 
         public void DisplayError(string msg, params string[] args)
         {
-            msg = msg.TrimEnd('.');
             if (args != null && args.Length > 0) msg = String.Format(msg, args);
             MessageBox.Show(msg, Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Error);
         }

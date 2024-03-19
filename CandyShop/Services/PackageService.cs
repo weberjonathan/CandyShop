@@ -174,6 +174,7 @@ namespace CandyShop.Services
         }
 
         /// <exception cref="PackageManagerException"></exception>
+        /// <exception cref="CandyShopException"></exception>
         public async Task Upgrade(string[] names)
         {
             List<GenericPackage> packages = GetPackagesByName(names.ToList());
@@ -185,7 +186,7 @@ namespace CandyShop.Services
             {
                 PackageManager.Upgrade(packages);
             }
-            catch (PackageManagerException)
+            catch (Exception)
             {
                 throw;
             }

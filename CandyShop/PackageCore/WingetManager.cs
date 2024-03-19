@@ -24,7 +24,7 @@ namespace CandyShop.PackageCore
                 return "No sources available for the selected package.";
             }
 
-            PackageManagerProcess p = ProcessFactory.Winget($"show --id \"{package.Id}\" --exact");
+            PackageManagerProcess p = BuildProcess($"show --id \"{package.Id}\" --exact");
             p.ExecuteHidden();
             if (p.ExitCode != 0)
                 throw new PackageManagerException($"Winget did not exit cleanly. Returned {p.ExitCode}.");
@@ -41,7 +41,7 @@ namespace CandyShop.PackageCore
         public override List<GenericPackage> FetchInstalled()
         {
             // launch process
-            PackageManagerProcess p = ProcessFactory.Winget($"list");
+            PackageManagerProcess p = BuildProcess($"list");
             p.ExecuteHidden();
             if (p.ExitCode != 0)
                 throw new PackageManagerException($"Winget did not exit cleanly. Returned {p.ExitCode}.");
@@ -71,7 +71,7 @@ namespace CandyShop.PackageCore
         public override List<GenericPackage> FetchPinList()
         {
             // launch process
-            PackageManagerProcess p = ProcessFactory.Winget($"pin list");
+            PackageManagerProcess p = BuildProcess($"pin list");
             p.ExecuteHidden();
             if (p.ExitCode != 0)
                 throw new PackageManagerException($"Winget did not exit cleanly. Returned {p.ExitCode}.");
@@ -97,7 +97,7 @@ namespace CandyShop.PackageCore
         public override void Pin(GenericPackage package)
         {
             var args = $"pin add --id \"{package.Id}\" --exact";
-            PackageManagerProcess p = ProcessFactory.Winget(args);
+            PackageManagerProcess p = BuildProcess(args);
             p.ExecuteHidden();
 
             if (p.ExitCode != 0)
@@ -108,7 +108,7 @@ namespace CandyShop.PackageCore
         public override void Unpin(GenericPackage package)
         {
             var args = $"pin remove --id \"{package.Id}\" --exact";
-            PackageManagerProcess p = ProcessFactory.Winget(args);
+            PackageManagerProcess p = BuildProcess(args);
             p.ExecuteHidden();
 
             if (p.ExitCode != 0)
@@ -116,16 +116,49 @@ namespace CandyShop.PackageCore
         }
 
         /// <exception cref="PackageManagerException"></exception>
+        /// <exception cref="CandyShopException"></exception>
         public override void Upgrade(List<GenericPackage> packages)
         {
+            // TODO add security section to README that discusses the cache
+
             if (packages.Count == 0) return;
 
-            var arguments = packages.Select(p => $"upgrade --id \"{p.Id}\" --silent --exact").ToList();
-            var p = ProcessFactory.WingetBatchPrivileged(arguments);
-            p.Execute();
+            // start gsudo cache session
+            bool isCacheEnabled = false;
+            if (RequireManualElevation)
+            {
+                EnableGsudoCache();
+                isCacheEnabled = true;
+            }
 
-            if (p.ExitCode != 0)
-                throw new PackageManagerException($"Winget did not exit cleanly. Returned {p.ExitCode}.");
+            // perform upgrades
+            List<int> nonZeroExitCodes = [];
+            foreach (var package in  packages)
+            {
+                var arguments = $"upgrade --id \"{package.Id}\" --silent --exact";
+                var p = BuildProcess(arguments);
+                try
+                {
+                    p.Execute();
+                    if (p.ExitCode != 0)
+                        throw new PackageManagerException();
+                }
+                catch (Exception e)
+                {
+                    Log.Error($"Winget upgrade process \"{p.Binary} {p.Arguments}\" failed with exit code {p.ExitCode}: {e.Message}");
+                    nonZeroExitCodes.Add(-1);
+                }
+            }
+
+            // if the upgrade console is closed during upgrading, Candy Shop exits,
+            // which also ends the gsudo cache session bc it is tied to this pid
+
+            // exit gsudo cache session
+            if (isCacheEnabled)
+                DisableGsudoCache();
+
+            if (nonZeroExitCodes.Count > 0)
+                throw new PackageManagerException($"One or more winget upgrade processes failed with exit codes {string.Join(", ", nonZeroExitCodes)}. See log for more information.");
         }
 
         private string TrimProgressChars(string output)
