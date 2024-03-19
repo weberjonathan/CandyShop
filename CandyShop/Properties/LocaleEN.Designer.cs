@@ -117,6 +117,15 @@ namespace CandyShop.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Failed to locate Winget binary. Please set the full path in the configuration file and restart the application. Check the &apos;Extras&apos; menu to quickly navigate to the config file. If this is the first time launching the application or the config file does not exist, it will be created on application exit..
+        /// </summary>
+        internal static string ERROR_WINGET_PATH {
+            get {
+                return ResourceManager.GetString("ERROR_WINGET_PATH", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Ignore.
         /// </summary>
         internal static string NOT_IGNORE {

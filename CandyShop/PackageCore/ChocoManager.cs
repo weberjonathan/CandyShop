@@ -8,10 +8,11 @@ namespace CandyShop.PackageCore
 {
     internal class ChocoManager : AbstractPackageManager
     {
-        private readonly int ChocoVersionMajor;
         private readonly List<int> ValidExitCodesOnUpgrade;
 
         public override bool SupportsFetchingOutdated => true;
+
+        public int ChocoVersionMajor { get; set; } = 2;
 
         public ChocoManager(int chocoVersionMajor, List<int> validExitCodesOnUpgrade)
         {

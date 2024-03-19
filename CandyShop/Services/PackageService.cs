@@ -30,6 +30,8 @@ namespace CandyShop.Services
         /// <exception cref="PackageManagerException"></exception>
         public async Task<List<GenericPackage>> GetInstalledPackagesAsync()
         {
+            if (PackageManager == null) return [];
+
             List<GenericPackage> installed = [];
             List<GenericPackage> pinned = [];
 
@@ -69,6 +71,8 @@ namespace CandyShop.Services
         /// <exception cref="PackageManagerException"></exception>
         public async Task<List<GenericPackage>> GetOutdatedPackagesAsync()
         {
+            if (PackageManager == null) return [];
+
             await OutdatedPckgLock.WaitAsync().ConfigureAwait(false);
             try
             {
@@ -106,6 +110,8 @@ namespace CandyShop.Services
         /// <exception cref="PackageManagerException"></exception>
         public async Task<string> GetPackageDetailsAsync(string name)
         {
+            if (PackageManager == null) return "";
+
             var package = GetPackageByName(name);
             if (package == null) return "";
             
@@ -126,6 +132,8 @@ namespace CandyShop.Services
         /// <exception cref="PackageManagerException"></exception>
         public async Task PinAsync(string name)
         {
+            if (PackageManager == null) return;
+
             Log.Information($"Attempting to pin package {name}.");
 
             var package = GetPackageByName(name);
@@ -151,6 +159,8 @@ namespace CandyShop.Services
         /// <exception cref="PackageManagerException"></exception>
         public async Task UnpinAsync(string name)
         {
+            if (PackageManager == null) return;
+
             Log.Information($"Attempting to unpin package {name}.");
 
             var package = GetPackageByName(name);
@@ -177,6 +187,8 @@ namespace CandyShop.Services
         /// <exception cref="CandyShopException"></exception>
         public async Task Upgrade(string[] names)
         {
+            if (PackageManager == null) return;
+
             List<GenericPackage> packages = GetPackagesByName(names.ToList());
             packages = packages.Where(p => !p.Pinned.GetValueOrDefault(false)).ToList();
 
@@ -205,7 +217,7 @@ namespace CandyShop.Services
             OutdatedPckgCache.Clear();
             OutdatedPckgLock.Release();
 
-            if (!PackageManager.SupportsFetchingOutdated)
+            if (PackageManager != null && !PackageManager.SupportsFetchingOutdated)
             {
                 await ClearInstalledPackages();
             }

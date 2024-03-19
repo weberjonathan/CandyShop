@@ -45,34 +45,53 @@ namespace CandyShop
                     Binary = context.WingetBinary,
                     RequireManualElevation = context.ElevateOnDemand && !context.HasAdminPrivileges
                 };
-                // TODO validate winget
+
+                var p = new PackageManagerProcess(context.WingetBinary, "--version");
+                try
+                {
+                    p.ExecuteHidden();
+                    if (p.ExitCode != 0)
+                        throw new PackageManagerException();
+                }
+                catch (Exception)
+                {
+                    ErrorHandler.ShowError(LocaleEN.ERROR_WINGET_PATH);
+                    packageManager = null;
+                }
             }
             else
             {
-                int majorVersion = 2;
-                var p = new PackageManagerProcess(context.ChocolateyBinary, "--version");
+                var chocoManager = new ChocoManager(2, context.ValidExitCodes)
+                {
+                    AllowGsudoCache = context.AllowGsudoCache,
+                    Binary = context.ChocolateyBinary,
+                    RequireManualElevation = context.ElevateOnDemand && !context.HasAdminPrivileges
+                };
 
+                var p = new PackageManagerProcess(context.ChocolateyBinary, "--version");
                 try
                 {
                     p.ExecuteHidden();
                     if (p.ExitCode == 0)
                     {
                         string majorString = p.Output.Trim().Split('.')[0];
-                        if (!int.TryParse(majorString, out majorVersion))
+                        if (!int.TryParse(majorString, out int majorVersion))
                             Log.Error($"Failed to parse the version string from Chocolatey, assume minimum version 2.x. Output was: {p.Output}");
+
+                        chocoManager.ChocoVersionMajor = majorVersion;
+                    }
+                    else
+                    {
+                        throw new PackageManagerException();
                     }
                 }
-                catch (Win32Exception)
+                catch (Exception)
                 {
                     ErrorHandler.ShowError(LocaleEN.ERROR_CHOCO_PATH);
+                    chocoManager = null;
                 }
 
-                packageManager = new ChocoManager(majorVersion, context.ValidExitCodes)
-                {
-                    AllowGsudoCache = context.AllowGsudoCache,
-                    Binary = context.ChocolateyBinary,
-                    RequireManualElevation = context.ElevateOnDemand && !context.HasAdminPrivileges
-                };
+                packageManager = chocoManager;
             }
 
             // init services
