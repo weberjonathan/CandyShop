@@ -101,7 +101,10 @@ namespace CandyShop.Controller
             }
 
             View.ClearItems();
-            packages.ForEach(p => View.AddItem(BuildDisplayItem(p)));
+            // TODO unknown packages can only be upgraded with a specific flag; give user control over that
+            IEnumerable<object[]> items = packages.Where(p => !"Unknown".Equals(p.CurrVer)).Select(BuildDisplayItem);
+            foreach (var item in items)
+                View.AddItem(item);
 
             if (packages.Count == 0)
             {
