@@ -111,11 +111,12 @@ namespace CandyShop.Controller
             CheckTopLevelPackages();
         }
 
-        private string[] BuildDisplayItem(GenericPackage package)
+        private object[] BuildDisplayItem(GenericPackage package)
         {
             if (Context.WingetMode)
                 return [
-                    "true",
+                    true,
+                    package.Pinned.GetValueOrDefault(false) ? Resources.ic_pin : null,
                     package.Name,
                     package.Id,
                     package.CurrVer,
@@ -125,7 +126,8 @@ namespace CandyShop.Controller
                 ];
             else
                 return [
-                    "true",
+                    true,
+                    package.Pinned.GetValueOrDefault(false) ? Resources.ic_pin : null,
                     package.Name,
                     package.CurrVer,
                     package.AvailVer,

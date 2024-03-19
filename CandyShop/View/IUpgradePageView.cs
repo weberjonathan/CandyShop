@@ -27,7 +27,7 @@ namespace CandyShop.View
         bool Loading { get; set; }
         bool ShowUacIcons { get; set; }
         bool AllowPinnedUacIon { get; set; }
-        void AddItem(string[] data);
+        void AddItem(object[] data);
         void ClearItems();
         void CheckAllItems();
         void SetItemCheckState(string name, bool state);

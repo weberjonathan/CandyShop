@@ -1,5 +1,4 @@
 ﻿using CandyShop.Properties;
-using System;
 using System.Windows.Forms;
 
 namespace CandyShop.Controls
@@ -9,10 +8,10 @@ namespace CandyShop.Controls
         public override PackageListBoxColumn[] GetUpgradeColumns()
         {
             return [
+                new(ColumnType.Pinned),
                 new(null,     LocaleEN.TEXT_COL_NAME,      .4f, PackageListBoxSize.Percent),
                 new(null,     LocaleEN.TEXT_COL_CURRENT,   .3f, PackageListBoxSize.Percent),
                 new(null,     LocaleEN.TEXT_COL_AVAILABLE, .3f, PackageListBoxSize.Percent),
-                new("Pinned", LocaleEN.TEXT_COL_PINNED,    60f, PackageListBoxSize.Fixed)
             ];
         }
 

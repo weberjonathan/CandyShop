@@ -1,18 +1,56 @@
 ﻿using System;
 using System.Drawing;
-using System.Linq;
 using System.Windows.Forms;
 
 namespace CandyShop.Controls
 {
-    internal class PackageListBoxColumn(string key, string name, float value, PackageListBoxSize unit) // TODO rename to PackageListBoxColumnHeader
+    internal enum ColumnType { Text, Checked, Pinned }
+
+    internal class PackageListBoxColumn // TODO rename to PackageListBoxColumnHeader
     {
-        public string Key { get; set; } = key;
-        public string Name { get; set; } = name;
-        public float Value { get; set; } = value;
-        public PackageListBoxSize Unit { get; set; } = unit;
+        public PackageListBoxColumn(ColumnType type)
+        {
+            if (type.Equals(ColumnType.Pinned))
+            {
+                ColumnType = ColumnType.Pinned;
+                Key = "Pinned";
+                Name = "";
+                Value = 30;
+                Unit = PackageListBoxSize.Fixed;
+            }
+        }
+
+        public PackageListBoxColumn(string key, string name, float value, PackageListBoxSize unit)
+        {
+            ColumnType = ColumnType.Text;
+            Key = key;
+            Name = name;
+            Value = value;
+            Unit = unit;
+        }
+
+        public ColumnType ColumnType { get; set; }
+        public string Key { get; set; }
+        public string Name { get; set; }
+        public float Value { get; set; }
+        public PackageListBoxSize Unit { get; set; }
 
         public DataGridViewColumn ToDataGridViewColumn()
+        {
+            switch (ColumnType)
+            {
+                case ColumnType.Text:
+                    return ToDataGridViewTextColumn();
+                case ColumnType.Checked:
+                    throw new NotImplementedException();
+                case ColumnType.Pinned:
+                    return ToDataGridViewImageColumn();
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
+        private DataGridViewTextBoxColumn ToDataGridViewTextColumn()
         {
             DataGridViewTextBoxColumn rtn = new()
             {
@@ -31,6 +69,22 @@ namespace CandyShop.Controls
                 rtn.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
                 rtn.Width = (int)Value;
             }
+            return rtn;
+        }
+
+        private DataGridViewImageColumn ToDataGridViewImageColumn()
+        {
+            DataGridViewImageColumn rtn = new()
+            {
+                Name = Key,
+                HeaderText = Name,
+                ReadOnly = true,
+                SortMode = DataGridViewColumnSortMode.NotSortable, // TODO allow sorting
+                AutoSizeMode = DataGridViewAutoSizeColumnMode.None,
+                Width = (int)Value,
+            };
+
+            rtn.DefaultCellStyle.NullValue = null;
             return rtn;
         }
     }
@@ -114,6 +168,28 @@ namespace CandyShop.Controls
             Other.AdvancedColumnHeadersBorderStyle.Right = DataGridViewAdvancedCellBorderStyle.Single;
             Other.AdvancedColumnHeadersBorderStyle.Bottom = DataGridViewAdvancedCellBorderStyle.None;
             Other.AdvancedColumnHeadersBorderStyle.Left = DataGridViewAdvancedCellBorderStyle.None;
+
+            // define default cell styles
+            DefaultStyle = Other.DefaultCellStyle;
+            DataGridViewCellStyle pinnedStyle = new(Other.DefaultCellStyle)
+            {
+                SelectionBackColor = Color.LightGray,
+                SelectionForeColor = Color.Black,
+            };
+            PinnedStyle = pinnedStyle;
+
+            // overwrite checkbox alignment
+            Other.RowDefaultCellStyleChanged += new DataGridViewRowEventHandler((sender, e) =>
+            {
+                if (CheckedCol.Index >= 0)
+                {
+                    e.Row.Cells[CheckedCol.Index].Style = new DataGridViewCellStyle(e.Row.DefaultCellStyle)
+                    {
+                        Alignment = DataGridViewContentAlignment.MiddleCenter
+                    };
+
+                }
+            });
         }
 
         public event DataGridViewCellEventHandler ItemChecked;
@@ -124,20 +200,12 @@ namespace CandyShop.Controls
             set { CheckBoxColumn.Visible = value; }
         }
 
+        public DataGridViewColumn PinnedCol { get; private set; }
+        public DataGridViewColumn NameCol { get; private set; }
+        public DataGridViewColumn CheckedCol => CheckBoxColumn;
         public DataGridViewRow SelectedItem => Other.SelectedRows.Count > 0 ? Other.SelectedRows[0] : null;
-        public bool TryGetSelectedItem(out DataGridViewRow value)
-        {
-            if (Other.SelectedRows.Count > 0)
-            {
-                value = Other.SelectedRows[0];
-                return true;
-            }
-            else
-            {
-                value = null;
-                return false;
-            }
-        }
+        public DataGridViewCellStyle DefaultStyle { get; set; }
+        public DataGridViewCellStyle PinnedStyle { get; set; }
 
         private bool _NoPackages = false;
         public bool NoPackages
@@ -180,10 +248,16 @@ namespace CandyShop.Controls
                     _ColumnHeaders = value;
                     Other.Columns.Clear();
                     Other.Columns.Add(CheckBoxColumn);
-                    Other.Columns.AddRange(
-                        value
-                        .Select(col => col.ToDataGridViewColumn())
-                        .ToArray());
+                    foreach (var col in value)
+                    {
+                        var dgvCol = col.ToDataGridViewColumn();
+                        Other.Columns.Add(dgvCol);
+                        if (col.ColumnType.Equals(ColumnType.Pinned))
+                            PinnedCol = dgvCol;
+
+                        if (col.Name.Equals("Name")) // TODO should be ColumnType.Key
+                            NameCol = dgvCol;
+                    }
                 }
             }
         }
@@ -194,16 +268,41 @@ namespace CandyShop.Controls
             set { SpinnerCtl.Text = value; }
         }
 
-        public int IndexOfColumn(string key)
+        public bool TryGetSelectedItem(out DataGridViewRow value)
         {
-            foreach (DataGridViewColumn col in Other.Columns)
+            if (Other.SelectedRows.Count > 0)
             {
-                if (col.Name.Equals(key))
+                value = Other.SelectedRows[0];
+                return true;
+            }
+            else
+            {
+                value = null;
+                return false;
+            }
+        }
+
+        public void AddItem(object[] data)
+        {
+            var index = Other.Rows.Add(data);
+            if (NoPackages) NoPackages = false;
+            if (Loading) Loading = false;
+            UpdateRowStyle(Other.Rows[index]);
+        }
+
+        public void UpdateRowStyle(DataGridViewRow row)
+        {
+            if (PinnedCol != null)
+            {
+                if (row.Cells[PinnedCol.Index].Value == null)
                 {
-                    return col.Index;
+                    row.DefaultCellStyle = DefaultStyle;
+                }
+                else
+                {
+                    row.DefaultCellStyle = PinnedStyle;
                 }
             }
-            return -1;
         }
 
         private void Other_SelectionChanged(object sender, EventArgs e)
