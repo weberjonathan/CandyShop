@@ -42,6 +42,7 @@ namespace CandyShop.Controls
                 case ColumnType.Text:
                     return ToDataGridViewTextColumn();
                 case ColumnType.Checked:
+                    // TODO this is currently unused; check box column is added via PackageListBox.Checkbox
                     throw new NotImplementedException();
                 case ColumnType.Pinned:
                     return ToDataGridViewImageColumn();

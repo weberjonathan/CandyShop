@@ -9,9 +9,6 @@ namespace CandyShop.View
 {
     partial class UpgradePage : UserControl, IUpgradePageView
     {
-        // TODO replace usages of this with PackageListBox.CheckedCol.Index; also add column checked via common controls, not via checkbox property for consistenccy with other columns
-        private const int COL_CHECKED_INDEX = 0;
-
         public UpgradePage()
         {
             InitializeComponent();
@@ -118,7 +115,7 @@ namespace CandyShop.View
                 foreach (DataGridViewRow row in LstPackages.Other.Rows)
                 {
                     // TODO make safe
-                    DataGridViewCell checkedCell = row.Cells[COL_CHECKED_INDEX];
+                    DataGridViewCell checkedCell = row.Cells[LstPackages.CheckedCol.Index];
                     if ((bool)checkedCell.Value) checkedItems.Add((string)row.Cells[LstPackages.NameCol.Index].Value);
                 }
 
@@ -241,7 +238,7 @@ namespace CandyShop.View
             var rows = LstPackages.Other.Rows;
             foreach (DataGridViewRow row in rows)
             {
-                row.Cells[COL_CHECKED_INDEX].Value = true;
+                row.Cells[LstPackages.CheckedCol.Index].Value = true;
             }
         }
 
@@ -250,7 +247,7 @@ namespace CandyShop.View
             var rows = LstPackages.Other.Rows;
             foreach (DataGridViewRow row in rows)
             {
-                row.Cells[COL_CHECKED_INDEX].Value = false;
+                row.Cells[LstPackages.CheckedCol.Index].Value = false;
             }
         }
 
@@ -267,7 +264,7 @@ namespace CandyShop.View
                 var cellName = (string)row.Cells[LstPackages.NameCol.Index].Value;
                 if (name.Equals(cellName))
                 {
-                    row.Cells[COL_CHECKED_INDEX].Value = state;
+                    row.Cells[LstPackages.CheckedCol.Index].Value = state;
                     return;
                 }
             }
@@ -310,7 +307,7 @@ namespace CandyShop.View
             var row = LstPackages.Other.Rows[index];
             row.DefaultCellStyle.ForeColor = SystemColors.GrayText;
             row.DefaultCellStyle.Font = new Font(LstPackages.Other.DefaultCellStyle.Font, FontStyle.Italic);
-            row.Cells[COL_CHECKED_INDEX].Value = false;
+            row.Cells[LstPackages.CheckedCol.Index].Value = false;
 
             LstPackages.NoPackages = true;
             if (Loading) Loading = false;
@@ -323,7 +320,7 @@ namespace CandyShop.View
 
             // disallow checking for pinned packages
             if (pinned)
-                LstPackages.Other.Rows[e.RowIndex].Cells[COL_CHECKED_INDEX].Value = false;
+                LstPackages.Other.Rows[e.RowIndex].Cells[LstPackages.CheckedCol.Index].Value = false;
 
             // update package count status text
             LblSelected.Text = string.Format(LocaleEN.TEXT_SELECTED_PACKAGE_COUNT, SelectedItems.Length);
