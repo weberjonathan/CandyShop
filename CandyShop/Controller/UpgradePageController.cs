@@ -6,6 +6,7 @@ using CandyShop.View;
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -160,7 +161,13 @@ namespace CandyShop.Controller
             });
 
             // upgrade
+            bool closeAfterUpgrade = Context.CloseAfterUpgrade;
             WindowsConsole.AllocConsole();
+            var StdOut = new StreamWriter(Console.OpenStandardOutput())
+            {
+                AutoFlush = true
+            };
+            Console.SetOut(StdOut);
             Console.CursorVisible = false;
 
             try
@@ -170,16 +177,12 @@ namespace CandyShop.Controller
             catch (PackageManagerException e)
             {
                 MainWindow?.DisplayError(LocaleEN.ERROR_UPGRADING_OUTDATED_PACKAGES, e.Message.TrimEnd('.'));
-                WindowsConsole.FreeConsole();
-                MainWindow?.ToForm().Show();
-                return; // TODO why return? shortcuts should be deleted even if chocolatey fails to upgrade some packages (others may have been upgraded and added a shortcut)
+                closeAfterUpgrade = false;
             }
             catch (CandyShopException e)
             {
                 MainWindow?.DisplayError(LocaleEN.ERROR_UPGRADING_OUTDATED_PACKAGES, e.Message.TrimEnd('.'));
-                WindowsConsole.FreeConsole();
-                MainWindow?.ToForm().Show();
-                return; // TODO why return? shortcuts should be deleted even if chocolatey fails to upgrade some packages (others may have been upgraded and added a shortcut)
+                closeAfterUpgrade = false;
             }
 
             // display results
@@ -206,17 +209,18 @@ namespace CandyShop.Controller
                 ShortcutService?.DeleteShortcuts(shortcuts);
             }
 
-            if (Context.CloseAfterUpgrade)
+            Log.Debug("Attempt to free console");
+            StdOut.Close();
+            StdOut.Dispose();
+            WindowsConsole.FreeConsole();
+            Log.Debug("Console freed successfully.");
+            if (closeAfterUpgrade)
             {
                 MainWindow?.ToForm().Dispose();
-                WindowsConsole.FreeConsole();
                 Program.Exit();
             }
             else
             {
-                Log.Debug("Attempt to free console");
-                WindowsConsole.FreeConsole();
-                Log.Debug("Console freed successfully.");
                 UpdateOutdatedPackageDisplayAsync();
                 MainWindow?.ToForm().Show();
             }
