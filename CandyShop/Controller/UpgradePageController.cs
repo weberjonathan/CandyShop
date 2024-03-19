@@ -164,7 +164,7 @@ namespace CandyShop.Controller
 
             try
             {
-                PackageService.Upgrade(packages);
+                await PackageService.Upgrade(packages);
             }
             catch (PackageManagerException e)
             {

@@ -174,7 +174,7 @@ namespace CandyShop.Services
         }
 
         /// <exception cref="PackageManagerException"></exception>
-        public async void Upgrade(string[] names)
+        public async Task Upgrade(string[] names)
         {
             List<GenericPackage> packages = GetPackagesByName(names.ToList());
             packages = packages.Where(p => !p.Pinned.GetValueOrDefault(false)).ToList();
