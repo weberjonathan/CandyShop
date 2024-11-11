@@ -14,14 +14,12 @@ namespace CandyShop.View
         event EventHandler CleanShortcutsChanged;
         event EventHandler CloseAfterUpgradeChanged;
         public event EventHandler CheckTopLevelClicked;
-        public event EventHandler AlwaysHideAdminWarningClicked;
         event EventHandler RefreshClicked;
 
         public event EventHandler<PinnedChangedArgs> PinnedChanged;
 
         string[] Items { get; }
         string[] SelectedItems { get; }
-        bool ShowAdminWarning { get; set; }
         bool CleanShortcuts { get; set; }
         bool CloseAfterUpgrade { get; set; }
         bool Loading { get; set; }

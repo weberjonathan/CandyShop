@@ -40,11 +40,15 @@ namespace CandyShop.Controller
             if (MainView == null) throw new InvalidOperationException("Set a view before intialising it!");
 
             MainView.LaunchOnSystemStartEnabled = WindowsTaskService.IsLaunchOnStartup();
+            MainView.ShowAdminWarning =
+                !CandyShopContext.HasAdminPrivileges &&
+                !CandyShopContext.ElevateOnDemand &&
+                !CandyShopContext.SupressAdminWarning;
 
-            if (!CandyShopContext.HasAdminPrivileges && !CandyShopContext.ElevateOnDemand && !CandyShopContext.SupressAdminWarning)
-                MainView.ShowAdminHints();
-            else
-                MainView.ClearAdminHints();
+            MainView.HideAdminWarningClicked += new EventHandler((sender, e) =>
+            {
+                CandyShopContext.SupressAdminWarning = true;
+            });
 
             // exit application on 'X'
             MainView.ToForm().FormClosed += new FormClosedEventHandler((sender, e) =>

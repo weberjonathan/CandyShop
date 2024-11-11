@@ -8,12 +8,12 @@ namespace CandyShop.View
         IInstalledPageView InstalledPackagesPage { get; }
         IUpgradePageView UpgradePackagesPage { get; }
         bool LaunchOnSystemStartEnabled { get; set; }
+        bool ShowAdminWarning {  get; set; }
 
         event EventHandler RefreshClicked;
+        event EventHandler HideAdminWarningClicked;
 
         void DisplayError(string msg, params string[] args);
-        void ClearAdminHints();
-        void ShowAdminHints();
 
         Form ToForm()
         {

@@ -234,6 +234,15 @@ namespace CandyShop.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Permanently hide this warning?.
+        /// </summary>
+        internal static string TEXT_HIDE_PERMANENTLY {
+            get {
+                return ResourceManager.GetString("TEXT_HIDE_PERMANENTLY", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {0} License.
         /// </summary>
         internal static string TEXT_LICENSE_TITLE {
@@ -279,7 +288,7 @@ namespace CandyShop.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Chocolatey will be executed without administrator privileges. To hide this warning, enable the property &apos;SuppressAdminWarning&apos;. If elevated privileges are required, launch CandyShop as administrator or enable the property &apos;ElevateOnDemand&apos;..
+        ///   Looks up a localized string similar to The selected package manager will be executed without administrator privileges. To hide this warning, enable the property &apos;SuppressAdminWarning&apos;. If elevated privileges are required, launch CandyShop as administrator or enable the property &apos;ElevateOnDemand&apos;..
         /// </summary>
         internal static string TEXT_NO_ADMIN_HINT {
             get {

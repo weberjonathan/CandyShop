@@ -61,11 +61,6 @@ namespace CandyShop.Controller
                 CheckTopLevelPackages();
             });
 
-            View.AlwaysHideAdminWarningClicked += new EventHandler((sender, e) =>
-            {
-                Context.SupressAdminWarning = true;
-            });
-
             View.AllowPinnedUacIon = !Context.WingetMode;
             View.ShowUacIcons = Context.ElevateOnDemand && !Context.HasAdminPrivileges;
 

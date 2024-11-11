@@ -176,6 +176,9 @@ Hint: Check the output in the Candy Shop console window before pressing OK, or s
   <data name="TEXT_COL_VERSION" xml:space="preserve">
     <value>Version</value>
   </data>
+  <data name="TEXT_HIDE_PERMANENTLY" xml:space="preserve">
+    <value>Permanently hide this warning?</value>
+  </data>
   <data name="TEXT_LICENSE_TITLE" xml:space="preserve">
     <value>{0} License</value>
   </data>
@@ -192,7 +195,7 @@ Hint: Check the output in the Candy Shop console window before pressing OK, or s
     <value>Open {0} logs</value>
   </data>
   <data name="TEXT_NO_ADMIN_HINT" xml:space="preserve">
-    <value>Chocolatey will be executed without administrator privileges. To hide this warning, enable the property 'SuppressAdminWarning'. If elevated privileges are required, launch CandyShop as administrator or enable the property 'ElevateOnDemand'.</value>
+    <value>The selected package manager will be executed without administrator privileges. To hide this warning, enable the property 'SuppressAdminWarning'. If elevated privileges are required, launch CandyShop as administrator or enable the property 'ElevateOnDemand'.</value>
   </data>
   <data name="TEXT_NO_ADMIN_HINT_SHORT" xml:space="preserve">
     <value> (no administrator privileges)</value>

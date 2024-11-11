@@ -1,4 +1,6 @@
-﻿using System;
+﻿using CandyShop.Controls;
+using System;
+using System.Windows.Forms;
 
 namespace CandyShop.View
 {
@@ -31,13 +33,14 @@ namespace CandyShop.View
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainWindow));
-            MainPanel = new System.Windows.Forms.Panel();
-            tabControl1 = new System.Windows.Forms.TabControl();
-            TabUpgrade = new System.Windows.Forms.TabPage();
+            MainPanel = new Panel();
+            tabControl1 = new TabControl();
+            TabUpgrade = new TabPage();
             UpgradePage = new UpgradePage();
-            TabInstalled = new System.Windows.Forms.TabPage();
+            TabInstalled = new TabPage();
             InstalledPage = new InstalledPage();
-            columnHeader1 = new System.Windows.Forms.ColumnHeader();
+            AdminBanner = new Banner();
+            columnHeader1 = new ColumnHeader();
             MainPanel.SuspendLayout();
             tabControl1.SuspendLayout();
             TabUpgrade.SuspendLayout();
@@ -48,21 +51,22 @@ namespace CandyShop.View
             // 
             MainPanel.BackColor = System.Drawing.SystemColors.Window;
             MainPanel.Controls.Add(tabControl1);
-            MainPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            MainPanel.Location = new System.Drawing.Point(0, 24);
+            MainPanel.Controls.Add(AdminBanner);
+            MainPanel.Dock = DockStyle.Fill;
+            MainPanel.Location = new System.Drawing.Point(0, 0);
             MainPanel.Name = "MainPanel";
-            MainPanel.Size = new System.Drawing.Size(730, 510);
+            MainPanel.Size = new System.Drawing.Size(730, 534);
             MainPanel.TabIndex = 1;
             // 
             // tabControl1
             // 
             tabControl1.Controls.Add(TabUpgrade);
             tabControl1.Controls.Add(TabInstalled);
-            tabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
-            tabControl1.Location = new System.Drawing.Point(0, 0);
+            tabControl1.Dock = DockStyle.Fill;
+            tabControl1.Location = new System.Drawing.Point(0, 64);
             tabControl1.Name = "tabControl1";
             tabControl1.SelectedIndex = 0;
-            tabControl1.Size = new System.Drawing.Size(730, 510);
+            tabControl1.Size = new System.Drawing.Size(730, 470);
             tabControl1.TabIndex = 3;
             // 
             // TabUpgrade
@@ -70,23 +74,23 @@ namespace CandyShop.View
             TabUpgrade.Controls.Add(UpgradePage);
             TabUpgrade.Location = new System.Drawing.Point(4, 24);
             TabUpgrade.Name = "TabUpgrade";
-            TabUpgrade.Padding = new System.Windows.Forms.Padding(3);
-            TabUpgrade.Size = new System.Drawing.Size(722, 482);
+            TabUpgrade.Padding = new Padding(3);
+            TabUpgrade.Size = new System.Drawing.Size(722, 442);
             TabUpgrade.TabIndex = 0;
             TabUpgrade.Text = "Upgrade";
             TabUpgrade.UseVisualStyleBackColor = true;
             // 
             // UpgradePage
             // 
+            UpgradePage.AllowPinnedUacIon = false;
             UpgradePage.CleanShortcuts = false;
             UpgradePage.CloseAfterUpgrade = false;
-            UpgradePage.Dock = System.Windows.Forms.DockStyle.Fill;
+            UpgradePage.Dock = DockStyle.Fill;
             UpgradePage.Loading = true;
             UpgradePage.Location = new System.Drawing.Point(3, 3);
             UpgradePage.Name = "UpgradePage";
-            UpgradePage.ShowAdminWarning = true;
             UpgradePage.ShowUacIcons = false;
-            UpgradePage.Size = new System.Drawing.Size(716, 476);
+            UpgradePage.Size = new System.Drawing.Size(716, 436);
             UpgradePage.TabIndex = 2;
             // 
             // TabInstalled
@@ -94,26 +98,35 @@ namespace CandyShop.View
             TabInstalled.Controls.Add(InstalledPage);
             TabInstalled.Location = new System.Drawing.Point(4, 24);
             TabInstalled.Name = "TabInstalled";
-            TabInstalled.Padding = new System.Windows.Forms.Padding(3);
-            TabInstalled.Size = new System.Drawing.Size(722, 482);
+            TabInstalled.Padding = new Padding(3);
+            TabInstalled.Size = new System.Drawing.Size(722, 435);
             TabInstalled.TabIndex = 1;
             TabInstalled.Text = "Installed";
             TabInstalled.UseVisualStyleBackColor = true;
             // 
             // InstalledPage
             // 
-            InstalledPage.Dock = System.Windows.Forms.DockStyle.Fill;
+            InstalledPage.Dock = DockStyle.Fill;
             InstalledPage.LoadingDetails = false;
             InstalledPage.LoadingPackages = false;
             InstalledPage.Location = new System.Drawing.Point(3, 3);
             InstalledPage.Name = "InstalledPage";
-            InstalledPage.Size = new System.Drawing.Size(716, 476);
+            InstalledPage.Size = new System.Drawing.Size(716, 429);
             InstalledPage.TabIndex = 0;
+            // 
+            // AdminBanner
+            // 
+            AdminBanner.Dock = DockStyle.Top;
+            AdminBanner.Location = new System.Drawing.Point(0, 0);
+            AdminBanner.Name = "AdminBanner";
+            AdminBanner.Padding = new Padding(0, 0, 0, 10);
+            AdminBanner.Size = new System.Drawing.Size(730, 64);
+            AdminBanner.TabIndex = 4;
             // 
             // MainWindow
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
-            AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new System.Drawing.Size(730, 534);
             Controls.Add(MainPanel);
             Icon = (System.Drawing.Icon)resources.GetObject("$this.Icon");
@@ -125,11 +138,11 @@ namespace CandyShop.View
             TabUpgrade.ResumeLayout(false);
             TabInstalled.ResumeLayout(false);
             ResumeLayout(false);
-            PerformLayout();
         }
 
         #endregion
         private System.Windows.Forms.Panel MainPanel;
+        private Banner AdminBanner;
         private System.Windows.Forms.ColumnHeader columnHeader1;
         private UpgradePage UpgradePage;
         private System.Windows.Forms.TabControl tabControl1;

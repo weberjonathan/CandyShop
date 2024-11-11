@@ -12,7 +12,6 @@ namespace CandyShop.View
         public UpgradePage()
         {
             InitializeComponent();
-            PanelTop.Visible = false;
 
             // configure PackageListBox
             LstPackages.Hint = LocaleEN.TEXT_LOADING_OUTDATED;
@@ -20,34 +19,12 @@ namespace CandyShop.View
             // labels
             BtnUpgradeSelected.Text = LocaleEN.TEXT_UPGRADE_SELECTED;
             BtnUpgradeAll.Text = LocaleEN.TEXT_UPGRADE_ALL;
-            LblAdmin.Text = LocaleEN.TEXT_NO_ADMIN_HINT;
             LblSelected.Text = string.Empty;
 
             // event handlers
             LstPackages.ItemChecked += LstPackages_ItemChecked;
             BtnUpgradeAll.Click += new EventHandler((sender, e) => { UpgradeAllClick?.Invoke(this, e); });
             BtnUpgradeSelected.Click += new EventHandler((sender, e) => { UpgradeSelectedClick?.Invoke(this, e); });
-            BtnHideWarning.Click += new EventHandler((sender, e) =>
-            {
-                var result = MessageBox.Show("Always hide this warning?",
-                    MetaInfo.Name,
-                    MessageBoxButtons.YesNoCancel,
-                    MessageBoxIcon.Question,
-                    MessageBoxDefaultButton.Button2);
-
-                switch (result)
-                {
-                    case DialogResult.Yes:
-                        ShowAdminWarning = false;
-                        AlwaysHideAdminWarningClicked?.Invoke(this, e);
-                        break;
-                    case DialogResult.No:
-                        ShowAdminWarning = false;
-                        break;
-                    default:
-                        break;
-                }
-            });
 
             // context menu
             var itemPin = new ToolStripMenuItem("&Toggle pin")
@@ -89,7 +66,6 @@ namespace CandyShop.View
         public event EventHandler CleanShortcutsChanged;
         public event EventHandler CloseAfterUpgradeChanged;
         public event EventHandler CheckTopLevelClicked;
-        public event EventHandler AlwaysHideAdminWarningClicked;
         public event EventHandler RefreshClicked;
 
         public string[] Items
@@ -120,18 +96,6 @@ namespace CandyShop.View
                 }
 
                 return checkedItems.ToArray();
-            }
-        }
-
-        public bool ShowAdminWarning
-        {
-            get
-            {
-                return PanelTop.Visible;
-            }
-            set
-            {
-                PanelTop.Visible = value;
             }
         }
 

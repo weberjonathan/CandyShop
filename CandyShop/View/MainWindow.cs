@@ -2,6 +2,7 @@
 using System.Windows.Forms;
 using CandyShop.Controller;
 using CandyShop.Controls;
+using CandyShop.Properties;
 
 namespace CandyShop.View
 {
@@ -18,9 +19,34 @@ namespace CandyShop.View
         {
             Controller = candyShopController;
             InitializeComponent();
+
+            AdminBanner.Visible = false;
+            AdminBanner.Text = LocaleEN.TEXT_NO_ADMIN_HINT;
+            AdminBanner.Closing += new EventHandler((sender, e) =>
+            {
+                var result = MessageBox.Show(LocaleEN.TEXT_HIDE_PERMANENTLY,
+                    MetaInfo.Name,
+                    MessageBoxButtons.YesNoCancel,
+                    MessageBoxIcon.Question,
+                    MessageBoxDefaultButton.Button2);
+
+                switch (result)
+                {
+                    case DialogResult.Yes:
+                        ShowAdminWarning = false;
+                        HideAdminWarningClicked?.Invoke(this, e);
+                        break;
+                    case DialogResult.No:
+                        ShowAdminWarning = false;
+                        break;
+                    default:
+                        break;
+                }
+            });
         }
 
         public event EventHandler RefreshClicked;
+        public event EventHandler HideAdminWarningClicked;
 
         public IInstalledPageView InstalledPackagesPage => InstalledPage;
         public IUpgradePageView UpgradePackagesPage => UpgradePage;
@@ -34,6 +60,18 @@ namespace CandyShop.View
             set
             {
                 StartWithSystemCheckBox.Checked = value;
+            }
+        }
+
+        public bool ShowAdminWarning
+        {
+            get
+            {
+                return AdminBanner.Visible;
+            }
+            set
+            {
+                AdminBanner.Visible = value;
             }
         }
 
@@ -64,16 +102,6 @@ namespace CandyShop.View
         {
             if (args != null && args.Length > 0) msg = String.Format(msg, args);
             MessageBox.Show(msg, MetaInfo.Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
-        }
-
-        public void ShowAdminHints()
-        {
-            UpgradePage.ShowAdminWarning = true;
-        }
-
-        public void ClearAdminHints()
-        {
-            UpgradePage.ShowAdminWarning = false;
         }
 
         private void ChocoAutoUpdateForm_Load(object sender, EventArgs e)

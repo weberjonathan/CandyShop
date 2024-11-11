@@ -31,85 +31,58 @@ namespace CandyShop.View
         /// </summary>
         private void InitializeComponent()
         {
-            LblAdmin = new System.Windows.Forms.Label();
-            PanelTop = new System.Windows.Forms.Panel();
-            tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-            panel1 = new System.Windows.Forms.Panel();
-            BtnHideWarning = new System.Windows.Forms.LinkLabel();
-            BtnUpgradeSelected = new System.Windows.Forms.Button();
-            BtnUpgradeAll = new System.Windows.Forms.Button();
-            panel2 = new System.Windows.Forms.Panel();
-            CheckCloseAfterUpgrade = new System.Windows.Forms.CheckBox();
-            LblSelected = new System.Windows.Forms.Label();
-            CheckDeleteShortcuts = new System.Windows.Forms.CheckBox();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             LstPackages = new PackageListBox();
-            PanelTop.SuspendLayout();
-            tableLayoutPanel1.SuspendLayout();
+            BtnUpgradeAll = new System.Windows.Forms.Button();
+            BtnUpgradeSelected = new System.Windows.Forms.Button();
+            CheckDeleteShortcuts = new System.Windows.Forms.CheckBox();
+            LblSelected = new System.Windows.Forms.Label();
+            CheckCloseAfterUpgrade = new System.Windows.Forms.CheckBox();
+            panel2 = new System.Windows.Forms.Panel();
             panel2.SuspendLayout();
             SuspendLayout();
             // 
-            // LblAdmin
+            // LstPackages
             // 
-            LblAdmin.Dock = System.Windows.Forms.DockStyle.Fill;
-            LblAdmin.Location = new System.Drawing.Point(19, 0);
-            LblAdmin.Name = "LblAdmin";
-            LblAdmin.Padding = new System.Windows.Forms.Padding(5, 0, 0, 0);
-            LblAdmin.Size = new System.Drawing.Size(575, 68);
-            LblAdmin.TabIndex = 0;
-            LblAdmin.Text = "Candy Shop does not have administrator privileges. Proceed with caution!";
-            LblAdmin.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            LstPackages.CheckBoxes = true;
+            LstPackages.ColumnHeaders = null;
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("Segoe UI", 9F);
+            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            LstPackages.DefaultStyle = dataGridViewCellStyle1;
+            LstPackages.Dock = System.Windows.Forms.DockStyle.Fill;
+            LstPackages.Hint = "";
+            LstPackages.Loading = false;
+            LstPackages.Location = new System.Drawing.Point(0, 0);
+            LstPackages.Name = "LstPackages";
+            LstPackages.NoPackages = false;
+            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle2.Font = new System.Drawing.Font("Segoe UI", 9F);
+            dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.Color.LightGray;
+            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.Color.Black;
+            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            LstPackages.PinnedStyle = dataGridViewCellStyle2;
+            LstPackages.Size = new System.Drawing.Size(637, 454);
+            LstPackages.TabIndex = 3;
             // 
-            // PanelTop
+            // BtnUpgradeAll
             // 
-            PanelTop.BackColor = System.Drawing.SystemColors.Info;
-            PanelTop.Controls.Add(tableLayoutPanel1);
-            PanelTop.Dock = System.Windows.Forms.DockStyle.Top;
-            PanelTop.Location = new System.Drawing.Point(0, 0);
-            PanelTop.Name = "PanelTop";
-            PanelTop.Size = new System.Drawing.Size(637, 68);
-            PanelTop.TabIndex = 2;
-            PanelTop.Visible = false;
-            // 
-            // tableLayoutPanel1
-            // 
-            tableLayoutPanel1.ColumnCount = 3;
-            tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 16F));
-            tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 40F));
-            tableLayoutPanel1.Controls.Add(panel1, 0, 0);
-            tableLayoutPanel1.Controls.Add(BtnHideWarning, 2, 0);
-            tableLayoutPanel1.Controls.Add(LblAdmin, 1, 0);
-            tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
-            tableLayoutPanel1.Name = "tableLayoutPanel1";
-            tableLayoutPanel1.RowCount = 1;
-            tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            tableLayoutPanel1.Size = new System.Drawing.Size(637, 68);
-            tableLayoutPanel1.TabIndex = 3;
-            // 
-            // panel1
-            // 
-            panel1.BackColor = System.Drawing.SystemColors.Info;
-            panel1.BackgroundImage = Resources.ic_warn;
-            panel1.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
-            panel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            panel1.Location = new System.Drawing.Point(0, 0);
-            panel1.Margin = new System.Windows.Forms.Padding(0);
-            panel1.Name = "panel1";
-            panel1.Size = new System.Drawing.Size(16, 68);
-            panel1.TabIndex = 1;
-            // 
-            // BtnHideWarning
-            // 
-            BtnHideWarning.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            BtnHideWarning.AutoSize = true;
-            BtnHideWarning.Location = new System.Drawing.Point(602, 26);
-            BtnHideWarning.Name = "BtnHideWarning";
-            BtnHideWarning.Size = new System.Drawing.Size(32, 15);
-            BtnHideWarning.TabIndex = 2;
-            BtnHideWarning.TabStop = true;
-            BtnHideWarning.Text = "&Hide";
-            BtnHideWarning.TextAlign = System.Drawing.ContentAlignment.TopRight;
+            BtnUpgradeAll.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right;
+            BtnUpgradeAll.Enabled = false;
+            BtnUpgradeAll.Location = new System.Drawing.Point(417, 39);
+            BtnUpgradeAll.Name = "BtnUpgradeAll";
+            BtnUpgradeAll.Size = new System.Drawing.Size(104, 23);
+            BtnUpgradeAll.TabIndex = 2;
+            BtnUpgradeAll.Text = "Upgrade &All";
+            BtnUpgradeAll.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+            BtnUpgradeAll.UseVisualStyleBackColor = true;
             // 
             // BtnUpgradeSelected
             // 
@@ -123,17 +96,39 @@ namespace CandyShop.View
             BtnUpgradeSelected.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             BtnUpgradeSelected.UseVisualStyleBackColor = true;
             // 
-            // BtnUpgradeAll
+            // CheckDeleteShortcuts
             // 
-            BtnUpgradeAll.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right;
-            BtnUpgradeAll.Enabled = false;
-            BtnUpgradeAll.Location = new System.Drawing.Point(417, 39);
-            BtnUpgradeAll.Name = "BtnUpgradeAll";
-            BtnUpgradeAll.Size = new System.Drawing.Size(104, 23);
-            BtnUpgradeAll.TabIndex = 2;
-            BtnUpgradeAll.Text = "Upgrade &All";
-            BtnUpgradeAll.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
-            BtnUpgradeAll.UseVisualStyleBackColor = true;
+            CheckDeleteShortcuts.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right;
+            CheckDeleteShortcuts.AutoSize = true;
+            CheckDeleteShortcuts.Location = new System.Drawing.Point(507, 10);
+            CheckDeleteShortcuts.Name = "CheckDeleteShortcuts";
+            CheckDeleteShortcuts.Size = new System.Drawing.Size(111, 19);
+            CheckDeleteShortcuts.TabIndex = 5;
+            CheckDeleteShortcuts.Text = "Delete &shortcuts";
+            CheckDeleteShortcuts.UseVisualStyleBackColor = true;
+            CheckDeleteShortcuts.CheckedChanged += CheckDeleteShortcuts_CheckedChanged;
+            // 
+            // LblSelected
+            // 
+            LblSelected.AutoSize = true;
+            LblSelected.ForeColor = System.Drawing.SystemColors.ControlDark;
+            LblSelected.Location = new System.Drawing.Point(3, 11);
+            LblSelected.Name = "LblSelected";
+            LblSelected.Size = new System.Drawing.Size(132, 15);
+            LblSelected.TabIndex = 6;
+            LblSelected.Text = "Selected package count";
+            // 
+            // CheckCloseAfterUpgrade
+            // 
+            CheckCloseAfterUpgrade.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right;
+            CheckCloseAfterUpgrade.AutoSize = true;
+            CheckCloseAfterUpgrade.Location = new System.Drawing.Point(363, 10);
+            CheckCloseAfterUpgrade.Name = "CheckCloseAfterUpgrade";
+            CheckCloseAfterUpgrade.Size = new System.Drawing.Size(129, 19);
+            CheckCloseAfterUpgrade.TabIndex = 7;
+            CheckCloseAfterUpgrade.Text = "&Close after upgrade";
+            CheckCloseAfterUpgrade.UseVisualStyleBackColor = true;
+            CheckCloseAfterUpgrade.CheckedChanged += CheckCloseAfterUpgrade_CheckedChanged;
             // 
             // panel2
             // 
@@ -148,75 +143,26 @@ namespace CandyShop.View
             panel2.Size = new System.Drawing.Size(637, 79);
             panel2.TabIndex = 0;
             // 
-            // CheckCloseAfterUpgrade
+            // UpgradePage
             // 
-            CheckCloseAfterUpgrade.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right;
-            CheckCloseAfterUpgrade.AutoSize = true;
-            CheckCloseAfterUpgrade.Location = new System.Drawing.Point(363, 10);
-            CheckCloseAfterUpgrade.Name = "CheckCloseAfterUpgrade";
-            CheckCloseAfterUpgrade.Size = new System.Drawing.Size(129, 19);
-            CheckCloseAfterUpgrade.TabIndex = 7;
-            CheckCloseAfterUpgrade.Text = "&Close after upgrade";
-            CheckCloseAfterUpgrade.UseVisualStyleBackColor = true;
-            CheckCloseAfterUpgrade.CheckedChanged += CheckCloseAfterUpgrade_CheckedChanged;
-            // 
-            // LblSelected
-            // 
-            LblSelected.AutoSize = true;
-            LblSelected.ForeColor = System.Drawing.SystemColors.ControlDark;
-            LblSelected.Location = new System.Drawing.Point(3, 11);
-            LblSelected.Name = "LblSelected";
-            LblSelected.Size = new System.Drawing.Size(132, 15);
-            LblSelected.TabIndex = 6;
-            LblSelected.Text = "Selected package count";
-            // 
-            // CheckDeleteShortcuts
-            // 
-            CheckDeleteShortcuts.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right;
-            CheckDeleteShortcuts.AutoSize = true;
-            CheckDeleteShortcuts.Location = new System.Drawing.Point(507, 10);
-            CheckDeleteShortcuts.Name = "CheckDeleteShortcuts";
-            CheckDeleteShortcuts.Size = new System.Drawing.Size(111, 19);
-            CheckDeleteShortcuts.TabIndex = 5;
-            CheckDeleteShortcuts.Text = "Delete &shortcuts";
-            CheckDeleteShortcuts.UseVisualStyleBackColor = true;
-            CheckDeleteShortcuts.CheckedChanged += CheckDeleteShortcuts_CheckedChanged;
-            // 
-            // LstPackages
-            // 
-            LstPackages.Dock = System.Windows.Forms.DockStyle.Fill;
-            LstPackages.Location = new System.Drawing.Point(0, 68);
-            LstPackages.Name = "LstPackages";
-            LstPackages.Size = new System.Drawing.Size(637, 386);
-            LstPackages.TabIndex = 3;
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             Controls.Add(LstPackages);
-            Controls.Add(PanelTop);
             Controls.Add(panel2);
             Name = "UpgradePage";
             Size = new System.Drawing.Size(637, 533);
-            PanelTop.ResumeLayout(false);
-            tableLayoutPanel1.ResumeLayout(false);
-            tableLayoutPanel1.PerformLayout();
             panel2.ResumeLayout(false);
             panel2.PerformLayout();
             ResumeLayout(false);
         }
 
         #endregion
-
-        private System.Windows.Forms.Label LblAdmin;
-        private System.Windows.Forms.Panel PanelTop;
-        private System.Windows.Forms.Button BtnUpgradeSelected;
-        private System.Windows.Forms.Button BtnUpgradeAll;
-        private System.Windows.Forms.Panel panel2;
         private PackageListBox LstPackages;
-        private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.Button BtnUpgradeAll;
+        private System.Windows.Forms.Button BtnUpgradeSelected;
         private System.Windows.Forms.CheckBox CheckDeleteShortcuts;
         private System.Windows.Forms.Label LblSelected;
-        private System.Windows.Forms.LinkLabel BtnHideWarning;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
         private System.Windows.Forms.CheckBox CheckCloseAfterUpgrade;
+        private System.Windows.Forms.Panel panel2;
     }
 }
