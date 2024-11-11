@@ -27,6 +27,7 @@ namespace CandyShop
             Log.Debug($"cwd: {cwd}; elevated: {context.HasAdminPrivileges}; elevateOnDemand: {context.ElevateOnDemand}; debug: {context.DebugEnabled}");
 
             // determine winget or choco and test executables
+            bool requireManualElevation = context.ElevateOnDemand && !context.HasAdminPrivileges;
             AbstractPackageManager packageManager;
             if (context.WingetMode)
             {
@@ -39,13 +40,7 @@ namespace CandyShop
                         Log.Warning($"Detected unsupported locale \"{ci.TwoLetterISOLanguageName}\". This may lead to parsing errors. See https://github.com/weberjonathan/CandyShop/blob/master/docs/lcoales.md for more.");
                 }
 
-                packageManager = new WingetManager(context.SupressLocaleLogWarning)
-                {
-                    AllowGsudoCache = context.AllowGsudoCache,
-                    Binary = context.WingetBinary,
-                    RequireManualElevation = context.ElevateOnDemand && !context.HasAdminPrivileges
-                };
-
+                packageManager = new WingetManager(context.SupressLocaleLogWarning, context.WingetBinary, requireManualElevation, context.AllowGsudoCache);
                 var p = new PackageManagerProcess(context.WingetBinary, "--version");
                 try
                 {
@@ -61,13 +56,7 @@ namespace CandyShop
             }
             else
             {
-                var chocoManager = new ChocoManager(2, context.ValidExitCodes)
-                {
-                    AllowGsudoCache = context.AllowGsudoCache,
-                    Binary = context.ChocolateyBinary,
-                    RequireManualElevation = context.ElevateOnDemand && !context.HasAdminPrivileges
-                };
-
+                var chocoManager = new ChocoManager(2, context.ValidExitCodes, context.ChocolateyBinary, requireManualElevation, context.AllowGsudoCache);
                 var p = new PackageManagerProcess(context.ChocolateyBinary, "--version");
                 try
                 {

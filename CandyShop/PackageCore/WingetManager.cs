@@ -2,11 +2,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Windows.Forms;
+using System.Threading.Tasks;
 
 namespace CandyShop.PackageCore
 {
-    internal class WingetManager(bool suppressLogWarning) : AbstractPackageManager
+    internal class WingetManager(bool suppressLogWarning, string binary, bool requireManualElevation, bool allowGsudoCache) : AbstractPackageManager(binary, requireManualElevation, allowGsudoCache)
     {
         private readonly List<string> VALIDATE_SEARCHES = ["Found", "Gefunden"];
         private readonly List<string> VALIDATE_PIN_LIST = ["There are no pins configured.", "Es sind keine Pins konfiguriert."];
@@ -17,7 +17,7 @@ namespace CandyShop.PackageCore
         public override bool SupportsFetchingOutdated => false;
 
         /// <exception cref="PackageManagerException"></exception>
-        public override string FetchInfo(GenericPackage package)
+        protected override string FetchInfo(GenericPackage package)
         {
             if (!package.HasSource)
             {
@@ -38,7 +38,7 @@ namespace CandyShop.PackageCore
         }
 
         /// <exception cref="PackageManagerException"></exception>
-        public override List<GenericPackage> FetchInstalled()
+        protected override List<GenericPackage> FetchInstalled()
         {
             Log.Information($"Fetching installed packages from winget.");
 
@@ -63,48 +63,18 @@ namespace CandyShop.PackageCore
                 .OrderBy(p => p.Name)
                 .ToList();
 
-            // resolve abbreviated names in winget output
-            int resolvedNamesCount = 0;
-            List<GenericPackage> unresolvedPackages = [];
-            foreach (var package in rtn)
-            {
-                if (package.HasSource && package.Name.Contains('…'))
-                {
-                    var fetched = FetchInfo(package); // TODO use async
-                    var (name, id) = GetMetaInfo(fetched);
-
-                    if (name != null && id != null)
-                    {
-                        package.Name = name;
-                        package.Id = id;
-                        resolvedNamesCount++;
-                    }
-                    else
-                    {
-                        unresolvedPackages.Add(package);
-                    }
-                }
-            }
-
-            // log unresolved packages
-            Log.Debug($"Resolved packages with incomplete name for {resolvedNamesCount} packages");
-            if (unresolvedPackages.Count > 0)
-            {
-                var value = string.Join(", ", unresolvedPackages.Select(p => p.Name).ToList());
-                Log.Warning($"Failed to resolve {unresolvedPackages.Count} package(s): {value}");
-            }
-
-            return rtn;
+            Log.Debug($"Attempting name resolution for {rtn.Count} packages from installed packages.");
+            return ResolveAbbreviatedNames(rtn); // TODO this only resolves names, not IDs
         }
 
         /// <exception cref="PackageManagerException"></exception>
-        public override List<GenericPackage> FetchOutdated()
+        protected override List<GenericPackage> FetchOutdated()
         {
             Log.Error("WingetManager tried to invoke a capabality that is not implemented: Fetch outdated.");
             throw new InvalidOperationException();
         }
 
-        public override List<GenericPackage> FetchPinList()
+        protected override List<GenericPackage> FetchPinList()
         {
             // launch process
             PackageManagerProcess p = BuildProcess($"pin list");
@@ -122,15 +92,15 @@ namespace CandyShop.PackageCore
                 Id = row[1],
                 CurrVer = row[2],
                 Source = row[3],
-                // PinType = row[3],
                 Pinned = true
             }).ToList();
 
-            return rtn;
+            Log.Debug($"Attempting name resolution for {rtn.Count} packages from pinned list.");
+            return ResolveAbbreviatedNames(rtn);
         }
 
         /// <exception cref="PackageManagerException"></exception>
-        public override void Pin(GenericPackage package)
+        protected override void Pin(GenericPackage package)
         {
             var args = $"pin add --id \"{package.Id}\" --exact";
             PackageManagerProcess p = BuildProcess(args);
@@ -141,7 +111,7 @@ namespace CandyShop.PackageCore
         }
 
         /// <exception cref="PackageManagerException"></exception>
-        public override void Unpin(GenericPackage package)
+        protected override void Unpin(GenericPackage package)
         {
             var args = $"pin remove --id \"{package.Id}\" --exact";
             PackageManagerProcess p = BuildProcess(args);
@@ -169,7 +139,7 @@ namespace CandyShop.PackageCore
 
             // perform upgrades
             List<int> nonZeroExitCodes = [];
-            foreach (var package in  packages)
+            foreach (var package in packages)
             {
                 var arguments = $"upgrade --id \"{package.Id}\" --silent --exact";
                 var p = BuildProcess(arguments, useGsudo: RequireManualElevation);
@@ -301,6 +271,48 @@ namespace CandyShop.PackageCore
             }
 
             return rows;
+        }
+
+        private List<GenericPackage> ResolveAbbreviatedNames(List<GenericPackage> packages)
+        {
+            var tasks = new Task[packages.Count];
+
+            int resolvedNamesCount = 0;
+            List<GenericPackage> unresolvedNames = [];
+            for (int i = 0; i < packages.Count; i++)
+            {
+                var package = packages[i];
+                tasks[i] = Task.Run(() =>
+                {
+                    if (package.HasSource && package.Name.Contains('…'))
+                    {
+                        var fetched = FetchInfo(package);
+                        var (name, id) = GetMetaInfo(fetched);
+                        // update resolved packages but do not discard others
+                        if (name != null && id != null)
+                        {
+                            package.Name = name;
+                            package.Id = id;
+                            resolvedNamesCount++;
+                        }
+                        else
+                        {
+                            unresolvedNames.Add(package);
+                        }
+                    }
+                });
+            }
+            Task.WaitAll(tasks);
+
+            // log unresolved packages
+            Log.Debug($"Resolved packages with incomplete name for {resolvedNamesCount} packages");
+            if (unresolvedNames.Count > 0)
+            {
+                var value = string.Join(", ", unresolvedNames.Select(p => p.Name).ToList());
+                Log.Warning($"Failed to resolve {unresolvedNames.Count} package(s): {value}");
+            }
+
+            return packages;
         }
 
         private (string, string) GetMetaInfo(string fetchInfoResult)

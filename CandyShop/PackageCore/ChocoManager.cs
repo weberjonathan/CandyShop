@@ -14,7 +14,7 @@ namespace CandyShop.PackageCore
 
         public int ChocoVersionMajor { get; set; } = 2;
 
-        public ChocoManager(int chocoVersionMajor, List<int> validExitCodesOnUpgrade)
+        public ChocoManager(int chocoVersionMajor, List<int> validExitCodesOnUpgrade, string binary, bool requireManualElevation, bool allowGsudoCache) : base(binary, requireManualElevation, allowGsudoCache)
         {
             ChocoVersionMajor = chocoVersionMajor;
             ValidExitCodesOnUpgrade = validExitCodesOnUpgrade;
@@ -23,7 +23,7 @@ namespace CandyShop.PackageCore
         }
 
         /// <exception cref="PackageManagerException"></exception>
-        public override string FetchInfo(GenericPackage package)
+        protected override string FetchInfo(GenericPackage package)
         {
             StringBuilder rtn = new();
 
@@ -50,7 +50,7 @@ namespace CandyShop.PackageCore
         }
 
         /// <exception cref="PackageManagerException"></exception>
-        public override List<GenericPackage> FetchInstalled()
+        protected override List<GenericPackage> FetchInstalled()
         {
             Log.Information("Fetching installed packages from Chocolatey");
 
@@ -104,7 +104,7 @@ namespace CandyShop.PackageCore
         }
 
         /// <exception cref="PackageManagerException"></exception>
-        public override List<GenericPackage> FetchOutdated()
+        protected override List<GenericPackage> FetchOutdated()
         {
             Log.Information("Fetching outdated packages from Chocolatey");
 
@@ -164,7 +164,7 @@ namespace CandyShop.PackageCore
             return ResolveMetaPackages(packages);
         }
 
-        public override List<GenericPackage> FetchPinList()
+        protected override List<GenericPackage> FetchPinList()
         {
             PackageManagerProcess p = BuildProcess("pin list --limit-output");
             p.ExecuteHidden();
@@ -191,7 +191,7 @@ namespace CandyShop.PackageCore
         }
 
         /// <exception cref="PackageManagerException"></exception>
-        public override void Pin(GenericPackage package)
+        protected override void Pin(GenericPackage package)
         {
             var args = $"pin add --name=\"{package.Name}\" --version=\"{package.CurrVer}\"";
             PackageManagerProcess p = BuildProcess(args, useGsudo: RequireManualElevation);
@@ -202,7 +202,7 @@ namespace CandyShop.PackageCore
         }
 
         /// <exception cref="PackageManagerException"></exception>
-        public override void Unpin(GenericPackage package)
+        protected override void Unpin(GenericPackage package)
         {
             PackageManagerProcess p = BuildProcess($"pin remove --name=\"{package.Name}\"", useGsudo: RequireManualElevation);
             p.ExecuteHidden();

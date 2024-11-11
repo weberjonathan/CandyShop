@@ -5,30 +5,13 @@ using System.Threading.Tasks;
 
 namespace CandyShop.PackageCore
 {
-    internal abstract class AbstractPackageManager
+    internal abstract class AbstractPackageManager(string binary, bool requireManualElevation, bool allowGsudoCache)
     {
-        public required string Binary { get; set; }
-        public required bool RequireManualElevation { get; set; }
-        public required bool AllowGsudoCache { get; set; }
         public abstract bool SupportsFetchingOutdated { get; }
 
-        /// <exception cref="PackageManagerException"></exception>
-        public abstract List<GenericPackage> FetchInstalled();
-
-        /// <exception cref="PackageManagerException"></exception>
-        public abstract List<GenericPackage> FetchOutdated();
-
-        /// <exception cref="PackageManagerException"></exception>
-        public abstract List<GenericPackage> FetchPinList();
-
-        /// <exception cref="PackageManagerException"></exception>
-        public abstract string FetchInfo(GenericPackage package);
-
-        /// <exception cref="PackageManagerException"></exception>
-        public abstract void Pin(GenericPackage package);
-
-        /// <exception cref="PackageManagerException"></exception>
-        public abstract void Unpin(GenericPackage package);
+        protected string Binary { get; private set; } = binary;
+        protected bool RequireManualElevation { get; } = requireManualElevation;
+        protected bool AllowGsudoCache { get; } = allowGsudoCache;
 
         /// <exception cref="PackageManagerException"></exception>
         /// <exception cref="CandyShopException"></exception>
@@ -69,6 +52,24 @@ namespace CandyShop.PackageCore
         {
             await Task.Run(() => Unpin(package));
         }
+
+        /// <exception cref="PackageManagerException"></exception>
+        protected abstract List<GenericPackage> FetchInstalled();
+
+        /// <exception cref="PackageManagerException"></exception>
+        protected abstract List<GenericPackage> FetchOutdated();
+
+        /// <exception cref="PackageManagerException"></exception>
+        protected abstract List<GenericPackage> FetchPinList();
+
+        /// <exception cref="PackageManagerException"></exception>
+        protected abstract string FetchInfo(GenericPackage package);
+
+        /// <exception cref="PackageManagerException"></exception>
+        protected abstract void Pin(GenericPackage package);
+
+        /// <exception cref="PackageManagerException"></exception>
+        protected abstract void Unpin(GenericPackage package);
 
         /// <exception cref="CandyShopException"></exception>
         protected void EnableGsudoCache()

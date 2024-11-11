@@ -44,6 +44,16 @@ namespace CandyShop.Services
             {
                 if (InstalledPckgCache.Count <= 0)
                 {
+                    // TODO
+                    // currently, fetching installed and fetching pin lists in winget
+                    // will cause separate executions of 'winget show' for abbreviated
+                    // packages; the output of those commands is discarded aside
+                    // from the full name.
+                    // Instead, the flag PackageManager.SupportsNameResolution
+                    // may be added (similar to PackageManager.SupportsFetchingOutdated)
+                    // and the resolution could be implemented here, thus removing
+                    // redundant winget executions and populating the details cache
+
                     var fetchInstalled = PackageManager.FetchInstalledAsync();
                     var fetchPinned = PackageManager.FetchPinListAsync();
 
