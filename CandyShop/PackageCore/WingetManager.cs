@@ -170,7 +170,7 @@ namespace CandyShop.PackageCore
             foreach (var package in  packages)
             {
                 var arguments = $"upgrade --id \"{package.Id}\" --silent --exact";
-                var p = BuildProcess(arguments, useGsudo: !AllowGsudoCache); // if credentials are cached, gsudo must not be invoked for each process, else it does
+                var p = BuildProcess(arguments, useGsudo: RequireManualElevation);
                 try
                 {
                     p.Execute();
