@@ -40,6 +40,8 @@ namespace CandyShop.PackageCore
         /// <exception cref="PackageManagerException"></exception>
         public override List<GenericPackage> FetchInstalled()
         {
+            Log.Information($"Fetching installed packages from winget.");
+
             // launch process
             PackageManagerProcess p = BuildProcess($"list");
             p.ExecuteHidden();

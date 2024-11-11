@@ -30,20 +30,23 @@ namespace CandyShop.Services
         /// <exception cref="PackageManagerException"></exception>
         public async Task<List<GenericPackage>> GetInstalledPackagesAsync()
         {
+            Log.Debug($"{Environment.CurrentManagedThreadId} GetInstalledPackagesAsync()");
+
             if (PackageManager == null) return [];
 
             List<GenericPackage> installed = [];
             List<GenericPackage> pinned = [];
 
-            var fetchInstalled = PackageManager.FetchInstalledAsync();
-            var fetchPinned = PackageManager.FetchPinListAsync();
-
             // get installed packages
             await InstalledPckgLock.WaitAsync().ConfigureAwait(false);
+
             try
             {
                 if (InstalledPckgCache.Count <= 0)
                 {
+                    var fetchInstalled = PackageManager.FetchInstalledAsync();
+                    var fetchPinned = PackageManager.FetchPinListAsync();
+
                     installed = await fetchInstalled;
                     installed.ForEach(p => p.Pinned = false);
                     installed.ForEach(p => InstalledPckgCache[p.Name] = p);
@@ -71,6 +74,8 @@ namespace CandyShop.Services
         /// <exception cref="PackageManagerException"></exception>
         public async Task<List<GenericPackage>> GetOutdatedPackagesAsync()
         {
+            Log.Debug($"{Environment.CurrentManagedThreadId} GetOutdatedPackagesAsync()");
+
             if (PackageManager == null) return [];
 
             await OutdatedPckgLock.WaitAsync().ConfigureAwait(false);
@@ -89,7 +94,6 @@ namespace CandyShop.Services
                         packages = packages
                             .Where(p => !string.IsNullOrEmpty(p.AvailVer))
                             .Where(p => !p.CurrVer.Equals(p.AvailVer))
-                            //.Where(p => !p.CurrVer.Equals("Unknown"))
                             .ToList();
                     }
                     packages.ForEach(p => OutdatedPckgCache[p.Name] = p);
