@@ -61,6 +61,37 @@ namespace CandyShop.PackageCore
                 .OrderBy(p => p.Name)
                 .ToList();
 
+            // resolve abbreviated names in winget output
+            int resolvedNamesCount = 0;
+            List<GenericPackage> unresolvedPackages = [];
+            foreach (var package in rtn)
+            {
+                if (package.HasSource && package.Name.Contains('…'))
+                {
+                    var fetched = FetchInfo(package); // TODO use async
+                    var (name, id) = GetMetaInfo(fetched);
+
+                    if (name != null && id != null)
+                    {
+                        package.Name = name;
+                        package.Id = id;
+                        resolvedNamesCount++;
+                    }
+                    else
+                    {
+                        unresolvedPackages.Add(package);
+                    }
+                }
+            }
+
+            // log unresolved packages
+            Log.Debug($"Resolved packages with incomplete name for {resolvedNamesCount} packages");
+            if (unresolvedPackages.Count > 0)
+            {
+                var value = string.Join(", ", unresolvedPackages.Select(p => p.Name).ToList());
+                Log.Warning($"Failed to resolve {unresolvedPackages.Count} package(s): {value}");
+            }
+
             return rtn;
         }
 
@@ -268,6 +299,26 @@ namespace CandyShop.PackageCore
             }
 
             return rows;
+        }
+
+        private (string, string) GetMetaInfo(string fetchInfoResult)
+        {
+            string name = null;
+            string id = null;
+
+            var lines = fetchInfoResult.Split(Environment.NewLine);
+            if (lines.Length > 0)
+            {
+                string meta = lines[0]; // pattern: "<name> [<id>]"
+                var index = meta.Split('[');
+                if (index.Length == 2)
+                {
+                    name = index[0].TrimEnd();
+                    id = index[1].TrimEnd(']');
+                }
+            }
+
+            return (name, id);
         }
     }
 }
