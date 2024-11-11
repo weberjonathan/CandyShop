@@ -286,7 +286,19 @@ namespace CandyShop.PackageCore
                 {
                     if (package.HasSource && package.Name.Contains('…'))
                     {
-                        var fetched = FetchInfo(package);
+                        string fetched;
+
+                        try
+                        {
+                            fetched = FetchInfo(package);
+                        }
+                        catch (PackageManagerException e)
+                        {
+                            Log.Error($"Failed to resolve package with name '{package.Name}': {e.Message}");
+                            unresolvedNames.Add(package);
+                            return;
+                        }
+
                         var (name, id) = GetMetaInfo(fetched);
                         // update resolved packages but do not discard others
                         if (name != null && id != null)
@@ -302,7 +314,16 @@ namespace CandyShop.PackageCore
                     }
                 });
             }
-            Task.WaitAll(tasks);
+
+            try
+            {
+                Task.WaitAll(tasks);
+            }
+            catch (AggregateException ae)
+            {
+                foreach (var e in ae.Flatten().InnerExceptions)
+                Log.Error($"Failed to resolve full package names: {e.Message}");
+            }
 
             // log unresolved packages
             Log.Debug($"Resolved packages with incomplete name for {resolvedNamesCount} packages");
