@@ -275,45 +275,42 @@ namespace CandyShop.PackageCore
 
         private List<GenericPackage> ResolveAbbreviatedNames(List<GenericPackage> packages)
         {
-            var tasks = new Task[packages.Count];
+            var candidates = packages.Where(p => p.HasSource && p.Name.Contains('…')).ToList();
+            var tasks = new Task[candidates.Count];
 
             int resolvedNamesCount = 0;
             List<GenericPackage> unresolvedNames = [];
-            for (int i = 0; i < packages.Count; i++)
+            for (int i = 0; i < candidates.Count; i++)
             {
-                var package = packages[i];
+                var package = candidates[i];
                 tasks[i] = Task.Run(() =>
                 {
-                    if (package.HasSource && package.Name.Contains('…'))
+                    string fetched;
+                    try
                     {
-                        string fetched;
-
-                        try
-                        {
-                            fetched = FetchInfo(package);
-                        }
-                        catch (PackageManagerException e)
-                        {
-                            Log.Error($"Failed to resolve package with name '{package.Name}': {e.Message}");
-                            unresolvedNames.Add(package);
-                            return;
-                        }
-
-                        var (name, id) = GetMetaInfo(fetched);
-                        // update resolved packages but do not discard others
-                        if (name != null && id != null)
-                        {
-                            package.Name = name;
-                            package.Id = id;
-                            resolvedNamesCount++;
-                        }
-                        else
-                        {
-                            unresolvedNames.Add(package);
-                        }
+                        fetched = FetchInfo(package);
                     }
-                });
-            }
+                    catch (PackageManagerException e)
+                    {
+                        Log.Error($"Failed to resolve package with name '{package.Name}': {e.Message}");
+                        unresolvedNames.Add(package);
+                        return;
+                    }
+
+                    var (name, id) = GetMetaInfo(fetched);
+                    // update resolved packages but do not discard others
+                    if (name != null && id != null)
+                    {
+                        package.Name = name;
+                        package.Id = id;
+                        resolvedNamesCount++;
+                    }
+                    else
+                    {
+                        unresolvedNames.Add(package);
+                    }
+            });
+        }
 
             try
             {
