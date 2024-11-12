@@ -26,6 +26,24 @@ namespace CandyShop
             string cwd = Directory.GetParent(Process.GetCurrentProcess().MainModule.FileName).FullName;
             Log.Debug($"cwd: {cwd}; elevated: {context.HasAdminPrivileges}; elevateOnDemand: {context.ElevateOnDemand}; debug: {context.DebugEnabled}");
 
+            if (context.FirstStart)
+            {
+                FirstStartForm f = new();
+                var result = f.ShowDialog();
+                if (result == DialogResult.OK)
+                {
+                    context.FirstStart = false;
+                    context.ElevateOnDemand = f.RequireAdmin;
+                    context.AllowGsudoCache = f.CacheAdmin;
+                    context.WingetMode = f.WingetMode;
+                    context.SaveProperties();
+                }
+                else
+                {
+                    Program.Exit(saveProperties: false);
+                }
+            }
+
             // determine winget or choco and test executables
             bool requireManualElevation = context.ElevateOnDemand && !context.HasAdminPrivileges;
             AbstractPackageManager packageManager;

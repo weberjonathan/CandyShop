@@ -12,10 +12,10 @@ namespace CandyShop
     {
         private static readonly CandyShopContext context = ContextSingleton.Get;
 
-        public static void Exit(int code = 0)
+        public static void Exit(int code = 0, bool saveProperties = true)
         {
             context?.StopPropertiesFileWatcher();
-            context?.SaveProperties();
+            if (saveProperties) context?.SaveProperties();
             Log.Information("Shutting down");
             Environment.Exit(code);
         }

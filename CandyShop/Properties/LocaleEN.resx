@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="ERROR_CHOCO_PATH" xml:space="preserve">
-    <value>Failed to locate Chocolatey binary. Please set the full path in the configuration file and restart the application. Check the 'Extras' menu to quickly navigate to the config file. If this is the first time launching the application or the config file does not exist, it will be created on application exit.</value>
+    <value>Failed to locate Chocolatey binary. Please set the full path in the configuration file and restart the application. Check the "Extras" menu to quickly navigate to the config file.</value>
   </data>
   <data name="ERROR_DISABLED_START_WITH_SYSTEM" xml:space="preserve">
     <value>Failed to disable Candy Shop launch with system start.</value>
@@ -138,7 +138,7 @@
 Hint: Check the output in the Candy Shop console window before pressing OK, or see the logs. (The log folder of the package manager is available through the Extras menu.)</value>
   </data>
   <data name="ERROR_WINGET_PATH" xml:space="preserve">
-    <value>Failed to locate Winget binary. Please set the full path in the configuration file and restart the application. Check the 'Extras' menu to quickly navigate to the config file. If this is the first time launching the application or the config file does not exist, it will be created on application exit.</value>
+    <value>Failed to locate Winget binary. Please set the full path in the configuration file and restart the application. Check the "Extras" menu to quickly navigate to the config file.</value>
   </data>
   <data name="ERROR_WINGET_SRC_AGREE" xml:space="preserve">
     <value>Winget terminated with an error indicating that "source agreements were not agreed to" (-1978335162) and currently requires user input to function.
@@ -203,7 +203,7 @@ You can fix this error by running "winget list" in the terminal (or any other co
     <value>Switch to {0} &amp;packages</value>
   </data>
   <data name="TEXT_NO_ADMIN_HINT" xml:space="preserve">
-    <value>The selected package manager will be executed without administrator privileges. To hide this warning, enable the property 'SuppressAdminWarning'. If elevated privileges are required, launch CandyShop as administrator or enable the property 'ElevateOnDemand'.</value>
+    <value>The selected package manager will be executed without administrator privileges. If elevated privileges are required, launch CandyShop as administrator or enable the property 'ElevateOnDemand'.</value>
   </data>
   <data name="TEXT_NO_ADMIN_HINT_SHORT" xml:space="preserve">
     <value> (no administrator privileges)</value>

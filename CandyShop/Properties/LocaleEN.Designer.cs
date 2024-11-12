@@ -61,7 +61,7 @@ namespace CandyShop.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Failed to locate Chocolatey binary. Please set the full path in the configuration file and restart the application. Check the &apos;Extras&apos; menu to quickly navigate to the config file. If this is the first time launching the application or the config file does not exist, it will be created on application exit..
+        ///   Looks up a localized string similar to Failed to locate Chocolatey binary. Please set the full path in the configuration file and restart the application. Check the &quot;Extras&quot; menu to quickly navigate to the config file..
         /// </summary>
         internal static string ERROR_CHOCO_PATH {
             get {
@@ -117,7 +117,7 @@ namespace CandyShop.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Failed to locate Winget binary. Please set the full path in the configuration file and restart the application. Check the &apos;Extras&apos; menu to quickly navigate to the config file. If this is the first time launching the application or the config file does not exist, it will be created on application exit..
+        ///   Looks up a localized string similar to Failed to locate Winget binary. Please set the full path in the configuration file and restart the application. Check the &quot;Extras&quot; menu to quickly navigate to the config file..
         /// </summary>
         internal static string ERROR_WINGET_PATH {
             get {
@@ -308,7 +308,7 @@ namespace CandyShop.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The selected package manager will be executed without administrator privileges. To hide this warning, enable the property &apos;SuppressAdminWarning&apos;. If elevated privileges are required, launch CandyShop as administrator or enable the property &apos;ElevateOnDemand&apos;..
+        ///   Looks up a localized string similar to The selected package manager will be executed without administrator privileges. If elevated privileges are required, launch CandyShop as administrator or enable the property &apos;ElevateOnDemand&apos;..
         /// </summary>
         internal static string TEXT_NO_ADMIN_HINT {
             get {

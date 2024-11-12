@@ -34,11 +34,11 @@ namespace CandyShop
     {
         private class PropertiesFileContent
         {
-            public string ChocolateyBinary { get; set; } = "C:/ProgramData/chocolatey/bin/choco.exe";
+            public string ChocolateyBinary { get; set; } = "choco";
             public string ChocolateyLogs { get; set; } = "C:/ProgramData/chocolatey/logs";
             public string WingetBinary { get; set; } = "winget";
             public bool AllowGsudoCache { get; set; } = false; // TODO msgBox when needed
-            public bool WingetMode { get; set; } = false;
+            public bool WingetMode { get; set; } = true;
             public bool CleanShortcuts { get; set; } = false;
             public bool ElevateOnDemand { get; set; } = true;
             public bool SupressAdminWarning { get; set; } = false;
@@ -77,6 +77,8 @@ namespace CandyShop
 
         public bool HasAdminPrivileges { get; set; } = false;
 
+        public bool FirstStart { get; set; } = false;
+
         // ----------------- set through arguments -----------------
 
         public bool LaunchedMinimized { get; set; } = false;
@@ -91,7 +93,7 @@ namespace CandyShop
 
         public string WingetBinary { get; private set; }
 
-        public bool AllowGsudoCache { get; private set; }
+        public bool AllowGsudoCache { get; set; }
 
         public bool CleanShortcuts { get; set; }
         
@@ -220,7 +222,7 @@ namespace CandyShop
             }
             else
             {
-                WriteProperties(content);
+                FirstStart = true;
             }
 
             // apply properties from content

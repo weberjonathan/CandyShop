@@ -10,7 +10,6 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Forms;
 
 namespace CandyShop.Controller
 {
@@ -152,10 +151,6 @@ namespace CandyShop.Controller
             Console.SetOut(StdOut);
             Console.CursorVisible = false;
             Console.Title = $"{MetaInfo.WindowTitle} | Upgrade in process";
-
-            if (Context.WingetMode && !Context.AllowGsudoCache && packages.Length > 1)
-                MessageBox.Show("Hint: Candy Shop is currently configured to prompt for administrator privileges for each selected package. To prevent repeated popups, enable \"AllowGsudoCache\" in the settings. Make sure to read about the security implications of this feature in the README file, or at Github (see Help menu).",
-                    MetaInfo.Name, MessageBoxButtons.OK, MessageBoxIcon.Information);
 
             try
             {
