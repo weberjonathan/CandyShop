@@ -265,7 +265,7 @@ namespace CandyShop.View
             object[] item = [
                 false,
                 null,
-                "All packages are up to date.",
+                LocaleEN.TEXT_NO_OUTDATED_PCKGS,
             ];
             var index = LstPackages.Other.Rows.Add(item);
             var row = LstPackages.Other.Rows[index];

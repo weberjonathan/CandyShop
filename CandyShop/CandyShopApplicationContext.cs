@@ -148,6 +148,7 @@ namespace CandyShop
             }
             catch (PackageManagerException e)
             {
+                ErrorHandler.ShowError(e.Message);
                 Log.Error(LocaleEN.ERROR_RETRIEVING_OUTDATED_PACKAGES, e.Message);
             }
         }

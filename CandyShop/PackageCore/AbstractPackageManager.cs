@@ -123,10 +123,9 @@ namespace CandyShop.PackageCore
                 throw new CandyShopException($"Failed to stop gsudo credentials cache session (gsudo returned {p.ExitCode}). To mitigate any security risk, please run 'gsudo -k' in a terminal to end all gsudo cache sessions, or restart your system.");
         }
 
-        protected PackageManagerProcess BuildProcess(string args, bool useGsudo = false)
+        protected virtual PackageManagerProcess BuildProcess(string args, bool useGsudo = false)
         {
-            return useGsudo ? new("gsudo", $"{Binary} {args}") : new (Binary, args);
-
+            return useGsudo ? new("gsudo", $"{Binary} {args}") : new(Binary, args);
         }
     }
 }

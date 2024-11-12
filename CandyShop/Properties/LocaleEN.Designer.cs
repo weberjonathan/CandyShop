@@ -126,6 +126,17 @@ namespace CandyShop.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Winget terminated with an error indicating that &quot;source agreements were not agreed to&quot; (-1978335162) and currently requires user input to function.
+        ///
+        ///You can fix this error by running &quot;winget list&quot; in the terminal (or any other command that interacts with the winget sources) and accept any outstanding user agreements. Until then, this application cannot fetch Winget packages..
+        /// </summary>
+        internal static string ERROR_WINGET_SRC_AGREE {
+            get {
+                return ResourceManager.GetString("ERROR_WINGET_SRC_AGREE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Ignore.
         /// </summary>
         internal static string NOT_IGNORE {
@@ -311,6 +322,15 @@ namespace CandyShop.Properties {
         internal static string TEXT_NO_ADMIN_HINT_SHORT {
             get {
                 return ResourceManager.GetString("TEXT_NO_ADMIN_HINT_SHORT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No upgrades available..
+        /// </summary>
+        internal static string TEXT_NO_OUTDATED_PCKGS {
+            get {
+                return ResourceManager.GetString("TEXT_NO_OUTDATED_PCKGS", resourceCulture);
             }
         }
         

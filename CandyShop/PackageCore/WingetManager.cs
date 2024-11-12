@@ -1,4 +1,5 @@
-﻿using Serilog;
+﻿using CandyShop.Properties;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,6 +17,14 @@ namespace CandyShop.PackageCore
 
         public override bool SupportsFetchingOutdated => false;
 
+        protected override PackageManagerProcess BuildProcess(string args, bool useGsudo = false)
+        {
+            if (!args.Contains("--disable-interactivity"))
+                args += " --disable-interactivity";
+
+            return base.BuildProcess(args, useGsudo);
+        }
+
         /// <exception cref="PackageManagerException"></exception>
         protected override string FetchInfo(GenericPackage package)
         {
@@ -26,8 +35,7 @@ namespace CandyShop.PackageCore
 
             PackageManagerProcess p = BuildProcess($"show --id \"{package.Id}\" --exact");
             p.ExecuteHidden();
-            if (p.ExitCode != 0)
-                throw new PackageManagerException($"Winget did not exit cleanly. Returned {p.ExitCode}.");
+            ThrowOnError(p);
 
             var output = TrimProgressChars(p.Output);
             var first_word_index = output.IndexOf(' ');
@@ -45,8 +53,7 @@ namespace CandyShop.PackageCore
             // launch process
             PackageManagerProcess p = BuildProcess($"list");
             p.ExecuteHidden();
-            if (p.ExitCode != 0)
-                throw new PackageManagerException($"Winget did not exit cleanly. Returned {p.ExitCode}.");
+            ThrowOnError(p);
 
             var output = ParseTable5Cols(p.Output, (firstColName) =>
                 HandleValidateOutputElement(firstColName, VALIDATE_FIRST_COLUMN, "Could not validate first column name of winget output for \"winget list\""));
@@ -79,8 +86,7 @@ namespace CandyShop.PackageCore
             // launch process
             PackageManagerProcess p = BuildProcess($"pin list");
             p.ExecuteHidden();
-            if (p.ExitCode != 0)
-                throw new PackageManagerException($"Winget did not exit cleanly. Returned {p.ExitCode}.");
+            ThrowOnError(p);
 
             var output = ParseTable5Cols(p.Output,
                 (firstColName) => HandleValidateOutputElement(firstColName, VALIDATE_FIRST_COLUMN, "Could not validate first column name of winget output for \"winget pin list\""),
@@ -105,9 +111,7 @@ namespace CandyShop.PackageCore
             var args = $"pin add --id \"{package.Id}\" --exact";
             PackageManagerProcess p = BuildProcess(args);
             p.ExecuteHidden();
-
-            if (p.ExitCode != 0)
-                throw new PackageManagerException($"Winget did not exit cleanly. Returned {p.ExitCode}.");
+            ThrowOnError(p);
         }
 
         /// <exception cref="PackageManagerException"></exception>
@@ -116,9 +120,7 @@ namespace CandyShop.PackageCore
             var args = $"pin remove --id \"{package.Id}\" --exact";
             PackageManagerProcess p = BuildProcess(args);
             p.ExecuteHidden();
-
-            if (p.ExitCode != 0)
-                throw new PackageManagerException($"Winget did not exit cleanly. Returned {p.ExitCode}.");
+            ThrowOnError(p);
         }
 
         /// <exception cref="PackageManagerException"></exception>
@@ -146,8 +148,7 @@ namespace CandyShop.PackageCore
                 try
                 {
                     p.Execute();
-                    if (p.ExitCode != 0)
-                        throw new PackageManagerException();
+                    ThrowOnError(p);
                 }
                 catch (Exception e)
                 {
@@ -351,6 +352,21 @@ namespace CandyShop.PackageCore
             }
 
             return (name, id);
+        }
+
+        /// <exception cref="PackageManagerException"></exception>
+        private void ThrowOnError(PackageManagerProcess p)
+        {
+            // https://github.com/microsoft/winget-cli/blob/master/doc/windows/package-manager/winget/returnCodes.md
+            switch (p.ExitCode)
+            {
+                case 0:
+                    return;
+                case -1978335162:
+                    throw new PackageManagerException(LocaleEN.ERROR_WINGET_SRC_AGREE);
+                default:
+                    throw new PackageManagerException($"Winget did not exit cleanly. Returned {p.ExitCode}.");
+            }
         }
     }
 }
