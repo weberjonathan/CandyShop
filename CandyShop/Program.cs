@@ -20,13 +20,16 @@ namespace CandyShop
             Environment.Exit(code);
         }
 
-        public static void Restart()
+        public static void Restart(bool saveProperties = true)
         {
             string CurrentExe = Process.GetCurrentProcess().MainModule.FileName;
             string CurrentWorkingDir = Directory.GetParent(Process.GetCurrentProcess().MainModule.FileName).FullName;
 
             context?.StopPropertiesFileWatcher();
-            context?.SaveProperties();
+
+            if (saveProperties)
+                context?.SaveProperties();
+
             ProcessStartInfo info = new(CurrentExe)
             {
                 WorkingDirectory = CurrentWorkingDir

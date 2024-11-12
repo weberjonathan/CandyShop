@@ -203,6 +203,9 @@ Hint: Check the output in the Candy Shop console window before pressing OK, or s
   <data name="TEXT_NO_ADMIN_HINT_SHORT" xml:space="preserve">
     <value> (no administrator privileges)</value>
   </data>
+  <data name="TEXT_PREFERENCES_CHANGED" xml:space="preserve">
+    <value>A change to the configuration file was detected. Please restart  the application by pressing OK.</value>
+  </data>
   <data name="TEXT_SELECTED_PACKAGE_COUNT" xml:space="preserve">
     <value>Selected packages: {0}</value>
   </data>

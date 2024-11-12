@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Security.Principal;
 using System.Text.Json;
 using System.Threading;
+using System.Windows.Forms;
 
 namespace CandyShop
 {
@@ -129,9 +130,8 @@ namespace CandyShop
         }
 
         /// <summary>
-        /// Executes the callback when the properties file changed on the disk.
         /// </summary>
-        public void OnPropertiesFileChanged(Action callback)
+        public void InitConfigFileWatcher()
         {
             // init file watcher
             if (_ConfigFileWatcher == null)
@@ -150,11 +150,11 @@ namespace CandyShop
             // of multiple write operations by editor used to change the file.
             // To prevent exceptions, delay parsing of properties file
             // also see https://failingfast.io/a-robust-solution-for-filesystemwatcher-firing-events-multiple-times/
-            Timer timer = new Timer((state) =>
+            var timer = new System.Threading.Timer((state) =>
             {
                 Log.Debug("Attempt reloading properties from file.");
-                ParseProperties();
-                callback.Invoke();
+                MessageBox.Show(LocaleEN.TEXT_PREFERENCES_CHANGED, Application.ProductName, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                Program.Restart(saveProperties: false);
             }, null, Timeout.Infinite, Timeout.Infinite);
 
             _ConfigFileWatcher.Changed += new FileSystemEventHandler((sender, e) =>

@@ -65,21 +65,7 @@ namespace CandyShop.Controller
             View.ShowUacIcons = Context.ElevateOnDemand && !Context.HasAdminPrivileges;
 
             // update UI if is properties file is updated
-            Context.OnPropertiesFileChanged(() =>
-            {
-                Action<bool> checkDelegate = isChecked =>
-                {
-                    View.CleanShortcuts = isChecked;
-                };
-                Action<bool> closeAfterDelegate = isChecked =>
-                {
-                    View.CloseAfterUpgrade = isChecked;
-                };
-                var ctrl = (System.Windows.Forms.Control)View;
-                ctrl.Invoke(checkDelegate, Context.CleanShortcuts);
-                ctrl.Invoke(closeAfterDelegate, Context.CloseAfterUpgrade);
-                // TODO message with require restart depending on the property
-            });
+            Context.InitConfigFileWatcher();
         }
 
         public async void UpdateOutdatedPackageDisplayAsync(bool forceFetch = false)

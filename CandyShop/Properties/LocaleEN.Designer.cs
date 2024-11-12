@@ -315,6 +315,15 @@ namespace CandyShop.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to A change to the configuration file was detected. Please restart  the application by pressing OK..
+        /// </summary>
+        internal static string TEXT_PREFERENCES_CHANGED {
+            get {
+                return ResourceManager.GetString("TEXT_PREFERENCES_CHANGED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Selected packages: {0}.
         /// </summary>
         internal static string TEXT_SELECTED_PACKAGE_COUNT {
