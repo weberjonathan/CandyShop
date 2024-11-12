@@ -194,6 +194,9 @@ Hint: Check the output in the Candy Shop console window before pressing OK, or s
   <data name="TEXT_MENU_LOGS" xml:space="preserve">
     <value>Open {0} logs</value>
   </data>
+  <data name="TEXT_MENU_SWITCH" xml:space="preserve">
+    <value>Switch to {0} &amp;packages</value>
+  </data>
   <data name="TEXT_NO_ADMIN_HINT" xml:space="preserve">
     <value>The selected package manager will be executed without administrator privileges. To hide this warning, enable the property 'SuppressAdminWarning'. If elevated privileges are required, launch CandyShop as administrator or enable the property 'ElevateOnDemand'.</value>
   </data>

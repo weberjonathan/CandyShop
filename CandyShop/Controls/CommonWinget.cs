@@ -41,6 +41,7 @@ namespace CandyShop.Controls
         {
             var menu = GetCommonMenuStrip();
             ResolveMenuItem(menu, "Extras", "Logs").Text = string.Format(LocaleEN.TEXT_MENU_LOGS, "Winget");
+            ResolveMenuItem(menu, "Extras", "SwitchMode").Text = string.Format(LocaleEN.TEXT_MENU_SWITCH, "Chocolatey");
             ResolveMenuItem(menu, "Help", "Meta").Visible = false;
             ResolveMenuItem(menu, "Edit", "SelectTop").Visible = false;
             return menu;

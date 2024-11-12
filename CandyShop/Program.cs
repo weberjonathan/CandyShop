@@ -2,6 +2,7 @@ using CandyShop.PackageCore;
 using CandyShop.Properties;
 using Serilog;
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Windows.Forms;
 
@@ -17,6 +18,21 @@ namespace CandyShop
             context?.SaveProperties();
             Log.Information("Shutting down");
             Environment.Exit(code);
+        }
+
+        public static void Restart()
+        {
+            string CurrentExe = Process.GetCurrentProcess().MainModule.FileName;
+            string CurrentWorkingDir = Directory.GetParent(Process.GetCurrentProcess().MainModule.FileName).FullName;
+
+            context?.StopPropertiesFileWatcher();
+            context?.SaveProperties();
+            ProcessStartInfo info = new(CurrentExe)
+            {
+                WorkingDirectory = CurrentWorkingDir
+            };
+            Process.Start(info);
+            Environment.Exit(0);
         }
 
         [STAThread]

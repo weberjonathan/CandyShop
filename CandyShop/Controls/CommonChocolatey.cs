@@ -49,6 +49,7 @@ namespace CandyShop.Controls
         {
             var menu = GetCommonMenuStrip();
             ResolveMenuItem(menu, "Extras", "Logs").Text = string.Format(LocaleEN.TEXT_MENU_LOGS, "Chocolatey");
+            ResolveMenuItem(menu, "Extras", "SwitchMode").Text = string.Format(LocaleEN.TEXT_MENU_SWITCH, "Winget");
             return menu;
         }
     }

@@ -288,6 +288,15 @@ namespace CandyShop.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Switch to {0} &amp;packages.
+        /// </summary>
+        internal static string TEXT_MENU_SWITCH {
+            get {
+                return ResourceManager.GetString("TEXT_MENU_SWITCH", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The selected package manager will be executed without administrator privileges. To hide this warning, enable the property &apos;SuppressAdminWarning&apos;. If elevated privileges are required, launch CandyShop as administrator or enable the property &apos;ElevateOnDemand&apos;..
         /// </summary>
         internal static string TEXT_NO_ADMIN_HINT {

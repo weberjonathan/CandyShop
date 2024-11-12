@@ -109,6 +109,11 @@ namespace CandyShop.Controls
             extras.DropDownItems.AddRange(new ToolStripItem[]
             {
                 new ToolStripMenuItem() {
+                    Name = "SwitchMode",
+                    Text = string.Format(LocaleEN.TEXT_MENU_SWITCH, "MODE")
+                },
+                new ToolStripSeparator(),
+                new ToolStripMenuItem() {
                     Name = "StartWithSystem",
                     Text = "&Display notification for outdated packages on login"
                 },
@@ -122,7 +127,7 @@ namespace CandyShop.Controls
                 new ToolStripMenuItem()
                 {
                     Name = "Logs",
-                    Text = "Open package manager logs",
+                    Text = "Open package manager &logs",
                     ShortcutKeys = Keys.Control | Keys.L
                 }
             });

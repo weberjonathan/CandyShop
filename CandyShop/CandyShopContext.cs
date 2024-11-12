@@ -102,7 +102,7 @@ namespace CandyShop
 
         public bool CloseAfterUpgrade { get; set; }
 
-        public bool WingetMode { get; private set; }
+        public bool WingetMode { get; set; }
 
         public List<int> ValidExitCodes { get; set; }
 

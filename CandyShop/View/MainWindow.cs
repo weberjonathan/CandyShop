@@ -87,6 +87,7 @@ namespace CandyShop.View
             item("Edit", "SelectTop").Click   += new EventHandler((sender, e) => UpgradePage.CheckTopLevelItems());
             item("Edit", "DeselectAll").Click += new EventHandler((sender, e) => UpgradePage.UncheckAllItems());
 
+            item("Extras", "SwitchMode").Click      += new EventHandler((sender, e) => Controller.TogglePackageSource());
             item("Extras", "StartWithSystem").Click += new EventHandler((sender, e) => Controller.ToggleLaunchOnSystemStart());
             item("Extras", "Settings").Click        += new EventHandler((sender, e) => Controller.ShowCandyShopConfigFolder());
             item("Extras", "Logs").Click            += new EventHandler((sender, e) => Controller.ShowLogFolder());

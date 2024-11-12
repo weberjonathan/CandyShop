@@ -150,6 +150,12 @@ namespace CandyShop.Controller
             }
         }
 
+        public void TogglePackageSource()
+        {
+            CandyShopContext.WingetMode = !CandyShopContext.WingetMode;
+            Program.Restart();
+    }
+
         private void OpenUrl(string url)
         {
             ProcessStartInfo info = new ProcessStartInfo()
