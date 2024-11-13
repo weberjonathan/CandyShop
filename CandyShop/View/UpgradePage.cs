@@ -1,4 +1,5 @@
-﻿using CandyShop.Controls.Factory;
+﻿using CandyShop.Controls;
+using CandyShop.Controls.Factory;
 using CandyShop.Properties;
 using System;
 using System.Collections.Generic;
@@ -7,12 +8,7 @@ using System.Windows.Forms;
 
 namespace CandyShop.View
 {
-    internal class PinnedChangedArgs : EventArgs
-    {
-        public string Name;
-    }
-
-    partial class UpgradePage : UserControl
+    partial class UpgradePage : UserControl, ITabPage, IPinSupport
     {
         public UpgradePage()
         {
@@ -28,41 +24,9 @@ namespace CandyShop.View
 
             // event handlers
             LstPackages.ItemChecked += LstPackages_ItemChecked;
+            LstPackages.PinChangeRequest += new EventHandler<PinnedChangedArgs>((sender, e) => PinnedChanged?.Invoke(this, e));
             BtnUpgradeAll.Click += new EventHandler((sender, e) => { UpgradeAllClick?.Invoke(this, e); });
             BtnUpgradeSelected.Click += new EventHandler((sender, e) => { UpgradeSelectedClick?.Invoke(this, e); });
-
-            // context menu
-            var itemPin = new ToolStripMenuItem("&Toggle pin")
-            {
-                Name = "Pin",
-            };
-            itemPin.Click += new EventHandler((sender, e) =>
-            {
-                if (LstPackages.TryGetSelectedItem(out var row))
-                {
-                    var name = (string)row.Cells[LstPackages.NameCol.Index].Value;
-                    PinnedChanged?.Invoke(this, new PinnedChangedArgs() { Name = name });
-                }
-            });
-
-            var contextMenu = new ContextMenuStrip();
-            contextMenu.Opening += new System.ComponentModel.CancelEventHandler((sender, e) =>
-            {
-                var index = LstPackages.PinnedCol.Index;
-                if (LstPackages.TryGetSelectedItem(out var row))
-                {
-                    bool pinned = row.Cells[index].Value != null;
-                    itemPin.Checked = pinned;
-                    e.Cancel = false;
-                }
-                else
-                {
-                    e.Cancel = true;
-                }
-            });
-
-            contextMenu.Items.Add(itemPin);
-            LstPackages.ContextMenuStrip = contextMenu;
         }
 
         public event EventHandler<PinnedChangedArgs> PinnedChanged;
@@ -237,30 +201,9 @@ namespace CandyShop.View
             }
         }
 
-        public void SetPinned(string name, bool pinned)
+        public void UpdatePinnedState(string name, bool pinned)
         {
-            // updates icon and checked state according to param pinned
-            var rows = LstPackages.Other.Rows;
-            foreach (DataGridViewRow row in rows)
-            {
-                var cellName = (string)row.Cells[LstPackages.NameCol.Index].Value;
-                if (name.Equals(cellName))
-                {
-                    int index = LstPackages.PinnedCol.Index;
-                    if (pinned)
-                    {
-                        row.Cells[index].Value = Resources.ic_pin;
-                        row.Cells[LstPackages.CheckedCol.Index].Value = false;
-                    }
-                    else
-                    {
-                        row.Cells[index].Value = null;
-                        row.Cells[LstPackages.CheckedCol.Index].Value = true;
-                    }
-                    LstPackages.UpdateRowStyle(row);
-                    return;
-                }
-            }
+            LstPackages.SetPinned(name, pinned);
         }
 
         public void DisplayEmpty()

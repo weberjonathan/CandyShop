@@ -20,6 +20,7 @@ namespace CandyShop.Controls.Factory
         public PackageListBoxColumn[] GetInstalledColumns()
         {
             return [
+                new(ColumnType.Pinned),
                 new(null, LocaleEN.TEXT_COL_NAME,    .4f, PackageListBoxSize.Percent),
                 new(null, "ID",                      .4f, PackageListBoxSize.Percent),
                 new(null, LocaleEN.TEXT_COL_VERSION, .2f, PackageListBoxSize.Percent),

@@ -57,10 +57,12 @@ namespace CandyShop.Controller
             SyncListView();
         }
 
-        private List<string> BuildDisplayItem(GenericPackage package)
+        private object[] BuildDisplayItem(GenericPackage package)
         {
             if (ContextSingleton.Get.WingetMode)
                 return [
+                    false,
+                    package.Pinned.GetValueOrDefault(false) ? Resources.ic_pin : null,
                     package.Name,
                     package.Id,
                     package.CurrVer,
@@ -68,6 +70,8 @@ namespace CandyShop.Controller
                 ];
             else
                 return [
+                    false,
+                    package.Pinned.GetValueOrDefault(false) ? Resources.ic_pin : null,
                     package.Name,
                     package.CurrVer
                 ];

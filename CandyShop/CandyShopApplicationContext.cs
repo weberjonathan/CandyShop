@@ -113,6 +113,7 @@ namespace CandyShop
             MainWindowController candyShopController = new(windowsTaskService, context);
             InstalledPageController installedPageController = new(packageService);
             UpgradePageController upgradePageController = new(context, packageService);
+            PinController pinController = new(packageService);
 
             // init views
             MainWindow mainPage = new MainWindow(candyShopController);
@@ -121,6 +122,7 @@ namespace CandyShop
             installedPageController.InjectView(mainPage, installedPage);
             upgradePageController.InjectViews(mainPage, upgradePage);
             candyShopController.InjectView(mainPage);
+            pinController.InjectView(installedPage, upgradePage);
 
             // declare notification handler, so if needed, it lives during the entire lifecycle
             NotificationShowHandler notifificationHandler;

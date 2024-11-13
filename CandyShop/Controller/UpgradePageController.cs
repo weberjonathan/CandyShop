@@ -31,7 +31,6 @@ namespace CandyShop.Controller
             IControlsFactory provider = ContextSingleton.Get.WingetMode ? new WingetControlsFactory() : new ChocoControlsFactory(); // TODO
             View.BuildControls(provider);
 
-            View.PinnedChanged += new EventHandler<PinnedChangedArgs>((sender, e) => TogglePin(e.Name));
             View.CleanShortcutsChanged += new EventHandler((sender, e) => Context.CleanShortcuts = View.CleanShortcuts);
             View.CloseAfterUpgradeChanged += new EventHandler((sender, e) => Context.CloseAfterUpgrade = View.CloseAfterUpgrade);
             View.CleanShortcuts = Context.CleanShortcuts;
@@ -157,37 +156,6 @@ namespace CandyShop.Controller
             {
                 UpdateOutdatedPackageDisplayAsync();
                 MainWindow?.Show();
-            }
-        }
-
-        private async void TogglePin(string packageName)
-        {
-            GenericPackage package = PackageService.GetPackageByName(packageName);
-            if (package == null)
-            {
-                ErrorHandler.ShowError("Could not find package '{0}'", packageName);
-                return;
-            }
-
-            if (package.Pinned.HasValue)
-            {
-                try
-                {
-                    if (package.Pinned.Value)
-                        await PackageService.UnpinAsync(package.Name);
-                    else
-                        await PackageService.PinAsync(package.Name);
-                }
-                catch (PackageManagerException e)
-                {
-                    ErrorHandler.ShowError("An unknown error occurred: {0}", e.Message);
-                }
-
-                View.SetPinned(package.Name, package.Pinned.Value);
-            }
-            else
-            {
-                ErrorHandler.ShowError("Failed to determine the pinned state of package '{0}'.", package.Name);
             }
         }
     }

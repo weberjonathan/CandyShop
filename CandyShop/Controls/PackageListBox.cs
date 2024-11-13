@@ -1,9 +1,15 @@
-﻿using System;
+﻿using CandyShop.Properties;
+using System;
 using System.Drawing;
 using System.Windows.Forms;
 
 namespace CandyShop.Controls
 {
+    internal class PinnedChangedArgs : EventArgs
+    {
+        public string Name;
+    }
+
     internal enum ColumnType { Text, Checked, Pinned }
 
     internal class PackageListBoxColumn
@@ -205,8 +211,11 @@ namespace CandyShop.Controls
 
                 }
             });
+
+            ContextMenuStrip = DefineContextMenu();
         }
 
+        public event EventHandler<PinnedChangedArgs> PinChangeRequest;
         public event DataGridViewCellEventHandler ItemChecked;
 
         public bool CheckBoxes
@@ -322,9 +331,68 @@ namespace CandyShop.Controls
             }
         }
 
+        public void SetPinned(string name, bool pinned)
+        {
+            // updates icon and checked state according to param pinned
+            var rows = Other.Rows;
+            foreach (DataGridViewRow row in rows)
+            {
+                var cellName = (string)row.Cells[NameCol.Index].Value;
+                if (name.Equals(cellName))
+                {
+                    if (pinned)
+                    {
+                        row.Cells[PinnedCol.Index].Value = Resources.ic_pin;
+                        row.Cells[CheckedCol.Index].Value = false;
+                    }
+                    else
+                    {
+                        row.Cells[PinnedCol.Index].Value = null;
+                        row.Cells[CheckedCol.Index].Value = true;
+                    }
+                    UpdateRowStyle(row);
+                    return;
+                }
+            }
+        }
+
         private void Other_SelectionChanged(object sender, EventArgs e)
         {
             Other.ClearSelection();
+        }
+
+        private ContextMenuStrip DefineContextMenu()
+        {
+            var itemPin = new ToolStripMenuItem("&Toggle pin")
+            {
+                Name = "Pin",
+            };
+            itemPin.Click += new EventHandler((sender, e) =>
+            {
+                if (TryGetSelectedItem(out var row))
+                {
+                    var name = (string)row.Cells[NameCol.Index].Value;
+                    PinChangeRequest?.Invoke(this, new PinnedChangedArgs() { Name = name });
+                }
+            });
+
+            var contextMenu = new ContextMenuStrip();
+            contextMenu.Opening += new System.ComponentModel.CancelEventHandler((sender, e) =>
+            {
+                if (PinnedCol != null && TryGetSelectedItem(out var row))
+                {
+                    bool pinned = row.Cells[PinnedCol.Index].Value != null;
+                    itemPin.Checked = pinned;
+                    e.Cancel = false;
+                }
+                else
+                {
+                    e.Cancel = true;
+                }
+            });
+
+            contextMenu.Items.Add(itemPin);
+            return contextMenu;
         }
     }
 }

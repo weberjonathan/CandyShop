@@ -8,18 +8,19 @@ using CandyShop.Controls.Factory;
 
 namespace CandyShop.View
 {
-    partial class InstalledPage : UserControl
+    partial class InstalledPage : UserControl, ITabPage, IPinSupport
     {
-        private const int COL_INDEX_NAME = 1;
-
         public InstalledPage()
         {
             InitializeComponent();
             LstPackages.Hint = LocaleEN.TEXT_LOADING_INSTALLED;
             LstPackages.Other.SelectionChanged += new EventHandler((sender, e) => SelectedItemChanged?.Invoke(this, EventArgs.Empty));
             SplitContainer.Panel2Collapsed = true;
+
+            LstPackages.PinChangeRequest += new EventHandler<PinnedChangedArgs>((sender, e) => PinnedChanged?.Invoke(this, e));
         }
 
+        public event EventHandler<PinnedChangedArgs> PinnedChanged;
         public event EventHandler SelectedItemChanged;
 
         public string SelectedItem
@@ -27,7 +28,7 @@ namespace CandyShop.View
             get
             {
                 if (LstPackages.Other.SelectedRows.Count > 0)
-                    return LstPackages.Other.SelectedRows[0].Cells[COL_INDEX_NAME].Value.ToString();
+                    return LstPackages.Other.SelectedRows[0].Cells[LstPackages.NameCol.Index].Value.ToString();
                 else
                     return null;
             }
@@ -67,7 +68,7 @@ namespace CandyShop.View
 
         public List<string> Items => LstPackages.Other.Rows
             .Cast<DataGridViewRow>()
-            .Select(item => (string)item.Cells[COL_INDEX_NAME].Value)
+            .Select(item => (string)item.Cells[LstPackages.NameCol.Index].Value)
             .ToList();
 
         public void BuildControls(IControlsFactory provider)
@@ -85,17 +86,17 @@ namespace CandyShop.View
             Controls.Add(SearchBar);
         }
 
-        public void AppendItem(List<string> data)
+        public void AppendItem(object[] data)
         {
-            data.Insert(0, "false");
-            LstPackages.Other.Rows.Add(data.ToArray());
-            LoadingPackages = false;
+            if (LoadingPackages)
+                LoadingPackages = false;
+
+            LstPackages.AddItem(data);
         }
 
-        public void InsertItem(int index, List<string> data)
+        public void InsertItem(int index, object[] data)
         {
-            data.Insert(0, "false");
-            LstPackages.Other.Rows.Insert(index, data.ToArray());
+            LstPackages.Other.Rows.Insert(index, data);
         }
 
         public void ClearItems()
@@ -115,7 +116,7 @@ namespace CandyShop.View
             DataGridViewRow item = null;
             foreach (DataGridViewRow row in LstPackages.Other.Rows)
             {
-                if (name.Equals(row.Cells[COL_INDEX_NAME].Value))
+                if (name.Equals(row.Cells[LstPackages.NameCol.Index].Value))
                 {
                     item = row;
                     break;
@@ -124,6 +125,11 @@ namespace CandyShop.View
 
             if (item != null)
                 LstPackages.Other.Rows.Remove(item);
+        }
+
+        public void UpdatePinnedState(string name, bool pinned)
+        {
+            LstPackages.SetPinned(name, pinned);
         }
     }
 }

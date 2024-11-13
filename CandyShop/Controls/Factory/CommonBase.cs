@@ -1,5 +1,4 @@
 ﻿using CandyShop.Properties;
-using CandyShop.Util;
 using System.Drawing;
 using System.Windows.Forms;
 
@@ -164,7 +163,5 @@ namespace CandyShop.Controls.Factory
 
             return menu;
         }
-
-        // TODO context menu
     }
 }
