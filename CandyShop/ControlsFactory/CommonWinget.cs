@@ -1,7 +1,9 @@
-﻿using CandyShop.Properties;
+﻿using CandyShop.Controls;
+using CandyShop.Controls.PackageManager;
+using CandyShop.Properties;
 using System.Windows.Forms;
 
-namespace CandyShop.Controls
+namespace CandyShop.ControlsFactory
 {
     internal class CommonWinget : AbstractCommon
     {

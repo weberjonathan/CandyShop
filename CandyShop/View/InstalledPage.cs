@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Windows.Forms;
 using System.Linq;
-using CandyShop.Controls;
 using CandyShop.Properties;
+using CandyShop.Controls.PackageManager;
+using CandyShop.ControlsFactory;
 
 namespace CandyShop.View
 {

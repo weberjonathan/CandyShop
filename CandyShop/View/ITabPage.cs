@@ -1,4 +1,4 @@
-﻿using CandyShop.Controls;
+﻿using CandyShop.ControlsFactory;
 
 namespace CandyShop.View
 {

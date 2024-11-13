@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 
-namespace CandyShop.Controls
+namespace CandyShop.Controls.PackageManager
 {
     public class CommonSearchBar : UserControl
     {

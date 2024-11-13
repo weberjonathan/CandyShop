@@ -1,4 +1,6 @@
 ﻿using CandyShop.Controls;
+using CandyShop.Controls.PackageManager;
+using CandyShop.ControlsFactory;
 using CandyShop.PackageCore;
 using CandyShop.Properties;
 using CandyShop.Services;

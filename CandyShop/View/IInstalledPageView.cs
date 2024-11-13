@@ -1,4 +1,4 @@
-﻿using CandyShop.Controls;
+﻿using CandyShop.Controls.PackageManager;
 using System;
 using System.Collections.Generic;
 

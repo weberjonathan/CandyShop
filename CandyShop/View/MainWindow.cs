@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 using CandyShop.Controller;
-using CandyShop.Controls;
+using CandyShop.ControlsFactory;
 using CandyShop.Properties;
 
 namespace CandyShop.View

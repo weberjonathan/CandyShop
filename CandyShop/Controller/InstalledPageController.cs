@@ -6,6 +6,8 @@ using CandyShop.Services;
 using Serilog;
 using CandyShop.Controls;
 using CandyShop.PackageCore;
+using CandyShop.Controls.PackageManager;
+using CandyShop.ControlsFactory;
 
 namespace CandyShop.Controller
 {
