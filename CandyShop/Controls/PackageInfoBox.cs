@@ -2,7 +2,7 @@
 
 namespace CandyShop.Controls
 {
-    public class PackageInfoBox : AbstractLoadingControl<TextBox>
+    public class PackageInfoBox : SpinnerBaseControl<TextBox>
     {
         public PackageInfoBox()
         {

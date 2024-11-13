@@ -2,7 +2,11 @@
 
 namespace CandyShop.Controls
 {
-    abstract public class AbstractLoadingControl<T> : Control where T: Control
+    /// <summary>
+    /// This control can be used to inherit from to easily switch between the other control and a spinner in the same space by toggling the Loading property
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    public partial class SpinnerBaseControl<T> : Control where T: Control
     {
         internal readonly Spinner SpinnerCtl = new()
         {

@@ -92,7 +92,7 @@ namespace CandyShop.Controls
 
     public enum PackageListBoxSize { Fixed, Percent }
 
-    internal class PackageListBox : AbstractLoadingControl<DataGridView>
+    internal class PackageListBox : SpinnerBaseControl<DataGridView>
     {
         private readonly DataGridViewCheckBoxColumn CheckBoxColumn;
 
