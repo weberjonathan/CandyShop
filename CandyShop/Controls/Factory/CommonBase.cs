@@ -45,6 +45,14 @@ namespace CandyShop.Controls.Factory
                 DisplayStyle = ToolStripItemDisplayStyle.Image
             };
 
+            var tsPin = new ToolStripButton
+            {
+                Name = "Pin",
+                Text = "Pin selected package",
+                Image = Resources.ic_pin,
+                DisplayStyle = ToolStripItemDisplayStyle.Image
+            };
+
             ToolStrip ts = new()
             {
                 BackColor = SystemColors.Window,
@@ -58,6 +66,8 @@ namespace CandyShop.Controls.Factory
             ts.Items.Add(new ToolStripLabel("Select:"));
             ts.Items.Add(tsSelectAll);
             ts.Items.Add(tsDeselect);
+            ts.Items.Add(new ToolStripSeparator());
+            ts.Items.Add(tsPin);
 
             return ts;
         }

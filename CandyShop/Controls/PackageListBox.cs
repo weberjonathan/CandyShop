@@ -228,6 +228,7 @@ namespace CandyShop.Controls
         public DataGridViewColumn NameCol { get; private set; }
         public DataGridViewColumn CheckedCol => CheckBoxColumn;
         public DataGridViewRow SelectedItem => Other.SelectedRows.Count > 0 ? Other.SelectedRows[0] : null;
+        public string SelectedName => SelectedItem?.Cells[NameCol.Index].Value.ToString();
         public DataGridViewCellStyle DefaultStyle { get; set; }
         public DataGridViewCellStyle PinnedStyle { get; set; }
 

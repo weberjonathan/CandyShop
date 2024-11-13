@@ -147,9 +147,19 @@ namespace CandyShop.View
             ts.Items["Refresh"].Click += new EventHandler((sender, e) => RefreshClicked?.Invoke(sender, e));
             ts.Items["Select"].Click += new EventHandler((sender, e) => CheckAllItems());
             ts.Items["Deselect"].Click += new EventHandler((sender, e) => UncheckAllItems());
+            ts.Items["Pin"].Click += new EventHandler((sender, e) =>
+            {
+                var packageName = LstPackages.SelectedName;
+                if (packageName != null)
+                {
+                    PinnedChanged?.Invoke(this, new PinnedChangedArgs() { Name = packageName });
+                }
+            });
+
             var selectTopLevel = ts.Items["SelectTopLevel"];
             if (selectTopLevel != null)
                 selectTopLevel.Click += new EventHandler((sender, e) => CheckTopLevelItems());
+
             Controls.Add(ts);
         }
 
