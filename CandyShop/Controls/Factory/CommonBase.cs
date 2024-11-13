@@ -5,21 +5,12 @@ using System.Windows.Forms;
 
 namespace CandyShop.Controls.Factory
 {
-    internal abstract class AbstractControlsFactory
+    internal class CommonBase
     {
-        abstract public PackageListBoxColumn[] GetUpgradeColumns();
-        abstract public PackageListBoxColumn[] GetInstalledColumns();
-        abstract public SearchBar GetSearchBar();
-        abstract public ToolStrip GetUpgradePageToolBar();
-        abstract public MenuStrip GetMenuStrip();
+        // TODO move to menuitem
+        
 
-        public ToolStripMenuItem ResolveMenuItem(MenuStrip menu, string level1, string level2)
-        {
-            ToolStripMenuItem parent = (ToolStripMenuItem)menu.Items[level1];
-            return (ToolStripMenuItem)parent.DropDownItems[level2];
-        }
-
-        protected ToolStrip GetCommonUpgradePageToolBar()
+        public static ToolStrip GetCommonUpgradePageToolBar()
         {
             var tsRefresh = new ToolStripButton
             {
@@ -50,7 +41,7 @@ namespace CandyShop.Controls.Factory
                 BackColor = SystemColors.Window,
                 GripStyle = ToolStripGripStyle.Hidden,
                 RenderMode = ToolStripRenderMode.ManagerRenderMode,
-                Renderer = new CandyShopTsRenderer()
+                Renderer = new CandyShopTsRenderer() // TODO remove from util
 
             };
             ts.Items.Add(tsRefresh);
@@ -62,7 +53,7 @@ namespace CandyShop.Controls.Factory
             return ts;
         }
 
-        protected MenuStrip GetCommonMenuStrip()
+        public static CandyShopMenuStrip GetCommonMenuStrip()
         {
             ToolStripMenuItem edit = new()
             {
@@ -155,7 +146,7 @@ namespace CandyShop.Controls.Factory
                 }
             });
 
-            MenuStrip menu = new() { BackColor = Color.White };
+            CandyShopMenuStrip menu = new() { BackColor = Color.White };
             menu.Items.AddRange(new ToolStripItem[]
             {
                 edit, extras, help

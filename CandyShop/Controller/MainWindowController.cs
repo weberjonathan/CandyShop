@@ -8,7 +8,6 @@ using System.IO;
 using System.Windows.Forms;
 using Serilog;
 using CandyShop.PackageCore;
-using CandyShop.ControlsFactory;
 using CandyShop.Controls.Factory;
 
 namespace CandyShop.Controller
@@ -30,7 +29,7 @@ namespace CandyShop.Controller
             MainView = mainView;
 
             // TODO use single provider instance accross all controllers
-            AbstractControlsFactory provider = ContextSingleton.Get.WingetMode ? new WingetControlsFactory() : new ChocoControlsFactory();
+            IControlsFactory provider = ContextSingleton.Get.WingetMode ? new WingetControlsFactory() : new ChocoControlsFactory();
             MainView.BuildControls(provider);
         }
 

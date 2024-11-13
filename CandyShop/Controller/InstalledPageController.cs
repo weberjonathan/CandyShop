@@ -5,7 +5,6 @@ using CandyShop.Properties;
 using CandyShop.Services;
 using Serilog;
 using CandyShop.PackageCore;
-using CandyShop.ControlsFactory;
 using CandyShop.Controls.Factory;
 
 namespace CandyShop.Controller
@@ -26,7 +25,7 @@ namespace CandyShop.Controller
             MainWindow = mainWindow;
             View = view;
 
-            AbstractControlsFactory provider = ContextSingleton.Get.WingetMode ? new WingetControlsFactory() : new ChocoControlsFactory();
+            IControlsFactory provider = ContextSingleton.Get.WingetMode ? new WingetControlsFactory() : new ChocoControlsFactory();
             View.BuildControls(provider);
 
             View.SearchBar.SearchChanged += new EventHandler((sender, e) => SyncListView());

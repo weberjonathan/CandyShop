@@ -171,7 +171,7 @@ namespace CandyShop.View
 
         public bool AllowPinnedUacIon { get; set; }
 
-        public void BuildControls(AbstractControlsFactory provider)
+        public void BuildControls(IControlsFactory provider)
         {
             LstPackages.ColumnHeaders = provider.GetUpgradeColumns();
             LstPackages.CheckBoxes = true;

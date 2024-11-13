@@ -70,7 +70,7 @@ namespace CandyShop.View
             .Select(item => (string)item.Cells[COL_INDEX_NAME].Value)
             .ToList();
 
-        public void BuildControls(AbstractControlsFactory provider)
+        public void BuildControls(IControlsFactory provider)
         {
             LstPackages.ColumnHeaders = provider.GetInstalledColumns();
             LstPackages.CheckBoxes = false;

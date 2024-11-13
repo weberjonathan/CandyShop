@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 using CandyShop.Controller;
+using CandyShop.Controls;
 using CandyShop.Controls.Factory;
 using CandyShop.Properties;
 
@@ -75,28 +76,27 @@ namespace CandyShop.View
             }
         }
 
-        public void BuildControls(AbstractControlsFactory provider)
+        public void BuildControls(IControlsFactory provider)
         {
-            MainMenuStrip = provider.GetMenuStrip();
+            CandyShopMenuStrip menu = provider.GetMenuStrip();
+            MainMenuStrip = menu;
             Controls.Add(MainMenuStrip);
 
-            ToolStripItem item(string s, string s2) => provider.ResolveMenuItem(MainMenuStrip, s, s2);
+            menu.ItemAt("Edit", "Refresh").Click     += new EventHandler((sender, e) => RefreshClicked?.Invoke(sender, e));
+            menu.ItemAt("Edit", "SelectAll").Click   += new EventHandler((sender, e) => UpgradePage.CheckAllItems());
+            menu.ItemAt("Edit", "SelectTop").Click   += new EventHandler((sender, e) => UpgradePage.CheckTopLevelItems());
+            menu.ItemAt("Edit", "DeselectAll").Click += new EventHandler((sender, e) => UpgradePage.UncheckAllItems());
 
-            item("Edit", "Refresh").Click     += new EventHandler((sender, e) => RefreshClicked?.Invoke(sender, e));
-            item("Edit", "SelectAll").Click   += new EventHandler((sender, e) => UpgradePage.CheckAllItems());
-            item("Edit", "SelectTop").Click   += new EventHandler((sender, e) => UpgradePage.CheckTopLevelItems());
-            item("Edit", "DeselectAll").Click += new EventHandler((sender, e) => UpgradePage.UncheckAllItems());
+            menu.ItemAt("Extras", "SwitchMode").Click      += new EventHandler((sender, e) => Controller.TogglePackageSource());
+            menu.ItemAt("Extras", "StartWithSystem").Click += new EventHandler((sender, e) => Controller.ToggleLaunchOnSystemStart());
+            menu.ItemAt("Extras", "Settings").Click        += new EventHandler((sender, e) => Controller.ShowCandyShopConfigFolder());
+            menu.ItemAt("Extras", "Logs").Click            += new EventHandler((sender, e) => Controller.ShowLogFolder());
 
-            item("Extras", "SwitchMode").Click      += new EventHandler((sender, e) => Controller.TogglePackageSource());
-            item("Extras", "StartWithSystem").Click += new EventHandler((sender, e) => Controller.ToggleLaunchOnSystemStart());
-            item("Extras", "Settings").Click        += new EventHandler((sender, e) => Controller.ShowCandyShopConfigFolder());
-            item("Extras", "Logs").Click            += new EventHandler((sender, e) => Controller.ShowLogFolder());
+            menu.ItemAt("Help", "Github").Click  += new EventHandler((sender, e) => Controller.ShowGithub());
+            menu.ItemAt("Help", "License").Click += new EventHandler((sender, e) => Controller.ShowLicenses());
+            menu.ItemAt("Help", "Meta").Click    += new EventHandler((sender, e) => Controller.ShowMetaPackageHelp());
 
-            item("Help", "Github").Click  += new EventHandler((sender, e) => Controller.ShowGithub());
-            item("Help", "License").Click += new EventHandler((sender, e) => Controller.ShowLicenses());
-            item("Help", "Meta").Click    += new EventHandler((sender, e) => Controller.ShowMetaPackageHelp());
-
-            StartWithSystemCheckBox = (ToolStripMenuItem)item("Extras", "StartWithSystem");
+            StartWithSystemCheckBox = menu.ItemAt("Extras", "StartWithSystem");
         }
 
         public void DisplayError(string msg, params string[] args)

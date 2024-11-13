@@ -3,9 +3,9 @@ using System.Windows.Forms;
 
 namespace CandyShop.Controls.Factory
 {
-    internal class ChocoControlsFactory : AbstractControlsFactory
+    internal class ChocoControlsFactory : IControlsFactory
     {
-        public override PackageListBoxColumn[] GetUpgradeColumns()
+        public PackageListBoxColumn[] GetUpgradeColumns()
         {
             return [
                 new(ColumnType.Pinned),
@@ -15,7 +15,7 @@ namespace CandyShop.Controls.Factory
             ];
         }
 
-        public override PackageListBoxColumn[] GetInstalledColumns()
+        public PackageListBoxColumn[] GetInstalledColumns()
         {
             return [
                 new(null, LocaleEN.TEXT_COL_NAME,    .6f, PackageListBoxSize.Percent),
@@ -23,7 +23,7 @@ namespace CandyShop.Controls.Factory
             ];
         }
 
-        public override SearchBar GetSearchBar()
+        public SearchBar GetSearchBar()
         {
             return new SearchBar()
             {
@@ -31,9 +31,9 @@ namespace CandyShop.Controls.Factory
             };
         }
 
-        public override ToolStrip GetUpgradePageToolBar()
+        public ToolStrip GetUpgradePageToolBar()
         {
-            var ts = GetCommonUpgradePageToolBar();
+            var ts = CommonBase.GetCommonUpgradePageToolBar();
             var index = ts.Items.IndexOfKey("Select") + 1;
 
             var tsSelectSmart = new ToolStripButton
@@ -48,11 +48,11 @@ namespace CandyShop.Controls.Factory
             return ts;
         }
 
-        public override MenuStrip GetMenuStrip()
+        public CandyShopMenuStrip GetMenuStrip()
         {
-            var menu = GetCommonMenuStrip();
-            ResolveMenuItem(menu, "Extras", "Logs").Text = string.Format(LocaleEN.TEXT_MENU_LOGS, "Chocolatey");
-            ResolveMenuItem(menu, "Extras", "SwitchMode").Text = string.Format(LocaleEN.TEXT_MENU_SWITCH, "Winget");
+            var menu = CommonBase.GetCommonMenuStrip();
+            menu.ItemAt("Extras", "Logs").Text = string.Format(LocaleEN.TEXT_MENU_LOGS, "Chocolatey");
+            menu.ItemAt("Extras", "SwitchMode").Text = string.Format(LocaleEN.TEXT_MENU_SWITCH, "Winget");
             return menu;
         }
     }

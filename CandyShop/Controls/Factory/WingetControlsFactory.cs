@@ -3,9 +3,9 @@ using System.Windows.Forms;
 
 namespace CandyShop.Controls.Factory
 {
-    internal class WingetControlsFactory : AbstractControlsFactory
+    internal class WingetControlsFactory : IControlsFactory
     {
-        public override PackageListBoxColumn[] GetUpgradeColumns()
+        public PackageListBoxColumn[] GetUpgradeColumns()
         {
             return [
                 new(ColumnType.Pinned),
@@ -17,7 +17,7 @@ namespace CandyShop.Controls.Factory
             ];
         }
 
-        public override PackageListBoxColumn[] GetInstalledColumns()
+        public PackageListBoxColumn[] GetInstalledColumns()
         {
             return [
                 new(null, LocaleEN.TEXT_COL_NAME,    .4f, PackageListBoxSize.Percent),
@@ -27,7 +27,7 @@ namespace CandyShop.Controls.Factory
             ];
         }
 
-        public override SearchBar GetSearchBar()
+        public SearchBar GetSearchBar()
         {
             return new SearchBar()
             {
@@ -35,18 +35,18 @@ namespace CandyShop.Controls.Factory
             };
         }
 
-        public override ToolStrip GetUpgradePageToolBar()
+        public ToolStrip GetUpgradePageToolBar()
         {
-            return GetCommonUpgradePageToolBar();
+            return CommonBase.GetCommonUpgradePageToolBar();
         }
 
-        public override MenuStrip GetMenuStrip()
+        public CandyShopMenuStrip GetMenuStrip()
         {
-            var menu = GetCommonMenuStrip();
-            ResolveMenuItem(menu, "Extras", "Logs").Text = string.Format(LocaleEN.TEXT_MENU_LOGS, "Winget");
-            ResolveMenuItem(menu, "Extras", "SwitchMode").Text = string.Format(LocaleEN.TEXT_MENU_SWITCH, "Chocolatey");
-            ResolveMenuItem(menu, "Help", "Meta").Visible = false;
-            ResolveMenuItem(menu, "Edit", "SelectTop").Visible = false;
+            var menu = CommonBase.GetCommonMenuStrip();
+            menu.ItemAt("Extras", "Logs").Text = string.Format(LocaleEN.TEXT_MENU_LOGS, "Winget");
+            menu.ItemAt("Extras", "SwitchMode").Text = string.Format(LocaleEN.TEXT_MENU_SWITCH, "Chocolatey");
+            menu.ItemAt("Help", "Meta").Visible = false;
+            menu.ItemAt("Edit", "SelectTop").Visible = false;
             return menu;
         }
     }
