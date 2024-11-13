@@ -4,9 +4,7 @@ using CandyShop.View;
 using CandyShop.Properties;
 using CandyShop.Services;
 using Serilog;
-using CandyShop.Controls;
 using CandyShop.PackageCore;
-using CandyShop.Controls.PackageManager;
 using CandyShop.ControlsFactory;
 
 namespace CandyShop.Controller
@@ -31,8 +29,7 @@ namespace CandyShop.Controller
             View.BuildControls(provider);
 
             View.SearchBar.SearchChanged += new EventHandler((sender, e) => SyncListView());
-            View.SearchBar.FilterRequireSourceChanged += new EventHandler((sender, e) => SyncListView());
-            View.SearchBar.FilterTopLevelOnlyChanged += new EventHandler((sender, e) => SyncListView());
+            View.SearchBar.CheckedChanged += new EventHandler((sender, e) => SyncListView());
             View.SelectedItemChanged += OnSelectedItemChanged;
             MainWindow.RefreshClicked += new EventHandler((sender, e) => UpdateInstalledPackagesDisplayAsync(forceFetch: true));
         }
@@ -106,10 +103,10 @@ namespace CandyShop.Controller
         private async void SyncListView()
         {
             string filterName = View.SearchBar.Text;
-            bool hideSuffixed = View.SearchBar.FilterTopLevelOnly;
-            bool requireSource = View.SearchBar.FilterRequireSource;
+            bool hideSuffixed = !ContextSingleton.Get.WingetMode && View.SearchBar.Checked;
+            bool requireSource = ContextSingleton.Get.WingetMode && View.SearchBar.Checked;
 
-            List<GenericPackage> packages = new List<GenericPackage>();
+            List<GenericPackage> packages = [];
             try
             {
                 packages = await PackageService.GetInstalledPackagesAsync();

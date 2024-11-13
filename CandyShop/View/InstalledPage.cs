@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Windows.Forms;
 using System.Linq;
 using CandyShop.Properties;
-using CandyShop.Controls.PackageManager;
 using CandyShop.ControlsFactory;
+using CandyShop.Controls;
 
 namespace CandyShop.View
 {
@@ -33,7 +33,7 @@ namespace CandyShop.View
             }
         }
 
-        public CommonSearchBar SearchBar { get; private set; }
+        public SearchBar SearchBar { get; private set; }
 
         public bool LoadingPackages
         {

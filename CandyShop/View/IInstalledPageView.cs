@@ -1,4 +1,4 @@
-﻿using CandyShop.Controls.PackageManager;
+﻿using CandyShop.Controls;
 using System;
 using System.Collections.Generic;
 
@@ -10,7 +10,7 @@ namespace CandyShop.View
 
         List<string> Items { get; }
         string SelectedItem { get; }
-        CommonSearchBar SearchBar { get; }
+        SearchBar SearchBar { get; }
         public bool LoadingPackages { get; set; }
         public bool LoadingDetails { get; set; }
         void AppendItem(List<string> data);

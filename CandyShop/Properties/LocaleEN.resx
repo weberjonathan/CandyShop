@@ -220,6 +220,12 @@ You can fix this error by running "winget list" in the terminal (or any other co
   <data name="TEXT_PREFERENCES_CHANGED" xml:space="preserve">
     <value>A change to the configuration file was detected. Please restart  the application by pressing OK.</value>
   </data>
+  <data name="TEXT_SEARCH_REQUIRE_SOURCE" xml:space="preserve">
+    <value>&amp;Require source</value>
+  </data>
+  <data name="TEXT_SEARCH_TOP_LEVEL" xml:space="preserve">
+    <value>&amp;Show top plevel only</value>
+  </data>
   <data name="TEXT_SELECTED_PACKAGE_COUNT" xml:space="preserve">
     <value>Selected packages: {0}</value>
   </data>

@@ -1,5 +1,4 @@
 ﻿using CandyShop.Controls;
-using CandyShop.Controls.PackageManager;
 using CandyShop.Properties;
 using System.Windows.Forms;
 
@@ -29,9 +28,12 @@ namespace CandyShop.ControlsFactory
             ];
         }
 
-        public override CommonSearchBar GetSearchBar()
+        public override SearchBar GetSearchBar()
         {
-            return new WingetSearchBar();
+            return new SearchBar()
+            {
+                CheckboxText = LocaleEN.TEXT_SEARCH_REQUIRE_SOURCE
+            };
         }
 
         public override ToolStrip GetUpgradePageToolBar()

@@ -1,5 +1,4 @@
 ﻿using CandyShop.Controls;
-using CandyShop.Controls.PackageManager;
 using CandyShop.Properties;
 using CandyShop.Util;
 using System.Drawing;
@@ -11,7 +10,7 @@ namespace CandyShop.ControlsFactory
     {
         abstract public PackageListBoxColumn[] GetUpgradeColumns();
         abstract public PackageListBoxColumn[] GetInstalledColumns();
-        abstract public CommonSearchBar GetSearchBar();
+        abstract public SearchBar GetSearchBar();
         abstract public ToolStrip GetUpgradePageToolBar();
         abstract public MenuStrip GetMenuStrip();
 

@@ -1,6 +1,4 @@
-﻿using CandyShop.Controls;
-using CandyShop.Controls.PackageManager;
-using CandyShop.ControlsFactory;
+﻿using CandyShop.ControlsFactory;
 using CandyShop.PackageCore;
 using CandyShop.Properties;
 using CandyShop.Services;
@@ -8,10 +6,7 @@ using CandyShop.View;
 using Serilog;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace CandyShop.Controller
 {

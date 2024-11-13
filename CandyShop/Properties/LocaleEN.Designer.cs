@@ -362,6 +362,24 @@ namespace CandyShop.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &amp;Require source.
+        /// </summary>
+        internal static string TEXT_SEARCH_REQUIRE_SOURCE {
+            get {
+                return ResourceManager.GetString("TEXT_SEARCH_REQUIRE_SOURCE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &amp;Show top plevel only.
+        /// </summary>
+        internal static string TEXT_SEARCH_TOP_LEVEL {
+            get {
+                return ResourceManager.GetString("TEXT_SEARCH_TOP_LEVEL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Selected packages: {0}.
         /// </summary>
         internal static string TEXT_SELECTED_PACKAGE_COUNT {
