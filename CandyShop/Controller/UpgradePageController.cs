@@ -17,15 +17,13 @@ namespace CandyShop.Controller
     {
         private readonly CandyShopContext Context;
         private readonly PackageService PackageService;
-        private readonly ShortcutService ShortcutService;
         private IMainWindowView MainWindow;
         private IUpgradePageView View;
 
-        public UpgradePageController(CandyShopContext context, PackageService packageService, ShortcutService shortcutService)
+        public UpgradePageController(CandyShopContext context, PackageService packageService)
         {
             Context = context;
             PackageService = packageService;
-            ShortcutService = shortcutService;
         }
 
         public void InjectViews(IMainWindowView mainWindow, IUpgradePageView upgradePage)
@@ -130,72 +128,29 @@ namespace CandyShop.Controller
             }
         }
 
-        private async void PerformUpgrade(string[] packages)
+        private async void PerformUpgrade(string[] packageNames)
         {
             MainWindow?.ToForm().Hide();
 
-            List<string> shortcuts = new List<string>();
-            ShortcutService?.WatchDesktops(shortcut =>
-            {
-                shortcuts.Add(shortcut);
-                Log.Information($"Detected new shortcut: {shortcut}");
-            });
-
             // upgrade
             bool closeAfterUpgrade = Context.CloseAfterUpgrade;
-            WindowsConsole.AllocConsole();
-            var StdOut = new StreamWriter(Console.OpenStandardOutput())
-            {
-                AutoFlush = true
-            };
-            Console.SetOut(StdOut);
-            Console.CursorVisible = false;
-            Console.Title = $"{MetaInfo.WindowTitle} | Upgrade in process";
 
             try
             {
+                var packages = PackageService.GetPackagesByName(packageNames.ToList());
                 await PackageService.Upgrade(packages);
             }
             catch (PackageManagerException e)
             {
-                MainWindow?.DisplayError(LocaleEN.ERROR_UPGRADING_OUTDATED_PACKAGES, e.Message.TrimEnd('.'));
+                MainWindow?.DisplayError(LocaleEN.ERROR_UPGRADING_OUTDATED_PACKAGES_SHORT, e.Message.TrimEnd('.'));
                 closeAfterUpgrade = false;
             }
             catch (CandyShopException e)
             {
-                MainWindow?.DisplayError(LocaleEN.ERROR_UPGRADING_OUTDATED_PACKAGES, e.Message.TrimEnd('.'));
+                MainWindow?.DisplayError(LocaleEN.ERROR_UPGRADING_OUTDATED_PACKAGES_SHORT, e.Message.TrimEnd('.'));
                 closeAfterUpgrade = false;
             }
 
-            // display results
-            Task minDelay = Task.Run(() => Thread.Sleep(3 * 1000));
-
-            IntPtr handle = WindowsConsole.GetConsoleWindow();
-            if (!IntPtr.Zero.Equals(handle))
-            {
-                WindowsConsole.SetForegroundWindow(handle);
-            }
-            Console.CursorVisible = false;
-            Console.Write("\nPress any key to continue... ");
-            Console.CursorVisible = true;
-            Console.ReadKey();
-            Log.Debug("Read key press after upgrading");
-            Console.Write("\nClosing terminal");
-            Console.CursorVisible = false;
-
-            // delete shortcuts
-            ShortcutService?.DisposeWatchers();
-            if (View.CleanShortcuts)
-            {
-                await minDelay; // wait for shortcuts to be created
-                ShortcutService?.DeleteShortcuts(shortcuts);
-            }
-
-            Log.Debug("Attempt to free console");
-            StdOut.Close();
-            StdOut.Dispose();
-            WindowsConsole.FreeConsole();
-            Log.Debug("Console freed successfully.");
             if (closeAfterUpgrade)
             {
                 MainWindow?.ToForm().Dispose();

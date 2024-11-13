@@ -1,4 +1,5 @@
 ﻿using Microsoft.Windows.AppNotifications;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -6,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace CandyShop
 {
-    public enum NotificationResult { Show, Ignore, None };
+    public enum NotificationResult { Show, Ignore, UpgradeAll, None };
 
 
     internal class NotificationShowHandler
@@ -34,6 +35,8 @@ namespace CandyShop
                     ResultState = NotificationResult.Show;
                 else if (HasAction(e.Arguments, "ignore"))
                     ResultState = NotificationResult.Ignore;
+                else if (HasAction(e.Arguments, "upgrade"))
+                    ResultState = NotificationResult.UpgradeAll;
 
                 Semaphore.Release();
             };

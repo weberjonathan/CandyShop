@@ -117,6 +117,15 @@ namespace CandyShop.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Error upgrading outdated packages: {0}..
+        /// </summary>
+        internal static string ERROR_UPGRADING_OUTDATED_PACKAGES_SHORT {
+            get {
+                return ResourceManager.GetString("ERROR_UPGRADING_OUTDATED_PACKAGES_SHORT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Failed to locate Winget binary. Please set the full path in the configuration file and restart the application. Check the &quot;Extras&quot; menu to quickly navigate to the config file..
         /// </summary>
         internal static string ERROR_WINGET_PATH {
@@ -169,6 +178,15 @@ namespace CandyShop.Properties {
         internal static string NOT_TEXT_SINGLE {
             get {
                 return ResourceManager.GetString("NOT_TEXT_SINGLE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Upgrade all.
+        /// </summary>
+        internal static string NOT_UPGRADE {
+            get {
+                return ResourceManager.GetString("NOT_UPGRADE", resourceCulture);
             }
         }
         

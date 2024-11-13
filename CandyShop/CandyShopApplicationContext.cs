@@ -13,6 +13,7 @@ using System.Diagnostics;
 using CandyShop.PackageCore;
 using System.ComponentModel;
 using System.Globalization;
+using System.Linq;
 
 namespace CandyShop
 {
@@ -102,16 +103,16 @@ namespace CandyShop
             }
 
             // init services
-            PackageService packageService = new(packageManager);
-            SystemStartService windowsTaskService = new();
             ShortcutService shortcutService = new();
+            PackageService packageService = new(packageManager, shortcutService);
+            SystemStartService windowsTaskService = new();
 
             LoadOutdatedPackagesAsync(packageService);
 
             // init controller
             MainWindowController candyShopController = new(windowsTaskService, context);
             InstalledPageController installedPageController = new(packageService);
-            UpgradePageController upgradePageController = new(context, packageService, shortcutService);
+            UpgradePageController upgradePageController = new(context, packageService);
 
             // init views
             IMainWindowView mainPage = new MainWindow(candyShopController);
@@ -130,7 +131,7 @@ namespace CandyShop
                 notifificationHandler = new();
                 // creates a tray icon, displays a notification if outdated packages
                 // are found and opens the upgrade UI on click
-                RunInBackground(candyShopController, upgradePageController, installedPageController, packageService, context, notifificationHandler);
+                RunInBackground(candyShopController, upgradePageController, installedPageController, packageService, context, notifificationHandler, packageService);
             }
             else
             {
@@ -176,7 +177,8 @@ namespace CandyShop
                                            InstalledPageController installedPageController,
                                            PackageService service,
                                            CandyShopContext context,
-                                           NotificationShowHandler notifificationHandler)
+                                           NotificationShowHandler notifificationHandler,
+                                           PackageService packageService)
         {
             List<GenericPackage> packages = null;
 
@@ -187,17 +189,10 @@ namespace CandyShop
             try
             {
                 packages = await service.GetOutdatedPackagesAsync();
-                // dummy for testing
-                //packages = new List<GenericPackage>();
-                //packages.Add(new GenericPackage(new ChocolateyPackage()));
             }
             catch (PackageManagerException e)
             {
-                icon.BalloonTipIcon = ToolTipIcon.Error;
-                icon.Text = MetaInfo.Name;
-                icon.BalloonTipTitle = MetaInfo.WindowTitle;
-                icon.BalloonTipText = string.Format(LocaleEN.ERROR_RETRIEVING_OUTDATED_PACKAGES, e.Message);
-                icon.ShowBalloonTip(2000);
+                ErrorHandler.NotifyError(icon, LocaleEN.ERROR_RETRIEVING_OUTDATED_PACKAGES, e.Message);
                 Program.Exit();
             }
 
@@ -224,6 +219,22 @@ namespace CandyShop
                 mainWindowController.InitView();
                 upgradePageController.UpdateOutdatedPackageDisplayAsync();
                 installedPageController.UpdateInstalledPackagesDisplayAsync();
+            }
+            else if (result.Equals(NotificationResult.UpgradeAll))
+            {
+                try
+                {
+                    await packageService.Upgrade(packages);
+                }
+                catch (PackageManagerException e)
+                {
+                    ErrorHandler.ShowError(LocaleEN.ERROR_UPGRADING_OUTDATED_PACKAGES_SHORT, e.Message.TrimEnd('.'));
+                }
+                catch (CandyShopException e)
+                {
+                    ErrorHandler.ShowError(LocaleEN.ERROR_UPGRADING_OUTDATED_PACKAGES_SHORT, e.Message.TrimEnd('.'));
+                }
+                Program.Exit();
             }
             else
             {
@@ -276,8 +287,8 @@ namespace CandyShop
                 .AddText(string.Format(text, packageCount, provider))
                 .AddButton(new AppNotificationButton(LocaleEN.NOT_SHOW)
                     .AddArgument("action", "show"))
-                .AddButton(new AppNotificationButton(LocaleEN.NOT_IGNORE)
-                    .AddArgument("action", "ignore"));
+                .AddButton(new AppNotificationButton(LocaleEN.NOT_UPGRADE)
+                    .AddArgument("action", "upgrade"));
 
             var p = uri.LocalPath[1..];
             p = Environment.ExpandEnvironmentVariables(p);

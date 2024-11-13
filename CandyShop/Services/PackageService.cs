@@ -5,6 +5,7 @@ using System.Threading;
 using Serilog;
 using System;
 using CandyShop.PackageCore;
+using System.IO;
 
 namespace CandyShop.Services
 {
@@ -21,10 +22,12 @@ namespace CandyShop.Services
         private readonly Dictionary<string, GenericPackage> OutdatedPckgCache = [];
 
         private readonly AbstractPackageManager PackageManager;
+        private readonly ShortcutService ShortcutService;
 
-        public PackageService(AbstractPackageManager packageManager)
+        public PackageService(AbstractPackageManager packageManager, ShortcutService shortcutService)
         {
             PackageManager = packageManager;
+            ShortcutService = shortcutService;
         }
 
         /// <exception cref="PackageManagerException"></exception>
@@ -199,14 +202,28 @@ namespace CandyShop.Services
 
         /// <exception cref="PackageManagerException"></exception>
         /// <exception cref="CandyShopException"></exception>
-        public async Task Upgrade(string[] names)
+        public async Task Upgrade(List<GenericPackage> packages)
         {
             if (PackageManager == null) return;
 
-            List<GenericPackage> packages = GetPackagesByName(names.ToList());
             packages = packages.Where(p => !p.Pinned.GetValueOrDefault(false)).ToList();
-
             if (packages.Count <= 0) return;
+
+            List<string> shortcuts = [];
+            ShortcutService?.WatchDesktops(shortcut =>
+            {
+                shortcuts.Add(shortcut);
+                Log.Information($"Detected new shortcut: {shortcut}");
+            });
+
+            WindowsConsole.AllocConsole();
+            var StdOut = new StreamWriter(Console.OpenStandardOutput())
+            {
+                AutoFlush = true
+            };
+            Console.SetOut(StdOut);
+            Console.CursorVisible = false;
+            Console.Title = $"{MetaInfo.WindowTitle} | Upgrade in process";
 
             try
             {
@@ -220,8 +237,40 @@ namespace CandyShop.Services
             {
                 await ClearOutdatedPackages();
                 await PckgDetailsLock.WaitAsync().ConfigureAwait(false);
-                names.ToList().ForEach(name => PckgDetailsCache.Remove(name));
+                packages.ForEach(p => PckgDetailsCache.Remove(p.Name));
                 PckgDetailsLock.Release();
+
+                // display results
+                Task minDelay = Task.Run(() => Thread.Sleep(3 * 1000));
+
+                IntPtr handle = WindowsConsole.GetConsoleWindow();
+                if (!IntPtr.Zero.Equals(handle))
+                {
+                    WindowsConsole.SetForegroundWindow(handle);
+                }
+                Console.CursorVisible = false;
+                Console.Write("\nPress any key to continue... ");
+                Console.CursorVisible = true;
+                Console.ReadKey();
+                Log.Debug("Read key press after upgrading");
+                Console.Write("\nClosing terminal");
+                Console.CursorVisible = false;
+
+                // delete shortcuts
+                ShortcutService?.DisposeWatchers();
+                if (ContextSingleton.Get.CleanShortcuts)
+                {
+                    await minDelay; // wait for shortcuts to be created
+                    ShortcutService?.DeleteShortcuts(shortcuts);
+                }
+
+                Log.Debug("Attempt to free console");
+                StdOut.Close();
+                StdOut.Dispose();
+                if (WindowsConsole.FreeConsole())
+                    Log.Debug("Console freed successfully.");
+                else
+                    Log.Debug("Failed to free console.");
             }
         }
 
