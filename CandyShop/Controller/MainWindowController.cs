@@ -16,7 +16,7 @@ namespace CandyShop.Controller
     {
         private readonly SystemStartService WindowsTaskService;
         private readonly CandyShopContext CandyShopContext;
-        private IMainWindowView MainView;
+        private MainWindow MainView;
 
         public MainWindowController(SystemStartService windowsTaskService, CandyShopContext candyShopContext)
         {
@@ -24,7 +24,7 @@ namespace CandyShop.Controller
             CandyShopContext = candyShopContext;
         }
 
-        public void InjectView(IMainWindowView mainView)
+        public void InjectView(MainWindow mainView)
         {
             MainView = mainView;
 
@@ -51,15 +51,15 @@ namespace CandyShop.Controller
             });
 
             // exit application on 'X'
-            MainView.ToForm().FormClosed += new FormClosedEventHandler((sender, e) =>
+            MainView.FormClosed += new FormClosedEventHandler((sender, e) =>
             {
                 Program.Exit();
             });
 
             // set app title
-            MainView.ToForm().Text = MetaInfo.WindowTitle;
+            MainView.Text = MetaInfo.WindowTitle;
 
-            MainView.ToForm().Show();
+            MainView.Show();
         }
 
         public void ShowGithub()

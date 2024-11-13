@@ -12,15 +12,15 @@ namespace CandyShop.Controller
     class InstalledPageController
     {
         private readonly PackageService PackageService;
-        private IMainWindowView MainWindow;
-        private IInstalledPageView View;
+        private MainWindow MainWindow;
+        private InstalledPage View;
 
         public InstalledPageController(PackageService service)
         {
             PackageService = service;
         }
 
-        public void InjectView(IMainWindowView mainWindow, IInstalledPageView view)
+        public void InjectView(MainWindow mainWindow, InstalledPage view)
         {
             MainWindow = mainWindow;
             View = view;

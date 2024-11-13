@@ -14,8 +14,8 @@ namespace CandyShop.Controller
     {
         private readonly CandyShopContext Context;
         private readonly PackageService PackageService;
-        private IMainWindowView MainWindow;
-        private IUpgradePageView View;
+        private MainWindow MainWindow;
+        private UpgradePage View;
 
         public UpgradePageController(CandyShopContext context, PackageService packageService)
         {
@@ -23,7 +23,7 @@ namespace CandyShop.Controller
             PackageService = packageService;
         }
 
-        public void InjectViews(IMainWindowView mainWindow, IUpgradePageView upgradePage)
+        public void InjectViews(MainWindow mainWindow, UpgradePage upgradePage)
         {
             MainWindow = mainWindow;
             View = upgradePage;
@@ -127,7 +127,7 @@ namespace CandyShop.Controller
 
         private async void PerformUpgrade(string[] packageNames)
         {
-            MainWindow?.ToForm().Hide();
+            MainWindow?.Hide();
 
             // upgrade
             bool closeAfterUpgrade = Context.CloseAfterUpgrade;
@@ -150,13 +150,13 @@ namespace CandyShop.Controller
 
             if (closeAfterUpgrade)
             {
-                MainWindow?.ToForm().Dispose();
+                MainWindow?.Dispose();
                 Program.Exit();
             }
             else
             {
                 UpdateOutdatedPackageDisplayAsync();
-                MainWindow?.ToForm().Show();
+                MainWindow?.Show();
             }
         }
 

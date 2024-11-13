@@ -7,7 +7,12 @@ using System.Windows.Forms;
 
 namespace CandyShop.View
 {
-    partial class UpgradePage : UserControl, IUpgradePageView
+    internal class PinnedChangedArgs : EventArgs
+    {
+        public string Name;
+    }
+
+    partial class UpgradePage : UserControl
     {
         public UpgradePage()
         {

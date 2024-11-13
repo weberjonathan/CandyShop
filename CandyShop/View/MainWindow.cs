@@ -10,7 +10,7 @@ namespace CandyShop.View
     // TODO remove "select top level"-menu item in winget mode
     // TODO add menu item -> Restart in other mode
 
-    partial class MainWindow : Form, IMainWindowView, ITabPage
+    partial class MainWindow : Form, ITabPage
     {
         private MainWindowController Controller;
 
@@ -49,8 +49,8 @@ namespace CandyShop.View
         public event EventHandler RefreshClicked;
         public event EventHandler HideAdminWarningClicked;
 
-        public IInstalledPageView InstalledPackagesPage => InstalledPage;
-        public IUpgradePageView UpgradePackagesPage => UpgradePage;
+        public InstalledPage InstalledPackagesPage => InstalledPage;
+        public UpgradePage UpgradePackagesPage => UpgradePage;
 
         public bool LaunchOnSystemStartEnabled
         {

@@ -115,9 +115,9 @@ namespace CandyShop
             UpgradePageController upgradePageController = new(context, packageService);
 
             // init views
-            IMainWindowView mainPage = new MainWindow(candyShopController);
-            IInstalledPageView installedPage = mainPage.InstalledPackagesPage;
-            IUpgradePageView upgradePage = mainPage.UpgradePackagesPage;
+            MainWindow mainPage = new MainWindow(candyShopController);
+            InstalledPage installedPage = mainPage.InstalledPackagesPage;
+            UpgradePage upgradePage = mainPage.UpgradePackagesPage;
             installedPageController.InjectView(mainPage, installedPage);
             upgradePageController.InjectViews(mainPage, upgradePage);
             candyShopController.InjectView(mainPage);

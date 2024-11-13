@@ -8,7 +8,7 @@ using CandyShop.Controls.Factory;
 
 namespace CandyShop.View
 {
-    partial class InstalledPage : UserControl, IInstalledPageView
+    partial class InstalledPage : UserControl
     {
         private const int COL_INDEX_NAME = 1;
 
