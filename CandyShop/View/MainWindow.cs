@@ -7,9 +7,6 @@ using CandyShop.Properties;
 
 namespace CandyShop.View
 {
-    // TODO remove "select top level"-menu item in winget mode
-    // TODO add menu item -> Restart in other mode
-
     partial class MainWindow : Form, ITabPage
     {
         private MainWindowController Controller;

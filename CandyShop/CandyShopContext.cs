@@ -37,7 +37,7 @@ namespace CandyShop
             public string ChocolateyBinary { get; set; } = "choco";
             public string ChocolateyLogs { get; set; } = "C:/ProgramData/chocolatey/logs";
             public string WingetBinary { get; set; } = "winget";
-            public bool AllowGsudoCache { get; set; } = false; // TODO msgBox when needed
+            public bool AllowGsudoCache { get; set; } = false;
             public bool WingetMode { get; set; } = true;
             public bool CleanShortcuts { get; set; } = false;
             public bool ElevateOnDemand { get; set; } = true;

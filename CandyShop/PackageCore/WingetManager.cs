@@ -127,8 +127,6 @@ namespace CandyShop.PackageCore
         /// <exception cref="CandyShopException"></exception>
         public override void Upgrade(List<GenericPackage> packages)
         {
-            // TODO add security section to README that discusses the cache
-
             if (packages.Count == 0) return;
 
             // start gsudo cache session

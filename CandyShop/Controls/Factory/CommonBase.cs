@@ -5,11 +5,21 @@ using System.Windows.Forms;
 
 namespace CandyShop.Controls.Factory
 {
+    /// <summary>
+    /// Renderer for toolstrips that behaves like the system renderer,
+    /// but does not draw any borders. Use in conjunction with
+    /// <c>ToolStripRenderMode.ManagerRenderMode</c>.
+    /// </summary>
+    internal class CandyShopTsRenderer : ToolStripSystemRenderer
+    {
+        protected override void OnRenderToolStripBorder(ToolStripRenderEventArgs e)
+        {
+            // noop
+        }
+    }
+
     internal class CommonBase
     {
-        // TODO move to menuitem
-        
-
         public static ToolStrip GetCommonUpgradePageToolBar()
         {
             var tsRefresh = new ToolStripButton
@@ -41,7 +51,7 @@ namespace CandyShop.Controls.Factory
                 BackColor = SystemColors.Window,
                 GripStyle = ToolStripGripStyle.Hidden,
                 RenderMode = ToolStripRenderMode.ManagerRenderMode,
-                Renderer = new CandyShopTsRenderer() // TODO remove from util
+                Renderer = new CandyShopTsRenderer()
 
             };
             ts.Items.Add(tsRefresh);

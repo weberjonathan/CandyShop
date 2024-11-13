@@ -80,7 +80,6 @@ namespace CandyShop.View
                 List<string> items = [];
                 foreach (DataGridViewRow row in LstPackages.Other.Rows)
                 {
-                    // TODO make safe
                     items.Add((string)row.Cells[LstPackages.NameCol.Index].Value);
                 }
 
@@ -88,14 +87,13 @@ namespace CandyShop.View
             }
         }
 
-        public string[] SelectedItems // TODO rename to CheckedItems
+        public string[] CheckedItems
         {
             get
             {
                 List<string> checkedItems = [];
                 foreach (DataGridViewRow row in LstPackages.Other.Rows)
                 {
-                    // TODO make safe
                     DataGridViewCell checkedCell = row.Cells[LstPackages.CheckedCol.Index];
                     if ((bool)checkedCell.Value) checkedItems.Add((string)row.Cells[LstPackages.NameCol.Index].Value);
                 }
@@ -285,7 +283,7 @@ namespace CandyShop.View
         private void LstPackages_ItemChecked(object sender, DataGridViewCellEventArgs e)
         {
             // update package count status text
-            LblSelected.Text = string.Format(LocaleEN.TEXT_SELECTED_PACKAGE_COUNT, SelectedItems.Length);
+            LblSelected.Text = string.Format(LocaleEN.TEXT_SELECTED_PACKAGE_COUNT, CheckedItems.Length);
         }
 
         private void CheckDeleteShortcuts_CheckedChanged(object sender, EventArgs e)

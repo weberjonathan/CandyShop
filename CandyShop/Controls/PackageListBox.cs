@@ -6,7 +6,7 @@ namespace CandyShop.Controls
 {
     internal enum ColumnType { Text, Checked, Pinned }
 
-    internal class PackageListBoxColumn // TODO rename to PackageListBoxColumnHeader
+    internal class PackageListBoxColumn
     {
         public PackageListBoxColumn(ColumnType type)
         {

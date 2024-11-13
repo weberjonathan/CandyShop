@@ -46,7 +46,7 @@ namespace CandyShop.Controller
 
             View.UpgradeSelectedClick += new EventHandler((sender, e) =>
             {
-                var packages = View.SelectedItems;
+                var packages = View.CheckedItems;
                 if (packages.Length > 0) PerformUpgrade(packages);
             });
 
