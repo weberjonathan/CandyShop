@@ -1,9 +1,9 @@
-﻿using CandyShop.ControlsFactory;
+﻿using CandyShop.Controls.Factory;
 
 namespace CandyShop.View
 {
     internal interface ITabPage
     {
-        void BuildControls(AbstractCommon provider);
+        void BuildControls(AbstractControlsFactory provider);
     }
 }

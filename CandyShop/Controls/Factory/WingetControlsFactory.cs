@@ -1,10 +1,9 @@
-﻿using CandyShop.Controls;
-using CandyShop.Properties;
+﻿using CandyShop.Properties;
 using System.Windows.Forms;
 
-namespace CandyShop.ControlsFactory
+namespace CandyShop.Controls.Factory
 {
-    internal class CommonWinget : AbstractCommon
+    internal class WingetControlsFactory : AbstractControlsFactory
     {
         public override PackageListBoxColumn[] GetUpgradeColumns()
         {

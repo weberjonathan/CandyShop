@@ -1,12 +1,11 @@
-﻿using CandyShop.Controls;
-using CandyShop.Properties;
+﻿using CandyShop.Properties;
 using CandyShop.Util;
 using System.Drawing;
 using System.Windows.Forms;
 
-namespace CandyShop.ControlsFactory
+namespace CandyShop.Controls.Factory
 {
-    internal abstract class AbstractCommon
+    internal abstract class AbstractControlsFactory
     {
         abstract public PackageListBoxColumn[] GetUpgradeColumns();
         abstract public PackageListBoxColumn[] GetInstalledColumns();

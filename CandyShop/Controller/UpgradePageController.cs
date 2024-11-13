@@ -1,4 +1,5 @@
-﻿using CandyShop.ControlsFactory;
+﻿using CandyShop.Controls.Factory;
+using CandyShop.ControlsFactory;
 using CandyShop.PackageCore;
 using CandyShop.Properties;
 using CandyShop.Services;
@@ -28,7 +29,7 @@ namespace CandyShop.Controller
             MainWindow = mainWindow;
             View = upgradePage;
 
-            AbstractCommon provider = ContextSingleton.Get.WingetMode ? new CommonWinget() : new CommonChocolatey(); // TODO
+            AbstractControlsFactory provider = ContextSingleton.Get.WingetMode ? new WingetControlsFactory() : new ChocoControlsFactory(); // TODO
             View.BuildControls(provider);
 
             View.PinnedChanged += new EventHandler<PinnedChangedArgs>((sender, e) => TogglePin(e.Name));

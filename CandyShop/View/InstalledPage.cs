@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Windows.Forms;
 using System.Linq;
 using CandyShop.Properties;
-using CandyShop.ControlsFactory;
 using CandyShop.Controls;
+using CandyShop.Controls.Factory;
 
 namespace CandyShop.View
 {
@@ -70,7 +70,7 @@ namespace CandyShop.View
             .Select(item => (string)item.Cells[COL_INDEX_NAME].Value)
             .ToList();
 
-        public void BuildControls(AbstractCommon provider)
+        public void BuildControls(AbstractControlsFactory provider)
         {
             LstPackages.ColumnHeaders = provider.GetInstalledColumns();
             LstPackages.CheckBoxes = false;

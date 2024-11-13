@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 using CandyShop.Controller;
-using CandyShop.ControlsFactory;
+using CandyShop.Controls.Factory;
 using CandyShop.Properties;
 
 namespace CandyShop.View
@@ -75,7 +75,7 @@ namespace CandyShop.View
             }
         }
 
-        public void BuildControls(AbstractCommon provider)
+        public void BuildControls(AbstractControlsFactory provider)
         {
             MainMenuStrip = provider.GetMenuStrip();
             Controls.Add(MainMenuStrip);
