@@ -15,9 +15,9 @@ namespace CandyShop
     {
         private static readonly Version VersionObject = Assembly.GetExecutingAssembly().GetName().Version;
 
-        public static string Name => System.Windows.Forms.Application.ProductName;
+        public static string Name => Application.ProductName;
         public static string WindowTitle => string.Format(LocaleEN.TEXT_APP_TITLE, Name, ContextSingleton.Get.WingetMode ? "Winget" : "Chocolatey", Version);
-        public static string Version = $"{VersionObject.Major}.{VersionObject.Minor}.{VersionObject.Build}";
+        public static string Version = $"{VersionObject.Major}.{VersionObject.Minor}";
     }
 
     // TODO either inject context or use singleton; not both
