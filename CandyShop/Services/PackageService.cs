@@ -16,10 +16,14 @@ namespace CandyShop.Services
     {
         private readonly SemaphoreSlim OutdatedPckgLock = new(1);
         private readonly SemaphoreSlim InstalledPckgLock = new(1);
+        private readonly SemaphoreSlim IntermediateInstalledPckgLock = new(1);
         private readonly SemaphoreSlim PckgDetailsLock = new(1);
+
         private readonly Dictionary<string, string> PckgDetailsCache = [];
         private readonly Dictionary<string, GenericPackage> InstalledPckgCache = [];
         private readonly Dictionary<string, GenericPackage> OutdatedPckgCache = [];
+
+        private List<GenericPackage> IntermediateInstalledPackages = [];
 
         private readonly AbstractPackageManager PackageManager;
         private readonly ShortcutService ShortcutService;
@@ -33,43 +37,60 @@ namespace CandyShop.Services
         /// <exception cref="PackageManagerException"></exception>
         public async Task<List<GenericPackage>> GetInstalledPackagesAsync()
         {
-            Log.Debug($"{Environment.CurrentManagedThreadId} GetInstalledPackagesAsync()");
+            Log.Debug($"PackageService [{Environment.CurrentManagedThreadId}]: Get installed packages.");
 
             if (PackageManager == null) return [];
-
-            List<GenericPackage> installed = [];
-            List<GenericPackage> pinned = [];
 
             // get installed packages
             await InstalledPckgLock.WaitAsync().ConfigureAwait(false);
 
+            bool reportIntermediateResults = PackageManager.RequiresNameResolution && !PackageManager.SupportsFetchingOutdated;
+            if (reportIntermediateResults)
+            {
+                // some package managers abbreviate the package names in their output (winget)
+                // and some package manager do not explicitly support fetching outdated packages (winget).
+                // Re-using the install fetch for determining outdated packages can be slow
+                // in this case, because resolving names is slow. But if no outdated packages
+                // require name resolution, they can be posted as intermediate results for consumption
+                // by the outdated fetch.
+                await IntermediateInstalledPckgLock.WaitAsync().ConfigureAwait(false);
+                IntermediateInstalledPackages.Clear();
+            }
+
             try
             {
-                if (InstalledPckgCache.Count <= 0)
+                if (InstalledPckgCache.Count == 0)
                 {
-                    // TODO
-                    // currently, fetching installed and fetching pin lists in winget
-                    // will cause separate executions of 'winget show' for abbreviated
-                    // packages; the output of those commands is discarded aside
-                    // from the full name.
-                    // Instead, the flag PackageManager.SupportsNameResolution
-                    // may be added (similar to PackageManager.SupportsFetchingOutdated)
-                    // and the resolution could be implemented here, thus removing
-                    // redundant winget executions and populating the details cache
-
                     var fetchInstalled = PackageManager.FetchInstalledAsync();
                     var fetchPinned = PackageManager.FetchPinListAsync();
 
-                    installed = await fetchInstalled;
+                    var installed = await fetchInstalled;
                     installed.ForEach(p => p.Pinned = false);
                     installed.ForEach(p => InstalledPckgCache[p.Name] = p);
-                    
-                    pinned = await fetchPinned;
-                    pinned.ForEach(p =>
+
+                    var pinned = await fetchPinned;
+
+                    // report intermediate results without resolving names if all pin info can be merged into cache
+                    if (reportIntermediateResults)
                     {
-                        if (InstalledPckgCache.TryGetValue(p.Name, out GenericPackage cachePackage))
-                            cachePackage.Pinned = p.Pinned;
-                    });
+                        pinned = ConditionalMergePinInfoUnsafe(pinned, (package) => !package.Name.Contains('…'));
+                        if (pinned.Count == 0)
+                            IntermediateInstalledPackages = InstalledPckgCache.Values.ToList();
+
+                        IntermediateInstalledPckgLock.Release();
+                    }
+
+                    // resolve names of installed packages and pinned packages
+                    if (PackageManager.RequiresNameResolution)
+                    {
+                        (var oldNames, var newPackages) = await Task.Run(() => PackageManager.ResolveAbbreviatedNames(InstalledPckgCache.Values.ToList())); // TODO this ugly
+                        MoveInstalledPackagesUnsafe(oldNames, newPackages);
+
+                        (oldNames, newPackages) = await Task.Run(() => PackageManager.ResolveAbbreviatedNames(pinned));
+                        pinned = newPackages.ToList();
+                    }
+
+                    MergePinInfoUnsafe(pinned);
                 }
             }
             catch (PackageManagerException)
@@ -79,6 +100,9 @@ namespace CandyShop.Services
             finally
             {
                 InstalledPckgLock.Release();
+
+                if (IntermediateInstalledPckgLock.CurrentCount == 0)
+                    IntermediateInstalledPckgLock.Release();
             }
 
             return InstalledPckgCache.Values.ToList();
@@ -87,27 +111,58 @@ namespace CandyShop.Services
         /// <exception cref="PackageManagerException"></exception>
         public async Task<List<GenericPackage>> GetOutdatedPackagesAsync()
         {
-            Log.Debug($"{Environment.CurrentManagedThreadId} GetOutdatedPackagesAsync()");
+            Log.Debug($"PackageService [{Environment.CurrentManagedThreadId}]: Get outdated packages.");
 
             if (PackageManager == null) return [];
 
             await OutdatedPckgLock.WaitAsync().ConfigureAwait(false);
             try
             {
-                if (OutdatedPckgCache.Count <= 0)
+                if (OutdatedPckgCache.Count == 0)
                 {
-                    List<GenericPackage> packages = [];
+                    List<GenericPackage> packages = null;
                     if (PackageManager.SupportsFetchingOutdated)
                     {
+                        // TODO this does not get pins right?
                         packages = await PackageManager.FetchOutdatedAsync();
                     }
                     else
                     {
-                        packages = await GetInstalledPackagesAsync();
-                        packages = packages
-                            .Where(p => !string.IsNullOrEmpty(p.AvailVer))
-                            .Where(p => !p.CurrVer.Equals(p.AvailVer))
-                            .ToList();
+                        var packagesFuture = GetInstalledPackagesAsync();
+                        Thread.Sleep(100); // TODO
+
+                        // try use intermediate installed package fetch results if (expensive) name resolution is required
+                        if (PackageManager.RequiresNameResolution)
+                        {
+                            // wait until the active install fetch posts intermediate results and check for oudated if the data is workable (ie no abbreviated names exist)
+                            if (InstalledPckgLock.CurrentCount == 0 && IntermediateInstalledPckgLock.CurrentCount == 0)
+                            {
+                                Log.Debug("Package manager is currently fetching installed packages. Waiting for intermediate results.");
+                                await IntermediateInstalledPckgLock.WaitAsync().ConfigureAwait(false);
+                                packages = IntermediateInstalledPackages
+                                    .Where(p => !string.IsNullOrEmpty(p.AvailVer))
+                                    .Where(p => !p.CurrVer.Equals(p.AvailVer))
+                                    .ToList();
+
+                                if (packages.Where(p => p.Name.Contains('…')).Any())
+                                    packages = null;
+
+                                Log.Debug($"Found {packages?.Count} outdated packages through intermediary data.");
+                                IntermediateInstalledPackages.Clear();
+                                IntermediateInstalledPckgLock.Release();
+                            }
+                        }
+
+                        // wait on full install package fetch if intermediate results were not workable or no fetch is underway
+                        if (packages == null)
+                        {
+                            packages = await packagesFuture;
+                            packages = packages
+                                .Where(p => !string.IsNullOrEmpty(p.AvailVer))
+                                .Where(p => !p.CurrVer.Equals(p.AvailVer))
+                                .ToList();
+                            Log.Debug($"Found {packages?.Count} outdated packages through full install data.");
+                        }
                     }
                     packages.ForEach(p => OutdatedPckgCache[p.Name] = p);
                 }
@@ -119,6 +174,9 @@ namespace CandyShop.Services
             finally
             {
                 OutdatedPckgLock.Release();
+
+                if (IntermediateInstalledPckgLock.CurrentCount == 0)
+                    IntermediateInstalledPckgLock.Release();
             }
 
             return OutdatedPckgCache.Values.ToList();
@@ -277,9 +335,11 @@ namespace CandyShop.Services
         public async Task ClearOutdatedPackages()
         {
             await OutdatedPckgLock.WaitAsync().ConfigureAwait(false);
+            Log.Debug($"Clear outdated package cache.");
             OutdatedPckgCache.Clear();
             OutdatedPckgLock.Release();
 
+            // this does not work for refreshs bc it causes the the outdated fetch to fetch installed twice -> refactor with unified package controller
             if (PackageManager != null && !PackageManager.SupportsFetchingOutdated)
             {
                 await ClearInstalledPackages();
@@ -289,6 +349,7 @@ namespace CandyShop.Services
         public async Task ClearInstalledPackages()
         {
             await InstalledPckgLock.WaitAsync().ConfigureAwait(false);
+            Log.Debug($"Clear installed package cache.");
             InstalledPckgCache.Clear();
             InstalledPckgLock.Release();
         }
@@ -330,6 +391,46 @@ namespace CandyShop.Services
             cachedPackage.Pinned = package.Pinned;
             cachedPackage.Parent = package.Parent;
             OutdatedPckgLock.Release();
+        }
+
+        private void MergePinInfoUnsafe(List<GenericPackage> pinned)
+        {
+            ConditionalMergePinInfoUnsafe(pinned, (p) => true);
+        }
+
+        /// <summary>
+        /// Merges the pin info from the supplied packages into the installed package cache
+        /// if the supplied condition is met. No lock is acquired during the operation.
+        /// Packages, that do not meet the defined condition or have not been cached, are returned.
+        /// </summary>
+        /// <param name="pinned"></param>
+        /// <param name="condition"></param>
+        /// <returns></returns>
+        private List<GenericPackage> ConditionalMergePinInfoUnsafe(List<GenericPackage> pinned, Func<GenericPackage, bool> condition)
+        {
+            List<GenericPackage> rtn = [];
+            pinned.ForEach(package =>
+            {
+                if (condition(package) && InstalledPckgCache.TryGetValue(package.Name, out GenericPackage cachePackage))
+                    cachePackage.Pinned = package.Pinned;
+                else
+                    rtn.Add(package);
+            });
+
+            return rtn;
+        }
+
+        private void MoveInstalledPackagesUnsafe(string[] oldNames, GenericPackage[] newPackages)
+        {
+            for (int i = 0; i < oldNames.Length; i++)
+            {
+                string name = oldNames[i];
+                if (InstalledPckgCache.ContainsKey(name))
+                {
+                    InstalledPckgCache.Remove(name);
+                    InstalledPckgCache[newPackages[i].Name] = newPackages[i];
+                }
+            }
         }
     }
 }

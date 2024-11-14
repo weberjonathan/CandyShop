@@ -16,6 +16,7 @@ namespace CandyShop.PackageCore
         private readonly bool SuppressLogWarnings = suppressLogWarning;
 
         public override bool SupportsFetchingOutdated => false;
+        public override bool RequiresNameResolution => true;
 
         protected override PackageManagerProcess BuildProcess(string args, bool useGsudo = false)
         {
@@ -70,14 +71,13 @@ namespace CandyShop.PackageCore
                 .OrderBy(p => p.Name)
                 .ToList();
 
-            Log.Debug($"Attempting name resolution for {rtn.Count} packages from installed packages.");
-            return ResolveAbbreviatedNames(rtn); // TODO this only resolves names, not IDs
+            return rtn;
         }
 
         /// <exception cref="PackageManagerException"></exception>
         protected override List<GenericPackage> FetchOutdated()
         {
-            Log.Error("WingetManager tried to invoke a capabality that is not implemented: Fetch outdated.");
+            Log.Error("Winget tried to invoke a capabality that is not implemented: Fetch outdated packages.");
             throw new InvalidOperationException();
         }
 
@@ -101,8 +101,7 @@ namespace CandyShop.PackageCore
                 Pinned = true
             }).ToList();
 
-            Log.Debug($"Attempting name resolution for {rtn.Count} packages from pinned list.");
-            return ResolveAbbreviatedNames(rtn);
+            return rtn;
         }
 
         /// <exception cref="PackageManagerException"></exception>
@@ -272,12 +271,17 @@ namespace CandyShop.PackageCore
             return rows;
         }
 
-        private List<GenericPackage> ResolveAbbreviatedNames(List<GenericPackage> packages)
+        // TODO try resolve ids
+        public override (string[], GenericPackage[]) ResolveAbbreviatedNames(List<GenericPackage> packages)
         {
+            List<string> oldNames = [];
+            List<GenericPackage> newPackages = [];
+
+            int total = packages.Count;
+
             var candidates = packages.Where(p => p.HasSource && p.Name.Contains('…')).ToList();
             var tasks = new Task[candidates.Count];
 
-            int resolvedNamesCount = 0;
             List<GenericPackage> unresolvedNames = [];
             for (int i = 0; i < candidates.Count; i++)
             {
@@ -300,16 +304,17 @@ namespace CandyShop.PackageCore
                     // update resolved packages but do not discard others
                     if (name != null && id != null)
                     {
+                        oldNames.Add(package.Name);
+                        newPackages.Add(package);
                         package.Name = name;
                         package.Id = id;
-                        resolvedNamesCount++;
                     }
                     else
                     {
                         unresolvedNames.Add(package);
                     }
-            });
-        }
+                });
+            }
 
             try
             {
@@ -321,15 +326,19 @@ namespace CandyShop.PackageCore
                 Log.Error($"Failed to resolve full package names: {e.Message}");
             }
 
+            // assert results
+            if (oldNames.Count != newPackages.Count)
+                throw new InvalidOperationException();
+
             // log unresolved packages
-            Log.Debug($"Resolved packages with incomplete name for {resolvedNamesCount} packages");
+            Log.Debug($"Resolved incomplete package names for {oldNames.Count} of {candidates.Count} candidates. Total package count was {total}.");
             if (unresolvedNames.Count > 0)
             {
                 var value = string.Join(", ", unresolvedNames.Select(p => p.Name).ToList());
                 Log.Warning($"Failed to resolve {unresolvedNames.Count} package(s): {value}");
             }
 
-            return packages;
+            return (oldNames.ToArray(), newPackages.ToArray());
         }
 
         private (string, string) GetMetaInfo(string fetchInfoResult)

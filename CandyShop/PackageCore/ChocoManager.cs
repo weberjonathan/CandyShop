@@ -11,6 +11,7 @@ namespace CandyShop.PackageCore
         private readonly List<int> ValidExitCodesOnUpgrade;
 
         public override bool SupportsFetchingOutdated => true;
+        public override bool RequiresNameResolution => false;
 
         public int ChocoVersionMajor { get; set; } = 2;
 
@@ -284,6 +285,12 @@ namespace CandyShop.PackageCore
             }
 
             return rtn;
+        }
+
+        public override (string[], GenericPackage[]) ResolveAbbreviatedNames(List<GenericPackage> packages)
+        {
+            Log.Error("Chocolatey tried to invoke a capabality that is not implemented: Resolving abbreviated names.");
+            throw new InvalidOperationException();
         }
     }
 }
