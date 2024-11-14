@@ -19,6 +19,97 @@ namespace CandyShop.PackageCore
         public override bool SupportsFetchingOutdated => false;
         public override bool RequiresNameResolution => true;
 
+        /// <exception cref="PackageManagerException"></exception>
+        /// <exception cref="CandyShopException"></exception>
+        public override void Upgrade(List<GenericPackage> packages)
+        {
+            if (packages.Count == 0) return;
+
+            // start gsudo cache session
+            bool isCacheEnabled = false;
+            if (AllowGsudoCache && RequireManualElevation)
+            {
+                EnableGsudoCache();
+                isCacheEnabled = true;
+            }
+
+            // perform upgrades
+            List<int> nonZeroExitCodes = [];
+            foreach (var package in packages)
+            {
+                var arguments = $"upgrade --id \"{package.Id}\" --silent --exact";
+                var p = BuildProcess(arguments, useGsudo: RequireManualElevation);
+                try
+                {
+                    p.Execute();
+                    ThrowOnError(p);
+                }
+                catch (Exception e)
+                {
+                    Log.Error($"Winget upgrade process \"{p.Binary} {p.Arguments}\" failed with exit code {p.ExitCode}: {e.Message}");
+                    nonZeroExitCodes.Add(-1);
+                }
+            }
+
+            // if the upgrade console is closed during upgrading, Candy Shop exits,
+            // which also ends the gsudo cache session bc it is tied to this pid
+
+            // exit gsudo cache session
+            if (isCacheEnabled)
+                DisableGsudoCache();
+
+            if (nonZeroExitCodes.Count > 0)
+                throw new PackageManagerException($"One or more winget upgrade processes failed with exit codes {string.Join(", ", nonZeroExitCodes)}. See log for more information.");
+        }
+
+        public override async Task<Dictionary<string, GenericPackage>> ResolveAbbreviatedNamesAsync(List<GenericPackage> packages)
+        {
+            int total = packages.Count;
+            ConcurrentBag<GenericPackage> unresolvedNames = [];
+            ConcurrentDictionary<string, GenericPackage> movedPackages = new();
+
+            var candidates = packages.Where(p => p.HasSource && p.Name.Contains('…')).ToList();
+            var options = new ParallelOptions() { MaxDegreeOfParallelism = 5 };
+            await Parallel.ForEachAsync(candidates, options, async (package, token) =>
+            {
+                Log.Debug("Started task");
+                string fetched;
+                try
+                {
+                    fetched = await FetchInfoAsync(package);
+                }
+                catch (PackageManagerException e)
+                {
+                    Log.Error($"Failed to resolve package with name '{package.Name}': {e.Message}");
+                    unresolvedNames.Add(package);
+                    return;
+                }
+
+                var (name, id) = GetMetaInfo(fetched);
+                if (name != null && id != null)
+                {
+                    movedPackages[package.Name] = package;
+                    package.Name = name;
+                    package.Id = id;
+                }
+                else
+                {
+                    unresolvedNames.Add(package);
+                }
+                Log.Debug("Finished");
+            });
+
+            // log unresolved packages
+            Log.Debug($"Resolved incomplete package names for {movedPackages.Count} of {candidates.Count} candidates. Total package count was {total}.");
+            if (!unresolvedNames.IsEmpty)
+            {
+                var value = string.Join(", ", unresolvedNames.Select(p => p.Name).ToList());
+                Log.Warning($"Failed to resolve {unresolvedNames.Count} package(s): {value}");
+            }
+
+            return movedPackages.ToDictionary();
+        }
+
         protected override PackageManagerProcess BuildProcess(string args, bool useGsudo = false)
         {
             if (!args.Contains("--disable-interactivity"))
@@ -121,49 +212,6 @@ namespace CandyShop.PackageCore
             PackageManagerProcess p = BuildProcess(args);
             p.ExecuteHidden();
             ThrowOnError(p);
-        }
-
-        /// <exception cref="PackageManagerException"></exception>
-        /// <exception cref="CandyShopException"></exception>
-        public override void Upgrade(List<GenericPackage> packages)
-        {
-            if (packages.Count == 0) return;
-
-            // start gsudo cache session
-            bool isCacheEnabled = false;
-            if (AllowGsudoCache && RequireManualElevation)
-            {
-                EnableGsudoCache();
-                isCacheEnabled = true;
-            }
-
-            // perform upgrades
-            List<int> nonZeroExitCodes = [];
-            foreach (var package in packages)
-            {
-                var arguments = $"upgrade --id \"{package.Id}\" --silent --exact";
-                var p = BuildProcess(arguments, useGsudo: RequireManualElevation);
-                try
-                {
-                    p.Execute();
-                    ThrowOnError(p);
-                }
-                catch (Exception e)
-                {
-                    Log.Error($"Winget upgrade process \"{p.Binary} {p.Arguments}\" failed with exit code {p.ExitCode}: {e.Message}");
-                    nonZeroExitCodes.Add(-1);
-                }
-            }
-
-            // if the upgrade console is closed during upgrading, Candy Shop exits,
-            // which also ends the gsudo cache session bc it is tied to this pid
-
-            // exit gsudo cache session
-            if (isCacheEnabled)
-                DisableGsudoCache();
-
-            if (nonZeroExitCodes.Count > 0)
-                throw new PackageManagerException($"One or more winget upgrade processes failed with exit codes {string.Join(", ", nonZeroExitCodes)}. See log for more information.");
         }
 
         private string TrimProgressChars(string output)
@@ -270,56 +318,6 @@ namespace CandyShop.PackageCore
             }
 
             return rows;
-        }
-
-        // TODO try resolve ids
-        // TODO move public up in structure
-        public override async Task<Dictionary<string, GenericPackage>> ResolveAbbreviatedNamesAsync(List<GenericPackage> packages)
-        {
-            int total = packages.Count;
-            ConcurrentBag<GenericPackage> unresolvedNames = [];
-            ConcurrentDictionary<string, GenericPackage> movedPackages = new();
-
-            var candidates = packages.Where(p => p.HasSource && p.Name.Contains('…')).ToList();
-            var options = new ParallelOptions() { MaxDegreeOfParallelism = 5 };
-            await Parallel.ForEachAsync(candidates, options, async (package, token) =>
-            {
-                Log.Debug("Started task");
-                string fetched;
-                try
-                {
-                    fetched = await FetchInfoAsync(package);
-                }
-                catch (PackageManagerException e)
-                {
-                    Log.Error($"Failed to resolve package with name '{package.Name}': {e.Message}");
-                    unresolvedNames.Add(package);
-                    return;
-                }
-
-                var (name, id) = GetMetaInfo(fetched);
-                if (name != null && id != null)
-                {
-                    movedPackages[package.Name] = package;
-                    package.Name = name;
-                    package.Id = id;
-                }
-                else
-                {
-                    unresolvedNames.Add(package);
-                }
-                Log.Debug("Finished");
-            });
-
-            // log unresolved packages
-            Log.Debug($"Resolved incomplete package names for {movedPackages.Count} of {candidates.Count} candidates. Total package count was {total}.");
-            if (!unresolvedNames.IsEmpty)
-            {
-                var value = string.Join(", ", unresolvedNames.Select(p => p.Name).ToList());
-                Log.Warning($"Failed to resolve {unresolvedNames.Count} package(s): {value}");
-            }
-
-            return movedPackages.ToDictionary();
         }
 
         private (string, string) GetMetaInfo(string fetchInfoResult)

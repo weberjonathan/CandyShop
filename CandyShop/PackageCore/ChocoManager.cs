@@ -24,6 +24,24 @@ namespace CandyShop.PackageCore
                 Log.Warning("List of valid exit codes does not contain '0'. This looks like a mistake in the configuration file.");
         }
 
+        public override void Upgrade(List<GenericPackage> packages)
+        {
+            string arg = string.Join(' ', packages.Select(p => p.Name));
+
+            // launch process
+            PackageManagerProcess p = BuildProcess($"upgrade {arg} -y", useGsudo: RequireManualElevation);
+            p.Execute();
+
+            if (!ValidExitCodesOnUpgrade.Contains(p.ExitCode))
+                throw new PackageManagerException($"Chocolatey did not exit cleanly. Returned {p.ExitCode}.");
+        }
+
+        public override Task<Dictionary<string, GenericPackage>> ResolveAbbreviatedNamesAsync(List<GenericPackage> packages)
+        {
+            Log.Error("Chocolatey tried to invoke a capabality that is not implemented: Resolving abbreviated names.");
+            throw new InvalidOperationException();
+        }
+
         /// <exception cref="PackageManagerException"></exception>
         protected override string FetchInfo(GenericPackage package)
         {
@@ -213,18 +231,6 @@ namespace CandyShop.PackageCore
                 throw new PackageManagerException($"Chocolatey did not exit cleanly. Returned {p.ExitCode}.");
         }
 
-        public override void Upgrade(List<GenericPackage> packages)
-        {
-            string arg = string.Join(' ', packages.Select(p => p.Name));
-
-            // launch process
-            PackageManagerProcess p = BuildProcess($"upgrade {arg} -y", useGsudo: RequireManualElevation);
-            p.Execute();
-
-            if (!ValidExitCodesOnUpgrade.Contains(p.ExitCode))
-                throw new PackageManagerException($"Chocolatey did not exit cleanly. Returned {p.ExitCode}.");
-        }
-
         /// <summary>
         /// Guess meta packages based on package names.
         /// For every suffixed package (child) where
@@ -286,12 +292,6 @@ namespace CandyShop.PackageCore
             }
 
             return rtn;
-        }
-
-        public override Task<Dictionary<string, GenericPackage>> ResolveAbbreviatedNamesAsync(List<GenericPackage> packages)
-        {
-            Log.Error("Chocolatey tried to invoke a capabality that is not implemented: Resolving abbreviated names.");
-            throw new InvalidOperationException();
         }
     }
 }

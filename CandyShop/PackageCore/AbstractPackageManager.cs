@@ -18,6 +18,8 @@ namespace CandyShop.PackageCore
         /// <exception cref="CandyShopException"></exception>
         public abstract void Upgrade(List<GenericPackage> packages);
 
+        public abstract Task<Dictionary<string, GenericPackage>> ResolveAbbreviatedNamesAsync(List<GenericPackage> packages);
+
         /// <exception cref="PackageManagerException"></exception>
         public async Task<List<GenericPackage>> FetchInstalledAsync()
         {
@@ -71,8 +73,6 @@ namespace CandyShop.PackageCore
 
         /// <exception cref="PackageManagerException"></exception>
         protected abstract void Unpin(GenericPackage package);
-
-        public abstract Task<Dictionary<string, GenericPackage>> ResolveAbbreviatedNamesAsync(List<GenericPackage> packages);
 
         /// <exception cref="CandyShopException"></exception>
         protected void EnableGsudoCache()
