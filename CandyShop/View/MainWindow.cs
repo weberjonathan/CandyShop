@@ -102,9 +102,10 @@ namespace CandyShop.View
             MessageBox.Show(msg, MetaInfo.Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
 
-        private void ChocoAutoUpdateForm_Load(object sender, EventArgs e)
+        public void ShowAndRefresh()
         {
-            this.Activate();
+            RefreshClicked?.Invoke(this, EventArgs.Empty);
+            Show();
         }
     }
 }

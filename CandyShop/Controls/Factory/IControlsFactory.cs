@@ -1,4 +1,5 @@
-﻿using System.Windows.Forms;
+﻿using CandyShop.PackageCore;
+using System.Windows.Forms;
 
 namespace CandyShop.Controls.Factory
 {
@@ -6,6 +7,8 @@ namespace CandyShop.Controls.Factory
     {
         PackageListBoxColumn[] GetUpgradeColumns();
         PackageListBoxColumn[] GetInstalledColumns();
+        object[] BuildUpgradeItem(GenericPackage package);
+        object[] BuildInstalledItem(GenericPackage package);
         SearchBar GetSearchBar();
         ToolStrip GetUpgradePageToolBar();
         CandyShopMenuStrip GetMenuStrip();

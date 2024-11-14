@@ -14,23 +14,22 @@ namespace CandyShop.Controller
 {
     internal class MainWindowController
     {
+        private readonly CandyShopContext Context;
         private readonly SystemStartService WindowsTaskService;
-        private readonly CandyShopContext CandyShopContext;
+        private readonly IControlsFactory ControlsFactory;
         private MainWindow MainView;
 
-        public MainWindowController(SystemStartService windowsTaskService, CandyShopContext candyShopContext)
+        public MainWindowController(CandyShopContext candyShopContext, SystemStartService windowsTaskService, IControlsFactory controlsFactory)
         {
+            Context = candyShopContext;
             WindowsTaskService = windowsTaskService;
-            CandyShopContext = candyShopContext;
+            ControlsFactory = controlsFactory;
         }
 
         public void InjectView(MainWindow mainView)
         {
             MainView = mainView;
-
-            // TODO use single provider instance accross all controllers
-            IControlsFactory provider = ContextSingleton.Get.WingetMode ? new WingetControlsFactory() : new ChocoControlsFactory();
-            MainView.BuildControls(provider);
+            MainView.BuildControls(ControlsFactory);
         }
 
         public void InitView()
@@ -41,13 +40,13 @@ namespace CandyShop.Controller
 
             MainView.LaunchOnSystemStartEnabled = WindowsTaskService.IsLaunchOnStartup();
             MainView.ShowAdminWarning =
-                !CandyShopContext.HasAdminPrivileges &&
-                !CandyShopContext.ElevateOnDemand &&
-                !CandyShopContext.SupressAdminWarning;
+                !Context.HasAdminPrivileges &&
+                !Context.ElevateOnDemand &&
+                !Context.SupressAdminWarning;
 
             MainView.HideAdminWarningClicked += new EventHandler((sender, e) =>
             {
-                CandyShopContext.SupressAdminWarning = true;
+                Context.SupressAdminWarning = true;
             });
 
             // exit application on 'X'
@@ -104,14 +103,14 @@ namespace CandyShop.Controller
 
         public void ShowLogFolder()
         {
-            if (ContextSingleton.Get.WingetMode)
+            if (Context.WingetMode)
             {
-                PackageManagerProcess proc = new(ContextSingleton.Get.WingetBinary, "--logs");
+                PackageManagerProcess proc = new(Context.WingetBinary, "--logs");
                 proc.ExecuteHidden();
             }
             else
             {
-                string path = Path.GetFullPath(CandyShopContext.CholoateyLogFolder);
+                string path = Path.GetFullPath(Context.CholoateyLogFolder);
                 if (Directory.Exists(path))
                 {
                     try
@@ -133,11 +132,11 @@ namespace CandyShop.Controller
 
         public void ShowCandyShopConfigFolder()
         {
-            if (Directory.Exists(CandyShopContext.ConfigFolder))
+            if (Directory.Exists(Context.ConfigFolder))
             {
                 try
                 {
-                    Process.Start("explorer.exe", CandyShopContext.ConfigFolder);
+                    Process.Start("explorer.exe", Context.ConfigFolder);
                 }
                 catch (Win32Exception e)
                 {
@@ -146,13 +145,13 @@ namespace CandyShop.Controller
             }
             else
             {
-                MainView.DisplayError("Cannot find CandyShop configuration directory at '{0}'", CandyShopContext.ConfigFolder);
+                MainView.DisplayError("Cannot find CandyShop configuration directory at '{0}'", Context.ConfigFolder);
             }
         }
 
         public void TogglePackageSource()
         {
-            CandyShopContext.WingetMode = !CandyShopContext.WingetMode;
+            Context.WingetMode = !Context.WingetMode;
             Program.Restart();
     }
 

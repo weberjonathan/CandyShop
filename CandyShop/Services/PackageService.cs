@@ -123,7 +123,6 @@ namespace CandyShop.Services
                     List<GenericPackage> packages = null;
                     if (PackageManager.SupportsFetchingOutdated)
                     {
-                        // TODO this does not get pins right?
                         packages = await PackageManager.FetchOutdatedAsync();
                     }
                     else
@@ -164,6 +163,10 @@ namespace CandyShop.Services
                             Log.Debug($"Found {packages?.Count} outdated packages through full install data.");
                         }
                     }
+
+                    // remove packages with unknown version (relevant for winget only)
+                    packages = packages.Where(p => !"Unknown".Equals(p.CurrVer)).ToList();
+
                     packages.ForEach(p => OutdatedPckgCache[p.Name] = p);
                 }
             }
@@ -293,7 +296,7 @@ namespace CandyShop.Services
             }
             finally
             {
-                await ClearOutdatedPackages();
+                await ClearPackages();
                 await PckgDetailsLock.WaitAsync().ConfigureAwait(false);
                 packages.ForEach(p => PckgDetailsCache.Remove(p.Name));
                 PckgDetailsLock.Release();
@@ -332,25 +335,14 @@ namespace CandyShop.Services
             }
         }
 
-        public async Task ClearOutdatedPackages()
+        public async Task ClearPackages()
         {
             await OutdatedPckgLock.WaitAsync().ConfigureAwait(false);
-            Log.Debug($"Clear outdated package cache.");
-            OutdatedPckgCache.Clear();
-            OutdatedPckgLock.Release();
-
-            // this does not work for refreshs bc it causes the the outdated fetch to fetch installed twice -> refactor with unified package controller
-            if (PackageManager != null && !PackageManager.SupportsFetchingOutdated)
-            {
-                await ClearInstalledPackages();
-            }
-        }
-
-        public async Task ClearInstalledPackages()
-        {
             await InstalledPckgLock.WaitAsync().ConfigureAwait(false);
-            Log.Debug($"Clear installed package cache.");
+            Log.Debug($"Clear package caches.");
+            OutdatedPckgCache.Clear();
             InstalledPckgCache.Clear();
+            OutdatedPckgLock.Release();
             InstalledPckgLock.Release();
         }
 

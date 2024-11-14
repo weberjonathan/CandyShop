@@ -1,4 +1,5 @@
-﻿using CandyShop.Properties;
+﻿using CandyShop.PackageCore;
+using CandyShop.Properties;
 using System.Windows.Forms;
 
 namespace CandyShop.Controls.Factory
@@ -21,6 +22,27 @@ namespace CandyShop.Controls.Factory
                 new(ColumnType.Pinned),
                 new(null, LocaleEN.TEXT_COL_NAME,    .6f, PackageListBoxSize.Percent),
                 new(null, LocaleEN.TEXT_COL_VERSION, .4f, PackageListBoxSize.Percent)
+            ];
+        }
+
+        public object[] BuildUpgradeItem(GenericPackage package)
+        {
+            return [
+                true,
+                package.Pinned.GetValueOrDefault(false) ? Resources.ic_pin : null,
+                package.Name,
+                package.CurrVer,
+                package.AvailVer,
+            ];
+        }
+
+        public object[] BuildInstalledItem(GenericPackage package)
+        {
+            return [
+                false,
+                package.Pinned.GetValueOrDefault(false) ? Resources.ic_pin : null,
+                package.Name,
+                package.CurrVer
             ];
         }
 

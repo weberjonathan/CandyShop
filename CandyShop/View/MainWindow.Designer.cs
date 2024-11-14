@@ -108,7 +108,7 @@ namespace CandyShop.View
             // 
             InstalledPage.Dock = DockStyle.Fill;
             InstalledPage.LoadingDetails = false;
-            InstalledPage.LoadingPackages = false;
+            InstalledPage.Loading = false;
             InstalledPage.Location = new System.Drawing.Point(3, 3);
             InstalledPage.Name = "InstalledPage";
             InstalledPage.Size = new System.Drawing.Size(716, 429);
@@ -132,7 +132,6 @@ namespace CandyShop.View
             Icon = (System.Drawing.Icon)resources.GetObject("$this.Icon");
             Name = "MainWindow";
             Text = "ChocoAutoUpdateForm";
-            Load += ChocoAutoUpdateForm_Load;
             MainPanel.ResumeLayout(false);
             tabControl1.ResumeLayout(false);
             TabUpgrade.ResumeLayout(false);

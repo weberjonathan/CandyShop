@@ -14,6 +14,7 @@ using CandyShop.PackageCore;
 using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
+using CandyShop.Controls.Factory;
 
 namespace CandyShop
 {
@@ -109,20 +110,25 @@ namespace CandyShop
 
             LoadOutdatedPackagesAsync(packageService);
 
+            IControlsFactory controlsFactory =
+                context.WingetMode ? new WingetControlsFactory() : new ChocoControlsFactory();
+
             // init controller
-            MainWindowController candyShopController = new(windowsTaskService, context);
-            InstalledPageController installedPageController = new(packageService);
-            UpgradePageController upgradePageController = new(context, packageService);
+            MainWindowController mainWindowController = new(context, windowsTaskService, controlsFactory);
+            InstalledPageController installedPageController = new(packageService, controlsFactory);
+            UpgradePageController upgradePageController = new(context, packageService, controlsFactory);
             PinController pinController = new(packageService);
+            PackageController packageController = new(packageService, controlsFactory);
 
             // init views
-            MainWindow mainPage = new MainWindow(candyShopController);
+            MainWindow mainPage = new(mainWindowController);
             InstalledPage installedPage = mainPage.InstalledPackagesPage;
             UpgradePage upgradePage = mainPage.UpgradePackagesPage;
-            installedPageController.InjectView(mainPage, installedPage);
+            installedPageController.InjectView(installedPage);
             upgradePageController.InjectViews(mainPage, upgradePage);
-            candyShopController.InjectView(mainPage);
+            mainWindowController.InjectView(mainPage);
             pinController.InjectView(installedPage, upgradePage);
+            packageController.InjectViews(mainPage, upgradePage, installedPage);
 
             // declare notification handler, so if needed, it lives during the entire lifecycle
             NotificationShowHandler notifificationHandler;
@@ -133,14 +139,13 @@ namespace CandyShop
                 notifificationHandler = new();
                 // creates a tray icon, displays a notification if outdated packages
                 // are found and opens the upgrade UI on click
-                RunInBackground(candyShopController, upgradePageController, installedPageController, packageService, context, notifificationHandler, packageService);
+                RunInBackground(mainWindowController, packageController, packageService, notifificationHandler, packageService);
             }
             else
             {
                 // launch window
-                candyShopController.InitView();
-                installedPageController.UpdateInstalledPackagesDisplayAsync();
-                upgradePageController.UpdateOutdatedPackageDisplayAsync();
+                mainWindowController.InitView();
+                packageController.UpdatePackageDisplaysAsync();
 
                 // attempt removal of legacy task
                 if (windowsTaskService.LaunchTaskExists())
@@ -175,10 +180,8 @@ namespace CandyShop
         }
 
         private async void RunInBackground(MainWindowController mainWindowController,
-                                           UpgradePageController upgradePageController,
-                                           InstalledPageController installedPageController,
+                                           PackageController packageController,
                                            PackageService service,
-                                           CandyShopContext context,
                                            NotificationShowHandler notifificationHandler,
                                            PackageService packageService)
         {
@@ -202,8 +205,7 @@ namespace CandyShop
             icon.MouseClick += new MouseEventHandler((sender, e) =>
             {
                 mainWindowController.InitView();
-                upgradePageController.UpdateOutdatedPackageDisplayAsync();
-                installedPageController.UpdateInstalledPackagesDisplayAsync();
+                packageController.UpdatePackageDisplaysAsync();
             });
 
             if (packages.Count > 0)
@@ -219,8 +221,7 @@ namespace CandyShop
             if (result.Equals(NotificationResult.Show))
             {
                 mainWindowController.InitView();
-                upgradePageController.UpdateOutdatedPackageDisplayAsync();
-                installedPageController.UpdateInstalledPackagesDisplayAsync();
+                packageController.UpdatePackageDisplaysAsync();
             }
             else if (result.Equals(NotificationResult.UpgradeAll))
             {

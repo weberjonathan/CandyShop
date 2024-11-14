@@ -12,69 +12,25 @@ namespace CandyShop.Controller
     class InstalledPageController
     {
         private readonly PackageService PackageService;
-        private MainWindow MainWindow;
+        private readonly IControlsFactory ControlsFactory;
         private InstalledPage View;
 
-        public InstalledPageController(PackageService service)
+        public InstalledPageController(PackageService service, IControlsFactory controlsFactory)
         {
             PackageService = service;
+            ControlsFactory = controlsFactory;
         }
 
-        public void InjectView(MainWindow mainWindow, InstalledPage view)
+        public void InjectView(InstalledPage view)
         {
-            MainWindow = mainWindow;
             View = view;
 
-            IControlsFactory provider = ContextSingleton.Get.WingetMode ? new WingetControlsFactory() : new ChocoControlsFactory();
-            View.BuildControls(provider);
+            View.BuildControls(ControlsFactory);
 
             View.SearchBar.SearchChanged += new EventHandler((sender, e) => SyncListView());
             View.SearchBar.CheckedChanged += new EventHandler((sender, e) => SyncListView());
+            View.PackagesAdded += new EventHandler((sender, e) => SyncListView());
             View.SelectedItemChanged += OnSelectedItemChanged;
-            MainWindow.RefreshClicked += new EventHandler((sender, e) => UpdateInstalledPackagesDisplayAsync(forceFetch: true));
-        }
-
-        public async void UpdateInstalledPackagesDisplayAsync(bool forceFetch = false)
-        {
-            View.LoadingPackages = true;
-            if (forceFetch) await PackageService.ClearInstalledPackages();
-
-            List<GenericPackage> packages = new List<GenericPackage>();
-            try
-            {
-                packages = await PackageService.GetInstalledPackagesAsync();
-            }
-            catch (PackageManagerException e)
-            {
-                Log.Error($"An error occurred while retrieving installed packages: {e.Message}");
-            }
-
-            if (forceFetch) await PackageService.ClearPackageDetails();
-
-            View.ClearItems();
-            View.LoadingPackages = false;
-            packages.ForEach(p => View.AppendItem(BuildDisplayItem(p)));
-            SyncListView();
-        }
-
-        private object[] BuildDisplayItem(GenericPackage package)
-        {
-            if (ContextSingleton.Get.WingetMode)
-                return [
-                    false,
-                    package.Pinned.GetValueOrDefault(false) ? Resources.ic_pin : null,
-                    package.Name,
-                    package.Id,
-                    package.CurrVer,
-                    string.IsNullOrEmpty(package.Source) ? "None" : package.Source
-                ];
-            else
-                return [
-                    false,
-                    package.Pinned.GetValueOrDefault(false) ? Resources.ic_pin : null,
-                    package.Name,
-                    package.CurrVer
-                ];
         }
 
         private async void OnSelectedItemChanged(object sender, EventArgs e)
@@ -98,7 +54,7 @@ namespace CandyShop.Controller
                 details = String.Format(LocaleEN.ERROR_RETRIEVING_PACKAGE_DETAILS, exception.Message);
             }
 
-            if (!String.IsNullOrEmpty(details) && name.Equals(View.SelectedItem) && !View.LoadingPackages)
+            if (!String.IsNullOrEmpty(details) && name.Equals(View.SelectedItem) && !View.Loading)
             {
                 View.UpdateDetails(details);
             }
@@ -168,7 +124,7 @@ namespace CandyShop.Controller
                 index = View.Items.IndexOf(lastVisibilePackage) + 1;
             }
 
-            View.InsertItem(index, BuildDisplayItem(package));
+            View.InsertItem(index, ControlsFactory.BuildInstalledItem(package));
         }
     }
 }

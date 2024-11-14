@@ -8,7 +8,7 @@ using System.Windows.Forms;
 
 namespace CandyShop.View
 {
-    partial class UpgradePage : UserControl, ITabPage, IPinSupport
+    partial class UpgradePage : UserControl, ITabPage, IPinSupport, IPackageViewer
     {
         public UpgradePage()
         {
@@ -36,6 +36,7 @@ namespace CandyShop.View
         public event EventHandler CloseAfterUpgradeChanged;
         public event EventHandler CheckTopLevelClicked;
         public event EventHandler RefreshClicked;
+        public event EventHandler PackagesAdded;
 
         public string[] Items
         {
@@ -163,13 +164,19 @@ namespace CandyShop.View
             Controls.Add(ts);
         }
 
-        public void AddItem(object[] data)
+        public void AddPackages(List<object[]> data)
         {
             if (Loading) Loading = false;
-            LstPackages.AddItem(data);
+
+            if (data.Count == 0)
+                DisplayEmpty();
+            else
+                data.ForEach(LstPackages.AddItem);
+
+            PackagesAdded?.Invoke(this, EventArgs.Empty);
         }
 
-        public void ClearItems()
+        public void ClearPackages()
         {
             LstPackages.Other.Rows.Clear();
         }

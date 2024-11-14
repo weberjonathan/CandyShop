@@ -1,4 +1,5 @@
-﻿using CandyShop.Properties;
+﻿using CandyShop.PackageCore;
+using CandyShop.Properties;
 using System.Windows.Forms;
 
 namespace CandyShop.Controls.Factory
@@ -26,6 +27,31 @@ namespace CandyShop.Controls.Factory
                 new(null, LocaleEN.TEXT_COL_VERSION, .2f, PackageListBoxSize.Percent),
                 new(null, LocaleEN.TEXT_COL_SOURCE,  65f, PackageListBoxSize.Fixed)
             ];
+        }
+
+        public object[] BuildUpgradeItem(GenericPackage package)
+        {
+            return [
+                true,
+                package.Pinned.GetValueOrDefault(false) ? Resources.ic_pin : null,
+                package.Name,
+                package.Id,
+                package.CurrVer,
+                package.AvailVer,
+                package.Source
+            ];
+        }
+
+        public object[] BuildInstalledItem(GenericPackage package)
+        {
+            return [
+                    false,
+                    package.Pinned.GetValueOrDefault(false) ? Resources.ic_pin : null,
+                    package.Name,
+                    package.Id,
+                    package.CurrVer,
+                    string.IsNullOrEmpty(package.Source) ? "None" : package.Source
+                ];
         }
 
         public SearchBar GetSearchBar()

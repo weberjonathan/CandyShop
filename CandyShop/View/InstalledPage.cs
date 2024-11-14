@@ -8,7 +8,7 @@ using CandyShop.Controls.Factory;
 
 namespace CandyShop.View
 {
-    partial class InstalledPage : UserControl, ITabPage, IPinSupport
+    partial class InstalledPage : UserControl, ITabPage, IPinSupport, IPackageViewer
     {
         public InstalledPage()
         {
@@ -22,6 +22,10 @@ namespace CandyShop.View
 
         public event EventHandler<PinnedChangedArgs> PinnedChanged;
         public event EventHandler SelectedItemChanged;
+        public event EventHandler PackagesAdded;
+#pragma warning disable 67
+        public event EventHandler RefreshClicked;
+#pragma warning restore 67
 
         public string SelectedItem
         {
@@ -36,7 +40,7 @@ namespace CandyShop.View
 
         public SearchBar SearchBar { get; private set; }
 
-        public bool LoadingPackages
+        public bool Loading
         {
             get
             {
@@ -86,12 +90,11 @@ namespace CandyShop.View
             Controls.Add(SearchBar);
         }
 
-        public void AppendItem(object[] data)
+        public void AddPackages(List<object[]> data)
         {
-            if (LoadingPackages)
-                LoadingPackages = false;
-
-            LstPackages.AddItem(data);
+            if (Loading) Loading = false;
+            data.ForEach(LstPackages.AddItem);
+            PackagesAdded?.Invoke(this, EventArgs.Empty);
         }
 
         public void InsertItem(int index, object[] data)
@@ -99,7 +102,7 @@ namespace CandyShop.View
             LstPackages.Other.Rows.Insert(index, data);
         }
 
-        public void ClearItems()
+        public void ClearPackages()
         {
             LstPackages.Other.Rows.Clear();
         }

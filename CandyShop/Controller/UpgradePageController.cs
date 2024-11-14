@@ -14,13 +14,15 @@ namespace CandyShop.Controller
     {
         private readonly CandyShopContext Context;
         private readonly PackageService PackageService;
+        private readonly IControlsFactory ControlsFactory;
         private MainWindow MainWindow;
         private UpgradePage View;
 
-        public UpgradePageController(CandyShopContext context, PackageService packageService)
+        public UpgradePageController(CandyShopContext context, PackageService packageService, IControlsFactory controlsFactory)
         {
             Context = context;
             PackageService = packageService;
+            ControlsFactory = controlsFactory;
         }
 
         public void InjectViews(MainWindow mainWindow, UpgradePage upgradePage)
@@ -28,15 +30,13 @@ namespace CandyShop.Controller
             MainWindow = mainWindow;
             View = upgradePage;
 
-            IControlsFactory provider = ContextSingleton.Get.WingetMode ? new WingetControlsFactory() : new ChocoControlsFactory(); // TODO
-            View.BuildControls(provider);
+            View.BuildControls(ControlsFactory);
 
             View.CleanShortcutsChanged += new EventHandler((sender, e) => Context.CleanShortcuts = View.CleanShortcuts);
             View.CloseAfterUpgradeChanged += new EventHandler((sender, e) => Context.CloseAfterUpgrade = View.CloseAfterUpgrade);
             View.CleanShortcuts = Context.CleanShortcuts;
             View.CloseAfterUpgrade = Context.CloseAfterUpgrade;
-            View.RefreshClicked += new EventHandler((sender, e) => UpdateOutdatedPackageDisplayAsync(forceFetch: true));
-            MainWindow.RefreshClicked += new EventHandler((sender, e) => UpdateOutdatedPackageDisplayAsync(forceFetch: true));
+            View.PackagesAdded += new EventHandler((sender, e) => CheckTopLevelPackages());
 
             View.UpgradeAllClick += new EventHandler((sender, e) =>
             {
@@ -59,57 +59,6 @@ namespace CandyShop.Controller
 
             // update UI if is properties file is updated
             Context.InitConfigFileWatcher();
-        }
-
-        public async void UpdateOutdatedPackageDisplayAsync(bool forceFetch = false)
-        {
-            View.Loading = true;
-            if (forceFetch) await PackageService.ClearOutdatedPackages();
-
-            List<GenericPackage> packages = new List<GenericPackage>();
-            try
-            {
-                packages = await PackageService.GetOutdatedPackagesAsync();
-            }
-            catch (PackageManagerException e)
-            {
-                Log.Error(LocaleEN.ERROR_RETRIEVING_OUTDATED_PACKAGES, e.Message);
-            }
-
-            View.ClearItems();
-            // TODO unknown packages can only be upgraded with a specific flag; give user control over that
-            IEnumerable<object[]> items = packages.Where(p => !"Unknown".Equals(p.CurrVer)).Select(BuildDisplayItem);
-            foreach (var item in items)
-                View.AddItem(item);
-
-            if (packages.Count == 0)
-            {
-                View.DisplayEmpty();
-            }
-
-            CheckTopLevelPackages();
-        }
-
-        private object[] BuildDisplayItem(GenericPackage package)
-        {
-            if (Context.WingetMode)
-                return [
-                    true,
-                    package.Pinned.GetValueOrDefault(false) ? Resources.ic_pin : null,
-                    package.Name,
-                    package.Id,
-                    package.CurrVer,
-                    package.AvailVer,
-                    package.Source
-                ];
-            else
-                return [
-                    true,
-                    package.Pinned.GetValueOrDefault(false) ? Resources.ic_pin : null,
-                    package.Name,
-                    package.CurrVer,
-                    package.AvailVer,
-                ];
         }
 
         private void CheckTopLevelPackages()
@@ -154,8 +103,7 @@ namespace CandyShop.Controller
             }
             else
             {
-                UpdateOutdatedPackageDisplayAsync();
-                MainWindow?.Show();
+                MainWindow?.ShowAndRefresh();
             }
         }
     }
