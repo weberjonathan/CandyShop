@@ -31,24 +31,24 @@ namespace CandyShop.View
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FirstStartForm));
-            label1 = new System.Windows.Forms.Label();
+            lblChooseSource = new System.Windows.Forms.Label();
             cmbSource = new System.Windows.Forms.ComboBox();
             checkCacheAdmin = new System.Windows.Forms.CheckBox();
             checkRequireAdmin = new System.Windows.Forms.CheckBox();
-            label2 = new System.Windows.Forms.Label();
-            label3 = new System.Windows.Forms.Label();
+            lblSecurity1 = new System.Windows.Forms.Label();
+            lblSecurity2 = new System.Windows.Forms.Label();
             btnContinue = new System.Windows.Forms.Button();
-            label4 = new System.Windows.Forms.Label();
+            lblHint = new System.Windows.Forms.Label();
             SuspendLayout();
             // 
-            // label1
+            // lblChooseSource
             // 
-            label1.AutoSize = true;
-            label1.Location = new System.Drawing.Point(18, 23);
-            label1.Name = "label1";
-            label1.Size = new System.Drawing.Size(208, 15);
-            label1.TabIndex = 0;
-            label1.Text = "Please choose your package manager.";
+            lblChooseSource.AutoSize = true;
+            lblChooseSource.Location = new System.Drawing.Point(18, 23);
+            lblChooseSource.Name = "lblChooseSource";
+            lblChooseSource.Size = new System.Drawing.Size(208, 15);
+            lblChooseSource.TabIndex = 0;
+            lblChooseSource.Text = "Please choose your package manager.";
             // 
             // cmbSource
             // 
@@ -80,24 +80,24 @@ namespace CandyShop.View
             checkRequireAdmin.Text = "Require administrator privileges for upgrades";
             checkRequireAdmin.UseVisualStyleBackColor = true;
             // 
-            // label2
+            // lblSecurity1
             // 
-            label2.BackColor = System.Drawing.SystemColors.Control;
-            label2.Location = new System.Drawing.Point(338, 23);
-            label2.Name = "label2";
-            label2.Size = new System.Drawing.Size(276, 97);
-            label2.TabIndex = 4;
-            label2.Text = resources.GetString("label2.Text");
+            lblSecurity1.BackColor = System.Drawing.SystemColors.Control;
+            lblSecurity1.Location = new System.Drawing.Point(338, 23);
+            lblSecurity1.Name = "lblSecurity1";
+            lblSecurity1.Size = new System.Drawing.Size(276, 97);
+            lblSecurity1.TabIndex = 4;
+            lblSecurity1.Text = resources.GetString("lblSecurity1.Text");
             // 
-            // label3
+            // LblSecurity2
             // 
-            label3.BackColor = System.Drawing.SystemColors.Control;
-            label3.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
-            label3.Location = new System.Drawing.Point(338, 120);
-            label3.Name = "label3";
-            label3.Size = new System.Drawing.Size(276, 59);
-            label3.TabIndex = 5;
-            label3.Text = "If you do not understand the security implications of this feature, it is strongly recommended to leave this option unchecked.";
+            lblSecurity2.BackColor = System.Drawing.SystemColors.Control;
+            lblSecurity2.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
+            lblSecurity2.Location = new System.Drawing.Point(338, 120);
+            lblSecurity2.Name = "LblSecurity2";
+            lblSecurity2.Size = new System.Drawing.Size(276, 59);
+            lblSecurity2.TabIndex = 5;
+            lblSecurity2.Text = "If you do not understand the security implications of this feature, it is strongly recommended to leave this option unchecked.";
             // 
             // btnContinue
             // 
@@ -108,15 +108,15 @@ namespace CandyShop.View
             btnContinue.Text = "&Continue";
             btnContinue.UseVisualStyleBackColor = true;
             // 
-            // label4
+            // lblHint
             // 
-            label4.BackColor = System.Drawing.SystemColors.Control;
-            label4.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, 0);
-            label4.Location = new System.Drawing.Point(12, 212);
-            label4.Name = "label4";
-            label4.Size = new System.Drawing.Size(602, 30);
-            label4.TabIndex = 7;
-            label4.Text = "Settings may be changed directly in the configuration file, which can be opened using the \"Extras\" menu. A proper configuration page is planned for later.";
+            lblHint.BackColor = System.Drawing.SystemColors.Control;
+            lblHint.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, 0);
+            lblHint.Location = new System.Drawing.Point(12, 212);
+            lblHint.Name = "lblHint";
+            lblHint.Size = new System.Drawing.Size(602, 30);
+            lblHint.TabIndex = 7;
+            lblHint.Text = "Settings may be changed directly in the configuration file, which can be opened using the \"Extras\" menu. A proper configuration page is planned for later.";
             // 
             // FirstStartForm
             // 
@@ -124,14 +124,14 @@ namespace CandyShop.View
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             ClientSize = new System.Drawing.Size(627, 298);
-            Controls.Add(label4);
+            Controls.Add(lblHint);
             Controls.Add(btnContinue);
-            Controls.Add(label3);
-            Controls.Add(label2);
+            Controls.Add(lblSecurity2);
+            Controls.Add(lblSecurity1);
             Controls.Add(checkRequireAdmin);
             Controls.Add(checkCacheAdmin);
             Controls.Add(cmbSource);
-            Controls.Add(label1);
+            Controls.Add(lblChooseSource);
             FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             Icon = (System.Drawing.Icon)resources.GetObject("$this.Icon");
             MaximizeBox = false;
@@ -144,13 +144,13 @@ namespace CandyShop.View
 
         #endregion
 
-        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label lblChooseSource;
         private System.Windows.Forms.ComboBox cmbSource;
         private System.Windows.Forms.CheckBox checkCacheAdmin;
         private System.Windows.Forms.CheckBox checkRequireAdmin;
-        private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Label lblSecurity1;
+        private System.Windows.Forms.Label lblSecurity2;
         private System.Windows.Forms.Button btnContinue;
-        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Label lblHint;
     }
 }

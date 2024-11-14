@@ -117,7 +117,7 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="label2.Text" xml:space="preserve">
+  <data name="lblSecurity1.Text" xml:space="preserve">
     <value>Chocolatey and Winget may be used with or without administrator privileges. If you want to run your package manager as administrator, Candy Shop will attempt to use GSudo to elevate the required processes. These credentials can be cached to prevent repeated UAC popups.</value>
   </data>
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />

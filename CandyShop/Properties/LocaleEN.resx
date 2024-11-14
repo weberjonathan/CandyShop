@@ -250,6 +250,30 @@ You can fix this error by running "winget list" in the terminal (or any other co
   <data name="TEXT_UPGRADE_SELECTED" xml:space="preserve">
     <value>&amp;Upgrade</value>
   </data>
+  <data name="TEXT_WIZARD_CHANGE_HINT" xml:space="preserve">
+    <value>Settings may be changed directly in the configuration file, which can be opened using the "Extras" menu. A proper configuration page is planned for later.</value>
+  </data>
+  <data name="TEXT_WIZARD_CHOOSE_SOURCE" xml:space="preserve">
+    <value>Please choose your package manager.</value>
+  </data>
+  <data name="TEXT_WIZARD_CONFIRM_RISKS" xml:space="preserve">
+    <value>I understand the risks.</value>
+  </data>
+  <data name="TEXT_WIZARD_CONTINUE" xml:space="preserve">
+    <value>&amp;Continue</value>
+  </data>
+  <data name="TEXT_WIZARD_ENABLE_CACHE" xml:space="preserve">
+    <value>Cache administrator privileges during upgrades</value>
+  </data>
+  <data name="TEXT_WIZARD_REQUIRE_ADMIN" xml:space="preserve">
+    <value>Require administrator privileges for upgrades</value>
+  </data>
+  <data name="TEXT_WIZARD_SECURITY1" xml:space="preserve">
+    <value>Chocolatey and Winget may be used with or without administrator privileges. If you want to run your package manager as administrator, Candy Shop will attempt to use GSudo to elevate the required processes. These credentials can be cached to prevent repeated UAC popups.</value>
+  </data>
+  <data name="TEXT_WIZARD_SECURITY2" xml:space="preserve">
+    <value>If you do not understand the security implications of this feature, it is strongly recommended to leave this option unchecked.</value>
+  </data>
   <data name="URL_GITHUB" xml:space="preserve">
     <value>https://github.com/weberjonathan/CandyShop</value>
   </data>

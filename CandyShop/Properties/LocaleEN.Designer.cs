@@ -452,6 +452,78 @@ namespace CandyShop.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Settings may be changed directly in the configuration file, which can be opened using the &quot;Extras&quot; menu. A proper configuration page is planned for later..
+        /// </summary>
+        internal static string TEXT_WIZARD_CHANGE_HINT {
+            get {
+                return ResourceManager.GetString("TEXT_WIZARD_CHANGE_HINT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Please choose your package manager..
+        /// </summary>
+        internal static string TEXT_WIZARD_CHOOSE_SOURCE {
+            get {
+                return ResourceManager.GetString("TEXT_WIZARD_CHOOSE_SOURCE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I understand the risks..
+        /// </summary>
+        internal static string TEXT_WIZARD_CONFIRM_RISKS {
+            get {
+                return ResourceManager.GetString("TEXT_WIZARD_CONFIRM_RISKS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &amp;Continue.
+        /// </summary>
+        internal static string TEXT_WIZARD_CONTINUE {
+            get {
+                return ResourceManager.GetString("TEXT_WIZARD_CONTINUE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cache administrator privileges during upgrades.
+        /// </summary>
+        internal static string TEXT_WIZARD_ENABLE_CACHE {
+            get {
+                return ResourceManager.GetString("TEXT_WIZARD_ENABLE_CACHE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Require administrator privileges for upgrades.
+        /// </summary>
+        internal static string TEXT_WIZARD_REQUIRE_ADMIN {
+            get {
+                return ResourceManager.GetString("TEXT_WIZARD_REQUIRE_ADMIN", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Chocolatey and Winget may be used with or without administrator privileges. If you want to run your package manager as administrator, Candy Shop will attempt to use GSudo to elevate the required processes. These credentials can be cached to prevent repeated UAC popups..
+        /// </summary>
+        internal static string TEXT_WIZARD_SECURITY1 {
+            get {
+                return ResourceManager.GetString("TEXT_WIZARD_SECURITY1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to If you do not understand the security implications of this feature, it is strongly recommended to leave this option unchecked..
+        /// </summary>
+        internal static string TEXT_WIZARD_SECURITY2 {
+            get {
+                return ResourceManager.GetString("TEXT_WIZARD_SECURITY2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to https://github.com/weberjonathan/CandyShop.
         /// </summary>
         internal static string URL_GITHUB {

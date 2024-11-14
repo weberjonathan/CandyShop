@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using CandyShop.Properties;
+using System;
 using System.Windows.Forms;
 
 namespace CandyShop.View
@@ -21,6 +15,15 @@ namespace CandyShop.View
         public FirstStartForm()
         {
             InitializeComponent();
+
+            checkRequireAdmin.Text = LocaleEN.TEXT_WIZARD_REQUIRE_ADMIN;
+            checkCacheAdmin.Text = LocaleEN.TEXT_WIZARD_ENABLE_CACHE;
+            lblHint.Text = LocaleEN.TEXT_WIZARD_CHANGE_HINT;
+            lblSecurity1.Text = LocaleEN.TEXT_WIZARD_SECURITY1;
+            lblSecurity2.Text = LocaleEN.TEXT_WIZARD_SECURITY2;
+            lblChooseSource.Text = LocaleEN.TEXT_WIZARD_CHOOSE_SOURCE;
+            btnContinue.Text = LocaleEN.TEXT_WIZARD_CONTINUE;
+
             btnContinue.DialogResult = DialogResult.OK;
             cmbSource.SelectedIndex = 0;
             checkCacheAdmin.CheckedChanged += new EventHandler((sender, e) =>
@@ -28,7 +31,7 @@ namespace CandyShop.View
                 if (!cacheConfirmation)
                 {
                     var result =
-                    MessageBox.Show("I know what I'm doing.", Application.ProductName, MessageBoxButtons.OKCancel, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2);
+                    MessageBox.Show(LocaleEN.TEXT_WIZARD_CONFIRM_RISKS, Application.ProductName, MessageBoxButtons.OKCancel, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2);
                     if (result == DialogResult.OK)
                     {
                         cacheConfirmation = true;
