@@ -47,8 +47,10 @@ namespace CandyShop
             public List<int> ValidExitCodes { get; set; } = new List<int> { 0, 1641, 3010, 350, 1604 };
         }
 
-        private const string OPTION_BACKGROUND = "--background";
-        private const string OPTION_BACKGROUND_SHORT = "-b";
+        private const string OPTION_BACKGROUND = "--silent";
+        private const string OPTION_BACKGROUND_SHORT = "-s";
+        private const string OPTION_BACKGROUND_LEGACY = "--background";
+        private const string OPTION_BACKGROUND_LEGACY_SHORT = "-b";
         private const string OPTION_DEBUG = "--debug";
 
         private static readonly string _AppDataDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "CandyShop");
@@ -184,6 +186,12 @@ namespace CandyShop
                         LaunchedMinimized = true;
                         break;
                     case OPTION_BACKGROUND_SHORT:
+                        LaunchedMinimized = true;
+                        break;
+                    case OPTION_BACKGROUND_LEGACY:
+                        LaunchedMinimized = true;
+                        break;
+                    case OPTION_BACKGROUND_LEGACY_SHORT:
                         LaunchedMinimized = true;
                         break;
                     case OPTION_DEBUG:

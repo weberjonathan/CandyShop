@@ -24,7 +24,7 @@ namespace CandyShop.Services
             IWshShortcut shortcut = (IWshShortcut)shell.CreateShortcut(SHORTCUT_PATH);
             shortcut.Description = "Silently launches Candy Shop";
             shortcut.TargetPath = Path.GetFullPath(CurrentExe);
-            shortcut.Arguments = "--background";
+            shortcut.Arguments = "--silent";
             shortcut.Save();
         }
 
