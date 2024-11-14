@@ -91,6 +91,14 @@ namespace CandyShop.Services
                     }
 
                     MergePinInfoUnsafe(pinned);
+
+                    var unresolvedIds = InstalledPckgCache.Values.Where(p => p.Id.Contains('…') && p.HasSource).ToList();
+                    if (unresolvedIds.Count > 0)
+                    {
+                        var value = string.Join(", ", unresolvedIds.Select(p => p.Name).ToList());
+                        Log.Warning($"{unresolvedIds.Count} package(s) have sources and unresolved IDs: {value}");
+                    }
+
                 }
             }
             catch (PackageManagerException)
