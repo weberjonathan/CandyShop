@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "Candy Shop"
-#define MyAppVersion "1.0"
+#define MyAppVersion "0.11"
 #define MyAppPublisher "Jonathan Weber"
 #define MyAppURL "https://github.com/weberjonathan/CandyShop"
 #define MyAppExeName "CandyShop.exe"
@@ -30,10 +30,10 @@ ArchitecturesInstallIn64BitMode=x64compatible
 DefaultGroupName={#MyAppName}
 AllowNoIcons=yes
 ; Uncomment the following line to run in non administrative install mode (install for current user only.)
-;PrivilegesRequired=lowest
-PrivilegesRequiredOverridesAllowed=commandline
+PrivilegesRequired=lowest
+PrivilegesRequiredOverridesAllowed=dialog
 OutputDir=.\out
-OutputBaseFilename=CandyShop-setup
+OutputBaseFilename=CandyShop-Setup
 Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
@@ -46,7 +46,7 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 
 [Files]
 Source: "..\CandyShop\bin\Release\net8.0-windows10.0.17763.0\publish\win-x64\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\CandyShop\bin\Release\net8.0-windows10.0.17763.0\publish\win-x64\Microsoft.WindowsAppRuntime.Bootstrap.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\CandyShop\bin\Release\net8.0-windows10.0.17763.0\publish\win-x64\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
