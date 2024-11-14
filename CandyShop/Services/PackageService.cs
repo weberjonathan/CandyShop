@@ -380,16 +380,19 @@ namespace CandyShop.Services
 
         private async Task UpdateCachedItem(GenericPackage package)
         {
-            await OutdatedPckgLock.WaitAsync().ConfigureAwait(false);
-            var cachedPackage = OutdatedPckgCache[package.Name];
-            cachedPackage.Name = package.Name;
-            cachedPackage.Id = package.Id;
-            cachedPackage.Source = package.Source;
-            cachedPackage.CurrVer = package.CurrVer;
-            cachedPackage.AvailVer = package.AvailVer;
-            cachedPackage.Pinned = package.Pinned;
-            cachedPackage.Parent = package.Parent;
-            OutdatedPckgLock.Release();
+            if (OutdatedPckgCache.ContainsKey(package.Name))
+            {
+                await OutdatedPckgLock.WaitAsync().ConfigureAwait(false);
+                OutdatedPckgCache[package.Name] = package;
+                OutdatedPckgLock.Release();
+            }
+
+            if (InstalledPckgCache.ContainsKey(package.Name))
+            {
+                await InstalledPckgLock.WaitAsync().ConfigureAwait(false);
+                InstalledPckgCache[package.Name] = package;
+                InstalledPckgLock.Release();
+            }
         }
 
         private void MergePinInfoUnsafe(List<GenericPackage> pinned)
