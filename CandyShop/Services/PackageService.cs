@@ -83,11 +83,11 @@ namespace CandyShop.Services
                     // resolve names of installed packages and pinned packages
                     if (PackageManager.RequiresNameResolution)
                     {
-                        (var oldNames, var newPackages) = await Task.Run(() => PackageManager.ResolveAbbreviatedNames(InstalledPckgCache.Values.ToList())); // TODO this ugly
-                        MoveInstalledPackagesUnsafe(oldNames, newPackages);
+                        var movedPackages = await PackageManager.ResolveAbbreviatedNamesAsync(InstalledPckgCache.Values.ToList());
+                        MoveInstalledPackagesUnsafe(movedPackages);
 
-                        (oldNames, newPackages) = await Task.Run(() => PackageManager.ResolveAbbreviatedNames(pinned));
-                        pinned = newPackages.ToList();
+                        movedPackages = await PackageManager.ResolveAbbreviatedNamesAsync(pinned);
+                        pinned = movedPackages.Values.ToList();
                     }
 
                     MergePinInfoUnsafe(pinned);
@@ -128,7 +128,6 @@ namespace CandyShop.Services
                     else
                     {
                         var packagesFuture = GetInstalledPackagesAsync();
-                        Thread.Sleep(100); // TODO
 
                         // try use intermediate installed package fetch results if (expensive) name resolution is required
                         if (PackageManager.RequiresNameResolution)
@@ -412,15 +411,14 @@ namespace CandyShop.Services
             return rtn;
         }
 
-        private void MoveInstalledPackagesUnsafe(string[] oldNames, GenericPackage[] newPackages)
+        private void MoveInstalledPackagesUnsafe(Dictionary<string, GenericPackage> movedPackages)
         {
-            for (int i = 0; i < oldNames.Length; i++)
+            foreach (var (oldName, package) in movedPackages)
             {
-                string name = oldNames[i];
-                if (InstalledPckgCache.ContainsKey(name))
+                if (InstalledPckgCache.ContainsKey(oldName))
                 {
-                    InstalledPckgCache.Remove(name);
-                    InstalledPckgCache[newPackages[i].Name] = newPackages[i];
+                    InstalledPckgCache.Remove(oldName);
+                    InstalledPckgCache[package.Name] = package;
                 }
             }
         }

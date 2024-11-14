@@ -1,6 +1,7 @@
 ﻿using CandyShop.Properties;
 using Serilog;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -272,73 +273,53 @@ namespace CandyShop.PackageCore
         }
 
         // TODO try resolve ids
-        public override (string[], GenericPackage[]) ResolveAbbreviatedNames(List<GenericPackage> packages)
+        // TODO move public up in structure
+        public override async Task<Dictionary<string, GenericPackage>> ResolveAbbreviatedNamesAsync(List<GenericPackage> packages)
         {
-            List<string> oldNames = [];
-            List<GenericPackage> newPackages = [];
-
             int total = packages.Count;
+            ConcurrentBag<GenericPackage> unresolvedNames = [];
+            ConcurrentDictionary<string, GenericPackage> movedPackages = new();
 
             var candidates = packages.Where(p => p.HasSource && p.Name.Contains('…')).ToList();
-            var tasks = new Task[candidates.Count];
-
-            List<GenericPackage> unresolvedNames = [];
-            for (int i = 0; i < candidates.Count; i++)
+            var options = new ParallelOptions() { MaxDegreeOfParallelism = 5 };
+            await Parallel.ForEachAsync(candidates, options, async (package, token) =>
             {
-                var package = candidates[i];
-                tasks[i] = Task.Run(() =>
+                Log.Debug("Started task");
+                string fetched;
+                try
                 {
-                    string fetched;
-                    try
-                    {
-                        fetched = FetchInfo(package);
-                    }
-                    catch (PackageManagerException e)
-                    {
-                        Log.Error($"Failed to resolve package with name '{package.Name}': {e.Message}");
-                        unresolvedNames.Add(package);
-                        return;
-                    }
+                    fetched = await FetchInfoAsync(package);
+                }
+                catch (PackageManagerException e)
+                {
+                    Log.Error($"Failed to resolve package with name '{package.Name}': {e.Message}");
+                    unresolvedNames.Add(package);
+                    return;
+                }
 
-                    var (name, id) = GetMetaInfo(fetched);
-                    // update resolved packages but do not discard others
-                    if (name != null && id != null)
-                    {
-                        oldNames.Add(package.Name);
-                        newPackages.Add(package);
-                        package.Name = name;
-                        package.Id = id;
-                    }
-                    else
-                    {
-                        unresolvedNames.Add(package);
-                    }
-                });
-            }
-
-            try
-            {
-                Task.WaitAll(tasks);
-            }
-            catch (AggregateException ae)
-            {
-                foreach (var e in ae.Flatten().InnerExceptions)
-                Log.Error($"Failed to resolve full package names: {e.Message}");
-            }
-
-            // assert results
-            if (oldNames.Count != newPackages.Count)
-                throw new InvalidOperationException();
+                var (name, id) = GetMetaInfo(fetched);
+                if (name != null && id != null)
+                {
+                    movedPackages[package.Name] = package;
+                    package.Name = name;
+                    package.Id = id;
+                }
+                else
+                {
+                    unresolvedNames.Add(package);
+                }
+                Log.Debug("Finished");
+            });
 
             // log unresolved packages
-            Log.Debug($"Resolved incomplete package names for {oldNames.Count} of {candidates.Count} candidates. Total package count was {total}.");
-            if (unresolvedNames.Count > 0)
+            Log.Debug($"Resolved incomplete package names for {movedPackages.Count} of {candidates.Count} candidates. Total package count was {total}.");
+            if (!unresolvedNames.IsEmpty)
             {
                 var value = string.Join(", ", unresolvedNames.Select(p => p.Name).ToList());
                 Log.Warning($"Failed to resolve {unresolvedNames.Count} package(s): {value}");
             }
 
-            return (oldNames.ToArray(), newPackages.ToArray());
+            return movedPackages.ToDictionary();
         }
 
         private (string, string) GetMetaInfo(string fetchInfoResult)

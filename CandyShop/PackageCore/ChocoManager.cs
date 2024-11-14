@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace CandyShop.PackageCore
 {
@@ -287,7 +288,7 @@ namespace CandyShop.PackageCore
             return rtn;
         }
 
-        public override (string[], GenericPackage[]) ResolveAbbreviatedNames(List<GenericPackage> packages)
+        public override Task<Dictionary<string, GenericPackage>> ResolveAbbreviatedNamesAsync(List<GenericPackage> packages)
         {
             Log.Error("Chocolatey tried to invoke a capabality that is not implemented: Resolving abbreviated names.");
             throw new InvalidOperationException();

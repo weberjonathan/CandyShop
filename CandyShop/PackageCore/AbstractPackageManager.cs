@@ -72,7 +72,7 @@ namespace CandyShop.PackageCore
         /// <exception cref="PackageManagerException"></exception>
         protected abstract void Unpin(GenericPackage package);
 
-        public abstract (string[], GenericPackage[]) ResolveAbbreviatedNames(List<GenericPackage> packages);
+        public abstract Task<Dictionary<string, GenericPackage>> ResolveAbbreviatedNamesAsync(List<GenericPackage> packages);
 
         /// <exception cref="CandyShopException"></exception>
         protected void EnableGsudoCache()
