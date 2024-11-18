@@ -52,6 +52,7 @@ namespace CandyShop
         private const string OPTION_BACKGROUND_LEGACY = "--background";
         private const string OPTION_BACKGROUND_LEGACY_SHORT = "-b";
         private const string OPTION_DEBUG = "--debug";
+        private const string OPTION_ENABLE_SELF_UPDATE = "--enable-self-update";
 
         private static readonly string _AppDataDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "CandyShop");
         private static readonly string _ConfigFilepath = Path.Combine(_AppDataDir, "CandyShop.config");
@@ -86,6 +87,8 @@ namespace CandyShop
         public bool LaunchedMinimized { get; set; } = false;
 
         public bool DebugEnabled { get; private set; } = false;
+
+        public bool SelfUpdateEnabled { get; private set; } = false;
 
         // -------------- set through properties file --------------
 
@@ -196,6 +199,9 @@ namespace CandyShop
                         break;
                     case OPTION_DEBUG:
                         DebugEnabled = true;
+                        break;
+                    case OPTION_ENABLE_SELF_UPDATE:
+                        SelfUpdateEnabled = true;
                         break;
                     default:
                         break;

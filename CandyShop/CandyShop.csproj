@@ -8,7 +8,7 @@
     <UseWindowsForms>true</UseWindowsForms>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <PackageId>Candy Shop</PackageId>
-    <Version>0.11.1</Version>
+    <Version>0.11.2</Version>
     <Authors>Jonathan Weber</Authors>
     <Product>Candy Shop</Product>
     <AssemblyName>CandyShop</AssemblyName>

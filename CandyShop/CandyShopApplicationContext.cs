@@ -11,9 +11,7 @@ using Microsoft.Windows.AppNotifications;
 using System.IO;
 using System.Diagnostics;
 using CandyShop.PackageCore;
-using System.ComponentModel;
 using System.Globalization;
-using System.Linq;
 using CandyShop.Controls.Factory;
 
 namespace CandyShop

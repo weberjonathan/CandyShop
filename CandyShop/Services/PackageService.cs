@@ -6,6 +6,7 @@ using Serilog;
 using System;
 using CandyShop.PackageCore;
 using System.IO;
+using System.Windows.Forms;
 
 namespace CandyShop.Services
 {
@@ -279,6 +280,17 @@ namespace CandyShop.Services
             if (PackageManager == null) return;
 
             packages = packages.Where(p => !p.Pinned.GetValueOrDefault(false)).ToList();
+            var selfPackages = packages.Where(p => p.Name.Equals("Candy Shop") || p.Name.Equals("CandyShop"));
+            if (selfPackages.Any() && !ContextSingleton.Get.SelfUpdateEnabled)
+            {
+                MessageBox.Show(
+                    "Candy Shop currently does not support upgrading itself. This feature is planned in the future. Please upgrade Candy Shop through the terminal instead.",
+                    MetaInfo.Name,
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information);
+                packages.Remove(selfPackages.First());
+            }
+
             if (packages.Count <= 0) return;
 
             List<string> shortcuts = [];
