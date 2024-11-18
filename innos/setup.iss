@@ -37,6 +37,9 @@ OutputBaseFilename=CandyShop-Setup
 Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
+;uninstall settings
+UninstallDisplayName={#MyAppName}
+UninstallDisplayIcon={app}\{#MyAppExeName}
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
@@ -57,3 +60,10 @@ Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: de
 [Run]
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
 
+[UninstallDelete]
+Type: files; Name: "{localappdata}\CandyShop\CandyShop.config"
+Type: files; Name: "{localappdata}\CandyShop\CandyShop.ico"
+Type: files; Name: "{localappdata}\CandyShop\CandyShop.png"
+Type: files; Name: "{localappdata}\CandyShop\CandyShop*.log"
+Type: dirifempty; Name: "{localappdata}\CandyShop"
+Type: files; Name: "{userstartup}\CandyShop.lnk"
