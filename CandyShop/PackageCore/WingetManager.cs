@@ -72,7 +72,6 @@ namespace CandyShop.PackageCore
             var options = new ParallelOptions() { MaxDegreeOfParallelism = 5 };
             await Parallel.ForEachAsync(candidates, options, async (package, token) =>
             {
-                Log.Debug("Started task");
                 string fetched;
                 try
                 {
@@ -96,7 +95,6 @@ namespace CandyShop.PackageCore
                 {
                     unresolvedNames.Add(package);
                 }
-                Log.Debug("Finished");
             });
 
             // log unresolved packages
