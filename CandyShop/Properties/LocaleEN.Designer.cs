@@ -515,7 +515,7 @@ namespace CandyShop.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to If you do not understand the security implications of this feature, it is strongly recommended to leave this option unchecked..
+        ///   Looks up a localized string similar to If you do not understand the security implications of this feature, it is strongly recommended to leave the option to cache administrator privileges unchecked..
         /// </summary>
         internal static string TEXT_WIZARD_SECURITY2 {
             get {

@@ -272,7 +272,7 @@ You can fix this error by running "winget list" in the terminal (or any other co
     <value>Chocolatey and Winget may be used with or without administrator privileges. If you want to run your package manager as administrator, Candy Shop will attempt to use GSudo to elevate the required processes. These credentials can be cached to prevent repeated UAC popups.</value>
   </data>
   <data name="TEXT_WIZARD_SECURITY2" xml:space="preserve">
-    <value>If you do not understand the security implications of this feature, it is strongly recommended to leave this option unchecked.</value>
+    <value>If you do not understand the security implications of this feature, it is strongly recommended to leave the option to cache administrator privileges unchecked.</value>
   </data>
   <data name="URL_GITHUB" xml:space="preserve">
     <value>https://github.com/weberjonathan/CandyShop</value>

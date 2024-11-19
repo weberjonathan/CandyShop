@@ -85,17 +85,17 @@ namespace CandyShop.View
             lblSecurity1.BackColor = System.Drawing.SystemColors.Control;
             lblSecurity1.Location = new System.Drawing.Point(338, 23);
             lblSecurity1.Name = "lblSecurity1";
-            lblSecurity1.Size = new System.Drawing.Size(276, 97);
+            lblSecurity1.Size = new System.Drawing.Size(276, 120);
             lblSecurity1.TabIndex = 4;
             lblSecurity1.Text = resources.GetString("lblSecurity1.Text");
             // 
-            // LblSecurity2
+            // lblSecurity2
             // 
             lblSecurity2.BackColor = System.Drawing.SystemColors.Control;
             lblSecurity2.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
             lblSecurity2.Location = new System.Drawing.Point(338, 120);
-            lblSecurity2.Name = "LblSecurity2";
-            lblSecurity2.Size = new System.Drawing.Size(276, 59);
+            lblSecurity2.Name = "lblSecurity2";
+            lblSecurity2.Size = new System.Drawing.Size(276, 82);
             lblSecurity2.TabIndex = 5;
             lblSecurity2.Text = "If you do not understand the security implications of this feature, it is strongly recommended to leave this option unchecked.";
             // 

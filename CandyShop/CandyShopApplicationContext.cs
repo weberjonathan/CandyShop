@@ -50,7 +50,7 @@ namespace CandyShop
             AbstractPackageManager packageManager;
             if (context.WingetMode)
             {
-                // determine locale
+                // determine locale // TODO just fuck this
                 if (!context.SupressLocaleLogWarning)
                 {
                     var ci = CultureInfo.CurrentCulture;
@@ -75,6 +75,7 @@ namespace CandyShop
             }
             else
             {
+                // TODO via settings manager
                 var chocoManager = new ChocoManager(2, context.ValidExitCodes, context.ChocolateyBinary, requireManualElevation, context.AllowGsudoCache);
                 var p = new PackageManagerProcess(context.ChocolateyBinary, "--version");
                 try
@@ -101,6 +102,12 @@ namespace CandyShop
 
                 packageManager = chocoManager;
             }
+
+            SettingsService settingsService = new();
+            SettingsController settingsController = new(context, settingsService);
+            SettingsWindow settingsView = new();
+            settingsController.InjectView(settingsView);
+            settingsController.ShowView();
 
             // init services
             ShortcutService shortcutService = new();
