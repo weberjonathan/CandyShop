@@ -1,10 +1,35 @@
-﻿using System;
+﻿using CandyShop.Services;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
 
 namespace CandyShop.PackageCore
 {
+    internal class PackageManagerFactory
+    {
+        // TODO
+        //public static AbstractPackageManager Create(SettingsDefinition settings)
+        //{
+        //    PackageManagerDefinition active = settings.ActivePackageManager;
+        //    bool requireManualElevation = settings.ElevateOnDemand && !ContextSingleton.Get.HasAdminPrivileges;
+        //    if ("Winget".Equals(active.Name))
+        //    {
+        //        return new WingetManager(false, active.Filepath, requireManualElevation, settings.AllowGsudoCache);
+        //        // TODO supress log warning thingy
+        //    }
+        //    else if ("Chocolatey".Equals(settings.ActivePackageManager.Name))
+        //    {
+        //        return new ChocoManager(2, active.ValidExitCodes, active.Filepath, requireManualElevation, settings.AllowGsudoCache);
+        //        // TODO version
+        //    }
+        //    else
+        //    {
+        //        throw new ArgumentException("Unknown active package manager.");
+        //    }
+        //}
+    }
+    
     internal abstract class AbstractPackageManager(string binary, bool requireManualElevation, bool allowGsudoCache)
     {
         public abstract bool SupportsFetchingOutdated { get; }

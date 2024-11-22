@@ -61,9 +61,6 @@ namespace CandyShop.Controller
 
             View.AllowPinnedUacIon = !Context.WingetMode;
             View.ShowUacIcons = Context.ElevateOnDemand && !Context.HasAdminPrivileges;
-
-            // update UI if is properties file is updated
-            Context.InitConfigFileWatcher();
         }
 
         private void CheckAllPackages(bool includePinned = false)

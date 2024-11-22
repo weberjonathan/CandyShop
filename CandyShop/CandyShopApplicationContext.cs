@@ -19,9 +19,13 @@ namespace CandyShop
 {
     internal class CandyShopApplicationContext : ApplicationContext
     {
-        public CandyShopApplicationContext(CandyShopContext context)
+        public CandyShopApplicationContext(SettingsService settingsService, CandyShopContext context)
         {
             Log.Information("--- Launching CandyShop ---");
+
+            // load and apply settings
+            var settings = settingsService.Load(context);
+            MetaInfo.ActiveSource = settings.ActivePackageManager;
 
             //
             string cwd = Directory.GetParent(Process.GetCurrentProcess().MainModule.FileName).FullName;
@@ -29,20 +33,7 @@ namespace CandyShop
 
             if (context.FirstStart)
             {
-                FirstStartForm f = new();
-                var result = f.ShowDialog();
-                if (result == DialogResult.OK)
-                {
-                    context.FirstStart = false;
-                    context.ElevateOnDemand = f.RequireAdmin;
-                    context.AllowGsudoCache = f.CacheAdmin;
-                    context.WingetMode = f.WingetMode;
-                    context.SaveProperties();
-                }
-                else
-                {
-                    Program.Exit(saveProperties: false);
-                }
+                // TODO
             }
 
             // determine winget or choco and test executables
@@ -102,12 +93,6 @@ namespace CandyShop
 
                 packageManager = chocoManager;
             }
-
-            SettingsService settingsService = new();
-            SettingsController settingsController = new(context, settingsService);
-            SettingsWindow settingsView = new();
-            settingsController.InjectView(settingsView);
-            settingsController.ShowView();
 
             // init services
             ShortcutService shortcutService = new();
@@ -292,9 +277,8 @@ namespace CandyShop
             var uri = new Uri("file:///%localappdata%/CandyShop/CandyShop.png");
 
             string text = packageCount == 1 ? LocaleEN.NOT_TEXT_SINGLE : LocaleEN.NOT_TEXT_MULTI;
-            string provider = ContextSingleton.Get.WingetMode ? "Winget" : "Chocolatey";
             var builder = new AppNotificationBuilder()
-                .AddText(string.Format(text, packageCount, provider))
+                .AddText(string.Format(text, packageCount, MetaInfo.ActiveSource))
                 .AddButton(new AppNotificationButton(LocaleEN.NOT_SHOW)
                     .AddArgument("action", "show"))
                 .AddButton(new AppNotificationButton(LocaleEN.NOT_UPGRADE)

@@ -1,5 +1,4 @@
-using CandyShop.PackageCore;
-using CandyShop.Properties;
+using CandyShop.Services;
 using Serilog;
 using System;
 using System.Diagnostics;
@@ -10,12 +9,12 @@ namespace CandyShop
 {
     static class Program
     {
+        private static readonly SettingsService SettingsService = new();
         private static readonly CandyShopContext context = ContextSingleton.Get;
 
         public static void Exit(int code = 0, bool saveProperties = true)
         {
-            context?.StopPropertiesFileWatcher();
-            if (saveProperties) context?.SaveProperties();
+            if (saveProperties) SettingsService.Write();
             Log.Information("Shutting down");
             Environment.Exit(code);
         }
@@ -25,10 +24,8 @@ namespace CandyShop
             string CurrentExe = Process.GetCurrentProcess().MainModule.FileName;
             string CurrentWorkingDir = Directory.GetParent(Process.GetCurrentProcess().MainModule.FileName).FullName;
 
-            context?.StopPropertiesFileWatcher();
-
             if (saveProperties)
-                context?.SaveProperties();
+                SettingsService.Write(ContextSingleton.Get); // TODO
 
             ProcessStartInfo info = new(CurrentExe)
             {
@@ -56,7 +53,7 @@ namespace CandyShop
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            CandyShopApplicationContext appContext = new CandyShopApplicationContext(context);
+            CandyShopApplicationContext appContext = new(SettingsService, context);
             Application.Run(appContext);
         }
 
