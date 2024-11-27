@@ -46,6 +46,8 @@ namespace CandyShop.View
         public event EventHandler RefreshClicked;
         public event EventHandler HideAdminWarningClicked;
         public event EventHandler OpenLogsClicked;
+        public event EventHandler OpenSettingsClicked;
+        public event EventHandler OpenSettingsDirClicked;
 
         public InstalledPage InstalledPackagesPage => InstalledPage;
         public UpgradePage UpgradePackagesPage => UpgradePage;
@@ -87,7 +89,8 @@ namespace CandyShop.View
 
             menu.ItemAt("Extras", "SwitchMode").Click      += new EventHandler((sender, e) => Controller.TogglePackageSource()); // TODO remove controller calls
             menu.ItemAt("Extras", "StartWithSystem").Click += new EventHandler((sender, e) => Controller.ToggleLaunchOnSystemStart());
-            menu.ItemAt("Extras", "Settings").Click        += new EventHandler((sender, e) => Controller.ShowCandyShopConfigFolder());
+            menu.ItemAt("Extras", "SettingsWindow").Click  += new EventHandler((sender, e) => OpenSettingsClicked?.Invoke(sender, e));
+            menu.ItemAt("Extras", "SettingsDir").Click     += new EventHandler((sender, e) => OpenSettingsDirClicked?.Invoke(sender, e));
             menu.ItemAt("Extras", "Logs").Click            += new EventHandler((sender, e) => OpenLogsClicked?.Invoke(sender, e));
 
             menu.ItemAt("Help", "Github").Click  += new EventHandler((sender, e) => Controller.ShowGithub());

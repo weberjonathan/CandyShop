@@ -2,9 +2,7 @@
 using CandyShop.Services;
 using CandyShop.View;
 using System;
-using System.ComponentModel;
 using System.Diagnostics;
-using System.IO;
 using System.Windows.Forms;
 using Serilog;
 using CandyShop.PackageCore;
@@ -51,7 +49,17 @@ namespace CandyShop.Controller
                 Context.SupressAdminWarning = true;
             });
 
-            MainView.OpenLogsClicked += new EventHandler((sender, e) => PackageService.OpenLogFolder());
+            MainView.OpenLogsClicked += new EventHandler((sender, e) =>
+            {
+                try
+                {
+                    PackageService.OpenLogFolder();
+                }
+                catch (PackageManagerException ex)
+                {
+                    MainView.DisplayError("Failed to open log folder: {0}", ex.Message);
+                }
+            });
 
             // exit application on 'X'
             MainView.FormClosed += new FormClosedEventHandler((sender, e) =>
@@ -103,25 +111,6 @@ namespace CandyShop.Controller
             }
 
             MainView.LaunchOnSystemStartEnabled = WindowsTaskService.IsLaunchOnStartup();
-        }
-
-        public void ShowCandyShopConfigFolder()
-        {
-            if (Directory.Exists(Context.ConfigFolder))
-            {
-                try
-                {
-                    Process.Start("explorer.exe", Context.ConfigFolder);
-                }
-                catch (Win32Exception e)
-                {
-                    MainView.DisplayError("An unknown error occurred: {0}", e.Message);
-                }
-            }
-            else
-            {
-                MainView.DisplayError("Cannot find CandyShop configuration directory at '{0}'", Context.ConfigFolder);
-            }
         }
 
         public void TogglePackageSource()

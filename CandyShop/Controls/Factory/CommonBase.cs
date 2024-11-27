@@ -118,7 +118,7 @@ namespace CandyShop.Controls.Factory
             };
             extras.DropDownItems.AddRange(new ToolStripItem[]
             {
-                new ToolStripMenuItem() {
+                new ToolStripMenuItem() { // TODO remove
                     Name = "SwitchMode",
                     Text = string.Format(LocaleEN.TEXT_MENU_SWITCH, "MODE")
                 },
@@ -127,11 +127,16 @@ namespace CandyShop.Controls.Factory
                     Name = "StartWithSystem",
                     Text = "&Display notification for outdated packages on login"
                 },
+                new ToolStripMenuItem() {
+                    Name = "SettingsWindow",
+                    Text = "&Settings",
+                    ShortcutKeys = Keys.Control | Keys.P
+                },
                 new ToolStripMenuItem()
                 {
-                    Name = "Settings",
-                    Text = "Open &Settings directory",
-                    ShortcutKeys = Keys.Control | Keys.P
+                    Name = "SettingsDir",
+                    Text = "&Open Settings directory",
+                    ShortcutKeys = Keys.Control | Keys.Shift | Keys.P
                 },
                 new ToolStripSeparator(),
                 new ToolStripMenuItem()

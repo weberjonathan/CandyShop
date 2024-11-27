@@ -11,6 +11,7 @@ namespace CandyShop.Controller
     {
         private readonly CandyShopContext Context;
         private readonly SettingsService SettingsService;
+        private MainWindow MainView;
         private SettingsWindow SettingsView;
 
         // TODO disable cache checkbox if require checkbox is unchecked
@@ -20,17 +21,33 @@ namespace CandyShop.Controller
             SettingsService = settingsService;
         }
 
-        public void InjectView(SettingsWindow settingsView)
+        public void InjectView(MainWindow mainView)
         {
-            SettingsView = settingsView;
+            MainView = mainView;
+            MainView.OpenSettingsClicked += new EventHandler((sender, e) => ShowView());
+            MainView.OpenSettingsDirClicked += new EventHandler((sender, e) =>
+            {
+                try
+                {
+                    SettingsService.OpenSettingsDirectory();
+                }
+                catch (CandyShopException ex)
+                {
+                    MainView.DisplayError("Failed to open settings directory: {0}", ex.Message);
+                }
+            });
+        }
 
+        public void ShowView()
+        {
+            SettingsView = new SettingsWindow();
             SettingsView.OkClicked += new EventHandler((sender, e) =>
             {
                 var succses = ApplySettings();
                 if (succses)
                 {
+                    SettingsView.Hide();
                     SettingsView.Close();
-                    SettingsView.Dispose();
                 }
             });
 
@@ -39,24 +56,26 @@ namespace CandyShop.Controller
                 ApplySettings();
             });
 
+            SettingsView.FormClosed += new FormClosedEventHandler((sender, e) =>
+            {
+                SettingsView.Dispose();
+                SettingsView = null;
+            });
+
             SettingsView.WingetBinaryChanged += OnWingetBinaryChanged;
-            SettingsView.WingetBinaryChanged += OnChocolateyBinaryChanged;
+            SettingsView.ChocolateyBinaryChanged += OnChocolateyBinaryChanged;
             SettingsView.GSudoBinaryChanged += OnGsudoBinaryChanged;
-        }
 
-        public void ShowView()
-        {
-            // TODO init view here, not in app context; do not inject view here either
+            // update view with current settings
+            var settings = SettingsService.GetCurrentSettings();
+            SettingsView.ActivePackageSource = settings.ActivePackageManager;
+            SettingsView.WingetBinary = settings.PackageManagers["Winget"].Filepath;
+            SettingsView.ChocolateyBinary = settings.PackageManagers["Chocolatey"].Filepath;
+            SettingsView.GSudoBinary = settings.Gsudo.Filepath;
+            SettingsView.RequireAdminPrivileges = settings.ElevateOnDemand;
+            SettingsView.CacheAdminPrivileges = settings.Gsudo.EnableCredentialsStore;
 
-            SettingsView.ActivePackageSource = Context.WingetMode ? "Winget" : "Chocolatey";
-            SettingsView.GSudoBinary = "gsudo"; // TODO
-            SettingsView.RequireAdminPrivileges = Context.ElevateOnDemand;
-
-            OnWingetBinaryChanged(this, EventArgs.Empty);
-            OnChocolateyBinaryChanged(this, EventArgs.Empty);
-            OnGsudoBinaryChanged(this, EventArgs.Empty);
-
-            SettingsView.Show();
+            SettingsView.ShowDialog();
         }
 
         private bool ApplySettings()
@@ -85,8 +104,9 @@ namespace CandyShop.Controller
 
                     if (gsudoViaEnvPath)
                         SettingsView.GSudoBinary = gsudoResolved;
+
+                    return false;
                 }
-                return false;
             }
 
             // build settings definition from view

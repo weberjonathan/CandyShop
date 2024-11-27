@@ -2,8 +2,8 @@
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Text.Json;
 
 namespace CandyShop.Services
@@ -23,6 +23,7 @@ namespace CandyShop.Services
     
     internal class SettingsDefinition
     {
+        // TODO replace packageManagers with list and provide simple, strongly-tpyed, transient accessors for Choco and Winget
         public Dictionary<string, PackageManagerDefinition> PackageManagers { get; set; } = new() {
             {
                 "Winget", new PackageManagerDefinition()
@@ -69,8 +70,7 @@ namespace CandyShop.Services
         public List<int> ValidExitCodes { get; set; } = new List<int> { 0, 1641, 3010, 350, 1604 };
     }
 
-    // TODO version methods should be awaitable
-    // TODO exception vs null return on error in version methods
+    // TODO validation methods should be awaitable
     internal class SettingsService
     {
         // TODO
@@ -78,6 +78,27 @@ namespace CandyShop.Services
         private static readonly string _ConfigFilepath = Path.Combine(_AppDataDir, "CandyShop.config");
 
         private SettingsDefinition CurrentSettings;
+
+        /// <exception cref="CandyShopException"></exception>
+        public void OpenSettingsDirectory()
+        {
+            if (!Directory.Exists(_AppDataDir))
+                throw new CandyShopException("Candy Shop appdata directory does not exist.");
+
+            try
+            {
+                Process.Start("explorer.exe", _AppDataDir);
+            }
+            catch (Exception ex)
+            {
+                throw new CandyShopException(ex.Message);
+            }
+        }
+
+        public SettingsDefinition GetCurrentSettings()
+        {
+            return CurrentSettings;
+        }
 
         public SettingsDefinition Load(CandyShopContext context)
         {
@@ -251,7 +272,7 @@ namespace CandyShop.Services
             if (!PathUtil.FileExists(pmDefinition.Filepath))
                 throw new FileNotFoundException();
 
-            var pm = PackageManagerFactory.Create(settings);
+            var pm = PackageManagerFactory.Create(pmDefinition, settings);
             var version = pm.ValidateExec();
             validatedPm = pm;
             return version;

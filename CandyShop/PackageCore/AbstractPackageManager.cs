@@ -26,9 +26,14 @@ namespace CandyShop.PackageCore
             }
         }
 
+        public static AbstractPackageManager Create(PackageManagerDefinition pm, SettingsDefinition settings)
+        {
+            return Create(pm, settings.ElevateOnDemand, settings.Gsudo.EnableCredentialsStore);
+        }
+
         public static AbstractPackageManager Create(SettingsDefinition settings)
         {
-            return Create(settings.PackageManagers[settings.ActivePackageManager], settings.ElevateOnDemand, settings.Gsudo.EnableCredentialsStore);
+            return Create(settings.PackageManagers[settings.ActivePackageManager], settings);
         }
     }
     

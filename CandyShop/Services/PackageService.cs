@@ -379,6 +379,7 @@ namespace CandyShop.Services
             return PackageManager.UseGsudo;
         }
 
+        /// <exception cref="PackageManagerException"></exception>
         public void OpenLogFolder()
         {
             PackageManager.OpenLogFolder();
