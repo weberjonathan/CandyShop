@@ -12,6 +12,31 @@ namespace CandyShop.PackageCore
     {
         public override bool SupportsFetchingOutdated => true;
         public override bool RequiresNameResolution => true;
+        public override bool SupportsPinningAsUser => true;
+
+        /// <exception cref="PackageManagerException"></exception>
+        public override string ValidateExec()
+        {
+            var p = BuildProcess("--version", useGsudo: false);
+            try
+            {
+                p.ExecuteHidden();
+            }
+            catch (Exception)
+            {
+                throw new PackageManagerException("Failed to execute Chocolatey.");
+            }
+
+            if (p.ExitCode != 0)
+                throw new PackageManagerException($"Chocolatey did not exit cleanly: {p.ExitCode}");
+
+            // validate version string
+            string version = p.Output.Trim();
+            if (!version.StartsWith('v') || !Util.HasDots(version, 2) || !Util.IsNumeric(version[1..]))
+                throw new PackageManagerException($"Failed to parse Winget version");
+
+            return version;
+        }
 
         /// <exception cref="PackageManagerException"></exception>
         /// <exception cref="CandyShopException"></exception>
@@ -21,7 +46,7 @@ namespace CandyShop.PackageCore
 
             // start gsudo cache session
             bool isCacheEnabled = false;
-            if (AllowGsudoCache && RequireManualElevation)
+            if (AllowGsudoCache && UseGsudo)
             {
                 EnableGsudoCache();
                 isCacheEnabled = true;
@@ -32,7 +57,7 @@ namespace CandyShop.PackageCore
             foreach (var package in packages)
             {
                 var arguments = $"upgrade --id \"{package.Id}\" --silent --exact";
-                var p = BuildProcess(arguments, useGsudo: RequireManualElevation);
+                var p = BuildProcess(arguments, useGsudo: UseGsudo);
                 try
                 {
                     p.Execute();

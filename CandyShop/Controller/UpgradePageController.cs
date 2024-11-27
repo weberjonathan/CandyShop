@@ -59,8 +59,7 @@ namespace CandyShop.Controller
                 CheckTopLevelPackages();
             });
 
-            View.AllowPinnedUacIon = !Context.WingetMode;
-            View.ShowUacIcons = Context.ElevateOnDemand && !Context.HasAdminPrivileges;
+            View.ShowUacIconsForUpgrades = PackageService.RequireElevationForUpgrades();
         }
 
         private void CheckAllPackages(bool includePinned = false)
@@ -103,7 +102,7 @@ namespace CandyShop.Controller
             try
             {
                 var packages = PackageService.GetPackagesByName(packageNames.ToList());
-                await PackageService.Upgrade(packages);
+                await PackageService.Upgrade(packages, View.CleanShortcuts);
             }
             catch (PackageManagerException e)
             {

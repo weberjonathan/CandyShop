@@ -26,13 +26,15 @@ namespace CandyShop.Services
 
         private readonly AbstractPackageManager PackageManager;
         private readonly ShortcutService ShortcutService;
+        private readonly bool EnableSelfUpdates;
 
         // TODO remove duplicate calls to pin
 
-        public PackageService(AbstractPackageManager packageManager, ShortcutService shortcutService)
+        public PackageService(AbstractPackageManager packageManager, ShortcutService shortcutService, bool enableSelfUpdates = false)
         {
             PackageManager = packageManager;
             ShortcutService = shortcutService;
+            EnableSelfUpdates = enableSelfUpdates;
         }
 
         /// <exception cref="PackageManagerException"></exception>
@@ -240,13 +242,13 @@ namespace CandyShop.Services
 
         /// <exception cref="PackageManagerException"></exception>
         /// <exception cref="CandyShopException"></exception>
-        public async Task Upgrade(List<GenericPackage> packages)
+        public async Task Upgrade(List<GenericPackage> packages, bool cleanShortcuts = false)
         {
             if (PackageManager == null) return;
 
             packages = packages.Where(p => !p.Pinned.GetValueOrDefault(false)).ToList();
             var selfPackages = packages.Where(p => p.Name.Equals("Candy Shop") || p.Name.Equals("CandyShop"));
-            if (selfPackages.Any() && !ContextSingleton.Get.SelfUpdateEnabled)
+            if (selfPackages.Any() && !EnableSelfUpdates)
             {
                 MessageBox.Show(
                     "Candy Shop currently does not support upgrading itself. This feature is planned in the future. Please upgrade Candy Shop through the terminal instead.",
@@ -307,7 +309,7 @@ namespace CandyShop.Services
 
                 // delete shortcuts
                 ShortcutService?.DisposeWatchers();
-                if (ContextSingleton.Get.CleanShortcuts)
+                if (cleanShortcuts)
                 {
                     await minDelay; // wait for shortcuts to be created
                     ShortcutService?.DeleteShortcuts(shortcuts);
@@ -365,6 +367,16 @@ namespace CandyShop.Services
                 .Select(GetPackageByName)
                 .Where(package => package != null)
                 .ToList();
+        }
+
+        public bool RequireElevationForPins()
+        {
+            return !PackageManager.SupportsPinningAsUser && PackageManager.UseGsudo;
+        }
+
+        public bool RequireElevationForUpgrades()
+        {
+            return PackageManager.UseGsudo;
         }
 
         private async Task UpdateCachedItem(GenericPackage package)

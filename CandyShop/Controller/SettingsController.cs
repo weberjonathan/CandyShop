@@ -1,6 +1,8 @@
-﻿using CandyShop.Services;
+﻿using CandyShop.PackageCore;
+using CandyShop.Services;
 using CandyShop.View;
 using System;
+using System.IO;
 using System.Windows.Forms;
 
 namespace CandyShop.Controller
@@ -37,21 +39,9 @@ namespace CandyShop.Controller
                 ApplySettings();
             });
 
-            SettingsView.WingetBinaryChanged += new EventHandler((sender, e) =>
-            {
-                ValidateBinary(SettingsView.WingetBinary, SettingsService.GetWingetVersion, SettingsView.SetWingetBinaryStatus);
-            });
-
-            SettingsView.ChocolateyBinaryChanged += new EventHandler((sender, e) =>
-            {
-                ValidateBinary(SettingsView.ChocolateyBinary, SettingsService.GetChocoVersion, SettingsView.SetChocoBinaryStatus);
-            });
-
-            SettingsView.GSudoBinaryChanged += new EventHandler((sender, e) =>
-            {
-                var validated = ValidateBinary(SettingsView.GSudoBinary, SettingsService.GetGsudoVersion, SettingsView.SetGSudoBinaryStatus);
-                SettingsView.EnableGsudoConfig = validated;
-            });
+            SettingsView.WingetBinaryChanged += OnWingetBinaryChanged;
+            SettingsView.WingetBinaryChanged += OnChocolateyBinaryChanged;
+            SettingsView.GSudoBinaryChanged += OnGsudoBinaryChanged;
         }
 
         public void ShowView()
@@ -65,36 +55,11 @@ namespace CandyShop.Controller
             SettingsView.RequireAdminPrivileges = Context.ElevateOnDemand;
             SettingsView.CacheAdminPrivileges = Context.AllowGsudoCache;
 
-            ValidateBinary(SettingsView.WingetBinary, SettingsService.GetWingetVersion, SettingsView.SetWingetBinaryStatus);
-            ValidateBinary(SettingsView.ChocolateyBinary, SettingsService.GetChocoVersion, SettingsView.SetChocoBinaryStatus);
-            var hasGsduo = ValidateBinary(SettingsView.GSudoBinary, SettingsService.GetGsudoVersion, SettingsView.SetGSudoBinaryStatus);
-            SettingsView.EnableGsudoConfig = hasGsduo;
+            OnWingetBinaryChanged(this, EventArgs.Empty);
+            OnChocolateyBinaryChanged(this, EventArgs.Empty);
+            OnGsudoBinaryChanged(this, EventArgs.Empty);
 
             SettingsView.Show();
-        }
-
-        private bool ValidateBinary(string binary, Func<string, string> getVersion, Action<string> updateStatus)
-        {
-            if (SettingsService.FileExists(binary))
-            {
-                updateStatus("Validating executable");
-                var version = getVersion(binary);
-                if (version == null)
-                {
-                    updateStatus("Failed to validate executable.");
-                    return false;
-                }
-                else
-                {
-                    updateStatus(version);
-                    return true;
-                }
-            }
-            else
-            {
-                updateStatus("File not found");
-                return false;
-            }
         }
 
         private bool ApplySettings()
@@ -127,8 +92,23 @@ namespace CandyShop.Controller
                 return false;
             }
 
-            // validate configuration
-            if (SettingsView.ActivePackageSource.Equals("Winget") && (!SettingsService.FileExists(SettingsView.WingetBinary) || SettingsService.GetWingetVersion(SettingsView.WingetBinary) == null))
+            // build settings definition from view
+            var settings = BuildSettingsFromView();
+
+            // validate package manager
+            AbstractPackageManager activePmInstance = null;
+            try
+            {
+                var active = SettingsView.ActivePackageSource;
+                var binary = active switch
+                {
+                    "Winget" => SettingsView.WingetBinary,
+                    "Chocolatey" => SettingsView?.ChocolateyBinary,
+                    _ => throw new ArgumentException("Uknown package manager")
+                };
+                SettingsService.ValidateActiveSource(settings, out activePmInstance); // TODO if this is changed, update packageService
+            }
+            catch (Exception)
             {
                 MessageBox.Show(
                     "Winget was selected as active package source but the executable is not viable.",
@@ -138,30 +118,111 @@ namespace CandyShop.Controller
                 return false;
             }
 
-            if (SettingsView.ActivePackageSource.Equals("Chocolatey") && (!SettingsService.FileExists(SettingsView.ChocolateyBinary) || SettingsService.GetChocoVersion(SettingsView.ChocolateyBinary) == null))
+            // validate gsudo
+            if (SettingsService.IsGsudoRequired(settings)) // TODO this check should respect whether CandyShop was launched as admin or not
             {
-                MessageBox.Show(
-                    "Chocolatey was selected as active package source but the executable is not viable.",
-                    MetaInfo.Name,
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Error);
-                return false;
-            }
-
-            if (SettingsView.EnableGsudoConfig && (!SettingsService.FileExists(SettingsView.GSudoBinary) || SettingsService.GetGsudoVersion(SettingsView.GSudoBinary) == null))
-            {
-                MessageBox.Show(
-                    "Administrator rights cannot be required without Gsudo and the Gsudo executable is not viable.",
-                    MetaInfo.Name,
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Error);
-                return false;
+                try
+                {
+                    SettingsService.ValidateGsudo(settings);
+                }
+                catch (Exception)
+                {
+                    MessageBox.Show(
+                        "Administrator rights cannot be required without Gsudo and the Gsudo executable is not viable.", // TODO
+                        MetaInfo.Name,
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Error);
+                    return false;
+                }
             }
 
             // TODO apply to context (via service)
             // TODO save context (via service)
 
             return true;
+        }
+
+        private void OnWingetBinaryChanged(object sender, EventArgs e)
+        {
+            SettingsDefinition settings = BuildSettingsFromView();
+            string status;
+            try
+            {
+                status = SettingsService.ValidateWinget(settings);
+            }
+            catch (FileNotFoundException)
+            {
+                status = "File not found";
+            }
+            catch (PackageManagerException)
+            {
+                status = "Validation failed";
+            }
+
+            SettingsView.SetWingetBinaryStatus(status);
+        }
+
+        private void OnChocolateyBinaryChanged(object sender, EventArgs e)
+        {
+            SettingsDefinition settings = BuildSettingsFromView();
+            string status;
+            try
+            {
+                status = SettingsService.ValidateChocolatey(settings);
+            }
+            catch (FileNotFoundException)
+            {
+                status = "File not found";
+            }
+            catch (PackageManagerException)
+            {
+                status = "Validation failed";
+            }
+
+            SettingsView.SetChocoBinaryStatus(status);
+        }
+
+        private void OnGsudoBinaryChanged(object sender, EventArgs e)
+        {
+            SettingsDefinition settings = BuildSettingsFromView();
+            string status;
+            bool valid = false;
+            try
+            {
+                status = SettingsService.ValidateGsudo(settings);
+                valid = true;
+            }
+            catch (FileNotFoundException)
+            {
+                status = "File not found";
+            }
+            catch (PackageManagerException)
+            {
+                status = "Validation failed";
+            }
+
+            SettingsView.SetGSudoBinaryStatus(status);
+            SettingsView.EnableGsudoConfig = valid;
+        }
+
+        private SettingsDefinition BuildSettingsFromView()
+        {
+            // TODO combine with get settings from service to fill out remaining properties
+
+            SettingsDefinition settings = new()
+            {
+                ActivePackageManager = SettingsView.ActivePackageSource,
+                //CleanShortcuts = 
+                //CloseAfterUpgrade =
+                ElevateOnDemand = SettingsView.RequireAdminPrivileges,
+                //SupressNoRightsWarning = 
+            };
+            settings.Gsudo.Filepath = SettingsView.GSudoBinary;
+            settings.Gsudo.EnableCredentialsStore = SettingsView.CacheAdminPrivileges;
+            settings.PackageManagers["Winget"].Filepath = SettingsView.WingetBinary;
+            settings.PackageManagers["Chocolatey"].Filepath = SettingsView.ChocolateyBinary;
+
+            return settings;
         }
     }
 }

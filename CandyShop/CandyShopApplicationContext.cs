@@ -13,19 +13,23 @@ using System.Diagnostics;
 using CandyShop.PackageCore;
 using System.Globalization;
 using CandyShop.Controls.Factory;
-using System.Linq;
+using CandyShop.Components;
 
 namespace CandyShop
 {
     internal class CandyShopApplicationContext : ApplicationContext
     {
+        // TODO pinning in Choco without admin currently fails silently
         public CandyShopApplicationContext(SettingsService settingsService, CandyShopContext context)
         {
             Log.Information("--- Launching CandyShop ---");
 
             // load and apply settings
             var settings = settingsService.Load(context);
+            // TODO overwrite active pm with eitehr winget or chocolatey, if it is different -> ie validate config
             MetaInfo.ActiveSource = settings.ActivePackageManager;
+
+            IPackageFilterContext packageListSyncContext = PackageFilterContextFactory.Create(settings.ActivePackageManager);
 
             //
             string cwd = Directory.GetParent(Process.GetCurrentProcess().MainModule.FileName).FullName;
@@ -36,67 +40,43 @@ namespace CandyShop
                 // TODO
             }
 
-            // determine winget or choco and test executables
-            bool requireManualElevation = context.ElevateOnDemand && !context.HasAdminPrivileges;
-            AbstractPackageManager packageManager;
-            if (context.WingetMode)
+            // determine locale // TODO should be handled via banner or popup; its also only relevant to winget
+            if (!context.SupressLocaleLogWarning)
             {
-                // determine locale // TODO just fuck this
-                if (!context.SupressLocaleLogWarning)
-                {
-                    var ci = CultureInfo.CurrentCulture;
-                    List<string> supported = ["en", "de"];
-                    if (!supported.Contains(ci.TwoLetterISOLanguageName))
-                        Log.Warning($"Detected unsupported locale \"{ci.TwoLetterISOLanguageName}\". This may lead to parsing errors. See https://github.com/weberjonathan/CandyShop/blob/master/docs/lcoales.md for more.");
-                }
-
-                packageManager = new WingetManager(context.WingetBinary, requireManualElevation, context.AllowGsudoCache);
-                var p = new PackageManagerProcess(context.WingetBinary, "--version");
-                try
-                {
-                    p.ExecuteHidden();
-                    if (p.ExitCode != 0)
-                        throw new PackageManagerException();
-                }
-                catch (Exception)
-                {
-                    ErrorHandler.ShowError(LocaleEN.ERROR_WINGET_PATH);
-                    packageManager = null;
-                }
+                var ci = CultureInfo.CurrentCulture;
+                List<string> supported = ["en", "de"];
+                if (!supported.Contains(ci.TwoLetterISOLanguageName))
+                    Log.Warning($"Detected unsupported locale \"{ci.TwoLetterISOLanguageName}\". This may lead to parsing errors. See https://github.com/weberjonathan/CandyShop/blob/master/docs/lcoales.md for more.");
             }
-            else
+
+            // validate selected package manager
+            AbstractPackageManager activePackageManager = null;
+            try
             {
-                // TODO via settings manager
-                var chocoManager = new ChocoManager(2, context.ValidExitCodes, context.ChocolateyBinary, requireManualElevation, context.AllowGsudoCache);
-                var p = new PackageManagerProcess(context.ChocolateyBinary, "--version");
+                settingsService.ValidateActiveSource(out activePackageManager);
+            }
+            catch (Exception)
+            {
+                // TODO an error here will obviously lead to null pointer exceptions -> needs handling (eg show settings akin to first start, noop PM, null checks where PM is used)
+                ErrorHandler.ShowError("{0} is selected as package source, but the executable is not viable. Please fix your settings.", settings.ActivePackageManager); // TODO
+            }
+
+            // validate gsudo
+            if (settingsService.IsGsudoRequired())
+            {
                 try
                 {
-                    p.ExecuteHidden();
-                    if (p.ExitCode == 0)
-                    {
-                        string majorString = p.Output.Trim().Split('.')[0];
-                        if (!int.TryParse(majorString, out int majorVersion))
-                            Log.Error($"Failed to parse the version string from Chocolatey, assume minimum version 2.x. Output was: {p.Output}");
-
-                        chocoManager.ChocoVersionMajor = majorVersion;
-                    }
-                    else
-                    {
-                        throw new PackageManagerException();
-                    }
+                    settingsService.ValidateGsudo();
                 }
                 catch (Exception)
                 {
-                    ErrorHandler.ShowError(LocaleEN.ERROR_CHOCO_PATH);
-                    chocoManager = null;
+                    ErrorHandler.ShowError("Validation of the gsudo executable failed. Please fix the filepath of the executable in the settings, or disable gsudo entirely.");
                 }
-
-                packageManager = chocoManager;
             }
 
             // init services
             ShortcutService shortcutService = new();
-            PackageService packageService = new(packageManager, shortcutService);
+            PackageService packageService = new(activePackageManager, shortcutService);
             SystemStartService windowsTaskService = new();
 
             LoadOutdatedPackagesAsync(packageService);
@@ -106,7 +86,7 @@ namespace CandyShop
 
             // init controller
             MainWindowController mainWindowController = new(context, windowsTaskService, controlsFactory);
-            InstalledPageController installedPageController = new(packageService, controlsFactory);
+            InstalledPageController installedPageController = new(packageService, controlsFactory, packageListSyncContext);
             UpgradePageController upgradePageController = new(context, packageService, controlsFactory);
             PinController pinController = new(packageService);
             PackageController packageController = new(packageService, controlsFactory);
@@ -130,7 +110,7 @@ namespace CandyShop
                 notifificationHandler = new();
                 // creates a tray icon, displays a notification if outdated packages
                 // are found and opens the upgrade UI on click
-                RunInBackground(mainWindowController, packageController, packageService, notifificationHandler, packageService);
+                RunInBackground(mainWindowController, packageController, packageService, notifificationHandler, packageService, settings.CleanShortcuts);
             }
             else
             {
@@ -174,7 +154,8 @@ namespace CandyShop
                                            PackageController packageController,
                                            PackageService service,
                                            NotificationShowHandler notifificationHandler,
-                                           PackageService packageService)
+                                           PackageService packageService,
+                                           bool cleanShortcuts)
         {
             List<GenericPackage> packages = null;
 
@@ -219,7 +200,7 @@ namespace CandyShop
             {
                 try
                 {
-                    await packageService.Upgrade(packages);
+                    await packageService.Upgrade(packages, cleanShortcuts);
                 }
                 catch (PackageManagerException e)
                 {

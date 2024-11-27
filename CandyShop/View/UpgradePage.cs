@@ -107,7 +107,7 @@ namespace CandyShop.View
             }
         }
 
-        public bool ShowUacIcons
+        public bool ShowUacIconsForUpgrades
         {
             get
             {
@@ -119,26 +119,14 @@ namespace CandyShop.View
                 {
                     BtnUpgradeSelected.Image = Resources.ic_uac;
                     BtnUpgradeAll.Image = Resources.ic_uac;
-                    if (LstPackages.ContextMenuStrip != null && AllowPinnedUacIon)
-                        if (LstPackages.ContextMenuStrip.Items.ContainsKey("Pin"))
-                        {
-                            LstPackages.ContextMenuStrip.Items["Pin"].Image = Resources.ic_uac;
-                        }
                 }
                 else
                 {
                     BtnUpgradeSelected.Image = null;
                     BtnUpgradeAll.Image = null;
-                    if (LstPackages.ContextMenuStrip != null)
-                        if (LstPackages.ContextMenuStrip.Items.ContainsKey("Pin"))
-                        {
-                            LstPackages.ContextMenuStrip.Items["Pin"].Image = null;
-                        }
                 }
             }
         }
-
-        public bool AllowPinnedUacIon { get; set; }
 
         public void BuildControls(IControlsFactory provider)
         {
@@ -218,6 +206,11 @@ namespace CandyShop.View
         public void UpdatePinnedState(string name, bool pinned)
         {
             LstPackages.SetPinned(name, pinned);
+        }
+
+        public void UpdateUacIconDisplayed(bool displayed)
+        {
+            LstPackages.ContextMenuPinnedItemImage = displayed ? Resources.ic_uac : null;
         }
 
         public void DisplayEmpty()

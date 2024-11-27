@@ -297,6 +297,16 @@ namespace CandyShop.Controls
             set { SpinnerCtl.Text = value; }
         }
 
+        public Image ContextMenuPinnedItemImage
+        {
+            get { return ContextMenuStrip?.Items["Pin"]?.Image; }
+            set
+            {
+                if (ContextMenuStrip != null && ContextMenuStrip.Items["Pin"] != null)
+                    ContextMenuStrip.Items["Pin"].Image = value;
+            }
+        }
+
         public bool TryGetSelectedItem(out DataGridViewRow value)
         {
             if (Other.SelectedRows.Count > 0)

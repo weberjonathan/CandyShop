@@ -8,36 +8,46 @@ namespace CandyShop.PackageCore
 {
     internal class PackageManagerFactory
     {
-        // TODO
-        //public static AbstractPackageManager Create(SettingsDefinition settings)
-        //{
-        //    PackageManagerDefinition active = settings.ActivePackageManager;
-        //    bool requireManualElevation = settings.ElevateOnDemand && !ContextSingleton.Get.HasAdminPrivileges;
-        //    if ("Winget".Equals(active.Name))
-        //    {
-        //        return new WingetManager(false, active.Filepath, requireManualElevation, settings.AllowGsudoCache);
-        //        // TODO supress log warning thingy
-        //    }
-        //    else if ("Chocolatey".Equals(settings.ActivePackageManager.Name))
-        //    {
-        //        return new ChocoManager(2, active.ValidExitCodes, active.Filepath, requireManualElevation, settings.AllowGsudoCache);
-        //        // TODO version
-        //    }
-        //    else
-        //    {
-        //        throw new ArgumentException("Unknown active package manager.");
-        //    }
-        //}
+        public static AbstractPackageManager Create(PackageManagerDefinition pm, bool useGsudo = false, bool useCredentialsStore = false)
+        {
+            if ("Winget".Equals(pm.Name))
+            {
+                return new WingetManager(false, pm.Filepath, useGsudo, useCredentialsStore);
+                // TODO supress log warning thingy
+            }
+            else if ("Chocolatey".Equals(pm.Name))
+            {
+                return new ChocoManager(2, pm.ValidExitCodes, pm.Filepath, useGsudo, useCredentialsStore);
+                // TODO version
+            }
+            else
+            {
+                throw new ArgumentException("Unknown active package manager.");
+            }
+        }
+
+        public static AbstractPackageManager Create(SettingsDefinition settings)
+        {
+            return Create(settings.PackageManagers[settings.ActivePackageManager], settings.ElevateOnDemand, settings.Gsudo.EnableCredentialsStore);
+        }
     }
     
-    internal abstract class AbstractPackageManager(string binary, bool requireManualElevation, bool allowGsudoCache)
+    internal abstract class AbstractPackageManager(string binary, bool useGsudo, bool useCredentialsStore)
     {
+        public bool UseGsudo { get; } = useGsudo;
+        public abstract bool SupportsPinningAsUser { get; }
         public abstract bool SupportsFetchingOutdated { get; }
         public abstract bool RequiresNameResolution { get; }
 
         protected string Binary { get; private set; } = binary;
-        protected bool RequireManualElevation { get; } = requireManualElevation;
-        protected bool AllowGsudoCache { get; } = allowGsudoCache;
+        protected bool AllowGsudoCache { get; } = useCredentialsStore;
+
+        /// <summary>
+        /// Validates the package manager and returns the validated version.
+        /// </summary>
+        /// <returns>Returns a validated version in the form major.minor.build or throws exceptions</returns>
+        /// <exception cref="PackageManagerException"></exception>
+        public abstract string ValidateExec();
 
         /// <exception cref="PackageManagerException"></exception>
         /// <exception cref="CandyShopException"></exception>

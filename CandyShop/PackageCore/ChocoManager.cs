@@ -1,4 +1,5 @@
-﻿using Serilog;
+﻿using CandyShop.Properties;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +14,7 @@ namespace CandyShop.PackageCore
 
         public override bool SupportsFetchingOutdated => true;
         public override bool RequiresNameResolution => false;
+        public override bool SupportsPinningAsUser => false;
 
         public int ChocoVersionMajor { get; set; } = 2;
 
@@ -24,12 +26,42 @@ namespace CandyShop.PackageCore
                 Log.Warning("List of valid exit codes does not contain '0'. This looks like a mistake in the configuration file.");
         }
 
+        /// <exception cref="PackageManagerException"></exception>
+        public override string ValidateExec()
+        {
+            var p = BuildProcess("--version", useGsudo: false);
+            try
+            {
+                p.ExecuteHidden();
+            }
+            catch (Exception)
+            {
+                throw new PackageManagerException("Failed to execute Chocolatey.");
+            }
+
+            if (p.ExitCode != 0)
+                throw new PackageManagerException($"Chocolatey did not exit cleanly: {p.ExitCode}");
+
+            // validate version string
+            string version = p.Output.Trim();
+            if (!Util.HasDots(version, 2) || !Util.IsNumeric(version))
+                throw new PackageManagerException($"Failed to parse Chocolatey version");
+
+            // parse major version
+            string majorString = version.Split('.')[0];
+            if (!int.TryParse(majorString, out int majorVersion))
+                throw new PackageManagerException($"Failed to parse Chocolatey version");
+
+            ChocoVersionMajor = majorVersion;
+            return $"v{version}";
+        }
+
         public override void Upgrade(List<GenericPackage> packages)
         {
             string arg = string.Join(' ', packages.Select(p => p.Name));
 
             // launch process
-            PackageManagerProcess p = BuildProcess($"upgrade {arg} -y", useGsudo: RequireManualElevation);
+            PackageManagerProcess p = BuildProcess($"upgrade {arg} -y", useGsudo: UseGsudo);
             p.Execute();
 
             if (!ValidExitCodesOnUpgrade.Contains(p.ExitCode))
@@ -213,7 +245,7 @@ namespace CandyShop.PackageCore
         protected override void Pin(GenericPackage package)
         {
             var args = $"pin add --name=\"{package.Name}\" --version=\"{package.CurrVer}\"";
-            PackageManagerProcess p = BuildProcess(args, useGsudo: RequireManualElevation);
+            PackageManagerProcess p = BuildProcess(args, useGsudo: UseGsudo);
             p.ExecuteHidden();
 
             if (p.ExitCode != 0)
@@ -223,7 +255,7 @@ namespace CandyShop.PackageCore
         /// <exception cref="PackageManagerException"></exception>
         protected override void Unpin(GenericPackage package)
         {
-            PackageManagerProcess p = BuildProcess($"pin remove --name=\"{package.Name}\"", useGsudo: RequireManualElevation);
+            PackageManagerProcess p = BuildProcess($"pin remove --name=\"{package.Name}\"", useGsudo: UseGsudo);
             p.ExecuteHidden();
 
             if (p.ExitCode != 0)

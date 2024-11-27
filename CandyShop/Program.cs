@@ -25,7 +25,7 @@ namespace CandyShop
             string CurrentWorkingDir = Directory.GetParent(Process.GetCurrentProcess().MainModule.FileName).FullName;
 
             if (saveProperties)
-                SettingsService.Write(ContextSingleton.Get); // TODO
+                SettingsService.Write();
 
             ProcessStartInfo info = new(CurrentExe)
             {

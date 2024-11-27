@@ -14,7 +14,7 @@ namespace CandyShop
 
         public static string Name => Application.ProductName;
         public static string ActiveSource { get; set; } = "Unknown";
-        public static string WindowTitle => string.Format(LocaleEN.TEXT_APP_TITLE, Name, ActiveSource);
+        public static string WindowTitle => string.Format(LocaleEN.TEXT_APP_TITLE, Name, ActiveSource, Version);
         public static string Version = $"{VersionObject.Major}.{VersionObject.Minor}";
     }
 

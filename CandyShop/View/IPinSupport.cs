@@ -8,5 +8,6 @@ namespace CandyShop.View
         public event EventHandler<PinnedChangedArgs> PinnedChanged;
 
         void UpdatePinnedState(string name, bool pinned);
+        void UpdateUacIconDisplayed(bool displayed);
     }
 }

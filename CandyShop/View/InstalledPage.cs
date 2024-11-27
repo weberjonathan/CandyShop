@@ -134,5 +134,10 @@ namespace CandyShop.View
         {
             LstPackages.SetPinned(name, pinned);
         }
+
+        public void UpdateUacIconDisplayed(bool displayed)
+        {
+            LstPackages.ContextMenuPinnedItemImage = displayed ? Resources.ic_uac : null;
+        }
     }
 }

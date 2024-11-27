@@ -1,5 +1,4 @@
 ﻿using CandyShop.PackageCore;
-using CandyShop.Properties;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -24,20 +23,24 @@ namespace CandyShop.Services
     
     internal class SettingsDefinition
     {
-        public List<PackageManagerDefinition> PackageManagers { get; set; } = [
-            new PackageManagerDefinition()
+        public Dictionary<string, PackageManagerDefinition> PackageManagers { get; set; } = new() {
             {
-                Name = "Winget",
-                Filepath = "winget",
-                ValidExitCodes = [ 0 ]
+                "Winget", new PackageManagerDefinition()
+                {
+                    Name = "Winget",
+                    Filepath = "winget",
+                    ValidExitCodes = [ 0 ]
+                }
             },
-            new PackageManagerDefinition()
             {
-                Name = "Chocolatey",
-                Filepath = "chocolatey",
-                ValidExitCodes = [0, 1641, 3010, 350, 1604]
+                "Chocolatey", new PackageManagerDefinition()
+                {
+                    Name = "Chocolatey",
+                    Filepath = "chocolatey",
+                    ValidExitCodes = [0, 1641, 3010, 350, 1604]
+                }
             }
-        ];
+        };
 
         public GsudoDefinition Gsudo { get; set; } = new() {
             Filepath = "gsudo",
@@ -96,9 +99,9 @@ namespace CandyShop.Services
 
             // apply to context
             // TODO context needs rework
-            context.ChocolateyBinary = settings.PackageManagers.Where(p => p.Name.Equals("Chocolatey")).First().Filepath;
+            context.ChocolateyBinary = settings.PackageManagers["Chocolatey"].Filepath;
             //context.CholoateyLogFolder = settings.ChocolateyLogs; // TODO
-            context.WingetBinary = settings.PackageManagers.Where(p => p.Name.Equals("Winget")).First().Filepath;
+            context.WingetBinary = settings.PackageManagers["Winget"].Filepath;
             context.AllowGsudoCache = settings.Gsudo.EnableCredentialsStore;
             context.CleanShortcuts = settings.CleanShortcuts;
             context.ElevateOnDemand = settings.ElevateOnDemand;
@@ -106,7 +109,7 @@ namespace CandyShop.Services
             context.SupressLocaleLogWarning = false;
             context.CloseAfterUpgrade = settings.CloseAfterUpgrade;
             context.WingetMode = settings.ActivePackageManager.Equals("Winget");
-            context.ValidExitCodes = settings.PackageManagers.Where(p => p.Name.Equals("Chocolatey")).First().ValidExitCodes;
+            context.ValidExitCodes = settings.PackageManagers["Chocolatey"].ValidExitCodes;
 
             CurrentSettings = settings;
             return settings;
@@ -117,9 +120,63 @@ namespace CandyShop.Services
             // Write CurrentSettings field
         }
 
-        public bool FileExists(string path, bool includePath = true)
+        /// <exception cref="PackageManagerException"></exception>
+        /// <exception cref="FileNotFoundException"></exception>
+        public string ValidateActiveSource(out AbstractPackageManager validatedPm)
         {
-            return File.Exists(path) || (includePath && TryDetectOnPath(path, out _));
+            return ValidateActiveSource(CurrentSettings, out validatedPm);
+        }
+
+        /// <exception cref="PackageManagerException"></exception>
+        /// <exception cref="FileNotFoundException"></exception>
+        public string ValidateActiveSource(SettingsDefinition settings, out AbstractPackageManager validatedPm)
+        {
+            return ValidatePmBinary(settings.ActivePackageManager, settings, out validatedPm);
+        }
+
+        /// <exception cref="FileNotFoundException"></exception>
+        /// <exception cref="PackageManagerException"></exception>
+        public string ValidateWinget(SettingsDefinition settings = null)
+        {
+            settings ??= CurrentSettings;
+            return ValidatePmBinary("Winget", settings, out _);
+        }
+
+        /// <exception cref="FileNotFoundException"></exception>
+        /// <exception cref="PackageManagerException"></exception>
+        public string ValidateChocolatey(SettingsDefinition settings = null)
+        {
+            settings ??= CurrentSettings;
+            return ValidatePmBinary("Chocolatey", settings, out _);
+        }
+
+        /// <exception cref="FileNotFoundException"></exception>
+        /// <exception cref="PackageManagerException"></exception>
+        public string ValidateGsudo(SettingsDefinition settings = null)
+        {
+            settings ??= CurrentSettings;
+
+            if (!FileExists(settings.Gsudo.Filepath, includePath: true))
+                throw new FileNotFoundException();
+
+            var p = new PackageManagerProcess(settings.Gsudo.Filepath, "--version"); // TODO this should not abuse the package manager process
+            try
+            {
+                p.ExecuteHidden();
+            }
+            catch (Exception)
+            {
+                throw new PackageManagerException("Failed to execute gsudo");
+            }
+
+            if (p.ExitCode != 0)
+                throw new PackageManagerException($"Gsudo did not exit cleanly: {p.ExitCode}");
+
+            var output = p.Output.Trim().Split(' ');
+            if (output.Length > 1 && output[0].Equals("gsudo") && output[1].StartsWith('v') && Util.HasDots(output[1], 2) && Util.IsNumeric(output[1][1..]))
+                return output[1];
+
+            throw new PackageManagerException("Failed to parse gsudo version");
         }
 
         public bool TryDetectOnPath(string name, out string path)
@@ -142,95 +199,10 @@ namespace CandyShop.Services
             return path != null;
         }
 
-        public string GetWingetVersion(string binary)
+        public bool IsGsudoRequired(SettingsDefinition settings = null)
         {
-            string version = null;
-            var p = new PackageManagerProcess(binary, "--version");
-            try
-            {
-                p.ExecuteHidden();
-                if (p.ExitCode == 0)
-                {
-                    version = p.Output.Trim();
-                    if (!version.StartsWith('v') || !HasDots(version, 2) || !IsNumeric(version[1..]))
-                        version = null;
-                }
-                else
-                {
-                    throw new PackageManagerException();
-                }
-            }
-            catch (Exception)
-            {
-                Log.Error(LocaleEN.ERROR_CHOCO_PATH);
-            }
-
-            return version;
-        }
-
-        public string GetChocoVersion(string binary)
-        {
-            string version = null;
-            var p = new PackageManagerProcess(binary, "--version --limit-output");
-            try
-            {
-                p.ExecuteHidden();
-                if (p.ExitCode == 0)
-                {
-                    version = p.Output.Trim();
-                    if (!HasDots(version, 2) || !IsNumeric(version))
-                    {
-                        version = null;
-                    }
-                    else
-                    {
-                        // TODO manager requires major version
-                        version = $"v{version}";
-                    }
-                }
-                else
-                {
-                    throw new PackageManagerException();
-                }
-            }
-            catch (Exception)
-            {
-                Log.Error(LocaleEN.ERROR_CHOCO_PATH);
-            }
-
-            return version;
-        }
-
-        public string GetGsudoVersion(string binary)
-        {
-            string version = null;
-            var p = new PackageManagerProcess(binary, "--version --limit-output");
-            try
-            {
-                p.ExecuteHidden();
-                if (p.ExitCode == 0)
-                {
-                    var output = p.Output.Trim().Split(' ');
-                    if (output.Length > 1 && output[0].Equals("gsudo") && output[1].StartsWith('v') && HasDots(output[1], 2) && IsNumeric(output[1][1..]))
-                    {
-                        version = output[1];
-                    }
-                    else
-                    {
-                        version = null;
-                    }
-                }
-                else
-                {
-                    throw new PackageManagerException();
-                }
-            }
-            catch (Exception)
-            {
-                Log.Error(LocaleEN.ERROR_CHOCO_PATH);
-            }
-
-            return version;
+            settings ??= CurrentSettings;
+            return !Util.IsAdmin() && settings.ElevateOnDemand;
         }
 
         private string LoadSettingsRaw()
@@ -276,9 +248,9 @@ namespace CandyShop.Services
             {
                 var legacy = JsonSerializer.Deserialize<LegacySettingsDefinition>(json);
                 loaded = new();
-                loaded.PackageManagers.Where(p => p.Name.Equals("Winget")).First().Filepath = legacy.WingetBinary;
-                loaded.PackageManagers.Where(p => p.Name.Equals("Chocolatey")).First().Filepath = legacy.ChocolateyBinary;
-                loaded.PackageManagers.Where(p => p.Name.Equals("Chocolatey")).First().ValidExitCodes = legacy.ValidExitCodes;
+                loaded.PackageManagers["Winget"].Filepath = legacy.WingetBinary;
+                loaded.PackageManagers["Chocolatey"].Filepath = legacy.ChocolateyBinary;
+                loaded.PackageManagers["Chocolatey"].ValidExitCodes = legacy.ValidExitCodes;
                 loaded.ActivePackageManager = legacy.WingetMode ? "Winget" : "Chocolatey";
                 loaded.Gsudo.EnableCredentialsStore = legacy.AllowGsudoCache;
                 loaded.ElevateOnDemand = legacy.ElevateOnDemand;
@@ -294,14 +266,25 @@ namespace CandyShop.Services
             return loaded;
         }
 
-        private bool HasDots(string value, int n)
+        private bool FileExists(string path, bool includePath = true)
         {
-            return value.Where(c => c.Equals('.')).Count() == n;
+            return File.Exists(path) || (includePath && TryDetectOnPath(path, out _));
         }
 
-        private bool IsNumeric(string value, char separator = '.')
+        /// <exception cref="FileNotFoundException"></exception>
+        /// <exception cref="PackageManagerException"></exception>
+        private string ValidatePmBinary(string name, SettingsDefinition settings, out AbstractPackageManager validatedPm)
         {
-            return value.Where(c => !c.Equals(separator) || !char.IsNumber(c)).Any();
+            if (!settings.PackageManagers.TryGetValue(name, out PackageManagerDefinition pmDefinition))
+                throw new ArgumentOutOfRangeException(nameof(name));
+
+            if (!FileExists(pmDefinition.Filepath, includePath: true))
+                throw new FileNotFoundException();
+
+            var pm = PackageManagerFactory.Create(settings);
+            var version = pm.ValidateExec();
+            validatedPm = pm;
+            return version;
         }
     }
 }
