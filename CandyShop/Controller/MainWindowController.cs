@@ -15,13 +15,15 @@ namespace CandyShop.Controller
     internal class MainWindowController
     {
         private readonly CandyShopContext Context;
+        private readonly PackageService PackageService;
         private readonly SystemStartService WindowsTaskService;
         private readonly IControlsFactory ControlsFactory;
         private MainWindow MainView;
 
-        public MainWindowController(CandyShopContext candyShopContext, SystemStartService windowsTaskService, IControlsFactory controlsFactory)
+        public MainWindowController(CandyShopContext candyShopContext, PackageService packageService, SystemStartService windowsTaskService, IControlsFactory controlsFactory)
         {
             Context = candyShopContext;
+            PackageService = packageService;
             WindowsTaskService = windowsTaskService;
             ControlsFactory = controlsFactory;
         }
@@ -48,6 +50,8 @@ namespace CandyShop.Controller
             {
                 Context.SupressAdminWarning = true;
             });
+
+            MainView.OpenLogsClicked += new EventHandler((sender, e) => PackageService.OpenLogFolder());
 
             // exit application on 'X'
             MainView.FormClosed += new FormClosedEventHandler((sender, e) =>
@@ -99,35 +103,6 @@ namespace CandyShop.Controller
             }
 
             MainView.LaunchOnSystemStartEnabled = WindowsTaskService.IsLaunchOnStartup();
-        }
-
-        public void ShowLogFolder()
-        {
-            if (Context.WingetMode)
-            {
-                PackageManagerProcess proc = new(Context.WingetBinary, "--logs");
-                proc.ExecuteHidden();
-            }
-            else
-            {
-                string path = Path.GetFullPath(Context.CholoateyLogFolder);
-                if (Directory.Exists(path))
-                {
-                    try
-                    {
-                        Process.Start("explorer.exe", path);
-                    }
-                    catch (Win32Exception e)
-                    {
-                        MainView.DisplayError("An unknown error occurred: {0}", e.Message);
-                    }
-
-                }
-                else
-                {
-                    MainView.DisplayError("Cannot find directory for Chocolatey logs: {0}", path);
-                }
-            }
         }
 
         public void ShowCandyShopConfigFolder()

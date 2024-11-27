@@ -39,6 +39,20 @@ namespace CandyShop.PackageCore
         }
 
         /// <exception cref="PackageManagerException"></exception>
+        public override void OpenLogFolder()
+        {
+            var proc = BuildProcess("--logs", useGsudo: false);
+            try
+            {
+                proc.ExecuteHidden();
+            }
+            catch (Exception e)
+            {
+                throw new PackageManagerException(e.Message);
+            }
+        }
+
+        /// <exception cref="PackageManagerException"></exception>
         /// <exception cref="CandyShopException"></exception>
         public override void Upgrade(List<GenericPackage> packages)
         {

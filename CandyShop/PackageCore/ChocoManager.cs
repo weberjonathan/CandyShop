@@ -1,7 +1,8 @@
-﻿using CandyShop.Properties;
-using Serilog;
+﻿using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -54,6 +55,30 @@ namespace CandyShop.PackageCore
 
             ChocoVersionMajor = majorVersion;
             return $"v{version}";
+        }
+
+        /// <exception cref="PackageManagerException"></exception>
+        public override void OpenLogFolder()
+        {
+            string filepath = Binary;
+            if (!File.Exists(filepath) && !PathUtil.FileExistsOnEnvPath(Binary, out filepath))
+                throw new PackageManagerException($"Chocolatey binary not found: {Binary}");
+
+            var dir = Path.GetDirectoryName(filepath);
+            dir = Path.GetDirectoryName(dir);
+            dir = Path.Combine(dir, "logs");
+
+            if (!Directory.Exists(dir))
+                throw new PackageManagerException($"Logs directory not found relative to {filepath}.");
+
+            try
+            {
+                Process.Start("explorer.exe", dir);
+            }
+            catch (Exception e)
+            {
+                throw new PackageManagerException($"Could not open logs directory {dir} ({e.Message})");
+            }
         }
 
         public override void Upgrade(List<GenericPackage> packages)

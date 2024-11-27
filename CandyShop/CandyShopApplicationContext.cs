@@ -85,7 +85,7 @@ namespace CandyShop
                 context.WingetMode ? new WingetControlsFactory() : new ChocoControlsFactory();
 
             // init controller
-            MainWindowController mainWindowController = new(context, windowsTaskService, controlsFactory);
+            MainWindowController mainWindowController = new(context, packageService, windowsTaskService, controlsFactory);
             InstalledPageController installedPageController = new(packageService, controlsFactory, packageListSyncContext);
             UpgradePageController upgradePageController = new(context, packageService, controlsFactory);
             PinController pinController = new(packageService);

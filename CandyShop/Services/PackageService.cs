@@ -379,6 +379,11 @@ namespace CandyShop.Services
             return PackageManager.UseGsudo;
         }
 
+        public void OpenLogFolder()
+        {
+            PackageManager.OpenLogFolder();
+        }
+
         private async Task UpdateCachedItem(GenericPackage package)
         {
             if (OutdatedPckgCache.ContainsKey(package.Name))

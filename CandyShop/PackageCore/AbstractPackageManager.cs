@@ -63,7 +63,10 @@ namespace CandyShop.PackageCore
         public abstract Task<GenericPackage[]> ResolveAbbreviatedNamesAsync(List<GenericPackage> unresolved);
 
         /// <exception cref="PackageManagerException"></exception>
-        public async Task<GenericPackage[]> FetchInstalledAsync()
+        public abstract void OpenLogFolder();
+
+        /// <exception cref="PackageManagerException"></exception>
+        public async Task<List<GenericPackage>> FetchInstalledAsync()
         {
             return await Task.Run(FetchInstalled);
         }

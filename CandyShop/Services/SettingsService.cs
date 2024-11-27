@@ -99,17 +99,12 @@ namespace CandyShop.Services
 
             // apply to context
             // TODO context needs rework
-            context.ChocolateyBinary = settings.PackageManagers["Chocolatey"].Filepath;
-            //context.CholoateyLogFolder = settings.ChocolateyLogs; // TODO
-            context.WingetBinary = settings.PackageManagers["Winget"].Filepath;
-            context.AllowGsudoCache = settings.Gsudo.EnableCredentialsStore;
             context.CleanShortcuts = settings.CleanShortcuts;
             context.ElevateOnDemand = settings.ElevateOnDemand;
             context.SupressAdminWarning = settings.SupressNoRightsWarning;
             context.SupressLocaleLogWarning = false;
             context.CloseAfterUpgrade = settings.CloseAfterUpgrade;
             context.WingetMode = settings.ActivePackageManager.Equals("Winget");
-            context.ValidExitCodes = settings.PackageManagers["Chocolatey"].ValidExitCodes;
 
             CurrentSettings = settings;
             return settings;
@@ -156,7 +151,7 @@ namespace CandyShop.Services
         {
             settings ??= CurrentSettings;
 
-            if (!FileExists(settings.Gsudo.Filepath, includePath: true))
+            if (!PathUtil.FileExists(settings.Gsudo.Filepath))
                 throw new FileNotFoundException();
 
             var p = new PackageManagerProcess(settings.Gsudo.Filepath, "--version"); // TODO this should not abuse the package manager process
@@ -177,26 +172,6 @@ namespace CandyShop.Services
                 return output[1];
 
             throw new PackageManagerException("Failed to parse gsudo version");
-        }
-
-        public bool TryDetectOnPath(string name, out string path)
-        {
-            path = null;
-
-            if (Path.IsPathFullyQualified(name))
-                return false;
-
-            name = Path.GetFileName(name);
-            if (!Path.HasExtension(name))
-                name = $"{name}.exe";
-
-            path = Environment.GetEnvironmentVariable("PATH") // TODO target
-                .Split(';')
-                .Select(dir => Path.Combine(dir, name))
-                .Where(File.Exists)
-                .FirstOrDefault();
-
-            return path != null;
         }
 
         public bool IsGsudoRequired(SettingsDefinition settings = null)
@@ -266,11 +241,6 @@ namespace CandyShop.Services
             return loaded;
         }
 
-        private bool FileExists(string path, bool includePath = true)
-        {
-            return File.Exists(path) || (includePath && TryDetectOnPath(path, out _));
-        }
-
         /// <exception cref="FileNotFoundException"></exception>
         /// <exception cref="PackageManagerException"></exception>
         private string ValidatePmBinary(string name, SettingsDefinition settings, out AbstractPackageManager validatedPm)
@@ -278,7 +248,7 @@ namespace CandyShop.Services
             if (!settings.PackageManagers.TryGetValue(name, out PackageManagerDefinition pmDefinition))
                 throw new ArgumentOutOfRangeException(nameof(name));
 
-            if (!FileExists(pmDefinition.Filepath, includePath: true))
+            if (!PathUtil.FileExists(pmDefinition.Filepath))
                 throw new FileNotFoundException();
 
             var pm = PackageManagerFactory.Create(settings);

@@ -49,11 +49,8 @@ namespace CandyShop.Controller
             // TODO init view here, not in app context; do not inject view here either
 
             SettingsView.ActivePackageSource = Context.WingetMode ? "Winget" : "Chocolatey";
-            SettingsView.WingetBinary = Context.WingetBinary;
-            SettingsView.ChocolateyBinary = Context.ChocolateyBinary;
             SettingsView.GSudoBinary = "gsudo"; // TODO
             SettingsView.RequireAdminPrivileges = Context.ElevateOnDemand;
-            SettingsView.CacheAdminPrivileges = Context.AllowGsudoCache;
 
             OnWingetBinaryChanged(this, EventArgs.Empty);
             OnChocolateyBinaryChanged(this, EventArgs.Empty);
@@ -65,9 +62,9 @@ namespace CandyShop.Controller
         private bool ApplySettings()
         {
             // ask to resolve any binaries defined through environment variables
-            var wingetViaEnvPath = SettingsService.TryDetectOnPath(SettingsView.WingetBinary, out var wingetResolved);
-            var chocoViaEnvPath = SettingsService.TryDetectOnPath(SettingsView.ChocolateyBinary, out var chocoResolved);
-            var gsudoViaEnvPath = SettingsService.TryDetectOnPath(SettingsView.GSudoBinary, out var gsudoResolved);
+            var wingetViaEnvPath = PathUtil.FileExistsOnEnvPath(SettingsView.WingetBinary, out var wingetResolved);
+            var chocoViaEnvPath = PathUtil.FileExistsOnEnvPath(SettingsView.ChocolateyBinary, out var chocoResolved);
+            var gsudoViaEnvPath = PathUtil.FileExistsOnEnvPath(SettingsView.GSudoBinary, out var gsudoResolved);
 
             if (wingetViaEnvPath || chocoViaEnvPath || gsudoViaEnvPath)
             {

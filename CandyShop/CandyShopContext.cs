@@ -71,14 +71,6 @@ namespace CandyShop
 
         // -------------- set through properties file --------------
 
-        public string ChocolateyBinary { get; set; }
-
-        public string CholoateyLogFolder { get; set; }
-
-        public string WingetBinary { get; set; }
-
-        public bool AllowGsudoCache { get; set; }
-
         public bool CleanShortcuts { get; set; }
         
         public bool ElevateOnDemand { get; set; }
@@ -90,8 +82,6 @@ namespace CandyShop
         public bool CloseAfterUpgrade { get; set; }
 
         public bool WingetMode { get; set; }
-
-        public List<int> ValidExitCodes { get; set; }
 
         // ---------------------------------------------------------
 
