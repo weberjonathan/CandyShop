@@ -9,3 +9,7 @@ __Upgrade view__
 __Notification__
 
 ![Notification](/docs/example.jpg)
+
+__Upgrade process__
+
+![Upgrade process](/docs/upgrading.jpg)
