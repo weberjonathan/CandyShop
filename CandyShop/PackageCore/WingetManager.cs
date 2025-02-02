@@ -16,7 +16,7 @@ namespace CandyShop.PackageCore
 
         private readonly bool SuppressLogWarnings = suppressLogWarning;
 
-        public override bool SupportsFetchingOutdated => false;
+        public override bool SupportsFetchingOutdated => true;
         public override bool RequiresNameResolution => true;
 
         /// <exception cref="PackageManagerException"></exception>
@@ -84,7 +84,7 @@ namespace CandyShop.PackageCore
                     return;
                 }
 
-                var (name, id) = GetMetaInfo(fetched);
+                var (name, id) = ExtractNameAndIdFromInfo(fetched);
                 if (name != null && id != null)
                 {
                     movedPackages[package.Name] = package;
@@ -128,7 +128,7 @@ namespace CandyShop.PackageCore
             p.ExecuteHidden();
             ThrowOnError(p);
 
-            var output = TrimProgressChars(p.Output);
+            var output = WingetParser.TrimProgressChars(p.Output);
             var first_word_index = output.IndexOf(' ');
             if (first_word_index < 0) first_word_index = 0;
             var first_word = output[..first_word_index].Trim();
@@ -146,18 +146,19 @@ namespace CandyShop.PackageCore
             p.ExecuteHidden();
             ThrowOnError(p);
 
-            var output = ParseTable5Cols(p.Output, (firstColName) =>
-                HandleValidateOutputElement(firstColName, VALIDATE_FIRST_COLUMN, "Could not validate first column name of winget output for \"winget list\""));
+            // parse and validate
+            WingetParser parser = new(p.Output);
+            string[] cols = parser.Columns;
+            HandleValidateOutputElement(cols[0], VALIDATE_FIRST_COLUMN, "Could not validate first column name of winget output for \"winget list\""); // TODO eval this, also make it safe
+            if (cols.Length != 4 && cols.Length != 5)
+            {
+                Log.Debug($"WingetManager [{Environment.CurrentManagedThreadId}]: Column layout is '{string.Join(", ", cols)}'");
+                throw new PackageManagerException($"Failed to fetch installed packages: Expected 4 or 5 columns, found {cols.Length}");
+            }
 
-            List<GenericPackage> rtn = output
-                .Select(row => new GenericPackage()
-                {
-                    Name = row[0],
-                    Id = row[1],
-                    CurrVer = row[2],
-                    AvailVer = row[3],
-                    Source = row[4]
-                })
+            // build packages
+            List<GenericPackage> rtn = parser.Items
+                .Select(GenericPackage.FromArgs)
                 .OrderBy(p => p.Name)
                 .ToList();
 
@@ -167,10 +168,34 @@ namespace CandyShop.PackageCore
         /// <exception cref="PackageManagerException"></exception>
         protected override List<GenericPackage> FetchOutdated()
         {
-            Log.Error("Winget tried to invoke a capabality that is not implemented: Fetch outdated packages.");
-            throw new InvalidOperationException();
+            Log.Information($"Fetching outdated packages from winget.");
+            Log.Debug($"WingetManager [{Environment.CurrentManagedThreadId}]: Fetching outdated packages.");
+
+            // launch process
+            PackageManagerProcess p = BuildProcess($"list --upgrade-available --include-pinned --include-unknown");
+            p.ExecuteHidden();
+            ThrowOnError(p);
+
+            // parse and validate
+            WingetParser parser = new(p.Output);
+            string[] cols = parser.Columns;
+            HandleValidateOutputElement(cols[0], VALIDATE_FIRST_COLUMN, "Could not validate first column name of winget output for \"winget list\""); // TODO eval this, also make it safe
+            if (cols.Length != 5)
+            {
+                Log.Debug($"WingetManager [{Environment.CurrentManagedThreadId}]: Column layout is '{string.Join(", ", cols)}'");
+                throw new PackageManagerException($"Failed to fetch installed packages: Expected 5 columns, found {cols.Length}");
+            }
+
+            // build packages
+            List<GenericPackage> rtn = parser.Items
+                .Select(GenericPackage.FromArgs)
+                .OrderBy(p => p.Name)
+                .ToList();
+
+            return rtn;
         }
 
+        // TODO
         protected override List<GenericPackage> FetchPinList()
         {
             // launch process
@@ -178,11 +203,20 @@ namespace CandyShop.PackageCore
             p.ExecuteHidden();
             ThrowOnError(p);
 
-            var output = ParseTable5Cols(p.Output,
-                (firstColName) => HandleValidateOutputElement(firstColName, VALIDATE_FIRST_COLUMN, "Could not validate first column name of winget output for \"winget pin list\""),
-                (value)        => HandleValidateOutputElement(value,        VALIDATE_PIN_LIST,     "Could not validate empty list of winget output for \"winget pin list\""));
+            // parse and validate
+            WingetParser parser = new(p.Output);
+            string[] cols = parser.Columns;
+            if (cols.Length != 5)
+            {
+                Log.Debug($"WingetManager [{Environment.CurrentManagedThreadId}]: Column layout is '{string.Join(", ", cols)}'");
+                throw new PackageManagerException($"Failed to fetch installed packages: Expected 5 columns, found {cols.Length}");
+            }
 
-            List<GenericPackage> rtn = output.Select(row => new GenericPackage()
+            // TODO
+            //(firstColName) => HandleValidateOutputElement(firstColName, VALIDATE_FIRST_COLUMN, "Could not validate first column name of winget output for \"winget pin list\""),
+            //    (value)        => HandleValidateOutputElement(value,        VALIDATE_PIN_LIST,     "Could not validate empty list of winget output for \"winget pin list\""));
+
+            List<GenericPackage> rtn = parser.Items.Select(row => new GenericPackage()
             {
                 Name = row[0],
                 Id = row[1],
@@ -212,37 +246,6 @@ namespace CandyShop.PackageCore
             ThrowOnError(p);
         }
 
-        private string TrimProgressChars(string output)
-        {
-            int i = 0;
-            while (!char.IsLetterOrDigit(output[i]))
-            {
-                if (i >= output.Length)
-                {
-                    Log.Debug("Winget output did not contain any letters or digits to parse.");
-                    break;
-                }
-                i++;
-            }
-            return output[i..];
-        }
-
-        private int GetNextColumnIndex(string row, int startIndex)
-        {
-            int i = startIndex;
-            while (i < row.Length && char.IsLetterOrDigit(row[i]))
-            {
-                i++;
-            }
-
-            while (i < row.Length && char.IsWhiteSpace(row[i]))
-            {
-                i++;
-            }
-
-            return i;
-        }
-
         private void HandleValidateOutputElement(string value, List<string> valid, string message)
         {
             if (!SuppressLogWarnings)
@@ -255,70 +258,7 @@ namespace CandyShop.PackageCore
             }
         }
 
-        private List<string[]> ParseTable5Cols(string outputAsString, Action<string> validateHeader, Action<string> validateEmpty = null)
-        {
-            Queue<string> output = new(outputAsString.Split(Environment.NewLine));
-
-            // find header and divider; divider consists exclusively of '----' and (localized) header is previous line
-            string header = output.Dequeue();
-            string divider = output.Dequeue();
-            bool isDivider(string value) => ("-".Equals(new string(value.Distinct().ToArray())));
-
-            while (!isDivider(divider))
-            {
-                // if the winget list is empty, header will be a message like "no pins are configured", divider will be "" and the queue will be empty
-                // the message may be validated
-                if (output.Count == 0)
-                {
-                    validateEmpty?.Invoke(TrimProgressChars(header));
-                    return [];
-                }
-
-                header = divider;
-                divider = output.Dequeue();
-            }
-
-            // strip characters from header that were indicating progress in winget output and validate
-            header = header.Substring(header.Length - divider.Length);
-            var firstColNameIndex = header.IndexOf(' ');
-            if (firstColNameIndex < 0) firstColNameIndex = 0;
-            var firstColName = header[..firstColNameIndex].Trim();
-            validateHeader.Invoke(firstColName);
-
-            int nameIndex = 0;
-            int idIndex = GetNextColumnIndex(header, nameIndex);
-            int versionIndex = GetNextColumnIndex(header, idIndex);
-            int availableIndex = GetNextColumnIndex(header, versionIndex);
-            int sourceIndex = GetNextColumnIndex(header, availableIndex);
-
-            if (idIndex == 0 || versionIndex == 0 || availableIndex == 0 || sourceIndex == 0)
-            {
-                throw new PackageManagerException("Failed to parse winget output: Could not find column offsets.");
-            }
-
-            // parse table content
-            List<string[]> rows = [];
-            while (output.Count > 0)
-            {
-                string row = output.Dequeue();
-                if (string.IsNullOrEmpty(row))
-                {
-                    continue;
-                }
-
-                rows.Add([
-                    row.Substring(nameIndex, idIndex).Trim(),
-                    row.Substring(idIndex, versionIndex - idIndex).Trim(),
-                    row.Substring(versionIndex, availableIndex - versionIndex).Trim(),
-                    row[availableIndex..sourceIndex].Trim(),
-                    row.Substring(sourceIndex).Trim()
-                ]);
-            }
-
-            return rows;
-        }
-
-        private (string, string) GetMetaInfo(string fetchInfoResult)
+        private (string, string) ExtractNameAndIdFromInfo(string fetchInfoResult)
         {
             string name = null;
             string id = null;

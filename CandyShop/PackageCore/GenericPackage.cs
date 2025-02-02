@@ -1,9 +1,26 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace CandyShop.PackageCore
 {
     internal class GenericPackage
     {
+        public static GenericPackage FromArgs(string[] args)
+        {
+            if (args.Length == 4)
+            {
+                return new GenericPackage(args[0], args[1], args[2], args[3]);
+            }
+            else if (args.Length == 5)
+            {
+                return new GenericPackage(args[0], args[1], args[2], args[3], args[4]);
+            }
+            else
+            {
+                throw new ArgumentException($"Expected 4 or 5 arguments, found {args.Length}.");
+            }
+        }
+
         private readonly List<string> SUFFIXES = [
             ".install",
             ".portable",
@@ -17,6 +34,23 @@ namespace CandyShop.PackageCore
         public GenericPackage(string name)
         {
             Name = name;
+        }
+
+        public GenericPackage(string name, string id, string currentVersion, string source)
+        {
+            Name = name;
+            Id = id;
+            CurrVer = currentVersion;
+            Source = source;
+        }
+
+        public GenericPackage(string name, string id, string currentVersion, string availableVersion, string source)
+        {
+            Name = name;
+            Id = id;
+            CurrVer = currentVersion;
+            AvailVer = availableVersion;
+            Source = source;
         }
 
         public string Name { get; set; }
