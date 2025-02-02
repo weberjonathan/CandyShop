@@ -43,33 +43,31 @@ namespace CandyShop.Controller
             InstalledPage.Loading = true;
 
             if (forceFetch) await PackageService.ClearPackages();
+            Task<List<GenericPackage>> installedTask = PackageService.GetInstalledPackagesAsync();
+            Task<List<GenericPackage>> outdatedTask = PackageService.GetOutdatedPackagesAsync();
 
-            Task<List<GenericPackage>> installedFuture = null;
-            Task<List<GenericPackage>> outdatedFuture = null;
+            List<GenericPackage> outdated = null;
             try
             {
-                installedFuture = PackageService.GetInstalledPackagesAsync();
+                outdated = await outdatedTask;
             }
             catch (PackageManagerException e)
             {
                 Log.Error(LocaleEN.ERROR_RETRIEVING_OUTDATED_PACKAGES, e.Message);
             }
-
-            try
-            {
-                outdatedFuture = PackageService.GetOutdatedPackagesAsync();
-            }
-            catch (PackageManagerException e)
-            {
-                Log.Error(LocaleEN.ERROR_RETRIEVING_OUTDATED_PACKAGES, e.Message);
-            }
-
-            List<GenericPackage> outdated = await outdatedFuture;
             outdated ??= [];
             UpgradePage.ClearPackages();
             UpgradePage.AddPackages(outdated.Select(ControlsFactory.BuildUpgradeItem).ToList());
 
-            List<GenericPackage> installed = await installedFuture;
+            List<GenericPackage> installed = null;
+            try
+            {
+                installed = await installedTask;
+            }
+            catch (PackageManagerException e)
+            {
+                Log.Error(LocaleEN.ERROR_RETRIEVING_OUTDATED_PACKAGES, e.Message);
+            }
             installed ??= [];
             InstalledPage.ClearPackages();
             InstalledPage.AddPackages(installed.Select(ControlsFactory.BuildInstalledItem).ToList());
