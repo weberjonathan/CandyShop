@@ -23,6 +23,7 @@ namespace CandyShop.View
             get { return txtChocoBinary.Text; }
             set { txtChocoBinary.Text = value; }
         }
+
         public string GSudoBinary
         {
             get { return txtGSudoBinary.Text; }

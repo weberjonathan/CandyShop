@@ -77,8 +77,6 @@ namespace CandyShop
 
         public bool SupressAdminWarning { get; set; }
 
-        public bool SupressLocaleLogWarning { get; set; }
-
         public bool CloseAfterUpgrade { get; set; }
 
         public bool WingetMode { get; set; }

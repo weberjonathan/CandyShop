@@ -42,11 +42,11 @@ namespace CandyShop.Controller
             MainView.ShowAdminWarning =
                 !Context.HasAdminPrivileges &&
                 !Context.ElevateOnDemand &&
-                !Context.SupressAdminWarning;
+                !Context.SupressAdminWarning; // move these to settingsController, bc it also knows the mainView
 
             MainView.HideAdminWarningClicked += new EventHandler((sender, e) =>
             {
-                Context.SupressAdminWarning = true;
+                Context.SupressAdminWarning = true; // move this to settingsController, bc it also knows the mainView TODO
             });
 
             MainView.OpenLogsClicked += new EventHandler((sender, e) =>

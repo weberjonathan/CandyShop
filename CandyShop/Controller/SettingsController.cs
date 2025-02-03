@@ -12,9 +12,8 @@ namespace CandyShop.Controller
         private readonly CandyShopContext Context;
         private readonly SettingsService SettingsService;
         private MainWindow MainView;
-        private SettingsWindow SettingsView;
+        private SettingsWindow SettingsView; // TODO inject this
 
-        // TODO disable cache checkbox if require checkbox is unchecked
         public SettingsController(CandyShopContext context, SettingsService settingsService)
         {
             Context = context;
@@ -24,7 +23,7 @@ namespace CandyShop.Controller
         public void InjectView(MainWindow mainView)
         {
             MainView = mainView;
-            MainView.OpenSettingsClicked += new EventHandler((sender, e) => ShowView());
+            MainView.OpenSettingsClicked += new EventHandler((sender, e) => ShowSettingsWindow());
             MainView.OpenSettingsDirClicked += new EventHandler((sender, e) =>
             {
                 try
@@ -38,7 +37,7 @@ namespace CandyShop.Controller
             });
         }
 
-        public void ShowView()
+        public void ShowSettingsWindow()
         {
             SettingsView = new SettingsWindow();
             SettingsView.OkClicked += new EventHandler((sender, e) =>

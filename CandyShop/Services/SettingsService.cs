@@ -123,7 +123,6 @@ namespace CandyShop.Services
             context.CleanShortcuts = settings.CleanShortcuts;
             context.ElevateOnDemand = settings.ElevateOnDemand;
             context.SupressAdminWarning = settings.SupressNoRightsWarning;
-            context.SupressLocaleLogWarning = false;
             context.CloseAfterUpgrade = settings.CloseAfterUpgrade;
             context.WingetMode = settings.ActivePackageManager.Equals("Winget");
 

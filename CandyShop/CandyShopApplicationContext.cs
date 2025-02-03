@@ -40,15 +40,6 @@ namespace CandyShop
                 // TODO
             }
 
-            // determine locale // TODO should be handled via banner or popup; its also only relevant to winget
-            if (!context.SupressLocaleLogWarning)
-            {
-                var ci = CultureInfo.CurrentCulture;
-                List<string> supported = ["en", "de"];
-                if (!supported.Contains(ci.TwoLetterISOLanguageName))
-                    Log.Warning($"Detected unsupported locale \"{ci.TwoLetterISOLanguageName}\". This may lead to parsing errors. See https://github.com/weberjonathan/CandyShop/blob/master/docs/lcoales.md for more.");
-            }
-
             // validate selected package manager
             AbstractPackageManager activePackageManager = null;
             try
