@@ -7,6 +7,7 @@ using System;
 using CandyShop.PackageCore;
 using System.IO;
 using System.Windows.Forms;
+using System.Collections.Immutable;
 
 namespace CandyShop.Services
 {
@@ -25,6 +26,8 @@ namespace CandyShop.Services
 
         private readonly AbstractPackageManager PackageManager;
         private readonly ShortcutService ShortcutService;
+
+        // TODO remove duplicate calls to pin
 
         public PackageService(AbstractPackageManager packageManager, ShortcutService shortcutService)
         {
@@ -49,34 +52,33 @@ namespace CandyShop.Services
                     var fetchInstalled = PackageManager.FetchInstalledAsync();
                     var fetchPinned = PackageManager.FetchPinListAsync();
 
-                    var installed = await fetchInstalled;
-                    installed.ForEach(p => p.Pinned = false);
-                    installed.ForEach(p => InstalledPckgCache[p.Name] = p);
-
+                    // fetch and resolve pinned packages
                     var pinned = await fetchPinned;
-
-                    // resolve names of installed packages and pinned packages
                     if (PackageManager.RequiresNameResolution)
                     {
-                        var movedPackages = await PackageManager.ResolveAbbreviatedNamesAsync(InstalledPckgCache.Values.ToList());
-                        MoveInstalledPackagesUnsafe(movedPackages);
-
-                        movedPackages = await PackageManager.ResolveAbbreviatedNamesAsync(pinned);
-                        pinned = movedPackages.Values.ToList();
+                        var unresolved = RemoveUnresolvedPackages(pinned);
+                        unresolved = await PackageManager.ResolveAbbreviatedNamesAsync(unresolved);
+                        pinned.AddRange(unresolved);
                     }
 
-                    MergePinInfoUnsafe(pinned);
-
-                    var unresolved = InstalledPckgCache
-                        .Values
-                        .Where(p => p.HasSource && p.Id != null && p.Id.Contains('…'))
-                        .Select(p => p.Name)
-                        .ToList();
-                    if (unresolved.Count > 0)
+                    // fetch and resolve installed packages
+                    var installed = await fetchInstalled;
+                    if (PackageManager.RequiresNameResolution)
                     {
-                        var value = string.Join(", ", unresolved);
-                        Log.Warning($"{unresolved.Count} package(s) have sources and unresolved IDs: {value}");
+                        var unresolved = RemoveUnresolvedPackages(installed);
+                        unresolved = await PackageManager.ResolveAbbreviatedNamesAsync(unresolved);
+                        installed.AddRange(unresolved);
                     }
+
+                    // merge pin info
+                    var pinnedNames = pinned.Select(package => package.Name).ToImmutableHashSet();
+                    installed.ForEach(package =>
+                    {
+                        package.Pinned = pinnedNames.Contains(package.Name);
+                    });
+
+                    // merge
+                    installed.ForEach(p => InstalledPckgCache[p.Name] = p);
                 }
             }
             catch (PackageManagerException)
@@ -103,22 +105,49 @@ namespace CandyShop.Services
             {
                 if (OutdatedPckgCache.Count == 0)
                 {
-                    List<GenericPackage> packages = null;
-                    if (PackageManager.SupportsFetchingOutdated)
+                    List<GenericPackage> outdated = null;
+                    if (!PackageManager.SupportsFetchingOutdated)
                     {
-                        packages = await PackageManager.FetchOutdatedAsync();
-                    }
-                    else
-                    {
-                        packages = (await GetInstalledPackagesAsync())
+                        // fallback to installed packages
+                        outdated = (await GetInstalledPackagesAsync())
                             .Where(p => !string.IsNullOrEmpty(p.AvailVer))
                             .Where(p => !p.CurrVer.Equals(p.AvailVer))
                             .ToList();
                     }
+                    else
+                    {
+                        // fetch outdated packages and pins
+                        var fetchOutdated = PackageManager.FetchOutdatedAsync();
+                        var fetchPinned = PackageManager.FetchPinListAsync();
 
-                    // remove packages with unknown version (relevant for winget only)
-                    packages = packages.Where(p => !"Unknown".Equals(p.CurrVer)).ToList();
-                    packages.ForEach(p => OutdatedPckgCache[p.Name] = p);
+                        // fetch and resolve pinned packages
+                        var pinned = await fetchPinned;
+                        if (PackageManager.RequiresNameResolution)
+                        {
+                            var unresolved = RemoveUnresolvedPackages(pinned);
+                            unresolved = await PackageManager.ResolveAbbreviatedNamesAsync(unresolved);
+                            pinned.AddRange(unresolved);
+                        }
+
+                        // fetch and resolve outdated packages
+                        outdated = await fetchOutdated;
+                        if (PackageManager.RequiresNameResolution)
+                        {
+                            var unresolved = RemoveUnresolvedPackages(outdated);
+                            unresolved = await PackageManager.ResolveAbbreviatedNamesAsync(unresolved);
+                            outdated.AddRange(unresolved);
+                        }
+
+                        // merge pin info
+                        var pinnedNames = pinned.Select(package => package.Name).ToImmutableHashSet();
+                        outdated.ForEach(package =>
+                        {
+                            package.Pinned = pinnedNames.Contains(package.Name);
+                        });
+                    }
+
+                    // merge
+                    outdated.ForEach(p => OutdatedPckgCache[p.Name] = p);
                 }
             }
             catch (PackageManagerException)
@@ -347,43 +376,27 @@ namespace CandyShop.Services
             }
         }
 
-        private void MergePinInfoUnsafe(List<GenericPackage> pinned)
-        {
-            ConditionalMergePinInfoUnsafe(pinned, (p) => true);
-        }
-
         /// <summary>
-        /// Merges the pin info from the supplied packages into the installed package cache
-        /// if the supplied condition is met. No lock is acquired during the operation.
-        /// Packages, that do not meet the defined condition or have not been cached, are returned.
+        /// Removes packages from the list if their name is incomplete (ie. contains an ellipsis)
+        /// and they have a source. Returns the removed packages.
         /// </summary>
-        /// <param name="pinned"></param>
-        /// <param name="condition"></param>
-        /// <returns></returns>
-        private List<GenericPackage> ConditionalMergePinInfoUnsafe(List<GenericPackage> pinned, Func<GenericPackage, bool> condition)
+        /// <param name="packages"></param>
+        private List<GenericPackage> RemoveUnresolvedPackages(List<GenericPackage> packages)
         {
-            List<GenericPackage> rtn = [];
-            pinned.ForEach(package =>
+            List<GenericPackage> unresolved = [];
+            int i = 0;
+            while (i < packages.Count)
             {
-                if (condition(package) && InstalledPckgCache.TryGetValue(package.Name, out GenericPackage cachePackage))
-                    cachePackage.Pinned = package.Pinned;
-                else
-                    rtn.Add(package);
-            });
-
-            return rtn;
-        }
-
-        private void MoveInstalledPackagesUnsafe(Dictionary<string, GenericPackage> movedPackages)
-        {
-            foreach (var (oldName, package) in movedPackages)
-            {
-                if (InstalledPckgCache.ContainsKey(oldName))
+                var package = packages[i];
+                if (package.HasSource && package.Name.Contains('…'))
                 {
-                    InstalledPckgCache.Remove(oldName);
-                    InstalledPckgCache[package.Name] = package;
+                    packages.Remove(package);
+                    unresolved.Add(package);
                 }
+                i++;
             }
+
+            return unresolved;
         }
     }
 }

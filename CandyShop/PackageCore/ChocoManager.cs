@@ -36,7 +36,7 @@ namespace CandyShop.PackageCore
                 throw new PackageManagerException($"Chocolatey did not exit cleanly. Returned {p.ExitCode}.");
         }
 
-        public override Task<Dictionary<string, GenericPackage>> ResolveAbbreviatedNamesAsync(List<GenericPackage> packages)
+        public override Task<List<GenericPackage>> ResolveAbbreviatedNamesAsync(List<GenericPackage> packages)
         {
             Log.Error("Chocolatey tried to invoke a capabality that is not implemented: Resolving abbreviated names.");
             throw new InvalidOperationException();

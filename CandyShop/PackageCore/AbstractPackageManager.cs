@@ -18,7 +18,14 @@ namespace CandyShop.PackageCore
         /// <exception cref="CandyShopException"></exception>
         public abstract void Upgrade(List<GenericPackage> packages);
 
-        public abstract Task<Dictionary<string, GenericPackage>> ResolveAbbreviatedNamesAsync(List<GenericPackage> packages);
+        /// <summary>
+        /// Tries to resolve incomplete package names and returns a list of
+        /// successful resolutions and the original packages in cases, where
+        /// package name resolution failed.
+        /// </summary>
+        /// <param name="unresolved"></param>
+        /// <returns></returns>
+        public abstract Task<List<GenericPackage>> ResolveAbbreviatedNamesAsync(List<GenericPackage> unresolved);
 
         /// <exception cref="PackageManagerException"></exception>
         public async Task<List<GenericPackage>> FetchInstalledAsync()

@@ -62,15 +62,16 @@ namespace CandyShop.PackageCore
                 throw new PackageManagerException($"One or more winget upgrade processes failed with exit codes {string.Join(", ", nonZeroExitCodes)}. See log for more information.");
         }
 
-        public override async Task<Dictionary<string, GenericPackage>> ResolveAbbreviatedNamesAsync(List<GenericPackage> packages)
+        public override async Task<List<GenericPackage>> ResolveAbbreviatedNamesAsync(List<GenericPackage> unresolved)
         {
-            int total = packages.Count;
-            ConcurrentBag<GenericPackage> unresolvedNames = [];
-            ConcurrentDictionary<string, GenericPackage> movedPackages = new();
+            int unresolvedTotal = unresolved.Count;
+            ConcurrentBag<GenericPackage> failed = [];
+            ConcurrentBag<GenericPackage> resolved = [];
 
-            var candidates = packages.Where(p => p.HasSource && p.Name.Contains('…')).ToList();
+            unresolved = unresolved.Where(p => p.HasSource && p.Name.Contains('…')).ToList();
             var options = new ParallelOptions() { MaxDegreeOfParallelism = 5 };
-            await Parallel.ForEachAsync(candidates, options, async (package, token) =>
+
+            await Parallel.ForEachAsync(unresolved, options, async (package, token) =>
             {
                 string fetched;
                 try
@@ -80,32 +81,32 @@ namespace CandyShop.PackageCore
                 catch (PackageManagerException e)
                 {
                     Log.Error($"Failed to resolve package with name '{package.Name}': {e.Message}");
-                    unresolvedNames.Add(package);
+                    failed.Add(package);
                     return;
                 }
 
                 var (name, id) = ExtractNameAndIdFromInfo(fetched);
                 if (name != null && id != null)
                 {
-                    movedPackages[package.Name] = package;
                     package.Name = name;
                     package.Id = id;
+                    resolved.Add(package);
                 }
                 else
                 {
-                    unresolvedNames.Add(package);
+                    failed.Add(package);
                 }
             });
 
             // log unresolved packages
-            Log.Debug($"Resolved incomplete package names for {movedPackages.Count} of {candidates.Count} candidates. Total package count was {total}.");
-            if (!unresolvedNames.IsEmpty)
+            Log.Debug($"WingetManager [{Environment.CurrentManagedThreadId}]: Resolved incomplete package names for {resolved.Count} of {unresolvedTotal} candidates.");
+            if (!failed.IsEmpty)
             {
-                var value = string.Join(", ", unresolvedNames.Select(p => p.Name).ToList());
-                Log.Warning($"Failed to resolve {unresolvedNames.Count} package(s): {value}");
+                var value = string.Join(", ", failed.Select(p => p.Name));
+                Log.Warning($"Failed to resolve {failed.Count} package(s): {value}");
             }
 
-            return movedPackages.ToDictionary();
+            return resolved.Concat(failed).ToList();
         }
 
         protected override PackageManagerProcess BuildProcess(string args, bool useGsudo = false)
@@ -189,6 +190,7 @@ namespace CandyShop.PackageCore
             // build packages
             List<GenericPackage> rtn = parser.Items
                 .Select(GenericPackage.FromArgs)
+                .Where(p => !"Unknown".Equals(p.CurrVer))
                 .OrderBy(p => p.Name)
                 .ToList();
 
