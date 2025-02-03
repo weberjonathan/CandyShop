@@ -26,16 +26,6 @@ namespace CandyShop.PackageCore
 
     internal class WingetParser
     {
-        enum State { LookingForTable, BeginTableContentRead, ReadingTableContent };
-
-        private Queue<string> _Output;
-
-        private State _CurrentState;
-
-        private List<WingetTable> Tables = [];
-
-        private WingetTable CurrentTable => Tables[^1];
-
         public string[] Columns { get; private set; }
 
         public string[][] Items { get; private set; }
@@ -43,76 +33,78 @@ namespace CandyShop.PackageCore
         public WingetParser(string output)
         {
             output = TrimProgressChars(output);
-            _Output = new(output.Split(Environment.NewLine));
+            var _output = new Queue<string>(output.Split(Environment.NewLine));
 
             // read all output; may contain multiple tables
-            while (_Output.Count > 0)
+            List<WingetTable> tables = [];
+            while (_output.Count > 0)
             {
-                var line = _Output.Dequeue();
-                switch (_CurrentState)
+                var table = LookForTable(_output);
+                if (table != null)
                 {
-                    case State.LookingForTable:
-                        _CurrentState = LookForTable(line);
-                        break;
-                    case State.BeginTableContentRead:
-                        _CurrentState = State.ReadingTableContent;
-                        break;
-                    case State.ReadingTableContent:
-                        _CurrentState = ReadTableContent(line);
-                        break;
-                    default:
-                        break;
+                    ReadTableContent(_output, table);
+                    tables.Add(table);
                 }
             }
 
             // disregard tables from the first different column layout
-            for (int i = 0; i < Tables.Count - 1; i++)
+            for (int i = 0; i < tables.Count - 1; i++)
             {
-                if (!Tables[i].HasMatchingColumns(Tables[i + 1]))
+                if (!tables[i].HasMatchingColumns(tables[i + 1]))
                 {
-                    Tables = Tables.GetRange(0, i + 1);
+                    tables = tables.GetRange(0, i + 1);
                     break;
                 }
             }
 
             // create output
-            if (Tables.Count > 0)
+            if (tables.Count > 0)
             {
-                Columns = Tables[0].Columns.Select(col => col.Name).ToArray();
-                Items = Tables.SelectMany((table) => table.Items).ToArray();
+                Columns = tables[0].Columns.Select(col => col.Name).ToArray();
+                Items = tables.SelectMany((table) => table.Items).ToArray();
             }
         }
 
-        private State LookForTable(string tableHead)
+        private WingetTable LookForTable(Queue<string> output)
         {
-            // current line is table head if next is divider
-            if (_Output.TryPeek(out string divider))
+            if (!output.TryDequeue(out string tableHead))
+                return null;
+
+            // current row is table head if next is divider
+            while (output.TryDequeue(out string divider))
+            {
                 if (string.IsNullOrEmpty(divider) || divider.All(c => c.Equals('-')))
                 {
                     var columns = ParseTableHead(tableHead);
-                    Tables.Add(new WingetTable(columns));
-                    return State.BeginTableContentRead;
+                    return new WingetTable(columns);
                 }
 
-            return State.LookingForTable;
-        }
-
-        private State ReadTableContent(string row)
-        {
-            // check end of content
-            if (string.IsNullOrEmpty(row) || row.Length < CurrentTable.Columns[^1].Offset)
-            {
-                // some tables end with a status message like '39 upgrades available.'
-                // and some with a blank line; there is no reliable way to determine
-                // the end, so let's assume the status line is shorter than the table
-                // content; this seems to work for now
-                return State.LookingForTable;
+                tableHead = divider;
             }
 
-            // parse items from row
-            var items = ParseTableRow(row);
-            CurrentTable.Items.Add(items);
-            return State.ReadingTableContent;
+            return null;
+        }
+
+        private WingetTable ReadTableContent(Queue<string> output, WingetTable table)
+        {
+            while (output.TryDequeue(out string tableRow))
+            {
+                // check end of content
+                if (string.IsNullOrEmpty(tableRow) || tableRow.Length < table.Columns[^1].Offset)
+                {
+                    // some tables end with a status message like '39 upgrades available.'
+                    // and some with a blank line; there is no reliable way to determine
+                    // the end, so let's assume the status line is shorter than the table
+                    // content; this seems to work for now
+                    break;
+                }
+
+                // parse content
+                var items = ParseTableRow(table.Columns, tableRow);
+                table.Items.Add(items);
+            }
+
+            return table;
         }
 
         private WingetColumn[] ParseTableHead(string tableHead)
@@ -138,15 +130,14 @@ namespace CandyShop.PackageCore
             return columns.ToArray();
         }
 
-        private string[] ParseTableRow(string row)
+        private string[] ParseTableRow(WingetColumn[] columns, string row)
         {
-            WingetColumn[] cols = CurrentTable.Columns;
-            string[] items = new string[cols.Length];
+            string[] items = new string[columns.Length];
 
-            for (int i = 0; i < cols.Length; i++)
+            for (int i = 0; i < columns.Length; i++)
             {
-                int start = cols[i].Offset;
-                int end = i + 1 < cols.Length ? cols[i + 1].Offset : row.Length;
+                int start = columns[i].Offset;
+                int end = i + 1 < columns.Length ? columns[i + 1].Offset : row.Length;
                 if (start < row.Length && end <= row.Length)
                 {
                     items[i] = row[start..end].Trim();
