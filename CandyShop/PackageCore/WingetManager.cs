@@ -8,14 +8,8 @@ using System.Threading.Tasks;
 
 namespace CandyShop.PackageCore
 {
-    internal class WingetManager(bool suppressLogWarning, string binary, bool requireManualElevation, bool allowGsudoCache) : AbstractPackageManager(binary, requireManualElevation, allowGsudoCache)
+    internal class WingetManager(string binary, bool requireManualElevation, bool allowGsudoCache) : AbstractPackageManager(binary, requireManualElevation, allowGsudoCache)
     {
-        private readonly List<string> VALIDATE_SEARCHES = ["Found", "Gefunden"];
-        private readonly List<string> VALIDATE_PIN_LIST = ["There are no pins configured.", "Es sind keine Pins konfiguriert."];
-        private readonly List<string> VALIDATE_FIRST_COLUMN = ["Name"];
-
-        private readonly bool SuppressLogWarnings = suppressLogWarning;
-
         public override bool SupportsFetchingOutdated => true;
         public override bool RequiresNameResolution => true;
 
@@ -130,11 +124,10 @@ namespace CandyShop.PackageCore
             ThrowOnError(p);
 
             var output = WingetParser.TrimProgressChars(p.Output);
-            var first_word_index = output.IndexOf(' ');
-            if (first_word_index < 0) first_word_index = 0;
-            var first_word = output[..first_word_index].Trim();
-            HandleValidateOutputElement(first_word, VALIDATE_SEARCHES, "Could not validate first word of winget output for \"winget show\"");
-            return output[(first_word_index + 1)..];
+
+            // trim the first word because it is a status indicator (like "found")
+            var offset = output.IndexOf(' ') + 1;
+            return output[offset..].Trim();
         }
 
         /// <exception cref="PackageManagerException"></exception>
@@ -150,7 +143,6 @@ namespace CandyShop.PackageCore
             // parse and validate
             WingetParser parser = new(p.Output);
             string[] cols = parser.Columns;
-            HandleValidateOutputElement(cols[0], VALIDATE_FIRST_COLUMN, "Could not validate first column name of winget output for \"winget list\""); // TODO eval this, also make it safe
             if (cols.Length != 4 && cols.Length != 5)
             {
                 Log.Debug($"WingetManager [{Environment.CurrentManagedThreadId}]: Column layout is '{string.Join(", ", cols)}'");
@@ -178,7 +170,6 @@ namespace CandyShop.PackageCore
             // parse and validate
             WingetParser parser = new(p.Output);
             string[] cols = parser.Columns;
-            HandleValidateOutputElement(cols[0], VALIDATE_FIRST_COLUMN, "Could not validate first column name of winget output for \"winget list\""); // TODO eval this, also make it safe
             if (cols.Length != 5)
             {
                 Log.Debug($"WingetManager [{Environment.CurrentManagedThreadId}]: Column layout is '{string.Join(", ", cols)}'");
@@ -209,10 +200,6 @@ namespace CandyShop.PackageCore
                 throw new PackageManagerException($"Failed to fetch installed packages: Expected 5 columns, found {cols.Length}");
             }
 
-            // TODO
-            //(firstColName) => HandleValidateOutputElement(firstColName, VALIDATE_FIRST_COLUMN, "Could not validate first column name of winget output for \"winget pin list\""),
-            //    (value)        => HandleValidateOutputElement(value,        VALIDATE_PIN_LIST,     "Could not validate empty list of winget output for \"winget pin list\""));
-
             return parser.Items
                 .Select(row => new GenericPackage()
                 {
@@ -241,18 +228,6 @@ namespace CandyShop.PackageCore
             PackageManagerProcess p = BuildProcess(args);
             p.ExecuteHidden();
             ThrowOnError(p);
-        }
-
-        private void HandleValidateOutputElement(string value, List<string> valid, string message)
-        {
-            if (!SuppressLogWarnings)
-            {
-                if (!valid.Contains(value))
-                {
-                    Log.Warning("{0}: \"{1}\". This message will be suppressed for future occurences.", message, value);
-                    valid.Add(value);
-                }
-            }
         }
 
         private (string, string) ExtractNameAndIdFromInfo(string fetchInfoResult)

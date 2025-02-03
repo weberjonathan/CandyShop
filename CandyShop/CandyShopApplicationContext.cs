@@ -59,7 +59,7 @@ namespace CandyShop
                         Log.Warning($"Detected unsupported locale \"{ci.TwoLetterISOLanguageName}\". This may lead to parsing errors. See https://github.com/weberjonathan/CandyShop/blob/master/docs/lcoales.md for more.");
                 }
 
-                packageManager = new WingetManager(context.SupressLocaleLogWarning, context.WingetBinary, requireManualElevation, context.AllowGsudoCache);
+                packageManager = new WingetManager(context.WingetBinary, requireManualElevation, context.AllowGsudoCache);
                 var p = new PackageManagerProcess(context.WingetBinary, "--version");
                 try
                 {
