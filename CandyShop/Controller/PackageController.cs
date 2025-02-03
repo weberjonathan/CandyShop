@@ -43,10 +43,10 @@ namespace CandyShop.Controller
             InstalledPage.Loading = true;
 
             if (forceFetch) await PackageService.ClearPackages();
-            Task<List<GenericPackage>> installedTask = PackageService.GetInstalledPackagesAsync();
-            Task<List<GenericPackage>> outdatedTask = PackageService.GetOutdatedPackagesAsync();
+            var installedTask = PackageService.GetInstalledPackagesAsync();
+            var outdatedTask = PackageService.GetOutdatedPackagesAsync();
 
-            List<GenericPackage> outdated = null;
+            GenericPackage[] outdated = null;
             try
             {
                 outdated = await outdatedTask;
@@ -59,7 +59,7 @@ namespace CandyShop.Controller
             UpgradePage.ClearPackages();
             UpgradePage.AddPackages(outdated.Select(ControlsFactory.BuildUpgradeItem).ToList());
 
-            List<GenericPackage> installed = null;
+            GenericPackage[] installed = null;
             try
             {
                 installed = await installedTask;

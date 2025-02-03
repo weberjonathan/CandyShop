@@ -36,7 +36,7 @@ namespace CandyShop.Services
         }
 
         /// <exception cref="PackageManagerException"></exception>
-        public async Task<List<GenericPackage>> GetInstalledPackagesAsync()
+        public async Task<GenericPackage[]> GetInstalledPackagesAsync()
         {
             Log.Debug($"PackageService [{Environment.CurrentManagedThreadId}]: Get installed packages.");
 
@@ -53,21 +53,21 @@ namespace CandyShop.Services
                     var fetchPinned = PackageManager.FetchPinListAsync();
 
                     // fetch and resolve pinned packages
-                    var pinned = await fetchPinned;
+                    var pinned = (await fetchPinned).ToList();
                     if (PackageManager.RequiresNameResolution)
                     {
                         var unresolved = RemoveUnresolvedPackages(pinned);
-                        unresolved = await PackageManager.ResolveAbbreviatedNamesAsync(unresolved);
-                        pinned.AddRange(unresolved);
+                        var resolved = await PackageManager.ResolveAbbreviatedNamesAsync(unresolved);
+                        pinned.AddRange(resolved);
                     }
 
                     // fetch and resolve installed packages
-                    var installed = await fetchInstalled;
+                    var installed = (await fetchInstalled).ToList();
                     if (PackageManager.RequiresNameResolution)
                     {
                         var unresolved = RemoveUnresolvedPackages(installed);
-                        unresolved = await PackageManager.ResolveAbbreviatedNamesAsync(unresolved);
-                        installed.AddRange(unresolved);
+                        var resolved = await PackageManager.ResolveAbbreviatedNamesAsync(unresolved);
+                        installed.AddRange(resolved);
                     }
 
                     // merge pin info
@@ -90,11 +90,11 @@ namespace CandyShop.Services
                 InstalledPckgLock.Release();
             }
 
-            return InstalledPckgCache.Values.ToList();
+            return InstalledPckgCache.Values.ToArray();
         }
 
         /// <exception cref="PackageManagerException"></exception>
-        public async Task<List<GenericPackage>> GetOutdatedPackagesAsync()
+        public async Task<GenericPackage[]> GetOutdatedPackagesAsync()
         {
             Log.Debug($"PackageService [{Environment.CurrentManagedThreadId}]: Get outdated packages.");
 
@@ -121,21 +121,21 @@ namespace CandyShop.Services
                         var fetchPinned = PackageManager.FetchPinListAsync();
 
                         // fetch and resolve pinned packages
-                        var pinned = await fetchPinned;
+                        var pinned = (await fetchPinned).ToList();
                         if (PackageManager.RequiresNameResolution)
                         {
                             var unresolved = RemoveUnresolvedPackages(pinned);
-                            unresolved = await PackageManager.ResolveAbbreviatedNamesAsync(unresolved);
-                            pinned.AddRange(unresolved);
+                            var resolved = await PackageManager.ResolveAbbreviatedNamesAsync(unresolved);
+                            pinned.AddRange(resolved);
                         }
 
                         // fetch and resolve outdated packages
-                        outdated = await fetchOutdated;
+                        outdated = (await fetchOutdated).ToList();
                         if (PackageManager.RequiresNameResolution)
                         {
                             var unresolved = RemoveUnresolvedPackages(outdated);
-                            unresolved = await PackageManager.ResolveAbbreviatedNamesAsync(unresolved);
-                            outdated.AddRange(unresolved);
+                            var resolved = await PackageManager.ResolveAbbreviatedNamesAsync(unresolved);
+                            outdated.AddRange(resolved);
                         }
 
                         // merge pin info
@@ -159,7 +159,7 @@ namespace CandyShop.Services
                 OutdatedPckgLock.Release();
             }
 
-            return OutdatedPckgCache.Values.ToList();
+            return OutdatedPckgCache.Values.ToArray();
         }
 
         /// <exception cref="PackageManagerException"></exception>

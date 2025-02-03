@@ -13,6 +13,7 @@ using System.Diagnostics;
 using CandyShop.PackageCore;
 using System.Globalization;
 using CandyShop.Controls.Factory;
+using System.Linq;
 
 namespace CandyShop
 {
@@ -191,7 +192,7 @@ namespace CandyShop
             // obtain outdated packages
             try
             {
-                packages = await service.GetOutdatedPackagesAsync();
+                packages = (await service.GetOutdatedPackagesAsync()).ToList();
             }
             catch (PackageManagerException e)
             {

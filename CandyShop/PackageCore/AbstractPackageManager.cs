@@ -25,22 +25,22 @@ namespace CandyShop.PackageCore
         /// </summary>
         /// <param name="unresolved"></param>
         /// <returns></returns>
-        public abstract Task<List<GenericPackage>> ResolveAbbreviatedNamesAsync(List<GenericPackage> unresolved);
+        public abstract Task<GenericPackage[]> ResolveAbbreviatedNamesAsync(List<GenericPackage> unresolved);
 
         /// <exception cref="PackageManagerException"></exception>
-        public async Task<List<GenericPackage>> FetchInstalledAsync()
+        public async Task<GenericPackage[]> FetchInstalledAsync()
         {
             return await Task.Run(FetchInstalled);
         }
 
         /// <exception cref="PackageManagerException"></exception>
-        public async Task<List<GenericPackage>> FetchOutdatedAsync()
+        public async Task<GenericPackage[]> FetchOutdatedAsync()
         {
             return await Task.Run(FetchOutdated);
         }
 
         /// <exception cref="PackageManagerException"></exception>
-        public async Task<List<GenericPackage>> FetchPinListAsync()
+        public async Task<GenericPackage[]> FetchPinListAsync()
         {
             return await Task.Run(FetchPinList);
         }
@@ -64,13 +64,13 @@ namespace CandyShop.PackageCore
         }
 
         /// <exception cref="PackageManagerException"></exception>
-        protected abstract List<GenericPackage> FetchInstalled();
+        protected abstract GenericPackage[] FetchInstalled();
 
         /// <exception cref="PackageManagerException"></exception>
-        protected abstract List<GenericPackage> FetchOutdated();
+        protected abstract GenericPackage[] FetchOutdated();
 
         /// <exception cref="PackageManagerException"></exception>
-        protected abstract List<GenericPackage> FetchPinList();
+        protected abstract GenericPackage[] FetchPinList();
 
         /// <exception cref="PackageManagerException"></exception>
         protected abstract string FetchInfo(GenericPackage package);

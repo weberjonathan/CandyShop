@@ -6,6 +6,7 @@ using CandyShop.Services;
 using Serilog;
 using CandyShop.PackageCore;
 using CandyShop.Controls.Factory;
+using System.Linq;
 
 namespace CandyShop.Controller
 {
@@ -69,7 +70,7 @@ namespace CandyShop.Controller
             List<GenericPackage> packages = [];
             try
             {
-                packages = await PackageService.GetInstalledPackagesAsync();
+                packages = (await PackageService.GetInstalledPackagesAsync()).ToList();
             }
             catch (PackageManagerException e)
             {

@@ -62,7 +62,7 @@ namespace CandyShop.PackageCore
                 throw new PackageManagerException($"One or more winget upgrade processes failed with exit codes {string.Join(", ", nonZeroExitCodes)}. See log for more information.");
         }
 
-        public override async Task<List<GenericPackage>> ResolveAbbreviatedNamesAsync(List<GenericPackage> unresolved)
+        public override async Task<GenericPackage[]> ResolveAbbreviatedNamesAsync(List<GenericPackage> unresolved)
         {
             int unresolvedTotal = unresolved.Count;
             ConcurrentBag<GenericPackage> failed = [];
@@ -106,7 +106,7 @@ namespace CandyShop.PackageCore
                 Log.Warning($"Failed to resolve {failed.Count} package(s): {value}");
             }
 
-            return resolved.Concat(failed).ToList();
+            return resolved.Concat(failed).ToArray();
         }
 
         protected override PackageManagerProcess BuildProcess(string args, bool useGsudo = false)
@@ -138,7 +138,7 @@ namespace CandyShop.PackageCore
         }
 
         /// <exception cref="PackageManagerException"></exception>
-        protected override List<GenericPackage> FetchInstalled()
+        protected override GenericPackage[] FetchInstalled()
         {
             Log.Information($"Fetching installed packages from winget.");
 
@@ -158,16 +158,14 @@ namespace CandyShop.PackageCore
             }
 
             // build packages
-            List<GenericPackage> rtn = parser.Items
+            return parser.Items
                 .Select(GenericPackage.FromArgs)
                 .OrderBy(p => p.Name)
-                .ToList();
-
-            return rtn;
+                .ToArray();
         }
 
         /// <exception cref="PackageManagerException"></exception>
-        protected override List<GenericPackage> FetchOutdated()
+        protected override GenericPackage[] FetchOutdated()
         {
             Log.Information($"Fetching outdated packages from winget.");
             Log.Debug($"WingetManager [{Environment.CurrentManagedThreadId}]: Fetching outdated packages.");
@@ -188,17 +186,14 @@ namespace CandyShop.PackageCore
             }
 
             // build packages
-            List<GenericPackage> rtn = parser.Items
+            return parser.Items
                 .Select(GenericPackage.FromArgs)
                 .Where(p => !"Unknown".Equals(p.CurrVer))
                 .OrderBy(p => p.Name)
-                .ToList();
-
-            return rtn;
+                .ToArray();
         }
 
-        // TODO
-        protected override List<GenericPackage> FetchPinList()
+        protected override GenericPackage[] FetchPinList()
         {
             // launch process
             PackageManagerProcess p = BuildProcess($"pin list");
@@ -218,16 +213,16 @@ namespace CandyShop.PackageCore
             //(firstColName) => HandleValidateOutputElement(firstColName, VALIDATE_FIRST_COLUMN, "Could not validate first column name of winget output for \"winget pin list\""),
             //    (value)        => HandleValidateOutputElement(value,        VALIDATE_PIN_LIST,     "Could not validate empty list of winget output for \"winget pin list\""));
 
-            List<GenericPackage> rtn = parser.Items.Select(row => new GenericPackage()
-            {
-                Name = row[0],
-                Id = row[1],
-                CurrVer = row[2],
-                Source = row[3],
-                Pinned = true
-            }).ToList();
-
-            return rtn;
+            return parser.Items
+                .Select(row => new GenericPackage()
+                {
+                    Name = row[0],
+                    Id = row[1],
+                    CurrVer = row[2],
+                    Source = row[3],
+                    Pinned = true
+                })
+                .ToArray();
         }
 
         /// <exception cref="PackageManagerException"></exception>

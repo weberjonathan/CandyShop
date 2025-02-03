@@ -36,7 +36,7 @@ namespace CandyShop.PackageCore
                 throw new PackageManagerException($"Chocolatey did not exit cleanly. Returned {p.ExitCode}.");
         }
 
-        public override Task<List<GenericPackage>> ResolveAbbreviatedNamesAsync(List<GenericPackage> packages)
+        public override Task<GenericPackage[]> ResolveAbbreviatedNamesAsync(List<GenericPackage> packages)
         {
             Log.Error("Chocolatey tried to invoke a capabality that is not implemented: Resolving abbreviated names.");
             throw new InvalidOperationException();
@@ -70,7 +70,7 @@ namespace CandyShop.PackageCore
         }
 
         /// <exception cref="PackageManagerException"></exception>
-        protected override List<GenericPackage> FetchInstalled()
+        protected override GenericPackage[] FetchInstalled()
         {
             Log.Information("Fetching installed packages from Chocolatey");
 
@@ -119,12 +119,11 @@ namespace CandyShop.PackageCore
                 }
             }
 
-            packages = ResolveMetaPackages(packages);
-            return packages;
+            return ResolveMetaPackages(packages).ToArray();
         }
 
         /// <exception cref="PackageManagerException"></exception>
-        protected override List<GenericPackage> FetchOutdated()
+        protected override GenericPackage[] FetchOutdated()
         {
             Log.Information("Fetching outdated packages from Chocolatey");
 
@@ -181,10 +180,10 @@ namespace CandyShop.PackageCore
                 }
             }
 
-            return ResolveMetaPackages(packages);
+            return ResolveMetaPackages(packages).ToArray();
         }
 
-        protected override List<GenericPackage> FetchPinList()
+        protected override GenericPackage[] FetchPinList()
         {
             PackageManagerProcess p = BuildProcess("pin list --limit-output");
             p.ExecuteHidden();
@@ -207,7 +206,7 @@ namespace CandyShop.PackageCore
                     });
                 }
             }
-            return packages;
+            return packages.ToArray();
         }
 
         /// <exception cref="PackageManagerException"></exception>
