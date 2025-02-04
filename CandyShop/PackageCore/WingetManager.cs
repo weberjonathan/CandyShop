@@ -143,7 +143,7 @@ namespace CandyShop.PackageCore
             // parse and validate
             WingetParser parser = new(p.Output);
             string[] cols = parser.Columns;
-            if (cols.Length != 4 && cols.Length != 5)
+            if (parser.HasTable && cols.Length != 4 && cols.Length != 5)
             {
                 Log.Debug($"WingetManager [{Environment.CurrentManagedThreadId}]: Column layout is '{string.Join(", ", cols)}'");
                 throw new PackageManagerException($"Failed to fetch installed packages: Expected 4 or 5 columns, found {cols.Length}");
@@ -170,7 +170,7 @@ namespace CandyShop.PackageCore
             // parse and validate
             WingetParser parser = new(p.Output);
             string[] cols = parser.Columns;
-            if (cols.Length != 5)
+            if (parser.HasTable && cols.Length != 5)
             {
                 Log.Debug($"WingetManager [{Environment.CurrentManagedThreadId}]: Column layout is '{string.Join(", ", cols)}'");
                 throw new PackageManagerException($"Failed to fetch installed packages: Expected 5 columns, found {cols.Length}");
@@ -194,7 +194,7 @@ namespace CandyShop.PackageCore
             // parse and validate
             WingetParser parser = new(p.Output);
             string[] cols = parser.Columns;
-            if (cols.Length != 5)
+            if (parser.HasTable && cols.Length != 5)
             {
                 Log.Debug($"WingetManager [{Environment.CurrentManagedThreadId}]: Column layout is '{string.Join(", ", cols)}'");
                 throw new PackageManagerException($"Failed to fetch installed packages: Expected 5 columns, found {cols.Length}");

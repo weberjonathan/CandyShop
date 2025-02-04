@@ -26,9 +26,11 @@ namespace CandyShop.PackageCore
 
     internal class WingetParser
     {
-        public string[] Columns { get; private set; }
+        public string[] Columns { get; private set; } = [];
 
-        public string[][] Items { get; private set; }
+        public string[][] Items { get; private set; } = [];
+
+        public bool HasTable => Columns.Length > 0 && Items.Length > 0;
 
         public WingetParser(string output)
         {
@@ -73,7 +75,7 @@ namespace CandyShop.PackageCore
             // current row is table head if next is divider
             while (output.TryDequeue(out string divider))
             {
-                if (string.IsNullOrEmpty(divider) || divider.All(c => c.Equals('-')))
+                if (!string.IsNullOrEmpty(divider) && divider.All(c => c.Equals('-')))
                 {
                     var columns = ParseTableHead(tableHead);
                     return new WingetTable(columns);
