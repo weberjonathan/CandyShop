@@ -194,22 +194,47 @@ namespace CandyShop.PackageCore
             // parse and validate
             WingetParser parser = new(p.Output);
             string[] cols = parser.Columns;
-            if (parser.HasTable && cols.Length != 5)
+
+            // build package list depending on available info
+            if (!parser.HasTable)
+            {
+                // nothing is pinned
+                return [];
+            }
+            else if (cols.Length == 4)
+            {
+                // winget pins may remain for uninstalled packages;
+                // these packages will not have a version and the
+                // column will be omitted, if no other pins exist
+                return parser.Items
+                    .Select(row => new GenericPackage()
+                    {
+                        Name = row[0],
+                        Id = row[1],
+                        CurrVer = "",
+                        Source = row[3],
+                        Pinned = true
+                    })
+                    .ToArray();
+            }
+            else if (cols.Length == 5)
+            {
+                return parser.Items
+                    .Select(row => new GenericPackage()
+                    {
+                        Name = row[0],
+                        Id = row[1],
+                        CurrVer = row[2],
+                        Source = row[3],
+                        Pinned = true
+                    })
+                    .ToArray();
+            }
+            else
             {
                 Log.Debug($"WingetManager [{Environment.CurrentManagedThreadId}]: Column layout is '{string.Join(", ", cols)}'");
-                throw new PackageManagerException($"Failed to fetch installed packages: Expected 5 columns, found {cols.Length}");
+                throw new PackageManagerException($"Failed to fetch installed packages: Expected 4 or 5 columns, found {cols.Length}");
             }
-
-            return parser.Items
-                .Select(row => new GenericPackage()
-                {
-                    Name = row[0],
-                    Id = row[1],
-                    CurrVer = row[2],
-                    Source = row[3],
-                    Pinned = true
-                })
-                .ToArray();
         }
 
         /// <exception cref="PackageManagerException"></exception>

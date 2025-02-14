@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace CandyShop.PackageCore
 {
@@ -24,7 +25,7 @@ namespace CandyShop.PackageCore
         }
     }
 
-    internal class WingetParser
+    public class WingetParser
     {
         public string[] Columns { get; private set; } = [];
 
@@ -77,6 +78,7 @@ namespace CandyShop.PackageCore
             {
                 if (!string.IsNullOrEmpty(divider) && divider.All(c => c.Equals('-')))
                 {
+                    tableHead = TrimProgressChars(tableHead); // see WingetParserTest.Constructor_ParsePinnedSomeText_CheckResult()
                     var columns = ParseTableHead(tableHead);
                     return new WingetTable(columns);
                 }
@@ -109,25 +111,54 @@ namespace CandyShop.PackageCore
             return table;
         }
 
+        /// <summary>
+        /// Parse column names and their offsets in the winget table output
+        /// from the table header, which is expected to contain the column
+        /// names separated by multiple whitespaces.
+        /// </summary>
+        /// <param name="tableHead"></param>
+        /// <returns></returns>
         private WingetColumn[] ParseTableHead(string tableHead)
         {
             List<WingetColumn> columns = [];
-            int i = 0;
-            while (i < tableHead.Length)
+
+            StringBuilder currentColName = new();
+            int currentColOffset = 0;
+            bool isReadingName = true;
+            for (int i = currentColOffset; i < tableHead.Length; i++)
             {
-                int columnStart = i;
-
-                // get column name
-                while (i < tableHead.Length && char.IsLetterOrDigit(tableHead[i]))
-                    i++;
-
-                string name = tableHead[columnStart..i];
-                columns.Add(new WingetColumn(name, columnStart));
-
-                // skip whitespaces until next column starts
-                while (i < tableHead.Length && char.IsWhiteSpace(tableHead[i]))
-                    i++;
+                if (isReadingName)
+                {
+                    if (char.IsLetterOrDigit(tableHead[i]))
+                    {
+                        // continue reading col name
+                        currentColName.Append(tableHead[i]);
+                    }
+                    else if (char.IsWhiteSpace(tableHead[i]))
+                    {
+                        // finish reading col name
+                        columns.Add(new WingetColumn(currentColName.ToString(), currentColOffset));
+                        isReadingName = false;
+                    }
+                }
+                else
+                {
+                    if (char.IsLetterOrDigit(tableHead[i]))
+                    {
+                        // begin reading col name
+                        currentColName = new();
+                        currentColName.Append(tableHead[i]);
+                        currentColOffset = i;
+                        isReadingName = true;
+                    }
+                }
             }
+
+            if (isReadingName)
+                columns.Add(new WingetColumn(currentColName.ToString(), currentColOffset));
+
+            // TODO test with saved output -> prolly want to call remove progress chars again to be sure
+            //         -> the testfile would have to be changed so that there are no \r\n for the progress chars
 
             return columns.ToArray();
         }
