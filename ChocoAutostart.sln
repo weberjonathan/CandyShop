@@ -5,16 +5,32 @@ VisualStudioVersion = 17.8.34525.116
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CandyShop", "CandyShop\CandyShop.csproj", "{528E9739-E029-4391-9E69-5A8A881B2711}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CandyShopTests", "CandyShopTests\CandyShopTests.csproj", "{D5411C89-9391-4577-BAC7-BAF6BD280A24}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
 		Debug|x64 = Debug|x64
+		Release|Any CPU = Release|Any CPU
 		Release|x64 = Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{528E9739-E029-4391-9E69-5A8A881B2711}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{528E9739-E029-4391-9E69-5A8A881B2711}.Debug|Any CPU.Build.0 = Debug|x64
 		{528E9739-E029-4391-9E69-5A8A881B2711}.Debug|x64.ActiveCfg = Debug|x64
 		{528E9739-E029-4391-9E69-5A8A881B2711}.Debug|x64.Build.0 = Debug|x64
+		{528E9739-E029-4391-9E69-5A8A881B2711}.Release|Any CPU.ActiveCfg = Release|x64
+		{528E9739-E029-4391-9E69-5A8A881B2711}.Release|Any CPU.Build.0 = Release|x64
 		{528E9739-E029-4391-9E69-5A8A881B2711}.Release|x64.ActiveCfg = Release|x64
 		{528E9739-E029-4391-9E69-5A8A881B2711}.Release|x64.Build.0 = Release|x64
+		{D5411C89-9391-4577-BAC7-BAF6BD280A24}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D5411C89-9391-4577-BAC7-BAF6BD280A24}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D5411C89-9391-4577-BAC7-BAF6BD280A24}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{D5411C89-9391-4577-BAC7-BAF6BD280A24}.Debug|x64.Build.0 = Debug|Any CPU
+		{D5411C89-9391-4577-BAC7-BAF6BD280A24}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D5411C89-9391-4577-BAC7-BAF6BD280A24}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D5411C89-9391-4577-BAC7-BAF6BD280A24}.Release|x64.ActiveCfg = Release|Any CPU
+		{D5411C89-9391-4577-BAC7-BAF6BD280A24}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
