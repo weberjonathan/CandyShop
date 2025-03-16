@@ -207,9 +207,10 @@ namespace CandyShop
                 packageController.UpdatePackageDisplaysAsync();
             });
 
-            if (packages.Count > 0)
+            int count = service.GetNonPinnedCount(packages);
+            if (count > 0)
             {
-                ShowNotification(packages.Count, icon);
+                ShowNotification(count, icon);
             }
             else
             {

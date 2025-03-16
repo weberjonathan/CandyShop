@@ -351,6 +351,14 @@ namespace CandyShop.Services
             return null;
         }
 
+        public int GetNonPinnedCount(List<GenericPackage> packages)
+        {
+            if (packages == null)
+                return 0;
+
+            return packages.Count(p => !p.Pinned.GetValueOrDefault(false));
+        }
+
         public List<GenericPackage> GetPackagesByName(List<string> names)
         {
             return names
