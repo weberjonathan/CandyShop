@@ -49,6 +49,11 @@ namespace CandyShop.Controller
                 if (packages.Length > 0) PerformUpgrade(packages);
             });
 
+            View.CheckAllClicked += new EventHandler((sender, e) =>
+            {
+                CheckAllPackages();
+            });
+
             View.CheckTopLevelClicked += new EventHandler((sender, e) =>
             {
                 CheckTopLevelPackages();
@@ -59,6 +64,24 @@ namespace CandyShop.Controller
 
             // update UI if is properties file is updated
             Context.InitConfigFileWatcher();
+        }
+
+        private void CheckAllPackages(bool includePinned = false)
+        {
+            if (includePinned)
+            {
+                string[] displayedItemNames = View.Items;
+                foreach (string name in displayedItemNames)
+                    View.SetItemCheckState(name, true);
+            }
+            else
+            {
+                string[] displayedItemNames = View.Items;
+                List<GenericPackage> packages = PackageService.GetPackagesByName(displayedItemNames.ToList());
+
+                foreach (var p in packages)
+                    View.SetItemCheckState(p.Name, !p.Pinned.GetValueOrDefault(false));
+            }
         }
 
         private void CheckTopLevelPackages()

@@ -34,6 +34,7 @@ namespace CandyShop.View
         public event EventHandler UpgradeSelectedClick;
         public event EventHandler CleanShortcutsChanged;
         public event EventHandler CloseAfterUpgradeChanged;
+        public event EventHandler CheckAllClicked;
         public event EventHandler CheckTopLevelClicked;
         public event EventHandler RefreshClicked;
         public event EventHandler PackagesAdded;
@@ -183,11 +184,7 @@ namespace CandyShop.View
 
         public void CheckAllItems()
         {
-            var rows = LstPackages.Other.Rows;
-            foreach (DataGridViewRow row in rows)
-            {
-                row.Cells[LstPackages.CheckedCol.Index].Value = true;
-            }
+            CheckAllClicked?.Invoke(this, EventArgs.Empty);
         }
 
         public void UncheckAllItems()
