@@ -8,15 +8,15 @@
     <UseWindowsForms>true</UseWindowsForms>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <PackageId>Candy Shop</PackageId>
-    <Version>0.11.3</Version>
+    <Version>0.11.4</Version>
     <Authors>Jonathan Weber</Authors>
     <Product>Candy Shop</Product>
     <AssemblyName>CandyShop</AssemblyName>
     <RootNamespace>CandyShop</RootNamespace>
     <StartupObject>CandyShop.Program</StartupObject>
     <ApplicationIcon>Resources\IconNew.ico</ApplicationIcon>
-    <AssemblyVersion>0.11.3.1000</AssemblyVersion>
-    <FileVersion>0.11.3.1000</FileVersion>
+    <AssemblyVersion>0.11.4.0</AssemblyVersion>
+    <FileVersion>0.11.4.0</FileVersion>
     <Copyright>(c) 2020-2025 Jonathan Weber</Copyright>
     <SupportedOSPlatformVersion>10.0.18362.0</SupportedOSPlatformVersion>
     <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
