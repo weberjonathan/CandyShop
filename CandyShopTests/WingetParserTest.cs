@@ -531,6 +531,73 @@ namespace CandyShopTests
             Assert.Equal("winget", parser.Items[0][4]);
         }
 
+        [Fact]
+        public void Constructor_ParseOutdatedExtra_CheckResult()
+        {
+            // feature:  Output of winget list --upgrade-available --include-unknown --include-pinned
+            //           with two tables
+            // observed: Win 11, winget v1.9.25200
+
+            string wingetOutput = "\r" +
+                "   - \r" +
+                "   \\ \r" +
+                "                                                                                                                        \r" +
+                "\r" +
+                "   - \r" +
+                "   \\ \r" +
+                "                                                                                                                        \r" +
+                "Name                                                               ID                           Version       Verfügbar     Quelle\r\n" +
+                "----------------------------------------------------------------------------------------------------------------------------------\r\n" +
+                "HWiNFO® 64                                                         REALiX.HWiNFO                8.16          8.20          winget\r\n" +
+                "IrfanView 4.66 (64-bit)                                            IrfanSkiljan.IrfanView       4.66          4.70          winget\r\n" +
+                "Mozilla Thunderbird (x64 de)                                       Mozilla.Thunderbird.de       128.6.1       128.7.0       winget\r\n" +
+                "Shotcut                                                            Meltytech.Shotcut            24.02.29      25.01.25      winget\r\n" +
+                "Xournal++                                                          Xournal++.Xournal++          1.2.2         1.2.5         winget\r\n" +
+                "Corsair iCUE5 Software                                             Corsair.iCUE.5               5.22.86       5.23.96       winget\r\n" +
+                "Dia (nur entfernen)                                                gnome.Dia                    Unknown       0.97.2        winget\r\n" +
+                "Microsoft Visual C++ 2005 Redistributable                          Microsoft.VCRedist.2005.x86  8.0.59193     8.0.61001     winget\r\n" +
+                "Microsoft Visual C++ 2015-2022 Redistributable (x64) - 14.42.34433 Microsoft.VCRedist.2015+.x64 14.42.34433.0 14.42.34438.0 winget\r\n" +
+                "10 Aktualisierungen verfügbar.\r\n" +
+                "\r\n" +
+                "Für die folgenden Pakete ist ein Upgrade verfügbar, für das Upgrade ist jedoch eine explizite Zielgruppenadressierung erforderlich:\r\n" +
+                "Name    ID              Version  Verfügbar Quelle\r\n" +
+                "-------------------------------------------------\r\n" +
+                "Discord Discord.Discord 1.0.9011 1.0.9182  winget\r\n";
+
+            string[] expectedCols = [
+                "Name",
+                "ID",
+                "Version",
+                "Verfügbar",
+                "Quelle"
+            ];
+
+            var parser = new WingetParser(wingetOutput);
+            Assert.True(parser.HasTable);
+            Assert.Equal(expectedCols, parser.Columns);
+            Assert.Equal(10, parser.Items.Length);
+            Assert.Equal(5, parser.Items[0].Length);
+
+            // first table
+            Assert.Equal("HWiNFO® 64", parser.Items[0][0]);
+            Assert.Equal("REALiX.HWiNFO", parser.Items[0][1]);
+            Assert.Equal("8.16", parser.Items[0][2]);
+            Assert.Equal("8.20", parser.Items[0][3]);
+            Assert.Equal("winget", parser.Items[0][4]);
+            Assert.Equal("Microsoft Visual C++ 2015-2022 Redistributable (x64) - 14.42.34433", parser.Items[^2][0]);
+            Assert.Equal("Microsoft.VCRedist.2015+.x64", parser.Items[^2][1]);
+            Assert.Equal("14.42.34433.0", parser.Items[^2][2]);
+            Assert.Equal("14.42.34438.0", parser.Items[^2][3]);
+            Assert.Equal("winget", parser.Items[^2][4]);
+
+            // second table
+            Assert.Equal("Discord", parser.Items[^1][0]);
+            Assert.Equal("Discord.Discord", parser.Items[^1][1]);
+            Assert.Equal("1.0.9011", parser.Items[^1][2]);
+            Assert.Equal("1.0.9182", parser.Items[^1][3]);
+            Assert.Equal("winget", parser.Items[^1][4]);
+        }
+
         // TODO
         // Constructor_ParseOutdatedNone_CheckResult
     }
