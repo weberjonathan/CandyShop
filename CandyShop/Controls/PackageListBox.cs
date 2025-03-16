@@ -155,8 +155,12 @@ namespace CandyShop.Controls
             {
                 if (CheckBoxes && e.RowIndex >= 0)
                 {
-                    bool previous = (bool)Other.Rows[e.RowIndex].Cells[CheckBoxColumn.Index].Value;
-                    Other.Rows[e.RowIndex].Cells[CheckBoxColumn.Index].Value = !previous;
+                    bool isPinned = PinnedCol != null && Other.Rows[e.RowIndex].Cells[PinnedCol.Index].Value != null;
+                    if (!isPinned)
+                    {
+                        bool currentCheckState = (bool)Other.Rows[e.RowIndex].Cells[CheckBoxColumn.Index].Value;
+                        Other.Rows[e.RowIndex].Cells[CheckBoxColumn.Index].Value = !currentCheckState;
+                    }
                 }
 
                 if (e.ColumnIndex == CheckBoxColumn.Index && e.RowIndex != -1)
