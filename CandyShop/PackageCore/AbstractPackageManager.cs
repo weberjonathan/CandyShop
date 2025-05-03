@@ -12,7 +12,7 @@ namespace CandyShop.PackageCore
         {
             if ("Winget".Equals(pm.Name))
             {
-                return new WingetManager(false, pm.Filepath, useGsudo, useCredentialsStore);
+                return new WingetManager(pm.Filepath, useGsudo, useCredentialsStore);
                 // TODO supress log warning thingy
             }
             else if ("Chocolatey".Equals(pm.Name))
@@ -71,7 +71,7 @@ namespace CandyShop.PackageCore
         public abstract void OpenLogFolder();
 
         /// <exception cref="PackageManagerException"></exception>
-        public async Task<List<GenericPackage>> FetchInstalledAsync()
+        public async Task<GenericPackage[]> FetchInstalledAsync()
         {
             return await Task.Run(FetchInstalled);
         }

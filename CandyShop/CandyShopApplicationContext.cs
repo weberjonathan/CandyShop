@@ -14,6 +14,7 @@ using CandyShop.PackageCore;
 using System.Globalization;
 using CandyShop.Controls.Factory;
 using CandyShop.Components;
+using System.Linq;
 
 namespace CandyShop
 {
