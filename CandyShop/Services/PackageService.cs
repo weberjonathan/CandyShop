@@ -267,6 +267,11 @@ namespace CandyShop.Services
                 throw new PackageManagerException("The operation should be performed as administrator, but the application does not have the necessary privileges and gsudo is disabled. Please change your settings or launch the application as admin.");
             }
 
+            if (Util.IsAdmin() && !SettingsService.RequireAdminPrivilegesForUpgrade())
+            {
+                throw new PackageManagerException("The operation should be performed without administrator privileges, but the application was launched as administrator. Please change your settings or launch the application without these privileges.");
+            }
+
             // remove pinned packages
             packages = packages.Where(p => !p.Pinned.GetValueOrDefault(false)).ToList();
 

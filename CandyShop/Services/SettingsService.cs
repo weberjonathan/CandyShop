@@ -205,6 +205,12 @@ namespace CandyShop.Services
             return !Util.IsAdmin() && settings.EnabledPackageManagers.First().UpgradeAsAdmin;
         }
 
+        public bool RequireAdminPrivilegesForUpgrade(SettingsDefinition settings = null)
+        {
+            settings ??= CurrentSettings;
+            return settings.EnabledPackageManagers.First().UpgradeAsAdmin;
+        }
+
         public bool IsGsudoEnabled(SettingsDefinition settings = null)
         {
             settings ??= CurrentSettings;
