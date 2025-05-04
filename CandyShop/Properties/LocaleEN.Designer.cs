@@ -326,24 +326,6 @@ namespace CandyShop.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The selected package manager will be executed without administrator privileges. If elevated privileges are required, launch CandyShop as administrator or enable the property &apos;ElevateOnDemand&apos;..
-        /// </summary>
-        internal static string TEXT_NO_ADMIN_HINT {
-            get {
-                return ResourceManager.GetString("TEXT_NO_ADMIN_HINT", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to  (no administrator privileges).
-        /// </summary>
-        internal static string TEXT_NO_ADMIN_HINT_SHORT {
-            get {
-                return ResourceManager.GetString("TEXT_NO_ADMIN_HINT_SHORT", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to No upgrades available..
         /// </summary>
         internal static string TEXT_NO_OUTDATED_PCKGS {

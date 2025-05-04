@@ -15,34 +15,9 @@ namespace CandyShop.View
         public MainWindow()
         {
             InitializeComponent();
-
-            AdminBanner.Visible = false;
-            AdminBanner.Text = LocaleEN.TEXT_NO_ADMIN_HINT;
-            AdminBanner.Closing += new EventHandler((sender, e) =>
-            {
-                var result = MessageBox.Show(LocaleEN.TEXT_HIDE_PERMANENTLY,
-                    MetaInfo.Name,
-                    MessageBoxButtons.YesNoCancel,
-                    MessageBoxIcon.Question,
-                    MessageBoxDefaultButton.Button2);
-
-                switch (result)
-                {
-                    case DialogResult.Yes:
-                        ShowAdminWarning = false;
-                        HideAdminWarningClicked?.Invoke(this, e);
-                        break;
-                    case DialogResult.No:
-                        ShowAdminWarning = false;
-                        break;
-                    default:
-                        break;
-                }
-            });
         }
 
         public event EventHandler RefreshClicked;
-        public event EventHandler HideAdminWarningClicked;
         public event EventHandler OpenLogsClicked;
         public event EventHandler OpenSettingsClicked;
         public event EventHandler OpenSettingsDirClicked;
@@ -63,18 +38,6 @@ namespace CandyShop.View
             set
             {
                 StartWithSystemCheckBox.Checked = value;
-            }
-        }
-
-        public bool ShowAdminWarning
-        {
-            get
-            {
-                return AdminBanner.Visible;
-            }
-            set
-            {
-                AdminBanner.Visible = value;
             }
         }
 
@@ -117,8 +80,6 @@ namespace CandyShop.View
         public void OnSettingsChanged(SettingsDefinition settings)
         {
             Text = MetaInfo.GetAppTitle(settings.EnabledPackageManagers.First().Name);
-
-            // TODO this banner is no longer required but we should fail gracefully for illegal configurations
         }
     }
 }

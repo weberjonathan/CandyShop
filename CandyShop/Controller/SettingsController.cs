@@ -27,7 +27,6 @@ namespace CandyShop.Controller
             MainView = mainView;
 
             MainView.OpenSettingsClicked += new EventHandler((sender, e) => ShowSettingsWindow());
-            MainView.HideAdminWarningClicked += new EventHandler((sender, e) => SettingsService.SetSupressNoRightsWarning(true)); // TODO test this behavior and see if I like it; does the banenr still exist in main window?
             MainView.OpenSettingsDirClicked += new EventHandler((sender, e) =>
             {
                 try
@@ -158,11 +157,7 @@ namespace CandyShop.Controller
                 }
                 catch (Exception)
                 {
-                    MessageBox.Show(
-                        "Administrator rights cannot be required without Gsudo and the Gsudo executable is not viable.", // TODO
-                        MetaInfo.Name,
-                        MessageBoxButtons.OK,
-                        MessageBoxIcon.Error);
+                    ErrorHandler.ShowError("The gsudo configuration is invalid! Please fix the path to the executable or disable gsudo.");
                     return false;
                 }
             }

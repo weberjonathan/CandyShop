@@ -49,7 +49,6 @@ namespace CandyShop.Settings
             definition.Gsudo.CachePrivileges = AllowGsudoCache;
             definition.CleanShortcuts = CleanShortcuts;
             definition.CloseAfterUpgrade = CloseAfterUpgrade;
-            definition.SupressNoRightsWarning = SupressAdminWarning;
 
             return definition;
         }

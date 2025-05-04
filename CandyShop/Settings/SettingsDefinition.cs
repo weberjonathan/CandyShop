@@ -9,8 +9,8 @@ namespace CandyShop.Settings
     internal class PackageManagerDefinition
     {
         public string Name { get; set; }
-        public bool Enabled { get; set; } // TODO use this but validate so that only one is allowed right now
-        public bool UpgradeAsAdmin { get; set; } // TODO
+        public bool Enabled { get; set; }
+        public bool UpgradeAsAdmin { get; set; }
         public string Filepath { get; set; }
         public List<int> ValidExitCodes { get; set; }
 
@@ -77,7 +77,6 @@ namespace CandyShop.Settings
 
         public bool CleanShortcuts { get; set; } = false;
         public bool CloseAfterUpgrade { get; set; } = false;
-        public bool SupressNoRightsWarning { get; set; } = false; // TODO if active pm has upgradeAsAdmin true and we are not launched as admin and we do not have gsudo, this is a configuration error and no longer a warning; this can be tested at the beginning of the upgrade process
         public string FileVersion { get; set; } = "1";
 
         [JsonIgnore]

@@ -11,7 +11,6 @@ using System.Threading.Tasks;
 
 namespace CandyShop.Services
 {
-    // TODO validation methods should be awaitable
     internal class SettingsService
     {
         private static readonly string _AppDataDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "CandyShop");
@@ -33,12 +32,6 @@ namespace CandyShop.Services
         public void RegisterListener(ISettingsListener listener)
         {
             Listeners.Add(listener);
-        }
-
-        public void SetSupressNoRightsWarning(bool value)
-        {
-            CurrentSettings.SupressNoRightsWarning = value;
-            Listeners.ForEach(listener => listener.OnSettingsChanged(CurrentSettings));
         }
 
         public void SetCleanShortcuts(bool value)
@@ -83,8 +76,7 @@ namespace CandyShop.Services
 
         public SettingsDefinition CreateSettings()
         {
-            // TODO ensure valid package manager selection
-            CurrentSettings = new();
+            CurrentSettings = ValidateAndFixSettingsDefinition(new());
             Listeners.ForEach(listener => listener.OnSettingsChanged(CurrentSettings));
             return CurrentSettings;
         }
@@ -116,32 +108,7 @@ namespace CandyShop.Services
                 return null;
             }
 
-            // validate winget
-            if (settings.Winget == null)
-            {
-                settings.PackageManagers.Insert(0, PackageManagerDefinition.BuildWinget());
-            }
-
-            // validate chocolatey
-            if (settings.Chocolatey == null)
-            {
-                settings.PackageManagers.Add(PackageManagerDefinition.BuildChocolatey());
-            }
-
-            // remove unknown package managers
-            settings.PackageManagers = settings.PackageManagers
-                .Where(pm => pm.Name.Equals(settings.Winget.Name) || pm.Name.Equals(settings.Chocolatey.Name))
-                .ToList();
-
-            // ensure at least one package source is enabled
-            if (settings.EnabledPackageManagers.Count == 0)
-                settings.Winget.Enabled = true;
-
-            // disable chocolatey if both are enabled
-            if (settings.EnabledPackageManagers.Count > 1)
-                foreach (var pm in settings.EnabledPackageManagers)
-                    if (!pm.Name.Equals(settings.Winget.Name))
-                        pm.Enabled = false;
+            settings = ValidateAndFixSettingsDefinition(settings);
 
             CurrentSettings = settings;
             Listeners.ForEach(listener => listener.OnSettingsChanged(CurrentSettings));
@@ -267,6 +234,38 @@ namespace CandyShop.Services
             }
 
             return null;
+        }
+
+        private SettingsDefinition ValidateAndFixSettingsDefinition(SettingsDefinition settings)
+        {
+            // validate winget
+            if (settings.Winget == null)
+            {
+                settings.PackageManagers.Insert(0, PackageManagerDefinition.BuildWinget());
+            }
+
+            // validate chocolatey
+            if (settings.Chocolatey == null)
+            {
+                settings.PackageManagers.Add(PackageManagerDefinition.BuildChocolatey());
+            }
+
+            // remove unknown package managers
+            settings.PackageManagers = settings.PackageManagers
+                .Where(pm => pm.Name.Equals(settings.Winget.Name) || pm.Name.Equals(settings.Chocolatey.Name))
+                .ToList();
+
+            // ensure at least one package source is enabled
+            if (settings.EnabledPackageManagers.Count == 0)
+                settings.Winget.Enabled = true;
+
+            // disable chocolatey if both are enabled
+            if (settings.EnabledPackageManagers.Count > 1)
+                foreach (var pm in settings.EnabledPackageManagers)
+                    if (!pm.Name.Equals(settings.Winget.Name))
+                        pm.Enabled = false;
+
+            return settings;
         }
 
         /// <exception cref="PackageManagerException"></exception>

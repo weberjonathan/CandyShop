@@ -39,7 +39,6 @@ namespace CandyShop.View
             UpgradePage = new UpgradePage();
             TabInstalled = new TabPage();
             InstalledPage = new InstalledPage();
-            AdminBanner = new Banner();
             columnHeader1 = new ColumnHeader();
             MainPanel.SuspendLayout();
             tabControl1.SuspendLayout();
@@ -51,7 +50,6 @@ namespace CandyShop.View
             // 
             MainPanel.BackColor = System.Drawing.SystemColors.Window;
             MainPanel.Controls.Add(tabControl1);
-            MainPanel.Controls.Add(AdminBanner);
             MainPanel.Dock = DockStyle.Fill;
             MainPanel.Location = new System.Drawing.Point(0, 0);
             MainPanel.Name = "MainPanel";
@@ -110,15 +108,6 @@ namespace CandyShop.View
             InstalledPage.Size = new System.Drawing.Size(716, 429);
             InstalledPage.TabIndex = 0;
             // 
-            // AdminBanner
-            // 
-            AdminBanner.Dock = DockStyle.Top;
-            AdminBanner.Location = new System.Drawing.Point(0, 0);
-            AdminBanner.Name = "AdminBanner";
-            AdminBanner.Padding = new Padding(0, 0, 0, 10);
-            AdminBanner.Size = new System.Drawing.Size(730, 64);
-            AdminBanner.TabIndex = 4;
-            // 
             // MainWindow
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -137,7 +126,6 @@ namespace CandyShop.View
 
         #endregion
         private System.Windows.Forms.Panel MainPanel;
-        private Banner AdminBanner;
         private System.Windows.Forms.ColumnHeader columnHeader1;
         private UpgradePage UpgradePage;
         private System.Windows.Forms.TabControl tabControl1;

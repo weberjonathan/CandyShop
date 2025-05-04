@@ -208,12 +208,6 @@ You can fix this error by running "winget list" in the terminal (or any other co
   <data name="TEXT_MENU_SWITCH" xml:space="preserve">
     <value>Switch to {0} &amp;packages</value>
   </data>
-  <data name="TEXT_NO_ADMIN_HINT" xml:space="preserve">
-    <value>The selected package manager will be executed without administrator privileges. If elevated privileges are required, launch CandyShop as administrator or enable the property 'ElevateOnDemand'.</value>
-  </data>
-  <data name="TEXT_NO_ADMIN_HINT_SHORT" xml:space="preserve">
-    <value> (no administrator privileges)</value>
-  </data>
   <data name="TEXT_NO_OUTDATED_PCKGS" xml:space="preserve">
     <value>No upgrades available.</value>
   </data>
