@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CandyShop.Settings;
+using System;
 
 namespace CandyShop.Components
 {
@@ -22,11 +23,11 @@ namespace CandyShop.Components
 
     internal class PackageFilterContextFactory
     {
-        public static IPackageFilterContext Create(string activePackageManager)
+        public static IPackageFilterContext Create(SettingsDefinition settings)
         {
-            if (activePackageManager.Equals("Winget"))
+            if (settings.Winget.Enabled)
                 return new WingetPackageFilterContext();
-            else if (activePackageManager.Equals("Chocolatey"))
+            else if (settings.Chocolatey.Enabled)
                 return new ChocoPackageFilterContext();
             else
                 throw new ArgumentException($"Unknown active package manager.");

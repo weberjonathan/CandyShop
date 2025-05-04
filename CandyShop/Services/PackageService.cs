@@ -246,7 +246,10 @@ namespace CandyShop.Services
         {
             if (PackageManager == null) return;
 
+            // remove pinned packages
             packages = packages.Where(p => !p.Pinned.GetValueOrDefault(false)).ToList();
+
+            // ensure no self updates
             var selfPackages = packages.Where(p => p.Name.Equals("Candy Shop") || p.Name.Equals("CandyShop"));
             if (selfPackages.Any() && !EnableSelfUpdates)
             {
@@ -258,7 +261,8 @@ namespace CandyShop.Services
                 packages.Remove(selfPackages.First());
             }
 
-            if (packages.Count <= 0) return;
+            if (packages.Count <= 0)
+                return;
 
             List<string> shortcuts = [];
             ShortcutService?.WatchDesktops(shortcut =>

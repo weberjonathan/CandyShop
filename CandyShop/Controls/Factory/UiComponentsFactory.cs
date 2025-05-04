@@ -7,12 +7,12 @@ namespace CandyShop.Controls.Factory
     {
         public static IUiComponents Create(SettingsDefinition settings)
         {
-            return settings.ActivePackageManager switch
-            {
-                "Winget" => new WingetUiComponents(),
-                "Chocolatey" => new ChocoUiComponents(),
-                _ => throw new ArgumentException(),
-            };
+            if (settings.Winget.Enabled)
+                return new WingetUiComponents();
+            else if (settings.Chocolatey.Enabled)
+                return new ChocoUiComponents();
+            else
+                throw new ArgumentException($"Unknown active package manager.");
         }
     }
 }

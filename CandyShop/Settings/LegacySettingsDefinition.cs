@@ -38,10 +38,11 @@ namespace CandyShop.Settings
         public SettingsDefinition ToDefinition()
         {
             SettingsDefinition loaded = new();
+            loaded.Winget.Enabled = WingetMode;
             loaded.Winget.Filepath = WingetBinary;
+            loaded.Chocolatey.Enabled = !WingetMode;
             loaded.Chocolatey.Filepath = ChocolateyBinary;
             loaded.Chocolatey.ValidExitCodes = ValidExitCodes;
-            loaded.ActivePackageManager = WingetMode ? "Winget" : "Chocolatey";
             loaded.Gsudo.CachePrivileges = AllowGsudoCache;
             loaded.ElevateOnDemand = ElevateOnDemand;
             loaded.CleanShortcuts = CleanShortcuts;

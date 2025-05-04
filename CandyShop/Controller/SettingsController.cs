@@ -4,6 +4,7 @@ using CandyShop.Settings;
 using CandyShop.View;
 using System;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -81,7 +82,7 @@ namespace CandyShop.Controller
 
             // update view with current settings
             var settings = SettingsService.GetCurrentSettings();
-            SettingsView.ActivePackageSource = settings.ActivePackageManager;
+            SettingsView.ActivePackageSource = settings.EnabledPackageManagers.First().Name;
             SettingsView.WingetBinary = settings.Winget.Filepath;
             SettingsView.ChocolateyBinary = settings.Chocolatey.Filepath;
             SettingsView.GSudoBinary = settings.Gsudo.Filepath;
@@ -254,11 +255,12 @@ namespace CandyShop.Controller
 
         private SettingsDefinition BuildPartialSettingsFromView()
         {
-            SettingsDefinition settings = new()
+            SettingsDefinition settings = new();
+            foreach (var pm in settings.PackageManagers)
             {
-                ActivePackageManager = SettingsView.ActivePackageSource,
-                ElevateOnDemand = SettingsView.RequireAdminPrivileges,
-            };
+                pm.Enabled = pm.Name.Equals(SettingsView.ActivePackageSource);
+                pm.UpgradeAsAdmin = SettingsView.RequireAdminPrivileges;
+            }
             settings.Gsudo.Filepath = SettingsView.GSudoBinary;
             settings.Gsudo.CachePrivileges = SettingsView.CacheAdminPrivileges;
             settings.Winget.Filepath = SettingsView.WingetBinary;

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Windows.Forms;
 using CandyShop.Controls;
 using CandyShop.Controls.Factory;
@@ -115,7 +116,7 @@ namespace CandyShop.View
 
         public void OnSettingsChanged(SettingsDefinition settings)
         {
-            Text = MetaInfo.GetAppTitle(settings.ActivePackageManager);
+            Text = MetaInfo.GetAppTitle(settings.EnabledPackageManagers.First().Name);
 
             ShowAdminWarning =
                 !Util.IsAdmin() && // TODO could move this to OnSettingsChanged param

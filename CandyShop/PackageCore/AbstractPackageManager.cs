@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace CandyShop.PackageCore
@@ -28,12 +29,12 @@ namespace CandyShop.PackageCore
 
         public static AbstractPackageManager Active(SettingsDefinition settings)
         {
-            return settings.ActivePackageManager switch
-            {
-                "Winget" => Winget(settings),
-                "Chocolatey" => Chocolatey(settings),
-                _ => throw new ArgumentException()
-            };
+            if (settings.Winget.Enabled)
+                return Winget(settings);
+            else if (settings.Chocolatey.Enabled)
+                return Chocolatey(settings);
+            else
+                throw new ArgumentException();
         }
     }
     

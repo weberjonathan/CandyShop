@@ -19,6 +19,7 @@ namespace CandyShop
 {
     internal class CandyShopApplicationContext : ApplicationContext
     {
+        // TODO settings service pm must be validated so that Winget, Chocolatey exist and that at least one is enabled
         // TODO pinning in Choco without admin currently fails silently
         public CandyShopApplicationContext(SettingsService settingsService, Arguments arguments)
         {
@@ -42,7 +43,7 @@ namespace CandyShop
                 settingsController.ShowSettingsWindow();
             }
 
-            IPackageFilterContext packageListSyncContext = PackageFilterContextFactory.Create(settings.ActivePackageManager);
+            IPackageFilterContext packageListSyncContext = PackageFilterContextFactory.Create(settings);
 
             //
             string cwd = Directory.GetParent(Environment.ProcessPath).FullName;
@@ -59,7 +60,7 @@ namespace CandyShop
             catch (Exception)
             {
                 // TODO how to proceed? nothign will work right? but not crash and then settings can be accessed
-                ErrorHandler.ShowError("{0} is selected as package source, but could not be validated. Please select the correct package manager in the settings.", settings.ActivePackageManager);
+                ErrorHandler.ShowError("Failed to validate selected package manager.");
             }
 
             // validate gsudo
@@ -67,7 +68,7 @@ namespace CandyShop
             {
                 try
                 {
-                    settingsService.ValidateGsudo();
+                    settingsService.ValidateGsudo(); // TODO
                 }
                 catch (Exception)
                 {
@@ -179,7 +180,7 @@ namespace CandyShop
             int count = service.GetNonPinnedCount(packages);
             if (count > 0)
             {
-                ShowNotification(count, icon, settings.ActivePackageManager);
+                ShowNotification(count, icon, settings.EnabledPackageManagers.First().Name);
             }
             else
             {
