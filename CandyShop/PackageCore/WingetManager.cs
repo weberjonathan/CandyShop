@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace CandyShop.PackageCore
 {
-    internal class WingetManager(string binary, bool requireManualElevation, bool allowGsudoCache) : AbstractPackageManager(binary, requireManualElevation, allowGsudoCache)
+    internal class WingetManager(string binary) : AbstractPackageManager(binary)
     {
         public override bool SupportsFetchingOutdated => true;
         public override bool RequiresNameResolution => true;
@@ -55,15 +55,15 @@ namespace CandyShop.PackageCore
 
         /// <exception cref="PackageManagerException"></exception>
         /// <exception cref="CandyShopException"></exception>
-        public override void Upgrade(List<GenericPackage> packages)
+        public override void Upgrade(List<GenericPackage> packages, bool useGsudo = false, bool enableGsudoCache = false)
         {
             if (packages.Count == 0) return;
 
             // start gsudo cache session
             bool isCacheEnabled = false;
-            if (AllowGsudoCache && UseGsudo)
+            if (enableGsudoCache && useGsudo)
             {
-                EnableGsudoCache();
+                InitGsudoCache();
                 isCacheEnabled = true;
             }
 
@@ -72,7 +72,7 @@ namespace CandyShop.PackageCore
             foreach (var package in packages)
             {
                 var arguments = $"upgrade --id \"{package.Id}\" --silent --exact";
-                var p = BuildProcess(arguments, useGsudo: UseGsudo);
+                var p = BuildProcess(arguments, useGsudo);
                 try
                 {
                     p.Execute();
@@ -278,7 +278,7 @@ namespace CandyShop.PackageCore
         }
 
         /// <exception cref="PackageManagerException"></exception>
-        protected override void Pin(GenericPackage package)
+        protected override void Pin(GenericPackage package, bool useGsudo = false)
         {
             var args = $"pin add --id \"{package.Id}\" --exact";
             PackageManagerProcess p = BuildProcess(args);
@@ -287,7 +287,7 @@ namespace CandyShop.PackageCore
         }
 
         /// <exception cref="PackageManagerException"></exception>
-        protected override void Unpin(GenericPackage package)
+        protected override void Unpin(GenericPackage package, bool useGsudo = false)
         {
             var args = $"pin remove --id \"{package.Id}\" --exact";
             PackageManagerProcess p = BuildProcess(args);

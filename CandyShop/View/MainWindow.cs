@@ -118,10 +118,7 @@ namespace CandyShop.View
         {
             Text = MetaInfo.GetAppTitle(settings.EnabledPackageManagers.First().Name);
 
-            ShowAdminWarning =
-                !Util.IsAdmin() && // TODO could move this to OnSettingsChanged param
-                !settings.ElevateOnDemand && // TODO rename requireAdminRights or whatever it says in the settings window
-                !settings.SupressNoRightsWarning;
+            // TODO this banner is no longer required but we should fail gracefully for illegal configurations
         }
     }
 }

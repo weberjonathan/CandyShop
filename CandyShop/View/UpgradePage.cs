@@ -5,6 +5,7 @@ using CandyShop.Settings;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace CandyShop.View
@@ -196,7 +197,7 @@ namespace CandyShop.View
             CheckDeleteShortcuts.Checked = settings.CleanShortcuts;
             CheckCloseAfterUpgrade.Checked = settings.CloseAfterUpgrade;
 
-            if (settings.ElevateOnDemand && Util.IsAdmin())
+            if (!Util.IsAdmin() && settings.EnabledPackageManagers.First().UpgradeAsAdmin)
             {
                 BtnUpgradeSelected.Image = Resources.ic_uac;
                 BtnUpgradeAll.Image = Resources.ic_uac;

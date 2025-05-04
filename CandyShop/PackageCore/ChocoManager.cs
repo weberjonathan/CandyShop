@@ -20,7 +20,7 @@ namespace CandyShop.PackageCore
 
         public int ChocoVersionMajor { get; set; } = 2;
 
-        public ChocoManager(int chocoVersionMajor, List<int> validExitCodesOnUpgrade, string binary, bool requireManualElevation, bool allowGsudoCache) : base(binary, requireManualElevation, allowGsudoCache)
+        public ChocoManager(int chocoVersionMajor, List<int> validExitCodesOnUpgrade, string binary) : base(binary)
         {
             ChocoVersionMajor = chocoVersionMajor;
             ValidExitCodesOnUpgrade = validExitCodesOnUpgrade;
@@ -80,12 +80,12 @@ namespace CandyShop.PackageCore
             }
         }
 
-        public override void Upgrade(List<GenericPackage> packages)
+        public override void Upgrade(List<GenericPackage> packages, bool useGsudo = false, bool enableGsudoCache = false)
         {
             string arg = string.Join(' ', packages.Select(p => p.Name));
 
             // launch process
-            PackageManagerProcess p = BuildProcess($"upgrade {arg} -y", useGsudo: UseGsudo);
+            PackageManagerProcess p = BuildProcess($"upgrade {arg} -y", useGsudo);
             p.Execute();
 
             if (!ValidExitCodesOnUpgrade.Contains(p.ExitCode))
@@ -266,10 +266,10 @@ namespace CandyShop.PackageCore
         }
 
         /// <exception cref="PackageManagerException"></exception>
-        protected override void Pin(GenericPackage package)
+        protected override void Pin(GenericPackage package, bool useGsudo = false)
         {
             var args = $"pin add --name=\"{package.Name}\" --version=\"{package.CurrVer}\"";
-            PackageManagerProcess p = BuildProcess(args, useGsudo: UseGsudo);
+            PackageManagerProcess p = BuildProcess(args, useGsudo);
             p.ExecuteHidden();
 
             if (p.ExitCode != 0)
@@ -277,9 +277,9 @@ namespace CandyShop.PackageCore
         }
 
         /// <exception cref="PackageManagerException"></exception>
-        protected override void Unpin(GenericPackage package)
+        protected override void Unpin(GenericPackage package, bool useGsudo = false)
         {
-            PackageManagerProcess p = BuildProcess($"pin remove --name=\"{package.Name}\"", useGsudo: UseGsudo);
+            PackageManagerProcess p = BuildProcess($"pin remove --name=\"{package.Name}\"", useGsudo);
             p.ExecuteHidden();
 
             if (p.ExitCode != 0)

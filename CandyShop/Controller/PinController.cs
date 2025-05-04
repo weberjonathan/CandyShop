@@ -24,7 +24,7 @@ namespace CandyShop.Controller
 
             Views = views.ToList();
 
-            var showUac = PackageService.RequireElevationForPins();
+            var showUac = PackageService.RequireGsudoForPinning();
             foreach (var view in views)
             {
                 view.PinnedChanged += View_PinnedChanged;

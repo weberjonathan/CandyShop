@@ -14,6 +14,7 @@ using CandyShop.Controls.Factory;
 using CandyShop.Components;
 using System.Linq;
 using CandyShop.Settings;
+using System.Threading.Tasks;
 
 namespace CandyShop
 {
@@ -64,11 +65,12 @@ namespace CandyShop
             }
 
             // validate gsudo
-            if (settingsService.IsGsudoRequired())
+            if (settings.Gsudo.Enabled)
             {
                 try
                 {
-                    settingsService.ValidateGsudo(); // TODO
+                    var task = Task.Run(() => settingsService.ValidateGsudo());
+                    task.Wait();
                 }
                 catch (Exception)
                 {
@@ -78,7 +80,7 @@ namespace CandyShop
 
             // init services
             ShortcutService shortcutService = new();
-            PackageService packageService = new(activePackageManager, shortcutService);
+            PackageService packageService = new(activePackageManager, settingsService, shortcutService);
             SystemStartService windowsTaskService = new();
 
             LoadOutdatedPackagesAsync(packageService);

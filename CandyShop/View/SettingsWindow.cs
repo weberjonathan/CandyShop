@@ -30,7 +30,7 @@ namespace CandyShop.View
             set { txtGSudoBinary.Text = value; }
         }
         
-        public bool RequireAdminPrivileges
+        public bool UpgradeAsAdmin
         {
             get { return checkRequireAdmin.Checked; }
             set
@@ -48,14 +48,14 @@ namespace CandyShop.View
             }
         }
 
-        public bool EnableGsudoConfig
+        public bool EnableGsudo
         {
-            get { return checkRequireAdmin.Enabled; }
+            get { return checkEnableGsudo.Checked; }
             set
             {
-                if (!value)
-                    checkRequireAdmin.Checked = false;
-                checkRequireAdmin.Enabled = value;
+                checkEnableGsudo.Checked = value;
+
+                checkCacheAdmin.Enabled = value;
             }
         }
 
@@ -82,8 +82,9 @@ namespace CandyShop.View
                 btnChocoBinary.Enabled = !value;
                 btnWingetBinary.Enabled = !value;
                 btnGSudoBinary.Enabled = !value;
-                checkCacheAdmin.Enabled = !value;
                 checkRequireAdmin.Enabled = !value;
+                checkEnableGsudo.Enabled = !value;
+                checkCacheAdmin.Enabled = !value && checkEnableGsudo.Checked;
                 txtChocoBinary.Enabled = !value;
                 txtWingetBinary.Enabled = !value;
                 txtGSudoBinary.Enabled = !value;
@@ -100,7 +101,6 @@ namespace CandyShop.View
         {
             InitializeComponent();
 
-            EnableGsudoConfig = false;
             Text = $"{MetaInfo.Name} | Settings";
 
             btnApply.Click += new EventHandler((sender, e) => ApplyClicked?.Invoke(sender, e));
@@ -131,12 +131,12 @@ namespace CandyShop.View
                 GSudoBinaryChanged?.Invoke(sender, e);
             };
 
-            checkRequireAdmin.CheckedChanged += (sender, e) =>
+            checkEnableGsudo.CheckedChanged += (sender, e) =>
             {
-                if (!checkRequireAdmin.Checked)
+                if (!checkEnableGsudo.Checked)
                     checkCacheAdmin.Checked = false;
 
-                checkCacheAdmin.Enabled = checkRequireAdmin.Checked;
+                checkCacheAdmin.Enabled = checkEnableGsudo.Checked;
             };
         }
 

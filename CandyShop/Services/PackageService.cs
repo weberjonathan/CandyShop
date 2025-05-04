@@ -25,14 +25,16 @@ namespace CandyShop.Services
         private readonly Dictionary<string, GenericPackage> OutdatedPckgCache = [];
 
         private readonly AbstractPackageManager PackageManager;
+        private readonly SettingsService SettingsService;
         private readonly ShortcutService ShortcutService;
         private readonly bool EnableSelfUpdates;
 
         // TODO remove duplicate calls to pin
 
-        public PackageService(AbstractPackageManager packageManager, ShortcutService shortcutService, bool enableSelfUpdates = false)
+        public PackageService(AbstractPackageManager packageManager, SettingsService settingsService, ShortcutService shortcutService, bool enableSelfUpdates = false)
         {
             PackageManager = packageManager;
+            SettingsService = settingsService;
             ShortcutService = shortcutService;
             EnableSelfUpdates = enableSelfUpdates;
         }
@@ -193,6 +195,12 @@ namespace CandyShop.Services
 
             Log.Information($"Attempting to pin package {name}.");
 
+            bool useGsudo = !PackageManager.SupportsPinningAsUser && !Util.IsAdmin();
+            if (useGsudo && !SettingsService.IsGsudoEnabled())
+            {
+                throw new PackageManagerException("The operation should be performed as administrator, but the application does not have the necessary privileges and gsudo is disabled. Please change your settings or launch the application as admin.");
+            }
+
             var package = GetPackageByName(name);
             if (package == null)
             {
@@ -220,6 +228,12 @@ namespace CandyShop.Services
 
             Log.Information($"Attempting to unpin package {name}.");
 
+            bool useGsudo = !PackageManager.SupportsPinningAsUser && !Util.IsAdmin();
+            if (useGsudo && !SettingsService.IsGsudoEnabled())
+            {
+                throw new PackageManagerException("The operation should be performed as administrator, but the application does not have the necessary privileges and gsudo is disabled. Please change your settings or launch the application as admin.");
+            }
+
             var package = GetPackageByName(name);
             if (package == null)
             {
@@ -242,9 +256,16 @@ namespace CandyShop.Services
 
         /// <exception cref="PackageManagerException"></exception>
         /// <exception cref="CandyShopException"></exception>
-        public async Task Upgrade(List<GenericPackage> packages, bool cleanShortcuts = false)
+        public async Task Upgrade(List<GenericPackage> packages, bool cleanShortcuts = false) // TODO now that we have the settings service we may remove clean shortcuts here
         {
             if (PackageManager == null) return;
+
+            bool useGsudo = SettingsService.RequireGsudoForUpgrade();
+            bool enableGsudoCache = SettingsService.IsGsudoCacheEnabled();
+            if (useGsudo && !SettingsService.IsGsudoEnabled())
+            {
+                throw new PackageManagerException("The operation should be performed as administrator, but the application does not have the necessary privileges and gsudo is disabled. Please change your settings or launch the application as admin.");
+            }
 
             // remove pinned packages
             packages = packages.Where(p => !p.Pinned.GetValueOrDefault(false)).ToList();
@@ -282,7 +303,7 @@ namespace CandyShop.Services
 
             try
             {
-                PackageManager.Upgrade(packages);
+                PackageManager.Upgrade(packages, useGsudo, enableGsudoCache);
             }
             catch (Exception)
             {
@@ -373,14 +394,9 @@ namespace CandyShop.Services
                 .ToList();
         }
 
-        public bool RequireElevationForPins()
+        public bool RequireGsudoForPinning()
         {
-            return !PackageManager.SupportsPinningAsUser && PackageManager.UseGsudo;
-        }
-
-        public bool RequireElevationForUpgrades()
-        {
-            return PackageManager.UseGsudo;
+            return !PackageManager.SupportsPinningAsUser && !Util.IsAdmin();
         }
 
         /// <exception cref="PackageManagerException"></exception>

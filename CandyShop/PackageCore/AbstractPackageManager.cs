@@ -14,17 +14,12 @@ namespace CandyShop.PackageCore
             return new ChocoManager(
                 2, // TODO
                 settings.Chocolatey.ValidExitCodes,
-                settings.Chocolatey.Filepath,
-                settings.ElevateOnDemand,
-                settings.Gsudo.CachePrivileges);
+                settings.Chocolatey.Filepath);
         }
 
         public static AbstractPackageManager Winget(SettingsDefinition settings)
         {
-            return new WingetManager(
-                settings.Winget.Filepath,
-                settings.ElevateOnDemand,
-                settings.Gsudo.CachePrivileges);
+            return new WingetManager(settings.Winget.Filepath);
         }
 
         public static AbstractPackageManager Active(SettingsDefinition settings)
@@ -38,16 +33,13 @@ namespace CandyShop.PackageCore
         }
     }
     
-    internal abstract class AbstractPackageManager(string binary, bool useGsudo, bool useCredentialsStore)
+    internal abstract class AbstractPackageManager(string binary)
     {
-        public bool UseGsudo { get; } = useGsudo;
         public string Binary { get; private set; } = binary;
         public abstract bool SupportsPinningAsUser { get; }
         public abstract bool SupportsFetchingOutdated { get; }
         public abstract bool RequiresNameResolution { get; }
         public abstract string Name { get; }
-
-        protected bool AllowGsudoCache { get; } = useCredentialsStore;
 
         /// <summary>
         /// Validates the package manager and returns the validated version.
@@ -58,7 +50,7 @@ namespace CandyShop.PackageCore
 
         /// <exception cref="PackageManagerException"></exception>
         /// <exception cref="CandyShopException"></exception>
-        public abstract void Upgrade(List<GenericPackage> packages);
+        public abstract void Upgrade(List<GenericPackage> packages, bool useGsudo = false, bool enableGsudoCache = false);
 
         /// <summary>
         /// Tries to resolve incomplete package names and returns a list of
@@ -97,15 +89,15 @@ namespace CandyShop.PackageCore
         }
 
         /// <exception cref="PackageManagerException"></exception>
-        public async Task PinAsync(GenericPackage package)
+        public async Task PinAsync(GenericPackage package, bool useGsudo = false)
         {
-            await Task.Run(() => Pin(package));
+            await Task.Run(() => Pin(package, useGsudo));
         }
 
         /// <exception cref="PackageManagerException"></exception>
-        public async Task UnpinAsync(GenericPackage package)
+        public async Task UnpinAsync(GenericPackage package, bool useGsudo = false)
         {
-            await Task.Run(() => Unpin(package));
+            await Task.Run(() => Unpin(package, useGsudo));
         }
 
         /// <exception cref="PackageManagerException"></exception>
@@ -121,13 +113,13 @@ namespace CandyShop.PackageCore
         protected abstract string FetchInfo(GenericPackage package);
 
         /// <exception cref="PackageManagerException"></exception>
-        protected abstract void Pin(GenericPackage package);
+        protected abstract void Pin(GenericPackage package, bool useGsudo = false);
 
         /// <exception cref="PackageManagerException"></exception>
-        protected abstract void Unpin(GenericPackage package);
+        protected abstract void Unpin(GenericPackage package, bool useGsudo = false);
 
         /// <exception cref="CandyShopException"></exception>
-        protected void EnableGsudoCache()
+        protected void InitGsudoCache()
         {
             Process p = new()
             {

@@ -214,10 +214,28 @@ namespace CandyShop.Services
             });
         }
 
-        public bool IsGsudoRequired(SettingsDefinition settings = null)
+        /// <summary>
+        /// True if the enabled package manager requires admin privileges,
+        /// but the application was launched without them
+        /// </summary>
+        /// <param name="settings"></param>
+        /// <returns></returns>
+        public bool RequireGsudoForUpgrade(SettingsDefinition settings = null)
         {
             settings ??= CurrentSettings;
-            return !Util.IsAdmin() && settings.ElevateOnDemand; // TODO for choco pinning it is also required
+            return !Util.IsAdmin() && settings.EnabledPackageManagers.First().UpgradeAsAdmin;
+        }
+
+        public bool IsGsudoEnabled(SettingsDefinition settings = null)
+        {
+            settings ??= CurrentSettings;
+            return settings.Gsudo.Enabled;
+        }
+
+        public bool IsGsudoCacheEnabled(SettingsDefinition settings = null)
+        {
+            settings ??= CurrentSettings;
+            return settings.Gsudo.CachePrivileges;
         }
 
         private string ReadSettingsFile()

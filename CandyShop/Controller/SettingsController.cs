@@ -86,7 +86,8 @@ namespace CandyShop.Controller
             SettingsView.WingetBinary = settings.Winget.Filepath;
             SettingsView.ChocolateyBinary = settings.Chocolatey.Filepath;
             SettingsView.GSudoBinary = settings.Gsudo.Filepath;
-            SettingsView.RequireAdminPrivileges = settings.ElevateOnDemand;
+            SettingsView.UpgradeAsAdmin = settings.EnabledPackageManagers.First().UpgradeAsAdmin;
+            SettingsView.EnableGsudo = settings.Gsudo.Enabled;
             SettingsView.CacheAdminPrivileges = settings.Gsudo.CachePrivileges;
 
             SettingsView.ShowDialog();
@@ -149,7 +150,7 @@ namespace CandyShop.Controller
             }
 
             // validate gsudo
-            if (SettingsService.IsGsudoRequired(settings)) // TODO this check should respect whether CandyShop was launched as admin or not
+            if (settings.Gsudo.Enabled)
             {
                 try
                 {
@@ -234,11 +235,9 @@ namespace CandyShop.Controller
             SettingsView.SetGSudoBinaryStatus(string.Empty);
 
             string status;
-            bool valid = false;
             try
             {
                 status = await SettingsService.ValidateGsudo(settings);
-                valid = true;
             }
             catch (FileNotFoundException)
             {
@@ -250,7 +249,6 @@ namespace CandyShop.Controller
             }
 
             SettingsView.SetGSudoBinaryStatus(status);
-            SettingsView.EnableGsudoConfig = valid;
         }
 
         private SettingsDefinition BuildPartialSettingsFromView()
@@ -259,8 +257,9 @@ namespace CandyShop.Controller
             foreach (var pm in settings.PackageManagers)
             {
                 pm.Enabled = pm.Name.Equals(SettingsView.ActivePackageSource);
-                pm.UpgradeAsAdmin = SettingsView.RequireAdminPrivileges;
+                pm.UpgradeAsAdmin = SettingsView.UpgradeAsAdmin;
             }
+            settings.Gsudo.Enabled = SettingsView.EnableGsudo;
             settings.Gsudo.Filepath = SettingsView.GSudoBinary;
             settings.Gsudo.CachePrivileges = SettingsView.CacheAdminPrivileges;
             settings.Winget.Filepath = SettingsView.WingetBinary;

@@ -53,6 +53,7 @@
             btnWingetBinary = new System.Windows.Forms.Button();
             label1 = new System.Windows.Forms.Label();
             txtWingetBinary = new System.Windows.Forms.TextBox();
+            checkEnableGsudo = new System.Windows.Forms.CheckBox();
             panel2.SuspendLayout();
             panel3.SuspendLayout();
             panel1.SuspendLayout();
@@ -84,14 +85,14 @@
             panel3.Controls.Add(btnOk);
             panel3.Controls.Add(btnApply);
             panel3.Dock = System.Windows.Forms.DockStyle.Bottom;
-            panel3.Location = new System.Drawing.Point(0, 327);
+            panel3.Location = new System.Drawing.Point(0, 335);
             panel3.Name = "panel3";
-            panel3.Size = new System.Drawing.Size(648, 61);
+            panel3.Size = new System.Drawing.Size(648, 53);
             panel3.TabIndex = 36;
             // 
             // btnOk
             // 
-            btnOk.Location = new System.Drawing.Point(555, 19);
+            btnOk.Location = new System.Drawing.Point(555, 15);
             btnOk.Name = "btnOk";
             btnOk.Size = new System.Drawing.Size(75, 23);
             btnOk.TabIndex = 10;
@@ -100,7 +101,7 @@
             // 
             // btnApply
             // 
-            btnApply.Location = new System.Drawing.Point(474, 19);
+            btnApply.Location = new System.Drawing.Point(474, 15);
             btnApply.Name = "btnApply";
             btnApply.Size = new System.Drawing.Size(75, 23);
             btnApply.TabIndex = 9;
@@ -109,6 +110,7 @@
             // 
             // panel1
             // 
+            panel1.Controls.Add(checkEnableGsudo);
             panel1.Controls.Add(panel3);
             panel1.Controls.Add(lblSecurity2);
             panel1.Controls.Add(lblSecurity1);
@@ -165,17 +167,17 @@
             // checkRequireAdmin
             // 
             checkRequireAdmin.AutoSize = true;
-            checkRequireAdmin.Location = new System.Drawing.Point(18, 199);
+            checkRequireAdmin.Location = new System.Drawing.Point(18, 182);
             checkRequireAdmin.Name = "checkRequireAdmin";
-            checkRequireAdmin.Size = new System.Drawing.Size(313, 19);
+            checkRequireAdmin.Size = new System.Drawing.Size(224, 19);
             checkRequireAdmin.TabIndex = 1;
-            checkRequireAdmin.Text = "Upgrade with administrator privileges (requires gsudo)";
+            checkRequireAdmin.Text = "Upgrade with administrator privileges";
             checkRequireAdmin.UseVisualStyleBackColor = true;
             // 
             // checkCacheAdmin
             // 
             checkCacheAdmin.AutoSize = true;
-            checkCacheAdmin.Location = new System.Drawing.Point(18, 224);
+            checkCacheAdmin.Location = new System.Drawing.Point(18, 232);
             checkCacheAdmin.Name = "checkCacheAdmin";
             checkCacheAdmin.Size = new System.Drawing.Size(276, 19);
             checkCacheAdmin.TabIndex = 2;
@@ -197,7 +199,7 @@
             lblGSudoStatus.AutoSize = true;
             lblGSudoStatus.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, 0);
             lblGSudoStatus.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
-            lblGSudoStatus.Location = new System.Drawing.Point(91, 282);
+            lblGSudoStatus.Location = new System.Drawing.Point(91, 290);
             lblGSudoStatus.Name = "lblGSudoStatus";
             lblGSudoStatus.Size = new System.Drawing.Size(178, 15);
             lblGSudoStatus.TabIndex = 28;
@@ -205,7 +207,7 @@
             // 
             // btnGSudoBinary
             // 
-            btnGSudoBinary.Location = new System.Drawing.Point(339, 256);
+            btnGSudoBinary.Location = new System.Drawing.Point(339, 264);
             btnGSudoBinary.Name = "btnGSudoBinary";
             btnGSudoBinary.Size = new System.Drawing.Size(75, 23);
             btnGSudoBinary.TabIndex = 8;
@@ -215,7 +217,7 @@
             // label6
             // 
             label6.AutoSize = true;
-            label6.Location = new System.Drawing.Point(18, 259);
+            label6.Location = new System.Drawing.Point(18, 267);
             label6.Name = "label6";
             label6.Size = new System.Drawing.Size(40, 15);
             label6.TabIndex = 26;
@@ -223,7 +225,7 @@
             // 
             // txtGSudoBinary
             // 
-            txtGSudoBinary.Location = new System.Drawing.Point(91, 256);
+            txtGSudoBinary.Location = new System.Drawing.Point(91, 264);
             txtGSudoBinary.Name = "txtGSudoBinary";
             txtGSudoBinary.Size = new System.Drawing.Size(242, 23);
             txtGSudoBinary.TabIndex = 7;
@@ -300,6 +302,16 @@
             txtWingetBinary.Size = new System.Drawing.Size(242, 23);
             txtWingetBinary.TabIndex = 3;
             // 
+            // checkEnableGsudo
+            // 
+            checkEnableGsudo.AutoSize = true;
+            checkEnableGsudo.Location = new System.Drawing.Point(18, 207);
+            checkEnableGsudo.Name = "checkEnableGsudo";
+            checkEnableGsudo.Size = new System.Drawing.Size(97, 19);
+            checkEnableGsudo.TabIndex = 37;
+            checkEnableGsudo.Text = "Enable gsudo";
+            checkEnableGsudo.UseVisualStyleBackColor = true;
+            // 
             // SettingsWindow
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -345,5 +357,6 @@
         private System.Windows.Forms.Button btnWingetBinary;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TextBox txtWingetBinary;
+        private System.Windows.Forms.CheckBox checkEnableGsudo;
     }
 }

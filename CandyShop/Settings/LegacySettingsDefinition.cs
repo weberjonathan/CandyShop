@@ -37,19 +37,21 @@ namespace CandyShop.Settings
 
         public SettingsDefinition ToDefinition()
         {
-            SettingsDefinition loaded = new();
-            loaded.Winget.Enabled = WingetMode;
-            loaded.Winget.Filepath = WingetBinary;
-            loaded.Chocolatey.Enabled = !WingetMode;
-            loaded.Chocolatey.Filepath = ChocolateyBinary;
-            loaded.Chocolatey.ValidExitCodes = ValidExitCodes;
-            loaded.Gsudo.CachePrivileges = AllowGsudoCache;
-            loaded.ElevateOnDemand = ElevateOnDemand;
-            loaded.CleanShortcuts = CleanShortcuts;
-            loaded.CloseAfterUpgrade = CloseAfterUpgrade;
-            loaded.SupressNoRightsWarning = SupressAdminWarning;
+            SettingsDefinition definition = new();
+            definition.Winget.Enabled = WingetMode;
+            definition.Winget.Filepath = WingetBinary;
+            definition.Winget.UpgradeAsAdmin = ElevateOnDemand;
+            definition.Chocolatey.Enabled = !WingetMode;
+            definition.Chocolatey.Filepath = ChocolateyBinary;
+            definition.Chocolatey.UpgradeAsAdmin = ElevateOnDemand;
+            definition.Chocolatey.ValidExitCodes = ValidExitCodes;
+            definition.Gsudo.Enabled = ElevateOnDemand;
+            definition.Gsudo.CachePrivileges = AllowGsudoCache;
+            definition.CleanShortcuts = CleanShortcuts;
+            definition.CloseAfterUpgrade = CloseAfterUpgrade;
+            definition.SupressNoRightsWarning = SupressAdminWarning;
 
-            return loaded;
+            return definition;
         }
     }
 }

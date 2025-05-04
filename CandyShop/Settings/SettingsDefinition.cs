@@ -75,7 +75,6 @@ namespace CandyShop.Settings
             CachePrivileges = false
         };
 
-        public bool ElevateOnDemand { get; set; } = true; // deprecate this and use combination of Gsudo.Enabled and field of active package manager
         public bool CleanShortcuts { get; set; } = false;
         public bool CloseAfterUpgrade { get; set; } = false;
         public bool SupressNoRightsWarning { get; set; } = false; // TODO if active pm has upgradeAsAdmin true and we are not launched as admin and we do not have gsudo, this is a configuration error and no longer a warning; this can be tested at the beginning of the upgrade process
