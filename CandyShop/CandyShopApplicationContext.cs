@@ -9,9 +9,7 @@ using Serilog;
 using Microsoft.Windows.AppNotifications.Builder;
 using Microsoft.Windows.AppNotifications;
 using System.IO;
-using System.Diagnostics;
 using CandyShop.PackageCore;
-using System.Globalization;
 using CandyShop.Controls.Factory;
 using CandyShop.Components;
 using System.Linq;
@@ -21,36 +19,46 @@ namespace CandyShop
     internal class CandyShopApplicationContext : ApplicationContext
     {
         // TODO pinning in Choco without admin currently fails silently
-        public CandyShopApplicationContext(SettingsService settingsService, CandyShopContext context)
+        public CandyShopApplicationContext(SettingsService settingsService, Arguments arguments)
         {
             Log.Information("--- Launching CandyShop ---");
 
+            // init views
+            MainWindow mainPage = new();
+            InstalledPage installedPage = mainPage.InstalledPackagesPage;
+            UpgradePage upgradePage = mainPage.UpgradePackagesPage;
+            settingsService.RegisterListener(mainPage);
+            settingsService.RegisterListener(upgradePage);
+
+
             // load and apply settings
-            var settings = settingsService.Load(context);
-            // TODO overwrite active pm with eitehr winget or chocolatey, if it is different -> ie validate config
-            MetaInfo.ActiveSource = settings.ActivePackageManager;
+            SettingsController settingsController = new(settingsService);
+            SettingsDefinition settings = settingsService.Load();
+            if (settings == null)
+            {
+                settings = settingsService.CreateSettings();
+                // TODO check how it behaves if we launched from background
+                settingsController.ShowSettingsWindow();
+            }
 
             IPackageFilterContext packageListSyncContext = PackageFilterContextFactory.Create(settings.ActivePackageManager);
 
             //
-            string cwd = Directory.GetParent(Process.GetCurrentProcess().MainModule.FileName).FullName;
-            Log.Debug($"cwd: {cwd}; elevated: {context.HasAdminPrivileges}; elevateOnDemand: {context.ElevateOnDemand}; debug: {context.DebugEnabled}");
-
-            if (context.FirstStart)
-            {
-                // TODO
-            }
+            string cwd = Directory.GetParent(Environment.ProcessPath).FullName;
+            Log.Debug($"cwd: {cwd}; elevated: {Util.IsAdmin()}; debug: {arguments.DebugEnabled}");
 
             // validate selected package manager
-            AbstractPackageManager activePackageManager = null;
+            // TODO the gsudo param should be elevateOnDemand && !isAdmin or no?
+            AbstractPackageManager activePackageManager = PackageManagerFactory.Active(settings);
+
             try
             {
-                settingsService.ValidateActiveSource(out activePackageManager);
+                activePackageManager.ValidateExec();
             }
             catch (Exception)
             {
-                // TODO an error here will obviously lead to null pointer exceptions -> needs handling (eg show settings akin to first start, noop PM, null checks where PM is used)
-                ErrorHandler.ShowError("{0} is selected as package source, but the executable is not viable. Please fix your settings.", settings.ActivePackageManager); // TODO
+                // TODO how to proceed? nothign will work right? but not crash and then settings can be accessed
+                ErrorHandler.ShowError("{0} is selected as package source, but could not be validated. Please select the correct package manager in the settings.", settings.ActivePackageManager);
             }
 
             // validate gsudo
@@ -73,21 +81,14 @@ namespace CandyShop
 
             LoadOutdatedPackagesAsync(packageService);
 
-            IControlsFactory controlsFactory =
-                context.WingetMode ? new WingetControlsFactory() : new ChocoControlsFactory();
+            IUiComponents controlsFactory = UiComponentsFactory.Create(settings);
 
             // init controller
-            MainWindowController mainWindowController = new(context, packageService, windowsTaskService, controlsFactory);
+            MainWindowController mainWindowController = new(packageService, windowsTaskService, controlsFactory);
             InstalledPageController installedPageController = new(packageService, controlsFactory, packageListSyncContext);
-            UpgradePageController upgradePageController = new(context, packageService, controlsFactory);
+            UpgradePageController upgradePageController = new(packageService, controlsFactory);
             PinController pinController = new(packageService);
             PackageController packageController = new(packageService, controlsFactory);
-            SettingsController settingsController = new(context, settingsService);
-
-            // init views
-            MainWindow mainPage = new(mainWindowController);
-            InstalledPage installedPage = mainPage.InstalledPackagesPage;
-            UpgradePage upgradePage = mainPage.UpgradePackagesPage;
             installedPageController.InjectView(installedPage);
             upgradePageController.InjectViews(mainPage, upgradePage);
             mainWindowController.InjectView(mainPage);
@@ -99,12 +100,12 @@ namespace CandyShop
             NotificationShowHandler notifificationHandler;
 
             // launch with form or in tray
-            if (context.LaunchedMinimized)
+            if (arguments.LaunchedMinimized)
             {
                 notifificationHandler = new();
                 // creates a tray icon, displays a notification if outdated packages
                 // are found and opens the upgrade UI on click
-                RunInBackground(mainWindowController, packageController, packageService, notifificationHandler, packageService, settings.CleanShortcuts);
+                RunInBackground(mainWindowController, packageController, packageService, notifificationHandler, packageService, settings);
             }
             else
             {
@@ -149,7 +150,7 @@ namespace CandyShop
                                            PackageService service,
                                            NotificationShowHandler notifificationHandler,
                                            PackageService packageService,
-                                           bool cleanShortcuts)
+                                           SettingsDefinition settings)
         {
             List<GenericPackage> packages = null;
 
@@ -177,7 +178,7 @@ namespace CandyShop
             int count = service.GetNonPinnedCount(packages);
             if (count > 0)
             {
-                ShowNotification(count, icon);
+                ShowNotification(count, icon, settings.ActivePackageManager);
             }
             else
             {
@@ -194,7 +195,7 @@ namespace CandyShop
             {
                 try
                 {
-                    await packageService.Upgrade(packages, cleanShortcuts);
+                    await packageService.Upgrade(packages, settings.CleanShortcuts);
                 }
                 catch (PackageManagerException e)
                 {
@@ -241,7 +242,7 @@ namespace CandyShop
             return rtn;
         }
 
-        private void ShowNotification(int packageCount, NotifyIcon icon)
+        private void ShowNotification(int packageCount, NotifyIcon icon, string packageSource)
         {
             if (!AppNotificationManager.IsSupported())
             {
@@ -253,7 +254,7 @@ namespace CandyShop
 
             string text = packageCount == 1 ? LocaleEN.NOT_TEXT_SINGLE : LocaleEN.NOT_TEXT_MULTI;
             var builder = new AppNotificationBuilder()
-                .AddText(string.Format(text, packageCount, MetaInfo.ActiveSource))
+                .AddText(string.Format(text, packageCount, packageSource))
                 .AddButton(new AppNotificationButton(LocaleEN.NOT_SHOW)
                     .AddArgument("action", "show"))
                 .AddButton(new AppNotificationButton(LocaleEN.NOT_UPGRADE)

@@ -12,15 +12,13 @@ namespace CandyShop.Controller
 {
     internal class MainWindowController
     {
-        private readonly CandyShopContext Context;
         private readonly PackageService PackageService;
         private readonly SystemStartService WindowsTaskService;
-        private readonly IControlsFactory ControlsFactory;
+        private readonly IUiComponents ControlsFactory;
         private MainWindow MainView;
 
-        public MainWindowController(CandyShopContext candyShopContext, PackageService packageService, SystemStartService windowsTaskService, IControlsFactory controlsFactory)
+        public MainWindowController(PackageService packageService, SystemStartService windowsTaskService, IUiComponents controlsFactory)
         {
-            Context = candyShopContext;
             PackageService = packageService;
             WindowsTaskService = windowsTaskService;
             ControlsFactory = controlsFactory;
@@ -36,19 +34,15 @@ namespace CandyShop.Controller
         {
             Log.Information("Initializing UI");
 
-            if (MainView == null) throw new InvalidOperationException("Set a view before intialising it!");
+            if (MainView == null)
+                throw new InvalidOperationException("Set a view before intialising it!");
 
             MainView.LaunchOnSystemStartEnabled = WindowsTaskService.IsLaunchOnStartup();
-            MainView.ShowAdminWarning =
-                !Context.HasAdminPrivileges &&
-                !Context.ElevateOnDemand &&
-                !Context.SupressAdminWarning; // move these to settingsController, bc it also knows the mainView
 
-            MainView.HideAdminWarningClicked += new EventHandler((sender, e) =>
-            {
-                Context.SupressAdminWarning = true; // move this to settingsController, bc it also knows the mainView TODO
-            });
-
+            MainView.LaunchOnSystemStartClicked += new EventHandler((sender, e) => ToggleLaunchOnSystemStart());
+            MainView.ShowGithubClicked += new EventHandler((sender, e) => ShowGithub());
+            MainView.ShowLicenseClicked += new EventHandler((sender, e) => ShowLicenses());
+            MainView.ShowMetaPackageHelpClicked += new EventHandler((sender, e) => ShowMetaPackageHelp());
             MainView.OpenLogsClicked += new EventHandler((sender, e) =>
             {
                 try
@@ -66,9 +60,6 @@ namespace CandyShop.Controller
             {
                 Program.Exit();
             });
-
-            // set app title
-            MainView.Text = MetaInfo.WindowTitle;
 
             MainView.Show();
         }
@@ -113,11 +104,11 @@ namespace CandyShop.Controller
             MainView.LaunchOnSystemStartEnabled = WindowsTaskService.IsLaunchOnStartup();
         }
 
+        // there still is the menu item in the extras menu; either make it work again or eliminate it
         public void TogglePackageSource()
         {
-            Context.WingetMode = !Context.WingetMode;
             Program.Restart();
-    }
+        }
 
         private void OpenUrl(string url)
         {

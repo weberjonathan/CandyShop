@@ -16,6 +16,7 @@ namespace CandyShop.PackageCore
         public override bool SupportsFetchingOutdated => true;
         public override bool RequiresNameResolution => false;
         public override bool SupportsPinningAsUser => false;
+        public override string Name => "Chocolatey";
 
         public int ChocoVersionMajor { get; set; } = 2;
 
@@ -23,8 +24,6 @@ namespace CandyShop.PackageCore
         {
             ChocoVersionMajor = chocoVersionMajor;
             ValidExitCodesOnUpgrade = validExitCodesOnUpgrade;
-            if (!validExitCodesOnUpgrade.Contains(0))
-                Log.Warning("List of valid exit codes does not contain '0'. This looks like a mistake in the configuration file.");
         }
 
         /// <exception cref="PackageManagerException"></exception>

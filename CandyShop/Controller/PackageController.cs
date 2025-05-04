@@ -14,13 +14,13 @@ namespace CandyShop.Controller
     internal class PackageController
     {
         private readonly PackageService PackageService;
-        private readonly IControlsFactory ControlsFactory;
+        private readonly IUiComponents ControlsFactory;
 
         private MainWindow MainWindow;
         private IPackageViewer UpgradePage;
         private IPackageViewer InstalledPage;
 
-        public PackageController(PackageService packageService, IControlsFactory controlsFactory)
+        public PackageController(PackageService packageService, IUiComponents controlsFactory)
         {
             PackageService = packageService;
             ControlsFactory = controlsFactory;

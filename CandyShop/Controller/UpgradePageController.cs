@@ -3,7 +3,6 @@ using CandyShop.PackageCore;
 using CandyShop.Properties;
 using CandyShop.Services;
 using CandyShop.View;
-using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,15 +11,13 @@ namespace CandyShop.Controller
 {
     class UpgradePageController
     {
-        private readonly CandyShopContext Context;
         private readonly PackageService PackageService;
-        private readonly IControlsFactory ControlsFactory;
+        private readonly IUiComponents ControlsFactory;
         private MainWindow MainWindow;
         private UpgradePage View;
 
-        public UpgradePageController(CandyShopContext context, PackageService packageService, IControlsFactory controlsFactory)
+        public UpgradePageController(PackageService packageService, IUiComponents controlsFactory)
         {
-            Context = context;
             PackageService = packageService;
             ControlsFactory = controlsFactory;
         }
@@ -31,11 +28,6 @@ namespace CandyShop.Controller
             View = upgradePage;
 
             View.BuildControls(ControlsFactory);
-
-            View.CleanShortcutsChanged += new EventHandler((sender, e) => Context.CleanShortcuts = View.CleanShortcuts);
-            View.CloseAfterUpgradeChanged += new EventHandler((sender, e) => Context.CloseAfterUpgrade = View.CloseAfterUpgrade);
-            View.CleanShortcuts = Context.CleanShortcuts;
-            View.CloseAfterUpgrade = Context.CloseAfterUpgrade;
             View.PackagesAdded += new EventHandler((sender, e) => CheckTopLevelPackages());
 
             View.UpgradeAllClick += new EventHandler((sender, e) =>
@@ -58,8 +50,6 @@ namespace CandyShop.Controller
             {
                 CheckTopLevelPackages();
             });
-
-            View.ShowUacIconsForUpgrades = PackageService.RequireElevationForUpgrades();
         }
 
         private void CheckAllPackages(bool includePinned = false)
@@ -97,12 +87,13 @@ namespace CandyShop.Controller
             MainWindow?.Hide();
 
             // upgrade
-            bool closeAfterUpgrade = Context.CloseAfterUpgrade;
+            bool closeAfterUpgrade = View.CloseAfterUpgrade;
+            bool cleanShortcuts = View.CleanShortcuts;
 
             try
             {
                 var packages = PackageService.GetPackagesByName(packageNames.ToList());
-                await PackageService.Upgrade(packages, View.CleanShortcuts);
+                await PackageService.Upgrade(packages, cleanShortcuts);
             }
             catch (PackageManagerException e)
             {

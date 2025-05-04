@@ -82,13 +82,10 @@ namespace CandyShop.View
             // 
             // UpgradePage
             // 
-            UpgradePage.CleanShortcuts = false;
-            UpgradePage.CloseAfterUpgrade = false;
             UpgradePage.Dock = DockStyle.Fill;
             UpgradePage.Loading = true;
             UpgradePage.Location = new System.Drawing.Point(3, 3);
             UpgradePage.Name = "UpgradePage";
-            UpgradePage.ShowUacIconsForUpgrades = false;
             UpgradePage.Size = new System.Drawing.Size(716, 436);
             UpgradePage.TabIndex = 2;
             // 

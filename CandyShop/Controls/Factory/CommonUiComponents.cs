@@ -17,7 +17,7 @@ namespace CandyShop.Controls.Factory
         }
     }
 
-    internal class CommonBase
+    internal class CommonUiComponents
     {
         public static ToolStrip GetCommonUpgradePageToolBar()
         {

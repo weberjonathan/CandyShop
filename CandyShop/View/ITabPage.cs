@@ -4,6 +4,6 @@ namespace CandyShop.View
 {
     internal interface ITabPage
     {
-        void BuildControls(IControlsFactory provider);
+        void BuildControls(IUiComponents provider);
     }
 }

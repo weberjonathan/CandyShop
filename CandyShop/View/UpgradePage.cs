@@ -1,6 +1,7 @@
 ﻿using CandyShop.Controls;
 using CandyShop.Controls.Factory;
 using CandyShop.Properties;
+using CandyShop.Services;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -8,7 +9,7 @@ using System.Windows.Forms;
 
 namespace CandyShop.View
 {
-    partial class UpgradePage : UserControl, ITabPage, IPinSupport, IPackageViewer
+    partial class UpgradePage : UserControl, ITabPage, IPinSupport, IPackageViewer, ISettingsListener
     {
         public UpgradePage()
         {
@@ -68,29 +69,9 @@ namespace CandyShop.View
             }
         }
 
-        public bool CleanShortcuts
-        {
-            get
-            {
-                return CheckDeleteShortcuts.Checked;
-            }
-            set
-            {
-                CheckDeleteShortcuts.Checked = value;
-            }
-        }
+        public bool CleanShortcuts => CheckDeleteShortcuts.Checked;
 
-        public bool CloseAfterUpgrade
-        {
-            get
-            {
-                return CheckCloseAfterUpgrade.Checked;
-            }
-            set
-            {
-                CheckCloseAfterUpgrade.Checked = value;
-            }
-        }
+        public bool CloseAfterUpgrade => CheckCloseAfterUpgrade.Checked;
 
         public bool Loading
         {
@@ -107,28 +88,7 @@ namespace CandyShop.View
             }
         }
 
-        public bool ShowUacIconsForUpgrades
-        {
-            get
-            {
-                return BtnUpgradeSelected.Image != null;
-            }
-            set
-            {
-                if (value)
-                {
-                    BtnUpgradeSelected.Image = Resources.ic_uac;
-                    BtnUpgradeAll.Image = Resources.ic_uac;
-                }
-                else
-                {
-                    BtnUpgradeSelected.Image = null;
-                    BtnUpgradeAll.Image = null;
-                }
-            }
-        }
-
-        public void BuildControls(IControlsFactory provider)
+        public void BuildControls(IUiComponents provider)
         {
             LstPackages.ColumnHeaders = provider.GetUpgradeColumns();
             LstPackages.CheckBoxes = true;
@@ -228,6 +188,24 @@ namespace CandyShop.View
 
             LstPackages.NoPackages = true;
             if (Loading) Loading = false;
+        }
+
+        public void OnSettingsChanged(SettingsDefinition settings)
+        {
+            // TODO package manager change
+            CheckDeleteShortcuts.Checked = settings.CleanShortcuts;
+            CheckCloseAfterUpgrade.Checked = settings.CloseAfterUpgrade;
+
+            if (settings.ElevateOnDemand && Util.IsAdmin())
+            {
+                BtnUpgradeSelected.Image = Resources.ic_uac;
+                BtnUpgradeAll.Image = Resources.ic_uac;
+            }
+            else
+            {
+                BtnUpgradeSelected.Image = null;
+                BtnUpgradeAll.Image = null;
+            }
         }
 
         private void LstPackages_ItemChecked(object sender, DataGridViewCellEventArgs e)

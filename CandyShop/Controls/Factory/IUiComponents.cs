@@ -3,7 +3,7 @@ using System.Windows.Forms;
 
 namespace CandyShop.Controls.Factory
 {
-    interface IControlsFactory
+    interface IUiComponents
     {
         PackageListBoxColumn[] GetUpgradeColumns();
         PackageListBoxColumn[] GetInstalledColumns();

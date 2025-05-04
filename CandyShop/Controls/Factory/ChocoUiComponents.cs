@@ -4,7 +4,8 @@ using System.Windows.Forms;
 
 namespace CandyShop.Controls.Factory
 {
-    internal class ChocoControlsFactory : IControlsFactory
+    // TODO rename namespace
+    internal class ChocoUiComponents : IUiComponents
     {
         public PackageListBoxColumn[] GetUpgradeColumns()
         {
@@ -56,7 +57,7 @@ namespace CandyShop.Controls.Factory
 
         public ToolStrip GetUpgradePageToolBar()
         {
-            var ts = CommonBase.GetCommonUpgradePageToolBar();
+            var ts = CommonUiComponents.GetCommonUpgradePageToolBar();
             var index = ts.Items.IndexOfKey("Select") + 1;
 
             var tsSelectSmart = new ToolStripButton
@@ -73,7 +74,7 @@ namespace CandyShop.Controls.Factory
 
         public CandyShopMenuStrip GetMenuStrip()
         {
-            var menu = CommonBase.GetCommonMenuStrip();
+            var menu = CommonUiComponents.GetCommonMenuStrip();
             menu.ItemAt("Extras", "Logs").Text = string.Format(LocaleEN.TEXT_MENU_LOGS, "Chocolatey");
             menu.ItemAt("Extras", "SwitchMode").Text = string.Format(LocaleEN.TEXT_MENU_SWITCH, "Winget");
             return menu;

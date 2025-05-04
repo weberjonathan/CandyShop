@@ -29,11 +29,12 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SettingsWindow));
-            tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-            panel1 = new System.Windows.Forms.Panel();
+            panel2 = new System.Windows.Forms.Panel();
+            lblChooseSource = new System.Windows.Forms.Label();
             panel3 = new System.Windows.Forms.Panel();
             btnOk = new System.Windows.Forms.Button();
             btnApply = new System.Windows.Forms.Button();
+            panel1 = new System.Windows.Forms.Panel();
             lblSecurity2 = new System.Windows.Forms.Label();
             lblSecurity1 = new System.Windows.Forms.Label();
             label7 = new System.Windows.Forms.Label();
@@ -52,28 +53,59 @@
             btnWingetBinary = new System.Windows.Forms.Button();
             label1 = new System.Windows.Forms.Label();
             txtWingetBinary = new System.Windows.Forms.TextBox();
-            panel2 = new System.Windows.Forms.Panel();
-            lblChooseSource = new System.Windows.Forms.Label();
-            tableLayoutPanel1.SuspendLayout();
-            panel1.SuspendLayout();
-            panel3.SuspendLayout();
             panel2.SuspendLayout();
+            panel3.SuspendLayout();
+            panel1.SuspendLayout();
             SuspendLayout();
             // 
-            // tableLayoutPanel1
+            // panel2
             // 
-            tableLayoutPanel1.ColumnCount = 1;
-            tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            tableLayoutPanel1.Controls.Add(panel1, 0, 1);
-            tableLayoutPanel1.Controls.Add(panel2, 0, 0);
-            tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
-            tableLayoutPanel1.Name = "tableLayoutPanel1";
-            tableLayoutPanel1.RowCount = 2;
-            tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 50F));
-            tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            tableLayoutPanel1.Size = new System.Drawing.Size(648, 435);
-            tableLayoutPanel1.TabIndex = 0;
+            panel2.BackColor = System.Drawing.SystemColors.ControlLightLight;
+            panel2.Controls.Add(lblChooseSource);
+            panel2.Dock = System.Windows.Forms.DockStyle.Top;
+            panel2.Location = new System.Drawing.Point(0, 0);
+            panel2.Name = "panel2";
+            panel2.Size = new System.Drawing.Size(648, 47);
+            panel2.TabIndex = 2;
+            panel2.Visible = false;
+            // 
+            // lblChooseSource
+            // 
+            lblChooseSource.AutoSize = true;
+            lblChooseSource.Location = new System.Drawing.Point(9, 16);
+            lblChooseSource.Name = "lblChooseSource";
+            lblChooseSource.Size = new System.Drawing.Size(566, 15);
+            lblChooseSource.TabIndex = 29;
+            lblChooseSource.Text = "Welcome to Candy Shop. Please review the settings below and change them as needed before continuing.";
+            // 
+            // panel3
+            // 
+            panel3.BackColor = System.Drawing.SystemColors.ControlLightLight;
+            panel3.Controls.Add(btnOk);
+            panel3.Controls.Add(btnApply);
+            panel3.Dock = System.Windows.Forms.DockStyle.Bottom;
+            panel3.Location = new System.Drawing.Point(0, 327);
+            panel3.Name = "panel3";
+            panel3.Size = new System.Drawing.Size(648, 61);
+            panel3.TabIndex = 36;
+            // 
+            // btnOk
+            // 
+            btnOk.Location = new System.Drawing.Point(555, 19);
+            btnOk.Name = "btnOk";
+            btnOk.Size = new System.Drawing.Size(75, 23);
+            btnOk.TabIndex = 10;
+            btnOk.Text = "&OK";
+            btnOk.UseVisualStyleBackColor = true;
+            // 
+            // btnApply
+            // 
+            btnApply.Location = new System.Drawing.Point(474, 19);
+            btnApply.Name = "btnApply";
+            btnApply.Size = new System.Drawing.Size(75, 23);
+            btnApply.TabIndex = 9;
+            btnApply.Text = "&Apply";
+            btnApply.UseVisualStyleBackColor = true;
             // 
             // panel1
             // 
@@ -97,39 +129,10 @@
             panel1.Controls.Add(label1);
             panel1.Controls.Add(txtWingetBinary);
             panel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            panel1.Location = new System.Drawing.Point(3, 53);
+            panel1.Location = new System.Drawing.Point(0, 47);
             panel1.Name = "panel1";
-            panel1.Size = new System.Drawing.Size(642, 379);
-            panel1.TabIndex = 0;
-            // 
-            // panel3
-            // 
-            panel3.BackColor = System.Drawing.SystemColors.ControlLightLight;
-            panel3.Controls.Add(btnOk);
-            panel3.Controls.Add(btnApply);
-            panel3.Dock = System.Windows.Forms.DockStyle.Bottom;
-            panel3.Location = new System.Drawing.Point(0, 318);
-            panel3.Name = "panel3";
-            panel3.Size = new System.Drawing.Size(642, 61);
-            panel3.TabIndex = 36;
-            // 
-            // btnOk
-            // 
-            btnOk.Location = new System.Drawing.Point(555, 19);
-            btnOk.Name = "btnOk";
-            btnOk.Size = new System.Drawing.Size(75, 23);
-            btnOk.TabIndex = 10;
-            btnOk.Text = "&OK";
-            btnOk.UseVisualStyleBackColor = true;
-            // 
-            // btnApply
-            // 
-            btnApply.Location = new System.Drawing.Point(474, 19);
-            btnApply.Name = "btnApply";
-            btnApply.Size = new System.Drawing.Size(75, 23);
-            btnApply.TabIndex = 9;
-            btnApply.Text = "&Apply";
-            btnApply.UseVisualStyleBackColor = true;
+            panel1.Size = new System.Drawing.Size(648, 388);
+            panel1.TabIndex = 3;
             // 
             // lblSecurity2
             // 
@@ -297,49 +300,35 @@
             txtWingetBinary.Size = new System.Drawing.Size(242, 23);
             txtWingetBinary.TabIndex = 3;
             // 
-            // panel2
-            // 
-            panel2.BackColor = System.Drawing.SystemColors.ControlLightLight;
-            panel2.Controls.Add(lblChooseSource);
-            panel2.Dock = System.Windows.Forms.DockStyle.Fill;
-            panel2.Location = new System.Drawing.Point(3, 3);
-            panel2.Name = "panel2";
-            panel2.Size = new System.Drawing.Size(642, 44);
-            panel2.TabIndex = 1;
-            // 
-            // lblChooseSource
-            // 
-            lblChooseSource.AutoSize = true;
-            lblChooseSource.Location = new System.Drawing.Point(9, 16);
-            lblChooseSource.Name = "lblChooseSource";
-            lblChooseSource.Size = new System.Drawing.Size(566, 15);
-            lblChooseSource.TabIndex = 29;
-            lblChooseSource.Text = "Welcome to Candy Shop. Please review the settings below and change them as needed before continuing.";
-            // 
             // SettingsWindow
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             ClientSize = new System.Drawing.Size(648, 435);
-            Controls.Add(tableLayoutPanel1);
+            Controls.Add(panel1);
+            Controls.Add(panel2);
             FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             Icon = (System.Drawing.Icon)resources.GetObject("$this.Icon");
             MaximizeBox = false;
             Name = "SettingsWindow";
             Text = "SettingsWindow";
-            tableLayoutPanel1.ResumeLayout(false);
-            panel1.ResumeLayout(false);
-            panel1.PerformLayout();
-            panel3.ResumeLayout(false);
             panel2.ResumeLayout(false);
             panel2.PerformLayout();
+            panel3.ResumeLayout(false);
+            panel1.ResumeLayout(false);
+            panel1.PerformLayout();
             ResumeLayout(false);
         }
 
         #endregion
-
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
+        private System.Windows.Forms.Panel panel2;
+        private System.Windows.Forms.Label lblChooseSource;
+        private System.Windows.Forms.Panel panel3;
+        private System.Windows.Forms.Button btnOk;
+        private System.Windows.Forms.Button btnApply;
         private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.Label lblSecurity2;
+        private System.Windows.Forms.Label lblSecurity1;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.CheckBox checkRequireAdmin;
         private System.Windows.Forms.CheckBox checkCacheAdmin;
@@ -356,12 +345,5 @@
         private System.Windows.Forms.Button btnWingetBinary;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TextBox txtWingetBinary;
-        private System.Windows.Forms.Panel panel2;
-        private System.Windows.Forms.Label lblChooseSource;
-        private System.Windows.Forms.Label lblSecurity2;
-        private System.Windows.Forms.Label lblSecurity1;
-        private System.Windows.Forms.Panel panel3;
-        private System.Windows.Forms.Button btnOk;
-        private System.Windows.Forms.Button btnApply;
     }
 }

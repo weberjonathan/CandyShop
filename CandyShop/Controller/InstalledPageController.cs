@@ -14,12 +14,12 @@ namespace CandyShop.Controller
     class InstalledPageController
     {
         private readonly PackageService PackageService;
-        private readonly IControlsFactory ControlsFactory;
-        private readonly IPackageFilterContext PackageListSyncContext;
+        private readonly IUiComponents ControlsFactory;
+        private readonly IPackageFilterContext PackageListSyncContext; // TODO settings listener
 
         private InstalledPage View;
 
-        public InstalledPageController(PackageService service, IControlsFactory controlsFactory, IPackageFilterContext packageListSyncContext)
+        public InstalledPageController(PackageService service, IUiComponents controlsFactory, IPackageFilterContext packageListSyncContext)
         {
             PackageService = service;
             ControlsFactory = controlsFactory;

@@ -7,23 +7,24 @@ using System.Windows.Forms;
 
 namespace CandyShop.Controller
 {
+    // TOOD update SettingsView through observer pattern
     internal class SettingsController
     {
-        private readonly CandyShopContext Context;
         private readonly SettingsService SettingsService;
         private MainWindow MainView;
-        private SettingsWindow SettingsView; // TODO inject this
+        private SettingsWindow SettingsView;
 
-        public SettingsController(CandyShopContext context, SettingsService settingsService)
+        public SettingsController(SettingsService settingsService)
         {
-            Context = context;
             SettingsService = settingsService;
         }
 
         public void InjectView(MainWindow mainView)
         {
             MainView = mainView;
+
             MainView.OpenSettingsClicked += new EventHandler((sender, e) => ShowSettingsWindow());
+            MainView.HideAdminWarningClicked += new EventHandler((sender, e) => SettingsService.SetSupressNoRightsWarning(true));
             MainView.OpenSettingsDirClicked += new EventHandler((sender, e) =>
             {
                 try
@@ -35,12 +36,20 @@ namespace CandyShop.Controller
                     MainView.DisplayError("Failed to open settings directory: {0}", ex.Message);
                 }
             });
+
+            // TODO inject upgrade page I guess
+            MainView.UpgradePackagesPage.CleanShortcutsChanged += new EventHandler((sender, e) => SettingsService.SetCleanShortcuts(MainView.UpgradePackagesPage.CleanShortcuts));
+            MainView.UpgradePackagesPage.CloseAfterUpgradeChanged += new EventHandler((sender, e) => SettingsService.SetCloseAfterUpgrade(MainView.UpgradePackagesPage.CloseAfterUpgrade));
         }
 
-        public void ShowSettingsWindow()
+        public void ShowSettingsWindow(bool displayFirstStartBanner = false)
         {
-            SettingsView = new SettingsWindow();
-            SettingsView.OkClicked += new EventHandler((sender, e) =>
+            SettingsView = new SettingsWindow
+            {
+                DisplayFirstStartBanner = displayFirstStartBanner
+            };
+
+            SettingsView.OkClicked += (sender, e) =>
             {
                 var succses = ApplySettings();
                 if (succses)
@@ -48,18 +57,18 @@ namespace CandyShop.Controller
                     SettingsView.Hide();
                     SettingsView.Close();
                 }
-            });
+            };
 
-            SettingsView.ApplyClicked += new EventHandler((sender, e) =>
+            SettingsView.ApplyClicked += (sender, e) =>
             {
                 ApplySettings();
-            });
+            };
 
-            SettingsView.FormClosed += new FormClosedEventHandler((sender, e) =>
+            SettingsView.FormClosed += (sender, e) =>
             {
                 SettingsView.Dispose();
                 SettingsView = null;
-            });
+            };
 
             SettingsView.WingetBinaryChanged += OnWingetBinaryChanged;
             SettingsView.ChocolateyBinaryChanged += OnChocolateyBinaryChanged;
@@ -68,11 +77,11 @@ namespace CandyShop.Controller
             // update view with current settings
             var settings = SettingsService.GetCurrentSettings();
             SettingsView.ActivePackageSource = settings.ActivePackageManager;
-            SettingsView.WingetBinary = settings.PackageManagers["Winget"].Filepath;
-            SettingsView.ChocolateyBinary = settings.PackageManagers["Chocolatey"].Filepath;
+            SettingsView.WingetBinary = settings.Winget.Filepath;
+            SettingsView.ChocolateyBinary = settings.Chocolatey.Filepath;
             SettingsView.GSudoBinary = settings.Gsudo.Filepath;
             SettingsView.RequireAdminPrivileges = settings.ElevateOnDemand;
-            SettingsView.CacheAdminPrivileges = settings.Gsudo.EnableCredentialsStore;
+            SettingsView.CacheAdminPrivileges = settings.Gsudo.CachePrivileges;
 
             SettingsView.ShowDialog();
         }
@@ -112,7 +121,6 @@ namespace CandyShop.Controller
             var settings = BuildSettingsFromView();
 
             // validate package manager
-            AbstractPackageManager activePmInstance = null;
             try
             {
                 var active = SettingsView.ActivePackageSource;
@@ -122,7 +130,7 @@ namespace CandyShop.Controller
                     "Chocolatey" => SettingsView?.ChocolateyBinary,
                     _ => throw new ArgumentException("Uknown package manager")
                 };
-                SettingsService.ValidateActiveSource(settings, out activePmInstance); // TODO if this is changed, update packageService
+                SettingsService.ValidateActiveSource(settings); // TODO if this is changed, update packageService
             }
             catch (Exception)
             {
@@ -152,9 +160,7 @@ namespace CandyShop.Controller
                 }
             }
 
-            // TODO apply to context (via service)
-            // TODO save context (via service)
-
+            SettingsService.UpdateSettings(settings);
             return true;
         }
 
@@ -234,9 +240,9 @@ namespace CandyShop.Controller
                 //SupressNoRightsWarning = 
             };
             settings.Gsudo.Filepath = SettingsView.GSudoBinary;
-            settings.Gsudo.EnableCredentialsStore = SettingsView.CacheAdminPrivileges;
-            settings.PackageManagers["Winget"].Filepath = SettingsView.WingetBinary;
-            settings.PackageManagers["Chocolatey"].Filepath = SettingsView.ChocolateyBinary;
+            settings.Gsudo.CachePrivileges = SettingsView.CacheAdminPrivileges;
+            settings.Winget.Filepath = SettingsView.WingetBinary;
+            settings.Chocolatey.Filepath = SettingsView.ChocolateyBinary;
 
             return settings;
         }

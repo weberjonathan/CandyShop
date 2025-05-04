@@ -1,21 +1,18 @@
 ﻿using System;
 using System.Windows.Forms;
-using CandyShop.Controller;
 using CandyShop.Controls;
 using CandyShop.Controls.Factory;
 using CandyShop.Properties;
+using CandyShop.Services;
 
 namespace CandyShop.View
 {
-    partial class MainWindow : Form, ITabPage
+    partial class MainWindow : Form, ITabPage, ISettingsListener
     {
-        private MainWindowController Controller;
-
         private ToolStripMenuItem StartWithSystemCheckBox;
 
-        public MainWindow(MainWindowController candyShopController)
+        public MainWindow()
         {
-            Controller = candyShopController;
             InitializeComponent();
 
             AdminBanner.Visible = false;
@@ -48,8 +45,12 @@ namespace CandyShop.View
         public event EventHandler OpenLogsClicked;
         public event EventHandler OpenSettingsClicked;
         public event EventHandler OpenSettingsDirClicked;
+        public event EventHandler LaunchOnSystemStartClicked;
+        public event EventHandler ShowGithubClicked;
+        public event EventHandler ShowLicenseClicked;
+        public event EventHandler ShowMetaPackageHelpClicked;
 
-        public InstalledPage InstalledPackagesPage => InstalledPage;
+        public InstalledPage InstalledPackagesPage => InstalledPage; // TODO remove these
         public UpgradePage UpgradePackagesPage => UpgradePage;
 
         public bool LaunchOnSystemStartEnabled
@@ -76,7 +77,7 @@ namespace CandyShop.View
             }
         }
 
-        public void BuildControls(IControlsFactory provider)
+        public void BuildControls(IUiComponents provider)
         {
             CandyShopMenuStrip menu = provider.GetMenuStrip();
             MainMenuStrip = menu;
@@ -87,15 +88,15 @@ namespace CandyShop.View
             menu.ItemAt("Edit", "SelectTop").Click   += new EventHandler((sender, e) => UpgradePage.CheckTopLevelItems());
             menu.ItemAt("Edit", "DeselectAll").Click += new EventHandler((sender, e) => UpgradePage.UncheckAllItems());
 
-            menu.ItemAt("Extras", "SwitchMode").Click      += new EventHandler((sender, e) => Controller.TogglePackageSource()); // TODO remove controller calls
-            menu.ItemAt("Extras", "StartWithSystem").Click += new EventHandler((sender, e) => Controller.ToggleLaunchOnSystemStart());
+            //menu.ItemAt("Extras", "SwitchMode").Click      += new EventHandler((sender, e) => Controller.TogglePackageSource()); // TODO fully remove item
+            menu.ItemAt("Extras", "StartWithSystem").Click += new EventHandler((sender, e) => LaunchOnSystemStartClicked?.Invoke(sender, e));
             menu.ItemAt("Extras", "SettingsWindow").Click  += new EventHandler((sender, e) => OpenSettingsClicked?.Invoke(sender, e));
             menu.ItemAt("Extras", "SettingsDir").Click     += new EventHandler((sender, e) => OpenSettingsDirClicked?.Invoke(sender, e));
             menu.ItemAt("Extras", "Logs").Click            += new EventHandler((sender, e) => OpenLogsClicked?.Invoke(sender, e));
 
-            menu.ItemAt("Help", "Github").Click  += new EventHandler((sender, e) => Controller.ShowGithub());
-            menu.ItemAt("Help", "License").Click += new EventHandler((sender, e) => Controller.ShowLicenses());
-            menu.ItemAt("Help", "Meta").Click    += new EventHandler((sender, e) => Controller.ShowMetaPackageHelp());
+            menu.ItemAt("Help", "Github").Click  += new EventHandler((sender, e) => ShowGithubClicked?.Invoke(sender, e));
+            menu.ItemAt("Help", "License").Click += new EventHandler((sender, e) => ShowLicenseClicked?.Invoke(sender, e));
+            menu.ItemAt("Help", "Meta").Click    += new EventHandler((sender, e) => ShowMetaPackageHelpClicked?.Invoke(sender, e));
 
             StartWithSystemCheckBox = menu.ItemAt("Extras", "StartWithSystem");
         }
@@ -110,6 +111,16 @@ namespace CandyShop.View
         {
             RefreshClicked?.Invoke(this, EventArgs.Empty);
             Show();
+        }
+
+        public void OnSettingsChanged(SettingsDefinition settings)
+        {
+            Text = MetaInfo.GetAppTitle(settings.ActivePackageManager);
+
+            ShowAdminWarning =
+                !Util.IsAdmin() && // TODO could move this to OnSettingsChanged param
+                !settings.ElevateOnDemand && // TODO rename requireAdminRights or whatever it says in the settings window
+                !settings.SupressNoRightsWarning;
         }
     }
 }

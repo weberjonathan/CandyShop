@@ -8,43 +8,44 @@ namespace CandyShop.PackageCore
 {
     internal class PackageManagerFactory
     {
-        public static AbstractPackageManager Create(PackageManagerDefinition pm, bool useGsudo = false, bool useCredentialsStore = false)
+        public static AbstractPackageManager Chocolatey(SettingsDefinition settings)
         {
-            if ("Winget".Equals(pm.Name))
-            {
-                return new WingetManager(pm.Filepath, useGsudo, useCredentialsStore);
-                // TODO supress log warning thingy
-            }
-            else if ("Chocolatey".Equals(pm.Name))
-            {
-                return new ChocoManager(2, pm.ValidExitCodes, pm.Filepath, useGsudo, useCredentialsStore);
-                // TODO version
-            }
-            else
-            {
-                throw new ArgumentException("Unknown active package manager.");
-            }
+            return new ChocoManager(
+                2, // TODO
+                settings.Chocolatey.ValidExitCodes,
+                settings.Chocolatey.Filepath,
+                settings.ElevateOnDemand,
+                settings.Gsudo.CachePrivileges);
         }
 
-        public static AbstractPackageManager Create(PackageManagerDefinition pm, SettingsDefinition settings)
+        public static AbstractPackageManager Winget(SettingsDefinition settings)
         {
-            return Create(pm, settings.ElevateOnDemand, settings.Gsudo.EnableCredentialsStore);
+            return new WingetManager(
+                settings.Winget.Filepath,
+                settings.ElevateOnDemand,
+                settings.Gsudo.CachePrivileges);
         }
 
-        public static AbstractPackageManager Create(SettingsDefinition settings)
+        public static AbstractPackageManager Active(SettingsDefinition settings)
         {
-            return Create(settings.PackageManagers[settings.ActivePackageManager], settings);
+            return settings.ActivePackageManager switch
+            {
+                "Winget" => Winget(settings),
+                "Chocolatey" => Chocolatey(settings),
+                _ => throw new ArgumentException()
+            };
         }
     }
     
     internal abstract class AbstractPackageManager(string binary, bool useGsudo, bool useCredentialsStore)
     {
         public bool UseGsudo { get; } = useGsudo;
+        public string Binary { get; private set; } = binary;
         public abstract bool SupportsPinningAsUser { get; }
         public abstract bool SupportsFetchingOutdated { get; }
         public abstract bool RequiresNameResolution { get; }
+        public abstract string Name { get; }
 
-        protected string Binary { get; private set; } = binary;
         protected bool AllowGsudoCache { get; } = useCredentialsStore;
 
         /// <summary>

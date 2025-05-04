@@ -4,7 +4,7 @@ using System.Windows.Forms;
 
 namespace CandyShop.Controls.Factory
 {
-    internal class WingetControlsFactory : IControlsFactory
+    internal class WingetUiComponents : IUiComponents
     {
         public PackageListBoxColumn[] GetUpgradeColumns()
         {
@@ -64,12 +64,12 @@ namespace CandyShop.Controls.Factory
 
         public ToolStrip GetUpgradePageToolBar()
         {
-            return CommonBase.GetCommonUpgradePageToolBar();
+            return CommonUiComponents.GetCommonUpgradePageToolBar();
         }
 
         public CandyShopMenuStrip GetMenuStrip()
         {
-            var menu = CommonBase.GetCommonMenuStrip();
+            var menu = CommonUiComponents.GetCommonMenuStrip();
             menu.ItemAt("Extras", "Logs").Text = string.Format(LocaleEN.TEXT_MENU_LOGS, "Winget");
             menu.ItemAt("Extras", "SwitchMode").Text = string.Format(LocaleEN.TEXT_MENU_SWITCH, "Chocolatey");
             menu.ItemAt("Help", "Meta").Visible = false;

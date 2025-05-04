@@ -59,6 +59,15 @@ namespace CandyShop.View
             }
         }
 
+        public bool DisplayFirstStartBanner
+        {
+            get { return panel2.Visible; }
+            set
+            {
+                panel2.Visible = value;
+            }
+        }
+
         public event EventHandler ApplyClicked;
         public event EventHandler OkClicked;
         public event EventHandler WingetBinaryChanged;

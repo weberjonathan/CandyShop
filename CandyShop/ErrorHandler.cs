@@ -1,13 +1,14 @@
-﻿using System.Windows.Forms;
+﻿using CandyShop.Services;
+using System.Windows.Forms;
 
 namespace CandyShop
 {
-    class ErrorHandler
+    internal class ErrorHandler
     {
         public static void ShowError(string msg, params string[] args)
         {
             if (args != null && args.Length > 0) msg = string.Format(msg, args);
-            MessageBox.Show(msg, MetaInfo.Name, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show(msg, MetaInfo.GetAppTitle(), MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
 
         public static void NotifyError(NotifyIcon icon, string msg, params string[] args)
@@ -16,7 +17,7 @@ namespace CandyShop
 
             icon.BalloonTipIcon = ToolTipIcon.Error;
             icon.Text = MetaInfo.Name;
-            icon.BalloonTipTitle = MetaInfo.WindowTitle;
+            icon.BalloonTipTitle = MetaInfo.GetAppTitle();
             icon.BalloonTipText = msg;
             icon.ShowBalloonTip(2000);
         }

@@ -10,7 +10,7 @@ namespace CandyShop
     static class Program
     {
         private static readonly SettingsService SettingsService = new();
-        private static readonly CandyShopContext context = ContextSingleton.Get;
+        private static readonly Arguments arguments = new();
 
         public static void Exit(int code = 0, bool saveProperties = true)
         {
@@ -53,7 +53,7 @@ namespace CandyShop
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            CandyShopApplicationContext appContext = new(SettingsService, context);
+            CandyShopApplicationContext appContext = new(SettingsService, arguments);
             Application.Run(appContext);
         }
 
@@ -68,31 +68,25 @@ namespace CandyShop
                     "[{Timestamp:yyyy-MM-dd HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}"
             );
 
-            return context.DebugEnabled ? config.MinimumLevel.Debug() : config.MinimumLevel.Information();
+            return arguments.DebugEnabled ? config.MinimumLevel.Debug() : config.MinimumLevel.Information();
         }
 
         private static string GetLogFilename()
         {
-            string path = context.LogFilepath;
+            string dir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "CandyShop");
+            string filename = "CandyShop";
+            string fileext = "log";
+
+            string path = Path.Combine(dir, $"{filename}.{fileext}");
 
             int i = 1;
-            while (true)
+            while (File.Exists(path) && IsFileLocked(path))
             {
-                if (File.Exists(path) && IsFileLocked(path))
-                {
-                    // logfile is in use, so try next
-                    string dir = Path.GetDirectoryName(Path.GetFullPath(path));
-                    string filename = Path.GetFileNameWithoutExtension(context.LogFilepath) + (i++) + Path.GetExtension(context.LogFilepath);
-                    path = Path.Combine(dir, filename);
-                }
-                else
-                {
-                    break;
-                }
+                // logfile is in use, so try next
+                path = Path.Combine(dir, $"{filename}{i++}.{fileext}");
             }
 
             return path;
-            
         }
 
         private static bool IsFileLocked(string path)

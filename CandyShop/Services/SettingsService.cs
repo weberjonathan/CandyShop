@@ -8,51 +8,68 @@ using System.Text.Json;
 
 namespace CandyShop.Services
 {
+    // TODO move interface and definitions out into own settings namespace
+    // TODO move legacy stuff out into own LegacySettings classes
+    // TODO add config file version
+    internal interface ISettingsListener
+    {
+        void OnSettingsChanged(SettingsDefinition settings);
+    }
+
     internal class PackageManagerDefinition
     {
-        public string Name { get; set; }
+        public bool Enabled { get; set; } // TODO use this but validate so that only one is allowed right now
+        public bool UpgradeAsAdmin { get; set; } // TODO
         public string Filepath { get; set; }
         public List<int> ValidExitCodes { get; set; }
     }
 
     internal class GsudoDefinition
     {
+        public bool Enabled { get; set; }
         public string Filepath { get; set; }
-        public bool EnableCredentialsStore { get; set; }
+        public bool CachePrivileges { get; set; } // TODO rename to CachePrivileges
     }
-    
+
     internal class SettingsDefinition
     {
-        // TODO replace packageManagers with list and provide simple, strongly-tpyed, transient accessors for Choco and Winget
-        public Dictionary<string, PackageManagerDefinition> PackageManagers { get; set; } = new() {
-            {
-                "Winget", new PackageManagerDefinition()
-                {
-                    Name = "Winget",
-                    Filepath = "winget",
-                    ValidExitCodes = [ 0 ]
-                }
-            },
-            {
-                "Chocolatey", new PackageManagerDefinition()
-                {
-                    Name = "Chocolatey",
-                    Filepath = "chocolatey",
-                    ValidExitCodes = [0, 1641, 3010, 350, 1604]
-                }
-            }
+        public PackageManagerDefinition Winget { get; set; } = new()
+        {
+            Enabled = true,
+            UpgradeAsAdmin = true,
+            Filepath = "winget",
+            ValidExitCodes = [0]
+        };
+
+        public PackageManagerDefinition Chocolatey { get; set; } = new()
+        {
+            Enabled = false,
+            UpgradeAsAdmin = true,
+            Filepath = "chocolatey",
+            ValidExitCodes = [0, 1641, 3010, 350, 1604]
         };
 
         public GsudoDefinition Gsudo { get; set; } = new() {
+            Enabled = true,
             Filepath = "gsudo",
-            EnableCredentialsStore = false
+            CachePrivileges = false
         };
 
-        public string ActivePackageManager { get; set; } = "Winget";
-        public bool ElevateOnDemand { get; set; } = true;
+        public string ActivePackageManager { get; set; } = "Winget"; // deprecate this in favor of the enabled stuff on pm defintion
+        public bool ElevateOnDemand { get; set; } = true; // deprecate this and use combination of Gsudo.Enabled and field of active package manager
         public bool CleanShortcuts { get; set; } = false;
         public bool CloseAfterUpgrade { get; set; } = false;
-        public bool SupressNoRightsWarning { get; set; } = false;
+        public bool SupressNoRightsWarning { get; set; } = false; // TODO if active pm has upgradeAsAdmin true and we are not launched as admin and we do not have gsudo, this is a configuration error and no longer a warning; this can be tested at the beginning of the upgrade process
+
+        public PackageManagerDefinition GetActivePm() // TODO can be removed; instead turn it into the getter of active package manager with new enabled fields in pm defintion
+        {
+            return ActivePackageManager switch
+            {
+                "Winget" => Winget,
+                "Chocolatey" => Chocolatey,
+                _ => null,
+            };
+        }
     }
 
     internal class LegacySettingsDefinition
@@ -73,11 +90,42 @@ namespace CandyShop.Services
     // TODO validation methods should be awaitable
     internal class SettingsService
     {
+        private List<ISettingsListener> Listeners = [];
+
         // TODO
         private static readonly string _AppDataDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "CandyShop");
         private static readonly string _ConfigFilepath = Path.Combine(_AppDataDir, "CandyShop.config");
 
         private SettingsDefinition CurrentSettings;
+
+        public SettingsService()
+        {
+            if (!Directory.Exists(_AppDataDir))
+                Directory.CreateDirectory(_AppDataDir);
+        }
+
+        public void RegisterListener(ISettingsListener listener)
+        {
+            Listeners.Add(listener);
+        }
+
+        public void SetSupressNoRightsWarning(bool value)
+        {
+            CurrentSettings.SupressNoRightsWarning = value;
+            Listeners.ForEach(listener => listener.OnSettingsChanged(CurrentSettings));
+        }
+
+        public void SetCleanShortcuts(bool value)
+        {
+            CurrentSettings.CleanShortcuts = value;
+            Listeners.ForEach(listener => listener.OnSettingsChanged(CurrentSettings));
+        }
+
+        public void SetCloseAfterUpgrade(bool value)
+        {
+            CurrentSettings.CloseAfterUpgrade = value;
+            Listeners.ForEach(listener => listener.OnSettingsChanged(CurrentSettings));
+        }
 
         /// <exception cref="CandyShopException"></exception>
         public void OpenSettingsDirectory()
@@ -95,58 +143,68 @@ namespace CandyShop.Services
             }
         }
 
+        // TODO remove this and use OnSettingsChanged to update settings view
         public SettingsDefinition GetCurrentSettings()
         {
             return CurrentSettings;
         }
 
-        public SettingsDefinition Load(CandyShopContext context)
+        public void UpdateSettings(SettingsDefinition settings)
+        {
+            CurrentSettings = settings;
+            Listeners.ForEach(listener => listener.OnSettingsChanged(CurrentSettings));
+        }
+
+        public SettingsDefinition CreateSettings()
+        {
+            // TODO ensure valid package manager selection
+            CurrentSettings = new();
+            Listeners.ForEach(listener => listener.OnSettingsChanged(CurrentSettings));
+            return CurrentSettings;
+        }
+
+        public SettingsDefinition Load()
         {
             // load settings
             string json = LoadSettingsRaw(); // TODO null check
             SettingsDefinition settings = ParseSettings(json);
 
             if (settings == null)
-            {
                 settings = ParseLegacySettings(json);
-                context.FirstStart = true;
-            }
 
-            if (settings == null)
-            {
-                settings ??= new();
-                context.FirstStart = true;
-            }
-
-            // apply to context
-            // TODO context needs rework
-            context.CleanShortcuts = settings.CleanShortcuts;
-            context.ElevateOnDemand = settings.ElevateOnDemand;
-            context.SupressAdminWarning = settings.SupressNoRightsWarning;
-            context.CloseAfterUpgrade = settings.CloseAfterUpgrade;
-            context.WingetMode = settings.ActivePackageManager.Equals("Winget");
+            // TODO ensure valid package manager selection
 
             CurrentSettings = settings;
-            return settings;
+            Listeners.ForEach(listener => listener.OnSettingsChanged(CurrentSettings));
+            return CurrentSettings;
         }
 
         public void Write()
         {
-            // Write CurrentSettings field
+            SettingsDefinition settings = CurrentSettings;
+
+            try
+            {
+                JsonSerializerOptions options = new()
+                {
+                    WriteIndented = true
+                };
+
+                string json = JsonSerializer.Serialize(settings, options);
+                File.WriteAllText(_ConfigFilepath, json);
+            }
+            catch (Exception e)
+            {
+                Log.Error($"An error occurred while saving properties to {_ConfigFilepath}: {e.Message}");
+            }
         }
 
         /// <exception cref="PackageManagerException"></exception>
         /// <exception cref="FileNotFoundException"></exception>
-        public string ValidateActiveSource(out AbstractPackageManager validatedPm)
+        public string ValidateActiveSource(SettingsDefinition settings)
         {
-            return ValidateActiveSource(CurrentSettings, out validatedPm);
-        }
-
-        /// <exception cref="PackageManagerException"></exception>
-        /// <exception cref="FileNotFoundException"></exception>
-        public string ValidateActiveSource(SettingsDefinition settings, out AbstractPackageManager validatedPm)
-        {
-            return ValidatePmBinary(settings.ActivePackageManager, settings, out validatedPm);
+            var pm = PackageManagerFactory.Active(settings);
+            return ValidatePmBinary(pm);
         }
 
         /// <exception cref="FileNotFoundException"></exception>
@@ -154,7 +212,8 @@ namespace CandyShop.Services
         public string ValidateWinget(SettingsDefinition settings = null)
         {
             settings ??= CurrentSettings;
-            return ValidatePmBinary("Winget", settings, out _);
+            var pm = PackageManagerFactory.Winget(settings);
+            return ValidatePmBinary(pm);
         }
 
         /// <exception cref="FileNotFoundException"></exception>
@@ -162,7 +221,8 @@ namespace CandyShop.Services
         public string ValidateChocolatey(SettingsDefinition settings = null)
         {
             settings ??= CurrentSettings;
-            return ValidatePmBinary("Chocolatey", settings, out _);
+            var pm = PackageManagerFactory.Chocolatey(settings);
+            return ValidatePmBinary(pm);
         }
 
         /// <exception cref="FileNotFoundException"></exception>
@@ -197,7 +257,7 @@ namespace CandyShop.Services
         public bool IsGsudoRequired(SettingsDefinition settings = null)
         {
             settings ??= CurrentSettings;
-            return !Util.IsAdmin() && settings.ElevateOnDemand;
+            return !Util.IsAdmin() && settings.ElevateOnDemand; // TODO for choco pinning it is also required
         }
 
         private string LoadSettingsRaw()
@@ -216,7 +276,7 @@ namespace CandyShop.Services
                 }
             }
 
-            return null;
+            return "";
         }
 
         private SettingsDefinition ParseSettings(string json)
@@ -243,11 +303,11 @@ namespace CandyShop.Services
             {
                 var legacy = JsonSerializer.Deserialize<LegacySettingsDefinition>(json);
                 loaded = new();
-                loaded.PackageManagers["Winget"].Filepath = legacy.WingetBinary;
-                loaded.PackageManagers["Chocolatey"].Filepath = legacy.ChocolateyBinary;
-                loaded.PackageManagers["Chocolatey"].ValidExitCodes = legacy.ValidExitCodes;
+                loaded.Winget.Filepath = legacy.WingetBinary;
+                loaded.Chocolatey.Filepath = legacy.ChocolateyBinary;
+                loaded.Chocolatey.ValidExitCodes = legacy.ValidExitCodes;
                 loaded.ActivePackageManager = legacy.WingetMode ? "Winget" : "Chocolatey";
-                loaded.Gsudo.EnableCredentialsStore = legacy.AllowGsudoCache;
+                loaded.Gsudo.CachePrivileges = legacy.AllowGsudoCache;
                 loaded.ElevateOnDemand = legacy.ElevateOnDemand;
                 loaded.CleanShortcuts = legacy.CleanShortcuts;
                 loaded.CloseAfterUpgrade = legacy.CloseAfterUpgrade;
@@ -263,17 +323,12 @@ namespace CandyShop.Services
 
         /// <exception cref="FileNotFoundException"></exception>
         /// <exception cref="PackageManagerException"></exception>
-        private string ValidatePmBinary(string name, SettingsDefinition settings, out AbstractPackageManager validatedPm)
+        private string ValidatePmBinary(AbstractPackageManager pm)
         {
-            if (!settings.PackageManagers.TryGetValue(name, out PackageManagerDefinition pmDefinition))
-                throw new ArgumentOutOfRangeException(nameof(name));
-
-            if (!PathUtil.FileExists(pmDefinition.Filepath))
+            if (!PathUtil.FileExists(pm.Binary))
                 throw new FileNotFoundException();
 
-            var pm = PackageManagerFactory.Create(pmDefinition, settings);
             var version = pm.ValidateExec();
-            validatedPm = pm;
             return version;
         }
     }

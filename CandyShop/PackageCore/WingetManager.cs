@@ -13,6 +13,7 @@ namespace CandyShop.PackageCore
         public override bool SupportsFetchingOutdated => true;
         public override bool RequiresNameResolution => true;
         public override bool SupportsPinningAsUser => true;
+        public override string Name => "Winget";
 
         /// <exception cref="PackageManagerException"></exception>
         public override string ValidateExec()

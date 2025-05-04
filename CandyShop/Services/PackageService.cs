@@ -274,7 +274,7 @@ namespace CandyShop.Services
             };
             Console.SetOut(StdOut);
             Console.CursorVisible = false;
-            Console.Title = $"{MetaInfo.WindowTitle} | Upgrade in process";
+            Console.Title = $"{MetaInfo.GetAppTitle(PackageManager.Name)} | Upgrade in process";
 
             try
             {
