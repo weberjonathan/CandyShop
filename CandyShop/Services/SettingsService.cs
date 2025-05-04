@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace CandyShop.Services
 {
@@ -131,57 +132,60 @@ namespace CandyShop.Services
 
         /// <exception cref="PackageManagerException"></exception>
         /// <exception cref="FileNotFoundException"></exception>
-        public string ValidateActiveSource(SettingsDefinition settings)
+        public async Task<string> ValidateActiveSource(SettingsDefinition settings)
         {
             var pm = PackageManagerFactory.Active(settings);
-            return ValidatePmBinary(pm);
+            return await ValidatePmBinary(pm);
         }
 
         /// <exception cref="FileNotFoundException"></exception>
         /// <exception cref="PackageManagerException"></exception>
-        public string ValidateWinget(SettingsDefinition settings = null)
+        public async Task<string> ValidateWinget(SettingsDefinition settings = null)
         {
             settings ??= CurrentSettings;
             var pm = PackageManagerFactory.Winget(settings);
-            return ValidatePmBinary(pm);
+            return await ValidatePmBinary(pm);
         }
 
         /// <exception cref="FileNotFoundException"></exception>
         /// <exception cref="PackageManagerException"></exception>
-        public string ValidateChocolatey(SettingsDefinition settings = null)
+        public async Task<string> ValidateChocolatey(SettingsDefinition settings = null)
         {
             settings ??= CurrentSettings;
             var pm = PackageManagerFactory.Chocolatey(settings);
-            return ValidatePmBinary(pm);
+            return await ValidatePmBinary(pm);
         }
 
         /// <exception cref="FileNotFoundException"></exception>
         /// <exception cref="PackageManagerException"></exception>
-        public string ValidateGsudo(SettingsDefinition settings = null)
+        public async Task<string> ValidateGsudo(SettingsDefinition settings = null)
         {
             settings ??= CurrentSettings;
 
             if (!PathUtil.FileExists(settings.Gsudo.Filepath))
                 throw new FileNotFoundException();
 
-            var p = new PackageManagerProcess(settings.Gsudo.Filepath, "--version"); // TODO this should not abuse the package manager process
-            try
+            return await Task.Run(() =>
             {
-                p.ExecuteHidden();
-            }
-            catch (Exception)
-            {
-                throw new PackageManagerException("Failed to execute gsudo");
-            }
+                var p = new PackageManagerProcess(settings.Gsudo.Filepath, "--version"); // TODO this should not abuse the package manager process
+                try
+                {
+                    p.ExecuteHidden();
+                }
+                catch (Exception)
+                {
+                    throw new PackageManagerException("Failed to execute gsudo");
+                }
 
-            if (p.ExitCode != 0)
-                throw new PackageManagerException($"Gsudo did not exit cleanly: {p.ExitCode}");
+                if (p.ExitCode != 0)
+                    throw new PackageManagerException($"Gsudo did not exit cleanly: {p.ExitCode}");
 
-            var output = p.Output.Trim().Split(' ');
-            if (output.Length > 1 && output[0].Equals("gsudo") && output[1].StartsWith('v') && Util.HasDots(output[1], 2) && Util.IsNumeric(output[1][1..]))
-                return output[1];
+                var output = p.Output.Trim().Split(' ');
+                if (output.Length > 1 && output[0].Equals("gsudo") && output[1].StartsWith('v') && Util.HasDots(output[1], 2) && Util.IsNumeric(output[1][1..]))
+                    return output[1];
 
-            throw new PackageManagerException("Failed to parse gsudo version");
+                throw new PackageManagerException("Failed to parse gsudo version");
+            });
         }
 
         public bool IsGsudoRequired(SettingsDefinition settings = null)
@@ -209,15 +213,10 @@ namespace CandyShop.Services
             return null;
         }
 
-        /// <exception cref="FileNotFoundException"></exception>
         /// <exception cref="PackageManagerException"></exception>
-        private string ValidatePmBinary(AbstractPackageManager pm)
+        private async Task<string> ValidatePmBinary(AbstractPackageManager pm)
         {
-            if (!PathUtil.FileExists(pm.Binary))
-                throw new FileNotFoundException();
-
-            var version = pm.ValidateExec();
-            return version;
+            return await Task.Run(pm.ValidateExec);
         }
     }
 }

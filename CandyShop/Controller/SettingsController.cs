@@ -4,6 +4,7 @@ using CandyShop.Settings;
 using CandyShop.View;
 using System;
 using System.IO;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace CandyShop.Controller
@@ -25,7 +26,7 @@ namespace CandyShop.Controller
             MainView = mainView;
 
             MainView.OpenSettingsClicked += new EventHandler((sender, e) => ShowSettingsWindow());
-            MainView.HideAdminWarningClicked += new EventHandler((sender, e) => SettingsService.SetSupressNoRightsWarning(true));
+            MainView.HideAdminWarningClicked += new EventHandler((sender, e) => SettingsService.SetSupressNoRightsWarning(true)); // TODO test this behavior and see if I like it; does the banenr still exist in main window?
             MainView.OpenSettingsDirClicked += new EventHandler((sender, e) =>
             {
                 try
@@ -50,19 +51,22 @@ namespace CandyShop.Controller
                 DisplayFirstStartBanner = displayFirstStartBanner
             };
 
-            SettingsView.OkClicked += (sender, e) =>
+            SettingsView.OkClicked += async (sender, e) =>
             {
-                var succses = ApplySettings();
-                if (succses)
+                SettingsView.Locked = true;
+                var success = await ApplySettings();
+                SettingsView.Locked = false;
+                if (success)
                 {
-                    SettingsView.Hide();
                     SettingsView.Close();
                 }
             };
 
-            SettingsView.ApplyClicked += (sender, e) =>
+            SettingsView.ApplyClicked += async (sender, e) =>
             {
-                ApplySettings();
+                SettingsView.Locked = true;
+                await ApplySettings();
+                SettingsView.Locked = false;
             };
 
             SettingsView.FormClosed += (sender, e) =>
@@ -87,7 +91,7 @@ namespace CandyShop.Controller
             SettingsView.ShowDialog();
         }
 
-        private bool ApplySettings()
+        private async Task<bool> ApplySettings()
         {
             // ask to resolve any binaries defined through environment variables
             var wingetViaEnvPath = PathUtil.FileExistsOnEnvPath(SettingsView.WingetBinary, out var wingetResolved);
@@ -119,7 +123,7 @@ namespace CandyShop.Controller
             }
 
             // build settings definition from view
-            var settings = BuildSettingsFromView();
+            var settings = BuildPartialSettingsFromView();
 
             // validate package manager
             try
@@ -131,7 +135,7 @@ namespace CandyShop.Controller
                     "Chocolatey" => SettingsView?.ChocolateyBinary,
                     _ => throw new ArgumentException("Uknown package manager")
                 };
-                SettingsService.ValidateActiveSource(settings); // TODO if this is changed, update packageService
+                await SettingsService.ValidateActiveSource(settings); // TODO if this is changed, update packageService
             }
             catch (Exception)
             {
@@ -148,7 +152,7 @@ namespace CandyShop.Controller
             {
                 try
                 {
-                    SettingsService.ValidateGsudo(settings);
+                    await SettingsService.ValidateGsudo(settings);
                 }
                 catch (Exception)
                 {
@@ -165,19 +169,23 @@ namespace CandyShop.Controller
             return true;
         }
 
-        private void OnWingetBinaryChanged(object sender, EventArgs e)
+        private async void OnWingetBinaryChanged(object sender, EventArgs e)
         {
-            SettingsDefinition settings = BuildSettingsFromView();
+            SettingsDefinition settings = BuildPartialSettingsFromView();
+            if (!PathUtil.FileExists(settings.Winget.Filepath))
+            {
+                SettingsView.SetWingetBinaryStatus("File not found");
+                return;
+            }
+
+            SettingsView.SetWingetBinaryStatus(string.Empty);
+
             string status;
             try
             {
-                status = SettingsService.ValidateWinget(settings);
+                status = await SettingsService.ValidateWinget(settings);
             }
-            catch (FileNotFoundException)
-            {
-                status = "File not found";
-            }
-            catch (PackageManagerException)
+            catch (Exception)
             {
                 status = "Validation failed";
             }
@@ -185,13 +193,21 @@ namespace CandyShop.Controller
             SettingsView.SetWingetBinaryStatus(status);
         }
 
-        private void OnChocolateyBinaryChanged(object sender, EventArgs e)
+        private async void OnChocolateyBinaryChanged(object sender, EventArgs e)
         {
-            SettingsDefinition settings = BuildSettingsFromView();
+            SettingsDefinition settings = BuildPartialSettingsFromView();
+            if (!PathUtil.FileExists(settings.Chocolatey.Filepath))
+            {
+                SettingsView.SetChocoBinaryStatus("File not found");
+                return;
+            }
+
+            SettingsView.SetChocoBinaryStatus(string.Empty);
+
             string status;
             try
             {
-                status = SettingsService.ValidateChocolatey(settings);
+                status = await SettingsService.ValidateChocolatey(settings);
             }
             catch (FileNotFoundException)
             {
@@ -205,14 +221,22 @@ namespace CandyShop.Controller
             SettingsView.SetChocoBinaryStatus(status);
         }
 
-        private void OnGsudoBinaryChanged(object sender, EventArgs e)
+        private async void OnGsudoBinaryChanged(object sender, EventArgs e)
         {
-            SettingsDefinition settings = BuildSettingsFromView();
+            SettingsDefinition settings = BuildPartialSettingsFromView();
+            if (!PathUtil.FileExists(settings.Gsudo.Filepath))
+            {
+                SettingsView.SetGSudoBinaryStatus("File not found");
+                return;
+            }
+
+            SettingsView.SetGSudoBinaryStatus(string.Empty);
+
             string status;
             bool valid = false;
             try
             {
-                status = SettingsService.ValidateGsudo(settings);
+                status = await SettingsService.ValidateGsudo(settings);
                 valid = true;
             }
             catch (FileNotFoundException)
@@ -228,17 +252,12 @@ namespace CandyShop.Controller
             SettingsView.EnableGsudoConfig = valid;
         }
 
-        private SettingsDefinition BuildSettingsFromView()
+        private SettingsDefinition BuildPartialSettingsFromView()
         {
-            // TODO combine with get settings from service to fill out remaining properties
-
             SettingsDefinition settings = new()
             {
                 ActivePackageManager = SettingsView.ActivePackageSource,
-                //CleanShortcuts = 
-                //CloseAfterUpgrade =
                 ElevateOnDemand = SettingsView.RequireAdminPrivileges,
-                //SupressNoRightsWarning = 
             };
             settings.Gsudo.Filepath = SettingsView.GSudoBinary;
             settings.Gsudo.CachePrivileges = SettingsView.CacheAdminPrivileges;

@@ -68,6 +68,28 @@ namespace CandyShop.View
             }
         }
 
+        public bool Locked
+        {
+            get
+            {
+                return btnOk.Enabled;
+            }
+            set
+            {
+                cmbSource.Enabled = !value;
+                btnOk.Enabled = !value;
+                btnApply.Enabled = !value;
+                btnChocoBinary.Enabled = !value;
+                btnWingetBinary.Enabled = !value;
+                btnGSudoBinary.Enabled = !value;
+                checkCacheAdmin.Enabled = !value;
+                checkRequireAdmin.Enabled = !value;
+                txtChocoBinary.Enabled = !value;
+                txtWingetBinary.Enabled = !value;
+                txtGSudoBinary.Enabled = !value;
+            }
+        }
+
         public event EventHandler ApplyClicked;
         public event EventHandler OkClicked;
         public event EventHandler WingetBinaryChanged;
@@ -84,24 +106,38 @@ namespace CandyShop.View
             btnApply.Click += new EventHandler((sender, e) => ApplyClicked?.Invoke(sender, e));
             btnOk.Click += new EventHandler((sender, e) => OkClicked?.Invoke(sender, e));
 
-            btnWingetBinary.Click += new EventHandler((sender, e)
-                => UpdateBinaryTextbox(txtWingetBinary, WingetBinaryChanged, "Winget"));
-            btnChocoBinary.Click += new EventHandler((sender, e)
-                => UpdateBinaryTextbox(txtChocoBinary, ChocolateyBinaryChanged, "Chocolatey"));
-            btnGSudoBinary.Click += new EventHandler((sender, e)
-                => UpdateBinaryTextbox(txtGSudoBinary, GSudoBinaryChanged, "Gsudo"));
+            btnWingetBinary.Click += (sender, e)
+                => UpdateBinaryTextbox(txtWingetBinary, WingetBinaryChanged, "Winget");
+            btnChocoBinary.Click += (sender, e)
+                => UpdateBinaryTextbox(txtChocoBinary, ChocolateyBinaryChanged, "Chocolatey");
+            btnGSudoBinary.Click += (sender, e)
+                => UpdateBinaryTextbox(txtGSudoBinary, GSudoBinaryChanged, "Gsudo");
 
-            txtWingetBinary.TextChanged += new EventHandler((sender, e) => WingetBinaryChanged?.Invoke(sender, e));
-            txtChocoBinary.TextChanged += new EventHandler((sender, e) => ChocolateyBinaryChanged?.Invoke(sender, e));
-            txtGSudoBinary.TextChanged += new EventHandler((sender, e) => GSudoBinaryChanged?.Invoke(sender, e));
+            txtWingetBinary.TextChanged += (sender, e) =>
+            {
+                lblWingetStatus.Text = string.Empty;
+                WingetBinaryChanged?.Invoke(sender, e);
+            };
 
-            checkRequireAdmin.CheckedChanged += new EventHandler((sender, e) =>
+            txtChocoBinary.TextChanged += (sender, e) =>
+            {
+                lblChocoStatus.Text = string.Empty;
+                ChocolateyBinaryChanged?.Invoke(sender, e);
+            };
+
+            txtGSudoBinary.TextChanged += (sender, e) =>
+            {
+                lblGSudoStatus.Text = string.Empty;
+                GSudoBinaryChanged?.Invoke(sender, e);
+            };
+
+            checkRequireAdmin.CheckedChanged += (sender, e) =>
             {
                 if (!checkRequireAdmin.Checked)
                     checkCacheAdmin.Checked = false;
 
                 checkCacheAdmin.Enabled = checkRequireAdmin.Checked;
-            });
+            };
         }
 
         public void SetWingetBinaryStatus(string status)
