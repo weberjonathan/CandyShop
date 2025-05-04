@@ -175,8 +175,11 @@ namespace CandyShop
             // create click handlers
             icon.MouseClick += new MouseEventHandler((sender, e) =>
             {
-                mainWindowController.InitView();
-                packageController.UpdatePackageDisplaysAsync();
+                if (e.Button == MouseButtons.Left)
+                {
+                    mainWindowController.InitView();
+                    packageController.UpdatePackageDisplaysAsync();
+                }
             });
 
             int count = service.GetNonPinnedCount(packages);
