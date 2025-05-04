@@ -1,4 +1,4 @@
-﻿using CandyShop.Services;
+﻿using CandyShop.Settings;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;

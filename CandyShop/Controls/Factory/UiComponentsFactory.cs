@@ -1,4 +1,4 @@
-﻿using CandyShop.Services;
+﻿using CandyShop.Settings;
 using System;
 
 namespace CandyShop.Controls.Factory

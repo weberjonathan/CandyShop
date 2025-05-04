@@ -1,5 +1,6 @@
 ﻿using CandyShop.PackageCore;
 using CandyShop.Services;
+using CandyShop.Settings;
 using CandyShop.View;
 using System;
 using System.IO;

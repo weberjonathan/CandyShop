@@ -13,6 +13,7 @@ using CandyShop.PackageCore;
 using CandyShop.Controls.Factory;
 using CandyShop.Components;
 using System.Linq;
+using CandyShop.Settings;
 
 namespace CandyShop
 {

@@ -1,7 +1,7 @@
 ﻿using CandyShop.Controls;
 using CandyShop.Controls.Factory;
 using CandyShop.Properties;
-using CandyShop.Services;
+using CandyShop.Settings;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
