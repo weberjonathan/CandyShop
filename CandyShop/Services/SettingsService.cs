@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 
@@ -103,7 +104,32 @@ namespace CandyShop.Services
                 settings = legacySettings.ToDefinition();
             }
 
-            // TODO ensure valid package manager selection
+            // validate winget
+            if (settings.Winget == null)
+            {
+                settings.PackageManagers.Insert(0, PackageManagerDefinition.BuildWinget());
+            }
+
+            // validate chocolatey
+            if (settings.Chocolatey == null)
+            {
+                settings.PackageManagers.Add(PackageManagerDefinition.BuildChocolatey());
+            }
+
+            // remove unknown package managers
+            settings.PackageManagers = settings.PackageManagers
+                .Where(pm => pm.Name.Equals(settings.Winget.Name) || pm.Name.Equals(settings.Chocolatey.Name))
+                .ToList();
+
+            // ensure at least one package source is enabled
+            if (settings.EnabledPackageManagers.Count == 0)
+                settings.Winget.Enabled = true;
+
+            // disable chocolatey if both are enabled
+            if (settings.EnabledPackageManagers.Count > 1)
+                foreach (var pm in settings.EnabledPackageManagers)
+                    if (!pm.Name.Equals(settings.Winget.Name))
+                        pm.Enabled = false;
 
             CurrentSettings = settings;
             Listeners.ForEach(listener => listener.OnSettingsChanged(CurrentSettings));

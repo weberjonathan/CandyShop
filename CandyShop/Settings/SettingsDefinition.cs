@@ -13,6 +13,30 @@ namespace CandyShop.Settings
         public bool UpgradeAsAdmin { get; set; } // TODO
         public string Filepath { get; set; }
         public List<int> ValidExitCodes { get; set; }
+
+        public static PackageManagerDefinition BuildWinget()
+        {
+            return new()
+            {
+                Name = "Winget",
+                Enabled = true,
+                UpgradeAsAdmin = true,
+                Filepath = "winget",
+                ValidExitCodes = [0]
+            };
+        }
+
+        public static PackageManagerDefinition BuildChocolatey()
+        {
+            return new()
+            {
+                Name = "Chocolatey",
+                Enabled = false,
+                UpgradeAsAdmin = true,
+                Filepath = "chocolatey",
+                ValidExitCodes = [0, 1641, 3010, 350, 1604]
+            };
+        }
     }
 
     internal class GsudoDefinition
@@ -40,22 +64,8 @@ namespace CandyShop.Settings
         }
 
         public List<PackageManagerDefinition> PackageManagers { get; set; } = [
-            new PackageManagerDefinition()
-            {
-                Name = "Winget",
-                Enabled = true,
-                UpgradeAsAdmin = true,
-                Filepath = "winget",
-                ValidExitCodes = [0]
-            },
-            new PackageManagerDefinition()
-            {
-                Name = "Chocolatey",
-                Enabled = false,
-                UpgradeAsAdmin = true,
-                Filepath = "chocolatey",
-                ValidExitCodes = [0, 1641, 3010, 350, 1604]
-            }
+            PackageManagerDefinition.BuildWinget(),
+            PackageManagerDefinition.BuildChocolatey()
         ];
 
         public GsudoDefinition Gsudo { get; set; } = new()
