@@ -20,7 +20,6 @@ namespace CandyShop
 {
     internal class CandyShopApplicationContext : ApplicationContext
     {
-        // TODO settings service pm must be validated so that Winget, Chocolatey exist and that at least one is enabled
         // TODO pinning in Choco without admin currently fails silently
         public CandyShopApplicationContext(SettingsService settingsService, Arguments arguments)
         {
@@ -36,13 +35,12 @@ namespace CandyShop
 
             // load and apply settings
             SettingsController settingsController = new(settingsService);
-            SettingsDefinition settings = settingsService.Load();
+            SettingsDefinition settings = settingsService.Load(out bool showFirstStartBanner);
             if (settings == null)
-            {
                 settings = settingsService.CreateSettings();
-                // TODO check how it behaves if we launched from background
-                settingsController.ShowSettingsWindow();
-            }
+
+            if (showFirstStartBanner)
+                settingsController.ShowSettingsWindow(displayFirstStartBanner: true);
 
             IPackageFilterContext packageListSyncContext = PackageFilterContextFactory.Create(settings);
 
@@ -51,9 +49,7 @@ namespace CandyShop
             Log.Debug($"cwd: {cwd}; elevated: {Util.IsAdmin()}; debug: {arguments.DebugEnabled}");
 
             // validate selected package manager
-            // TODO the gsudo param should be elevateOnDemand && !isAdmin or no?
             AbstractPackageManager activePackageManager = PackageManagerFactory.Active(settings);
-
             try
             {
                 activePackageManager.ValidateExec();

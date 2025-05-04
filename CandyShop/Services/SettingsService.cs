@@ -89,19 +89,31 @@ namespace CandyShop.Services
             return CurrentSettings;
         }
 
-        public SettingsDefinition Load()
+        public SettingsDefinition Load(out bool requiresReview)
         {
+            requiresReview = false;
+
             // read settings file to json text
             string json = ReadSettingsFile();
             if (json == null)
+            {
+                requiresReview = true;
                 return null;
+            }
 
             // parse json
             SettingsDefinition settings = SettingsDefinition.FromJson(json, JsonDisallowUnknownMembers);
             if (settings == null)
             {
+                requiresReview = true;
                 var legacySettings = LegacySettingsDefinition.FromJson(json);
-                settings = legacySettings.ToDefinition();
+                settings = legacySettings?.ToDefinition();
+            }
+
+            if (settings == null)
+            {
+                requiresReview = true;
+                return null;
             }
 
             // validate winget

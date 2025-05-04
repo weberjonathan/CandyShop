@@ -192,7 +192,7 @@ namespace CandyShop.Controller
                 status = "Validation failed";
             }
 
-            SettingsView.SetWingetBinaryStatus(status);
+            SettingsView?.SetWingetBinaryStatus(status);
         }
 
         private async void OnChocolateyBinaryChanged(object sender, EventArgs e)
@@ -220,7 +220,7 @@ namespace CandyShop.Controller
                 status = "Validation failed";
             }
 
-            SettingsView.SetChocoBinaryStatus(status);
+            SettingsView?.SetChocoBinaryStatus(status);
         }
 
         private async void OnGsudoBinaryChanged(object sender, EventArgs e)
@@ -248,7 +248,7 @@ namespace CandyShop.Controller
                 status = "Validation failed";
             }
 
-            SettingsView.SetGSudoBinaryStatus(status);
+            SettingsView?.SetGSudoBinaryStatus(status);
         }
 
         private SettingsDefinition BuildPartialSettingsFromView()
