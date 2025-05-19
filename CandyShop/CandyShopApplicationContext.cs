@@ -51,10 +51,9 @@ namespace CandyShop
             }
             catch (Exception)
             {
-                // TODO how to proceed? nothign will work right? but not crash and then settings can be accessed
                 ErrorHandler.ShowError("Failed to validate selected package manager.");
-                // TODO this should show the settings window
-                // but what happens on invalid configuration? Or does the settings window only allow valid configs?
+                // the settings window enforces a valid configuration and restarts the program
+                settingsController.ShowSettingsWindow(displayFirstStartBanner: true, requireRestart: true);
             }
 
             // validate gsudo

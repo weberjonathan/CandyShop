@@ -44,7 +44,7 @@ namespace CandyShop.Controller
             MainView.UpgradePackagesPage.CloseAfterUpgradeChanged += new EventHandler((sender, e) => SettingsService.SetCloseAfterUpgrade(MainView.UpgradePackagesPage.CloseAfterUpgrade));
         }
 
-        public void ShowSettingsWindow(bool displayFirstStartBanner = false)
+        public void ShowSettingsWindow(bool displayFirstStartBanner = false, bool requireRestart = false)
         {
             SettingsView = new SettingsWindow
             {
@@ -58,6 +58,7 @@ namespace CandyShop.Controller
                 SettingsView.Locked = false;
                 if (success)
                 {
+                    SettingsView.DialogResult = DialogResult.OK;
                     SettingsView.Close();
                 }
             };
@@ -73,6 +74,8 @@ namespace CandyShop.Controller
             {
                 SettingsView.Dispose();
                 SettingsView = null;
+                if (requireRestart)
+                    Program.Restart();
             };
 
             SettingsView.WingetBinaryChanged += OnWingetBinaryChanged;
