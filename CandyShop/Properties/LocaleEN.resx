@@ -206,7 +206,7 @@ You can fix this error by running "winget list" in the terminal (or any other co
     <value>Open {0} logs</value>
   </data>
   <data name="TEXT_MENU_SWITCH" xml:space="preserve">
-    <value>Switch to {0} &amp;packages</value>
+    <value>Switch to {0} &amp;packages (requires restart)</value>
   </data>
   <data name="TEXT_NO_OUTDATED_PCKGS" xml:space="preserve">
     <value>No upgrades available.</value>

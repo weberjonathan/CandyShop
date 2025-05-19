@@ -118,7 +118,7 @@ namespace CandyShop.Controls.Factory
             };
             extras.DropDownItems.AddRange(new ToolStripItem[]
             {
-                new ToolStripMenuItem() { // TODO remove
+                new ToolStripMenuItem() {
                     Name = "SwitchMode",
                     Text = string.Format(LocaleEN.TEXT_MENU_SWITCH, "MODE")
                 },

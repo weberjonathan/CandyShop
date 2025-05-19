@@ -24,6 +24,7 @@ namespace CandyShop.View
         public event EventHandler ShowGithubClicked;
         public event EventHandler ShowLicenseClicked;
         public event EventHandler ShowMetaPackageHelpClicked;
+        public event EventHandler TogglePackageSourceClicked;
 
         public InstalledPage InstalledPackagesPage => InstalledPage; // TODO remove these
         public UpgradePage UpgradePackagesPage => UpgradePage;
@@ -46,20 +47,20 @@ namespace CandyShop.View
             MainMenuStrip = menu;
             Controls.Add(MainMenuStrip);
 
-            menu.ItemAt("Edit", "Refresh").Click     += new EventHandler((sender, e) => RefreshClicked?.Invoke(sender, e));
-            menu.ItemAt("Edit", "SelectAll").Click   += new EventHandler((sender, e) => UpgradePage.CheckAllItems());
-            menu.ItemAt("Edit", "SelectTop").Click   += new EventHandler((sender, e) => UpgradePage.CheckTopLevelItems());
-            menu.ItemAt("Edit", "DeselectAll").Click += new EventHandler((sender, e) => UpgradePage.UncheckAllItems());
+            menu.ItemAt("Edit", "Refresh").Click     += (sender, e) => RefreshClicked?.Invoke(sender, e);
+            menu.ItemAt("Edit", "SelectAll").Click   += (sender, e) => UpgradePage.CheckAllItems();
+            menu.ItemAt("Edit", "SelectTop").Click   += (sender, e) => UpgradePage.CheckTopLevelItems();
+            menu.ItemAt("Edit", "DeselectAll").Click += (sender, e) => UpgradePage.UncheckAllItems();
 
-            //menu.ItemAt("Extras", "SwitchMode").Click      += new EventHandler((sender, e) => Controller.TogglePackageSource()); // TODO fully remove item
-            menu.ItemAt("Extras", "StartWithSystem").Click += new EventHandler((sender, e) => LaunchOnSystemStartClicked?.Invoke(sender, e));
-            menu.ItemAt("Extras", "SettingsWindow").Click  += new EventHandler((sender, e) => OpenSettingsClicked?.Invoke(sender, e));
-            menu.ItemAt("Extras", "SettingsDir").Click     += new EventHandler((sender, e) => OpenSettingsDirClicked?.Invoke(sender, e));
-            menu.ItemAt("Extras", "Logs").Click            += new EventHandler((sender, e) => OpenLogsClicked?.Invoke(sender, e));
+            menu.ItemAt("Extras", "SwitchMode").Click      += (sender, e) => TogglePackageSourceClicked?.Invoke(sender, e);
+            menu.ItemAt("Extras", "StartWithSystem").Click += (sender, e) => LaunchOnSystemStartClicked?.Invoke(sender, e);
+            menu.ItemAt("Extras", "SettingsWindow").Click  += (sender, e) => OpenSettingsClicked?.Invoke(sender, e);
+            menu.ItemAt("Extras", "SettingsDir").Click     += (sender, e) => OpenSettingsDirClicked?.Invoke(sender, e);
+            menu.ItemAt("Extras", "Logs").Click            += (sender, e) => OpenLogsClicked?.Invoke(sender, e);
 
-            menu.ItemAt("Help", "Github").Click  += new EventHandler((sender, e) => ShowGithubClicked?.Invoke(sender, e));
-            menu.ItemAt("Help", "License").Click += new EventHandler((sender, e) => ShowLicenseClicked?.Invoke(sender, e));
-            menu.ItemAt("Help", "Meta").Click    += new EventHandler((sender, e) => ShowMetaPackageHelpClicked?.Invoke(sender, e));
+            menu.ItemAt("Help", "Github").Click  += (sender, e) => ShowGithubClicked?.Invoke(sender, e);
+            menu.ItemAt("Help", "License").Click += (sender, e) => ShowLicenseClicked?.Invoke(sender, e);
+            menu.ItemAt("Help", "Meta").Click    += (sender, e) => ShowMetaPackageHelpClicked?.Invoke(sender, e);
 
             StartWithSystemCheckBox = menu.ItemAt("Extras", "StartWithSystem");
         }

@@ -317,7 +317,7 @@ namespace CandyShop.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Switch to {0} &amp;packages.
+        ///   Looks up a localized string similar to Switch to {0} &amp;packages (requires restart).
         /// </summary>
         internal static string TEXT_MENU_SWITCH {
             get {

@@ -46,6 +46,27 @@ namespace CandyShop.Services
             Listeners.ForEach(listener => listener.OnSettingsChanged(CurrentSettings));
         }
 
+        public void ToggleActivePackageManager()
+        {
+            if (CurrentSettings.PackageManagers.Count != 2)
+            {
+                Log.Warning($"Cannot toggle between package managers because more than two exist.");
+                return;
+            }
+
+            foreach (var pm in CurrentSettings.PackageManagers)
+            {
+                pm.Enabled = !pm.Enabled;
+            }
+        }
+
+        public bool HaveEnabledPackageManagersChanged(SettingsDefinition newSettings)
+        {
+            var current = CurrentSettings.EnabledPackageManagers;
+            var updated = newSettings.EnabledPackageManagers;
+            return !current.Zip(updated).All(pms => pms.First.Name.Equals(pms.Second.Name));
+        }
+
         /// <exception cref="CandyShopException"></exception>
         public void OpenSettingsDirectory()
         {
@@ -257,13 +278,19 @@ namespace CandyShop.Services
 
             // ensure at least one package source is enabled
             if (settings.EnabledPackageManagers.Count == 0)
+            {
+                Log.Warning($"No package manager is enabled, defaulting to winget.");
                 settings.Winget.Enabled = true;
+            }
 
             // disable chocolatey if both are enabled
             if (settings.EnabledPackageManagers.Count > 1)
+            {
+                Log.Warning($"Too many package managers are enabled, defaulting to winget.");
                 foreach (var pm in settings.EnabledPackageManagers)
                     if (!pm.Name.Equals(settings.Winget.Name))
                         pm.Enabled = false;
+            }
 
             return settings;
         }

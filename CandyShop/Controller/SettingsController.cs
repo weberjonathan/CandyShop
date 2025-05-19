@@ -51,8 +51,8 @@ namespace CandyShop.Controller
 
             // Main view
             MainView = mainView;
-            MainView.OpenSettingsClicked += new EventHandler((sender, e) => ShowSettingsWindow());
-            MainView.OpenSettingsDirClicked += new EventHandler((sender, e) =>
+            MainView.OpenSettingsClicked += (sender, e) => ShowSettingsWindow();
+            MainView.OpenSettingsDirClicked += (sender, e) =>
             {
                 try
                 {
@@ -62,7 +62,13 @@ namespace CandyShop.Controller
                 {
                     MainView.DisplayError("Failed to open settings directory: {0}", ex.Message);
                 }
-            });
+            };
+
+            MainView.TogglePackageSourceClicked += (sender, e) =>
+            {
+                SettingsService.ToggleActivePackageManager();
+                Program.Restart(saveProperties: true);
+            };
 
             // upgrade view
             MainView.UpgradePackagesPage.CleanShortcutsChanged += new EventHandler((sender, e) => SettingsService.SetCleanShortcuts(MainView.UpgradePackagesPage.CleanShortcuts));
@@ -121,11 +127,11 @@ namespace CandyShop.Controller
                 var active = SettingsView.ActivePackageSource;
                 var binary = active switch
                 {
-                    "Winget" => SettingsView.WingetBinary,
+                    "Winget" => SettingsView?.WingetBinary,
                     "Chocolatey" => SettingsView?.ChocolateyBinary,
                     _ => throw new ArgumentException("Uknown package manager")
                 };
-                await SettingsService.ValidateActiveSource(settings); // TODO if this is changed, update packageService
+                await SettingsService.ValidateActiveSource(settings);
             }
             catch (Exception)
             {
@@ -149,6 +155,21 @@ namespace CandyShop.Controller
                     ErrorHandler.ShowError("The gsudo configuration is invalid! Please fix the path to the executable or disable gsudo.");
                     return false;
                 }
+            }
+
+            // check if restart is required
+            if (SettingsService.HaveEnabledPackageManagersChanged(settings))
+            {
+                var result = MessageBox.Show(
+                    "A restart is required to apply your settings. Press OK to restart the application.",
+                    MetaInfo.Name,
+                    MessageBoxButtons.OKCancel,
+                    MessageBoxIcon.Information,
+                    MessageBoxDefaultButton.Button1);
+                if (result != DialogResult.OK)
+                    return false;
+
+                SettingsView.FormClosed += RestartEventHandler;
             }
 
             SettingsService.UpdateSettings(settings);
