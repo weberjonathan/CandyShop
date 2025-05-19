@@ -6,7 +6,6 @@ using CandyShop.Services;
 using Serilog;
 using CandyShop.PackageCore;
 using CandyShop.Controls.Factory;
-using CandyShop.Components;
 using System.Linq;
 
 namespace CandyShop.Controller
@@ -15,15 +14,13 @@ namespace CandyShop.Controller
     {
         private readonly PackageService PackageService;
         private readonly IUiComponents ControlsFactory;
-        private readonly IPackageFilterContext PackageListSyncContext; // TODO settings listener
 
         private InstalledPage View;
 
-        public InstalledPageController(PackageService service, IUiComponents controlsFactory, IPackageFilterContext packageListSyncContext)
+        public InstalledPageController(PackageService service, IUiComponents controlsFactory)
         {
             PackageService = service;
             ControlsFactory = controlsFactory;
-            PackageListSyncContext = packageListSyncContext;
         }
 
         public void InjectView(InstalledPage view)
@@ -68,8 +65,8 @@ namespace CandyShop.Controller
         private async void SyncListView()
         {
             string filterName = View.SearchBar.Text;
-            bool hideSuffixed = PackageListSyncContext.HideSuffixedEnabled && View.SearchBar.Checked;
-            bool requireSource = PackageListSyncContext.RequireSourceEnabled && View.SearchBar.Checked;
+            bool hideSuffixed = PackageService.SupportsHideSuffixFiltering() && View.SearchBar.Checked;
+            bool requireSource = PackageService.SupportsRequireSourceFiltering() && View.SearchBar.Checked;
 
             List<GenericPackage> packages = [];
             try

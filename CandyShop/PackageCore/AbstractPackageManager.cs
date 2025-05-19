@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace CandyShop.PackageCore
@@ -32,7 +31,14 @@ namespace CandyShop.PackageCore
                 throw new ArgumentException();
         }
     }
-    
+
+    [Flags]
+    internal enum PackageManagerFilters
+    {
+        HideSuffix,
+        RequireSource
+    }
+
     internal abstract class AbstractPackageManager(string binary)
     {
         public string Binary { get; private set; } = binary;
@@ -40,6 +46,7 @@ namespace CandyShop.PackageCore
         public abstract bool SupportsFetchingOutdated { get; }
         public abstract bool RequiresNameResolution { get; }
         public abstract string Name { get; }
+        public abstract PackageManagerFilters SupportedFilters { get; }
 
         /// <summary>
         /// Validates the package manager and returns the validated version.

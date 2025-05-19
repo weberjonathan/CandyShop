@@ -17,6 +17,7 @@ namespace CandyShop.PackageCore
         public override bool RequiresNameResolution => false;
         public override bool SupportsPinningAsUser => false;
         public override string Name => "Chocolatey";
+        public override PackageManagerFilters SupportedFilters => PackageManagerFilters.HideSuffix;
 
         public int ChocoVersionMajor { get; set; } = 2;
 

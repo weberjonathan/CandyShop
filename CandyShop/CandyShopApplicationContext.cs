@@ -11,7 +11,6 @@ using Microsoft.Windows.AppNotifications;
 using System.IO;
 using CandyShop.PackageCore;
 using CandyShop.Controls.Factory;
-using CandyShop.Components;
 using System.Linq;
 using CandyShop.Settings;
 using System.Threading.Tasks;
@@ -24,6 +23,8 @@ namespace CandyShop
         public CandyShopApplicationContext(SettingsService settingsService, Arguments arguments)
         {
             Log.Information("--- Launching CandyShop ---");
+            string cwd = Directory.GetParent(Environment.ProcessPath).FullName;
+            Log.Debug($"cwd: {cwd}; elevated: {Util.IsAdmin()}; debug: {arguments.DebugEnabled}");
 
             // init views
             MainWindow mainPage = new();
@@ -42,12 +43,6 @@ namespace CandyShop
             if (showFirstStartBanner)
                 settingsController.ShowSettingsWindow(displayFirstStartBanner: true);
 
-            IPackageFilterContext packageListSyncContext = PackageFilterContextFactory.Create(settings);
-
-            //
-            string cwd = Directory.GetParent(Environment.ProcessPath).FullName;
-            Log.Debug($"cwd: {cwd}; elevated: {Util.IsAdmin()}; debug: {arguments.DebugEnabled}");
-
             // validate selected package manager
             AbstractPackageManager activePackageManager = PackageManagerFactory.Active(settings);
             try
@@ -58,6 +53,8 @@ namespace CandyShop
             {
                 // TODO how to proceed? nothign will work right? but not crash and then settings can be accessed
                 ErrorHandler.ShowError("Failed to validate selected package manager.");
+                // TODO this should show the settings window
+                // but what happens on invalid configuration? Or does the settings window only allow valid configs?
             }
 
             // validate gsudo
@@ -85,7 +82,7 @@ namespace CandyShop
 
             // init controller
             MainWindowController mainWindowController = new(packageService, windowsTaskService, controlsFactory);
-            InstalledPageController installedPageController = new(packageService, controlsFactory, packageListSyncContext);
+            InstalledPageController installedPageController = new(packageService, controlsFactory);
             UpgradePageController upgradePageController = new(packageService, controlsFactory);
             PinController pinController = new(packageService);
             PackageController packageController = new(packageService, controlsFactory);

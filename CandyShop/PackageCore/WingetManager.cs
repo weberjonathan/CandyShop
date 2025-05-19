@@ -14,6 +14,7 @@ namespace CandyShop.PackageCore
         public override bool RequiresNameResolution => true;
         public override bool SupportsPinningAsUser => true;
         public override string Name => "Winget";
+        public override PackageManagerFilters SupportedFilters => PackageManagerFilters.RequireSource;
 
         /// <exception cref="PackageManagerException"></exception>
         public override string ValidateExec()

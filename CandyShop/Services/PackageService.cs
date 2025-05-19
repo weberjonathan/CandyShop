@@ -410,6 +410,16 @@ namespace CandyShop.Services
             PackageManager.OpenLogFolder();
         }
 
+        public bool SupportsHideSuffixFiltering()
+        {
+            return PackageManager.SupportedFilters.HasFlag(PackageManagerFilters.HideSuffix);
+        }
+
+        public bool SupportsRequireSourceFiltering()
+        {
+            return PackageManager.SupportedFilters.HasFlag(PackageManagerFilters.RequireSource);
+        }
+
         private async Task UpdateCachedItem(GenericPackage package)
         {
             if (OutdatedPckgCache.ContainsKey(package.Name))
