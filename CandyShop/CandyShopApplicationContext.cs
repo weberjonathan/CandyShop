@@ -30,12 +30,14 @@ namespace CandyShop
             MainWindow mainPage = new();
             InstalledPage installedPage = mainPage.InstalledPackagesPage;
             UpgradePage upgradePage = mainPage.UpgradePackagesPage;
+            SettingsWindow settingsWindow = new();
             settingsService.RegisterListener(mainPage);
             settingsService.RegisterListener(upgradePage);
-
+            settingsService.RegisterListener(settingsWindow);
 
             // load and apply settings
             SettingsController settingsController = new(settingsService);
+            settingsController.InjectView(settingsWindow, mainPage);
             SettingsDefinition settings = settingsService.Load(out bool showFirstStartBanner);
             if (settings == null)
                 settings = settingsService.CreateSettings();
@@ -54,6 +56,7 @@ namespace CandyShop
                 ErrorHandler.ShowError("Failed to validate selected package manager.");
                 // the settings window enforces a valid configuration and restarts the program
                 settingsController.ShowSettingsWindow(displayFirstStartBanner: true, requireRestart: true);
+                // TODO hot reload instead of restart
             }
 
             // validate gsudo
@@ -90,7 +93,6 @@ namespace CandyShop
             mainWindowController.InjectView(mainPage);
             pinController.InjectView(installedPage, upgradePage);
             packageController.InjectViews(mainPage, upgradePage, installedPage);
-            settingsController.InjectView(mainPage);
 
             // declare notification handler, so if needed, it lives during the entire lifecycle
             NotificationShowHandler notifificationHandler;

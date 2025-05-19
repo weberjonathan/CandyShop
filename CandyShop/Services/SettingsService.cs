@@ -62,12 +62,6 @@ namespace CandyShop.Services
             }
         }
 
-        // TODO remove this and use OnSettingsChanged to update settings view
-        public SettingsDefinition GetCurrentSettings()
-        {
-            return CurrentSettings;
-        }
-
         public void UpdateSettings(SettingsDefinition settings)
         {
             CurrentSettings = settings;

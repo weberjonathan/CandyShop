@@ -22,35 +22,10 @@ namespace CandyShop.Controller
             SettingsService = settingsService;
         }
 
-        public void InjectView(MainWindow mainView)
+        public void InjectView(SettingsWindow settingsView, MainWindow mainView)
         {
-            MainView = mainView;
-
-            MainView.OpenSettingsClicked += new EventHandler((sender, e) => ShowSettingsWindow());
-            MainView.OpenSettingsDirClicked += new EventHandler((sender, e) =>
-            {
-                try
-                {
-                    SettingsService.OpenSettingsDirectory();
-                }
-                catch (CandyShopException ex)
-                {
-                    MainView.DisplayError("Failed to open settings directory: {0}", ex.Message);
-                }
-            });
-
-            // TODO inject upgrade page I guess
-            MainView.UpgradePackagesPage.CleanShortcutsChanged += new EventHandler((sender, e) => SettingsService.SetCleanShortcuts(MainView.UpgradePackagesPage.CleanShortcuts));
-            MainView.UpgradePackagesPage.CloseAfterUpgradeChanged += new EventHandler((sender, e) => SettingsService.SetCloseAfterUpgrade(MainView.UpgradePackagesPage.CloseAfterUpgrade));
-        }
-
-        public void ShowSettingsWindow(bool displayFirstStartBanner = false, bool requireRestart = false)
-        {
-            SettingsView = new SettingsWindow
-            {
-                DisplayFirstStartBanner = displayFirstStartBanner
-            };
-
+            // Settings view
+            SettingsView = settingsView;
             SettingsView.OkClicked += async (sender, e) =>
             {
                 SettingsView.Locked = true;
@@ -70,27 +45,38 @@ namespace CandyShop.Controller
                 SettingsView.Locked = false;
             };
 
-            SettingsView.FormClosed += (sender, e) =>
-            {
-                SettingsView.Dispose();
-                SettingsView = null;
-                if (requireRestart)
-                    Program.Restart();
-            };
-
             SettingsView.WingetBinaryChanged += OnWingetBinaryChanged;
             SettingsView.ChocolateyBinaryChanged += OnChocolateyBinaryChanged;
             SettingsView.GSudoBinaryChanged += OnGsudoBinaryChanged;
 
-            // update view with current settings
-            var settings = SettingsService.GetCurrentSettings();
-            SettingsView.ActivePackageSource = settings.EnabledPackageManagers.First().Name;
-            SettingsView.WingetBinary = settings.Winget.Filepath;
-            SettingsView.ChocolateyBinary = settings.Chocolatey.Filepath;
-            SettingsView.GSudoBinary = settings.Gsudo.Filepath;
-            SettingsView.UpgradeAsAdmin = settings.EnabledPackageManagers.First().UpgradeAsAdmin;
-            SettingsView.EnableGsudo = settings.Gsudo.Enabled;
-            SettingsView.CacheAdminPrivileges = settings.Gsudo.CachePrivileges;
+            // Main view
+            MainView = mainView;
+            MainView.OpenSettingsClicked += new EventHandler((sender, e) => ShowSettingsWindow());
+            MainView.OpenSettingsDirClicked += new EventHandler((sender, e) =>
+            {
+                try
+                {
+                    SettingsService.OpenSettingsDirectory();
+                }
+                catch (CandyShopException ex)
+                {
+                    MainView.DisplayError("Failed to open settings directory: {0}", ex.Message);
+                }
+            });
+
+            // upgrade view
+            MainView.UpgradePackagesPage.CleanShortcutsChanged += new EventHandler((sender, e) => SettingsService.SetCleanShortcuts(MainView.UpgradePackagesPage.CleanShortcuts));
+            MainView.UpgradePackagesPage.CloseAfterUpgradeChanged += new EventHandler((sender, e) => SettingsService.SetCloseAfterUpgrade(MainView.UpgradePackagesPage.CloseAfterUpgrade));
+        }
+
+        public void ShowSettingsWindow(bool displayFirstStartBanner = false, bool requireRestart = false)
+        {
+            SettingsView.DisplayFirstStartBanner = displayFirstStartBanner;
+
+            if (requireRestart)
+                SettingsView.FormClosed += RestartEventHandler;
+            else
+                SettingsView.FormClosed -= RestartEventHandler;
 
             SettingsView.ShowDialog();
         }
@@ -247,6 +233,11 @@ namespace CandyShop.Controller
             }
 
             SettingsView?.SetGSudoBinaryStatus(status);
+        }
+
+        private void RestartEventHandler(object sender, EventArgs e)
+        {
+            Program.Restart();
         }
 
         private SettingsDefinition BuildPartialSettingsFromView()

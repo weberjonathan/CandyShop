@@ -3,7 +3,6 @@ using System.Linq;
 using System.Windows.Forms;
 using CandyShop.Controls;
 using CandyShop.Controls.Factory;
-using CandyShop.Properties;
 using CandyShop.Settings;
 
 namespace CandyShop.View

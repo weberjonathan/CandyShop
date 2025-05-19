@@ -1,10 +1,12 @@
-﻿using System;
+﻿using CandyShop.Settings;
+using System;
+using System.Linq;
 using System.Security;
 using System.Windows.Forms;
 
 namespace CandyShop.View
 {
-    public partial class SettingsWindow : Form
+    partial class SettingsWindow : Form, ISettingsListener
     {
         public string ActivePackageSource
         {
@@ -153,6 +155,17 @@ namespace CandyShop.View
         public void SetGSudoBinaryStatus(string status)
         {
             lblGSudoStatus.Text = status;
+        }
+
+        public void OnSettingsChanged(SettingsDefinition settings)
+        {
+            ActivePackageSource = settings.EnabledPackageManagers.First().Name;
+            WingetBinary = settings.Winget.Filepath;
+            ChocolateyBinary = settings.Chocolatey.Filepath;
+            GSudoBinary = settings.Gsudo.Filepath;
+            UpgradeAsAdmin = settings.EnabledPackageManagers.First().UpgradeAsAdmin;
+            EnableGsudo = settings.Gsudo.Enabled;
+            CacheAdminPrivileges = settings.Gsudo.CachePrivileges;
         }
 
         private void UpdateBinaryTextbox(TextBox target, EventHandler handler, string title)
