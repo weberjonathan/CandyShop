@@ -38,8 +38,12 @@ namespace CandyShop.PackageCore
             Output = output;
             ExitCode = proc.ExitCode;
 
-            var stderr = proc.StandardError.ReadToEnd();
-            Log.Debug($"Process \"{Binary} {Arguments}\" finished with {ExitCode}. Stdout:\n{Output}\nStderr:\n{stderr}");
+            string stdout = $"Stdout:\n{Output}";
+            string stderr = proc.StandardError.ReadToEnd().Trim();
+            if (!stderr.Equals(""))
+                stderr = $"\nStderr:\n{stderr}";
+
+            Log.Debug($"Process \"{Binary} {Arguments}\" finished with {ExitCode}. {stdout}{stderr}");
         }
 
         public void Execute()
