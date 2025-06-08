@@ -275,6 +275,20 @@ namespace CandyShop.PackageCore
                     })
                     .ToArray();
             }
+            else if (cols.Length == 6)
+            {
+                // sometimes a 6th empty column with name 'type' was observed
+                return parser.Items
+                    .Select(row => new GenericPackage()
+                    {
+                        Name = row[0],
+                        Id = row[1],
+                        CurrVer = row[2],
+                        Source = row[3],
+                        Pinned = true
+                    })
+                    .ToArray();
+            }
             else
             {
                 Log.Debug($"WingetManager [{Environment.CurrentManagedThreadId}]: Column layout is '{string.Join(", ", cols)}'");
