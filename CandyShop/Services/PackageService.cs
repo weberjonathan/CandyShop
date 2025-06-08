@@ -126,24 +126,30 @@ namespace CandyShop.Services
 
                         // fetch and resolve pinned packages
                         var pinned = (await fetchPinned).ToList();
+                        Log.Debug($"Pinned packages: {string.Join(" ", (pinned.Select(package => $"{{{package.Id}, {package.Name}}}")))}");
                         if (PackageManager.RequiresNameResolution)
                         {
                             var unresolved = RemoveUnresolvedPackages(pinned);
                             var resolved = await PackageManager.ResolveAbbreviatedNamesAsync(unresolved);
                             pinned.AddRange(resolved);
                         }
+                        Log.Debug($"Pinned packages after resolve: {string.Join(" ", (pinned.Select(package => $"{{{package.Id}, {package.Name}}}")))}");
 
                         // fetch and resolve outdated packages
                         outdated = (await fetchOutdated).ToList();
+                        Log.Debug($"Outdaded packages: {string.Join(" ", (outdated.Select(package => $"{{{package.Id}, {package.Name}}}")))}");
                         if (PackageManager.RequiresNameResolution)
                         {
                             var unresolved = RemoveUnresolvedPackages(outdated);
                             var resolved = await PackageManager.ResolveAbbreviatedNamesAsync(unresolved);
                             outdated.AddRange(resolved);
                         }
+                        Log.Debug($"Outdaded packages after resolve: {string.Join(" ", (outdated.Select(package => $"{{{package.Id}, {package.Name}}}")))}");
+
 
                         // merge pin info
                         var pinnedNames = pinned.Select(package => package.Name).ToImmutableHashSet();
+                        Log.Debug($"PinnedNames: {string.Join(" ", pinnedNames)}");
                         outdated.ForEach(package =>
                         {
                             package.Pinned = pinnedNames.Contains(package.Name);

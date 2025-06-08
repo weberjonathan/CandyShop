@@ -55,7 +55,9 @@ namespace CandyShop.Controller
             {
                 Log.Error(LocaleEN.ERROR_RETRIEVING_OUTDATED_PACKAGES, e.Message);
             }
+
             outdated ??= [];
+            Log.Debug($"Pinned packages [Controller]: {string.Join(" ", (outdated.Select(package => $"{{{package.Id}, {package.Name}, {package.Pinned}}}")))}");
             UpgradePage.ClearPackages();
             UpgradePage.AddPackages(outdated.Select(ControlsFactory.BuildUpgradeItem).ToList());
 

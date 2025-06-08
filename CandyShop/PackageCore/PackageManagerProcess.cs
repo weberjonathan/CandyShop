@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using Serilog;
+using System.Diagnostics;
 using System.Text;
 
 namespace CandyShop.PackageCore
@@ -24,6 +25,7 @@ namespace CandyShop.PackageCore
             ProcessStartInfo procInfo = new(Binary, Arguments)
             {
                 RedirectStandardOutput = true,
+                RedirectStandardError = true,
                 UseShellExecute = false,
                 CreateNoWindow = true,
                 StandardOutputEncoding = Encoding.Default
@@ -35,6 +37,9 @@ namespace CandyShop.PackageCore
             
             Output = output;
             ExitCode = proc.ExitCode;
+
+            var stderr = proc.StandardError.ReadToEnd();
+            Log.Debug($"Process \"{Binary} {Arguments}\" finished with {ExitCode}. Stdout:\n{Output}\nStderr:\n{stderr}");
         }
 
         public void Execute()

@@ -24,9 +24,9 @@ namespace CandyShop.PackageCore
             {
                 p.ExecuteHidden();
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                throw new PackageManagerException("Failed to execute Chocolatey.");
+                throw new PackageManagerException("Failed to execute Chocolatey.", e);
             }
 
             if (p.ExitCode != 0)
