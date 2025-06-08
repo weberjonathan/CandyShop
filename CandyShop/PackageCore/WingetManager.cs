@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace CandyShop.PackageCore
 {
-    internal class WingetManager(string binary) : AbstractPackageManager(binary)
+    internal class WingetManager(string binary, string gsudoBinary, List<int> validExitCodesOnUpgrade) : AbstractPackageManager(binary, gsudoBinary, validExitCodesOnUpgrade)
     {
         public override bool SupportsFetchingOutdated => true;
         public override bool RequiresNameResolution => true;
@@ -82,7 +82,7 @@ namespace CandyShop.PackageCore
                 catch (Exception e)
                 {
                     Log.Error($"Winget upgrade process \"{p.Binary} {p.Arguments}\" failed with exit code {p.ExitCode}: {e.Message}");
-                    nonZeroExitCodes.Add(-1);
+                    nonZeroExitCodes.Add(p.ExitCode);
                 }
             }
 
@@ -94,7 +94,11 @@ namespace CandyShop.PackageCore
                 DisableGsudoCache();
 
             if (nonZeroExitCodes.Count > 0)
-                throw new PackageManagerException($"One or more winget upgrade processes failed with exit codes {string.Join(", ", nonZeroExitCodes)}. See log for more information.");
+            {
+                var nonValid = nonZeroExitCodes.Where(exitCode => !ValidExitCodesOnUpgrade.Contains(exitCode));
+                if (nonValid.Any())
+                    throw new PackageManagerException($"One or more winget upgrade processes failed with exit codes {string.Join(", ", nonValid)}. See log for more information.");
+            }
         }
 
         public override async Task<GenericPackage[]> ResolveAbbreviatedNamesAsync(List<GenericPackage> unresolved)

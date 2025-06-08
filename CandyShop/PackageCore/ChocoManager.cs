@@ -11,20 +11,19 @@ namespace CandyShop.PackageCore
 {
     internal class ChocoManager : AbstractPackageManager
     {
-        private readonly List<int> ValidExitCodesOnUpgrade;
-
         public override bool SupportsFetchingOutdated => true;
         public override bool RequiresNameResolution => false;
         public override bool SupportsPinningAsUser => false;
         public override string Name => "Chocolatey";
         public override PackageManagerFilters SupportedFilters => PackageManagerFilters.HideSuffix;
 
-        public int ChocoVersionMajor { get; set; } = 2;
+        public int? ChocoVersionMajor { get; private set; } = null;
 
-        public ChocoManager(int chocoVersionMajor, List<int> validExitCodesOnUpgrade, string binary) : base(binary)
+        public ChocoManager(string binary, string gsudoBinary, List<int> validExitCodesOnUpgrade) : base(binary, gsudoBinary, validExitCodesOnUpgrade) { }
+
+        public ChocoManager(string binary, string gsudoBinary, List<int> validExitCodesOnUpgrade, int chocoVersionMajor) : base(binary, gsudoBinary, validExitCodesOnUpgrade)
         {
             ChocoVersionMajor = chocoVersionMajor;
-            ValidExitCodesOnUpgrade = validExitCodesOnUpgrade;
         }
 
         /// <exception cref="PackageManagerException"></exception>
@@ -132,6 +131,10 @@ namespace CandyShop.PackageCore
             Log.Information("Fetching installed packages from Chocolatey");
 
             List<GenericPackage> packages = [];
+
+            // read version if necessary
+            if (ChocoVersionMajor == null)
+                ValidateExec();
 
             // launch process
             var args = ChocoVersionMajor < 2 ? "list --local-only" : "list";

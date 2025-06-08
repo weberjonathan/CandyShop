@@ -11,14 +11,17 @@ namespace CandyShop.PackageCore
         public static AbstractPackageManager Chocolatey(SettingsDefinition settings)
         {
             return new ChocoManager(
-                2, // TODO
-                settings.Chocolatey.ValidExitCodes,
-                settings.Chocolatey.Filepath);
+                settings.Chocolatey.Filepath,
+                settings.Gsudo.Filepath,
+                settings.Chocolatey.ValidExitCodes);
         }
 
         public static AbstractPackageManager Winget(SettingsDefinition settings)
         {
-            return new WingetManager(settings.Winget.Filepath);
+            return new WingetManager(
+                settings.Winget.Filepath,
+                settings.Gsudo.Filepath,
+                settings.Winget.ValidExitCodes);
         }
 
         public static AbstractPackageManager Active(SettingsDefinition settings)
@@ -39,14 +42,17 @@ namespace CandyShop.PackageCore
         RequireSource
     }
 
-    internal abstract class AbstractPackageManager(string binary)
+    internal abstract class AbstractPackageManager(string binary, string gsudoBinary, List<int> validExitCodesOnUpgrade)
     {
         public string Binary { get; private set; } = binary;
+        public string GsudoBinary { get; private set; } = gsudoBinary;
         public abstract bool SupportsPinningAsUser { get; }
         public abstract bool SupportsFetchingOutdated { get; }
         public abstract bool RequiresNameResolution { get; }
         public abstract string Name { get; }
         public abstract PackageManagerFilters SupportedFilters { get; }
+
+        protected List<int> ValidExitCodesOnUpgrade { get; private set; } = validExitCodesOnUpgrade;
 
         /// <summary>
         /// Validates the package manager and returns the validated version.
@@ -130,7 +136,7 @@ namespace CandyShop.PackageCore
         {
             Process p = new()
             {
-                StartInfo = new("gsudo", $"cache on -p {Environment.ProcessId}")
+                StartInfo = new(GsudoBinary, $"cache on -p {Environment.ProcessId}")
                 {
                     UseShellExecute = false,
                     CreateNoWindow = true,
@@ -156,7 +162,7 @@ namespace CandyShop.PackageCore
         {
             Process p = new()
             {
-                StartInfo = new("gsudo", $"cache off -p {Environment.ProcessId}")
+                StartInfo = new(GsudoBinary, $"cache off -p {Environment.ProcessId}")
                 {
                     UseShellExecute = false,
                     CreateNoWindow = true,
@@ -179,7 +185,7 @@ namespace CandyShop.PackageCore
 
         protected virtual PackageManagerProcess BuildProcess(string args, bool useGsudo = false)
         {
-            return useGsudo ? new("gsudo", $"{Binary} {args}") : new(Binary, args);
+            return useGsudo ? new(GsudoBinary, $"{Binary} {args}") : new(Binary, args);
         }
     }
 }
