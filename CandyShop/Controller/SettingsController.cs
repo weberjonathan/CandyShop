@@ -75,16 +75,11 @@ namespace CandyShop.Controller
             MainView.UpgradePackagesPage.CloseAfterUpgradeChanged += new EventHandler((sender, e) => SettingsService.SetCloseAfterUpgrade(MainView.UpgradePackagesPage.CloseAfterUpgrade));
         }
 
-        public void ShowSettingsWindow(bool displayFirstStartBanner = false, bool requireRestart = false)
+        public bool ShowSettingsWindow(bool displayFirstStartBanner = false)
         {
             SettingsView.DisplayFirstStartBanner = displayFirstStartBanner;
-
-            if (requireRestart)
-                SettingsView.FormClosed += RestartEventHandler;
-            else
-                SettingsView.FormClosed -= RestartEventHandler;
-
-            SettingsView.ShowDialog();
+            DialogResult result = SettingsView.ShowDialog();
+            return result.Equals(DialogResult.OK);
         }
 
         private async Task<bool> ApplySettings()

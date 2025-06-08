@@ -43,7 +43,13 @@ namespace CandyShop
                 settings = settingsService.CreateSettings();
 
             if (showFirstStartBanner)
-                settingsController.ShowSettingsWindow(displayFirstStartBanner: true);
+            {
+                bool wasNotAborted = settingsController.ShowSettingsWindow(displayFirstStartBanner: true);
+                if (!wasNotAborted)
+                    Program.Exit(saveProperties: false);
+            }
+
+            // TODO fix the invalid config active loop
 
             // validate selected package manager
             AbstractPackageManager activePackageManager = PackageManagerFactory.Active(settings);
@@ -53,10 +59,14 @@ namespace CandyShop
             }
             catch (Exception)
             {
-                ErrorHandler.ShowError("Failed to validate selected package manager.");
-                // the settings window enforces a valid configuration and restarts the program
-                settingsController.ShowSettingsWindow(displayFirstStartBanner: true, requireRestart: true);
+                // give opportunity to fix the settings and restart, or abort and exit
                 // TODO hot reload instead of restart
+                ErrorHandler.ShowError("Failed to validate selected package manager.");
+                bool wasNotAborted = settingsController.ShowSettingsWindow(displayFirstStartBanner: true);
+                if (wasNotAborted)
+                    Program.Restart(true);
+                else
+                    Program.Exit(saveProperties: false);
             }
 
             // validate gsudo

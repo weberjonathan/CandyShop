@@ -33,7 +33,7 @@ namespace CandyShop.Settings
                 Name = "Chocolatey",
                 Enabled = false,
                 UpgradeAsAdmin = true,
-                Filepath = "chocolatey",
+                Filepath = "choco",
                 ValidExitCodes = [0, 1641, 3010, 350, 1604]
             };
         }
