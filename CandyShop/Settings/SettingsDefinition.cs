@@ -44,6 +44,8 @@ namespace CandyShop.Settings
         public bool Enabled { get; set; }
         public string Filepath { get; set; }
         public bool CachePrivileges { get; set; }
+        public bool OverwriteCacheDuration { get; set; } = false;
+        public int CacheDurationInSeconds { get; set; } = 5*60;
     }
 
     internal class SettingsDefinition
@@ -72,7 +74,9 @@ namespace CandyShop.Settings
         {
             Enabled = true,
             Filepath = "gsudo",
-            CachePrivileges = false
+            CachePrivileges = false,
+            CacheDurationInSeconds = 5*60,
+            OverwriteCacheDuration = false,
         };
 
         public bool CleanShortcuts { get; set; } = false;

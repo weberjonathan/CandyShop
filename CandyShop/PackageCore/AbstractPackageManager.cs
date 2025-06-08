@@ -1,4 +1,5 @@
 ﻿using CandyShop.Settings;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -21,7 +22,8 @@ namespace CandyShop.PackageCore
             return new WingetManager(
                 settings.Winget.Filepath,
                 settings.Gsudo.Filepath,
-                settings.Winget.ValidExitCodes);
+                settings.Winget.ValidExitCodes,
+                settings.Gsudo.OverwriteCacheDuration ? settings.Gsudo.CacheDurationInSeconds : null);
         }
 
         public static AbstractPackageManager Active(SettingsDefinition settings)
@@ -42,10 +44,11 @@ namespace CandyShop.PackageCore
         RequireSource
     }
 
-    internal abstract class AbstractPackageManager(string binary, string gsudoBinary, List<int> validExitCodesOnUpgrade)
+    internal abstract class AbstractPackageManager(string binary, string gsudoBinary, List<int> validExitCodesOnUpgrade, int? gsudoCacheDuration = null)
     {
         public string Binary { get; private set; } = binary;
         public string GsudoBinary { get; private set; } = gsudoBinary;
+        public int? GsudoCacheDuration { get; private set; } = gsudoCacheDuration;
         public abstract bool SupportsPinningAsUser { get; }
         public abstract bool SupportsFetchingOutdated { get; }
         public abstract bool RequiresNameResolution { get; }
@@ -134,14 +137,28 @@ namespace CandyShop.PackageCore
         /// <exception cref="CandyShopException"></exception>
         protected void InitGsudoCache()
         {
+            // TODO move this to some gsudo class that handles everything gsudo or everything gsudo cache session
+            string argCacheDuration = "";
+            if (GsudoCacheDuration != null)
+            {
+                if (GsudoCacheDuration.Value == -1)
+                    argCacheDuration = $" -d -1";
+                else
+                {
+                    var duration = TimeSpan.FromSeconds(GsudoCacheDuration.Value);
+                    argCacheDuration = $" -d {(int)Math.Floor(duration.TotalHours)}:{duration.Minutes}:{duration.Seconds}";
+                }
+            }
+
             Process p = new()
             {
-                StartInfo = new(GsudoBinary, $"cache on -p {Environment.ProcessId}")
+                StartInfo = new(GsudoBinary, $"cache on -p {Environment.ProcessId}{argCacheDuration}")
                 {
                     UseShellExecute = false,
                     CreateNoWindow = true,
                 }
             };
+            Log.Debug($"GsudoCacheSession: Starting {p.StartInfo.FileName} {p.StartInfo.Arguments}");
 
             try
             {

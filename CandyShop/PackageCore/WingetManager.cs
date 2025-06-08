@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace CandyShop.PackageCore
 {
-    internal class WingetManager(string binary, string gsudoBinary, List<int> validExitCodesOnUpgrade) : AbstractPackageManager(binary, gsudoBinary, validExitCodesOnUpgrade)
+    internal class WingetManager(string binary, string gsudoBinary, List<int> validExitCodesOnUpgrade, int? gsudoCacheDuration = null) : AbstractPackageManager(binary, gsudoBinary, validExitCodesOnUpgrade, gsudoCacheDuration)
     {
         public override bool SupportsFetchingOutdated => true;
         public override bool RequiresNameResolution => true;
