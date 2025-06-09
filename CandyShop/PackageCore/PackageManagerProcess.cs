@@ -28,7 +28,7 @@ namespace CandyShop.PackageCore
                 RedirectStandardError = true,
                 UseShellExecute = false,
                 CreateNoWindow = true,
-                StandardOutputEncoding = Encoding.Default
+                StandardOutputEncoding = Encoding.UTF8
             };
 
             Process proc = Process.Start(procInfo);

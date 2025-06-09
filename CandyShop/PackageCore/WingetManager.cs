@@ -168,7 +168,7 @@ namespace CandyShop.PackageCore
             p.ExecuteHidden();
             ThrowOnError(p);
 
-            var output = WingetTableParser.TrimProgressChars(p.Output);
+            var output = WingetParser.LeftTrimProgressChars(p.Output);
 
             // trim the first word because it is a status indicator (like "found")
             var offset = output.IndexOf(' ') + 1;

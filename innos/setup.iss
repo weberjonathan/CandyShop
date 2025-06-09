@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "Candy Shop"
-#define MyAppVersion "0.12.0-beta3"
+#define MyAppVersion "0.12.0-beta4"
 #define MyAppPublisher "Jonathan Weber"
 #define MyAppURL "https://github.com/weberjonathan/CandyShop"
 #define MyAppExeName "CandyShop.exe"

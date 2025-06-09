@@ -1,7 +1,9 @@
-﻿using System;
+﻿using Serilog;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Unicode;
 
 namespace CandyShop.PackageCore
 {
@@ -35,8 +37,11 @@ namespace CandyShop.PackageCore
 
         public WingetTableParser(string output)
         {
-            output = TrimProgressChars(output);
             var _output = new Queue<string>(output.Split(Environment.NewLine));
+
+            // monitor occurence of unicode chars
+            if (output.Any(c => UnicodeRanges.BlockElements.Contains(c)))
+                Log.Debug($"WingetParser: Encountered unicode block characters in output.");
 
             // read all output; may contain multiple tables
             List<WingetTable> tables = [];
@@ -68,6 +73,10 @@ namespace CandyShop.PackageCore
             }
         }
 
+        /// <summary>
+        /// Discards rows from the queue until a table is identified by its divider
+        /// and returns a new empty table with column names and offsets
+        /// </summary>
         private WingetTable LookForTable(Queue<string> output)
         {
             if (!output.TryDequeue(out string tableHead))
@@ -78,8 +87,8 @@ namespace CandyShop.PackageCore
             {
                 if (!string.IsNullOrEmpty(divider) && divider.All(c => c.Equals('-')))
                 {
-                    tableHead = TrimProgressChars(tableHead); // see WingetParserTest.Constructor_ParsePinnedSomeText_CheckResult()
-                    var columns = ParseTableHead(tableHead);
+                    tableHead = WingetParser.LeftTrimProgressChars(tableHead);
+                    WingetColumn[] columns = ParseTableHead(tableHead);
                     return new WingetTable(columns);
                 }
 
@@ -89,6 +98,10 @@ namespace CandyShop.PackageCore
             return null;
         }
 
+        /// <summary>
+        /// Reads rows from the queue and adds them to the table
+        /// until the format changes or end of queue.
+        /// </summary>
         private WingetTable ReadTableContent(Queue<string> output, WingetTable table)
         {
             while (output.TryDequeue(out string tableRow))
@@ -112,12 +125,8 @@ namespace CandyShop.PackageCore
         }
 
         /// <summary>
-        /// Parse column names and their offsets in the winget table output
-        /// from the table header, which is expected to contain the column
-        /// names separated by multiple whitespaces.
+        /// Reads column names and column offsets from a winget table heading
         /// </summary>
-        /// <param name="tableHead"></param>
-        /// <returns></returns>
         private WingetColumn[] ParseTableHead(string tableHead)
         {
             List<WingetColumn> columns = [];
@@ -157,12 +166,12 @@ namespace CandyShop.PackageCore
             if (isReadingName)
                 columns.Add(new WingetColumn(currentColName.ToString(), currentColOffset));
 
-            // TODO test with saved output -> prolly want to call remove progress chars again to be sure
-            //         -> the testfile would have to be changed so that there are no \r\n for the progress chars
-
             return columns.ToArray();
         }
 
+        /// <summary>
+        /// Reads items in row based on column offsets
+        /// </summary>
         private string[] ParseTableRow(WingetColumn[] columns, string row)
         {
             string[] items = new string[columns.Length];
@@ -182,19 +191,6 @@ namespace CandyShop.PackageCore
             }
 
             return items;
-        }
-
-        public static string TrimProgressChars(string value)
-        {
-            if (string.IsNullOrEmpty(value))
-                return value;
-
-            int i = 0;
-            while (i < value.Length && !char.IsLetterOrDigit(value[i]))
-            {
-                i++;
-            }
-            return value[i..];
         }
     }
 }
