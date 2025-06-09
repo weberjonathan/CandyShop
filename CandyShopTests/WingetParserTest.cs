@@ -27,7 +27,7 @@ namespace CandyShopTests
             "                                                                                                                        \r" +
             "Es sind keine Pins konfiguriert.\r\n";
 
-            var parser = new WingetParser(wingetOutput);
+            var parser = new WingetTableParser(wingetOutput);
             Assert.False(parser.HasTable);
             Assert.Empty(parser.Columns);
             Assert.Empty(parser.Items);
@@ -72,7 +72,7 @@ namespace CandyShopTests
                 "Stecknadeltyp"
             ];
 
-            var parser = new WingetParser(wingetOutput);
+            var parser = new WingetTableParser(wingetOutput);
             Assert.True(parser.HasTable);
             Assert.Equal(expectedCols, parser.Columns);
             Assert.Equal(7, parser.Items.Length);
@@ -132,7 +132,7 @@ namespace CandyShopTests
                 "Stecknadeltyp"
             ];
 
-            var parser = new WingetParser(wingetOutput);
+            var parser = new WingetTableParser(wingetOutput);
             Assert.True(parser.HasTable);
             Assert.Equal(expectedCols, parser.Columns);
             Assert.Equal(7, parser.Items.Length);
@@ -469,7 +469,7 @@ namespace CandyShopTests
                 "Quelle"
             ];
 
-            var parser = new WingetParser(wingetOutput);
+            var parser = new WingetTableParser(wingetOutput);
             Assert.True(parser.HasTable);
             Assert.Equal(expectedCols, parser.Columns);
             Assert.Equal(302, parser.Items.Length);
@@ -519,7 +519,7 @@ namespace CandyShopTests
                 "Quelle"
             ];
 
-            var parser = new WingetParser(wingetOutput);
+            var parser = new WingetTableParser(wingetOutput);
             Assert.True(parser.HasTable);
             Assert.Equal(expectedCols, parser.Columns);
             Assert.Equal(10, parser.Items.Length);
@@ -572,7 +572,7 @@ namespace CandyShopTests
                 "Quelle"
             ];
 
-            var parser = new WingetParser(wingetOutput);
+            var parser = new WingetTableParser(wingetOutput);
             Assert.True(parser.HasTable);
             Assert.Equal(expectedCols, parser.Columns);
             Assert.Equal(10, parser.Items.Length);

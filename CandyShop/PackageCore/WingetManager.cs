@@ -168,7 +168,7 @@ namespace CandyShop.PackageCore
             p.ExecuteHidden();
             ThrowOnError(p);
 
-            var output = WingetParser.TrimProgressChars(p.Output);
+            var output = WingetTableParser.TrimProgressChars(p.Output);
 
             // trim the first word because it is a status indicator (like "found")
             var offset = output.IndexOf(' ') + 1;
@@ -186,7 +186,7 @@ namespace CandyShop.PackageCore
             ThrowOnError(p);
 
             // parse and validate
-            WingetParser parser = new(p.Output);
+            WingetTableParser parser = new(p.Output);
             string[] cols = parser.Columns;
             if (parser.HasTable && cols.Length != 4 && cols.Length != 5)
             {
@@ -213,7 +213,7 @@ namespace CandyShop.PackageCore
             ThrowOnError(p);
 
             // parse and validate
-            WingetParser parser = new(p.Output);
+            WingetTableParser parser = new(p.Output);
             string[] cols = parser.Columns;
             if (parser.HasTable && cols.Length != 5)
             {
@@ -237,7 +237,7 @@ namespace CandyShop.PackageCore
             ThrowOnError(p);
 
             // parse and validate
-            WingetParser parser = new(p.Output);
+            WingetTableParser parser = new(p.Output);
             string[] cols = parser.Columns;
 
             // build package list depending on available info

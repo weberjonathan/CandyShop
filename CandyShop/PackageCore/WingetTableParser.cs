@@ -25,7 +25,7 @@ namespace CandyShop.PackageCore
         }
     }
 
-    public class WingetParser
+    public class WingetTableParser
     {
         public string[] Columns { get; private set; } = [];
 
@@ -33,7 +33,7 @@ namespace CandyShop.PackageCore
 
         public bool HasTable => Columns.Length > 0 && Items.Length > 0;
 
-        public WingetParser(string output)
+        public WingetTableParser(string output)
         {
             output = TrimProgressChars(output);
             var _output = new Queue<string>(output.Split(Environment.NewLine));
