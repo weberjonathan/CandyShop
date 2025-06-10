@@ -1,6 +1,4 @@
 # Candy Shop
-![CandyShop Example](/docs/example.jpg)
-<img src="/docs/upgrade.jpg" alt="upgrade view" height="233px"/>
 
 _Candy Shop_ offers a simple user interface to upgrade any number
 of packages installed through either
@@ -10,6 +8,8 @@ can be launched directly from the notification or for a selection
 of packages from the application window. The upgrades are performed
 in a visible terminal, allowing the user to inspect the package
 manager's output directly.
+
+<div align="center"><img src="/docs/showcase.jpg" alt="upgrade view" /></div>
 
 __[Visit the gallery.](/docs/gallery.md)__
 
